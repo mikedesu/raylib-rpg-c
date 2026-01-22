@@ -18,7 +18,6 @@ private:
     bool stop_on_last_frame;
     bool is_animating;
     Rectangle src;
-    Rectangle dest;
 
 public:
     sprite() {
@@ -42,7 +41,7 @@ public:
         // the width is the current frame times the width of the sprite
         src = Rectangle{
             static_cast<float>(currentframe * width), static_cast<float>(currentcontext * height), static_cast<float>(width), static_cast<float>(height)};
-        dest = Rectangle{0, 0, 0, 0};
+        //dest = Rectangle{0, 0, 0, 0};
     }
 
     ~sprite() {
@@ -116,20 +115,12 @@ public:
         return texture;
     }
 
-    Rectangle get_dest() {
-        return dest;
-    }
-
     Rectangle get_src() {
         return src;
     }
 
     void set_src(Rectangle r) {
         src = r;
-    }
-
-    void set_dest(Rectangle r) {
-        dest = r;
     }
 
     void set_src_x(float x) {
@@ -155,15 +146,14 @@ public:
     void set_stop_on_last_frame(bool b) {
         stop_on_last_frame = b;
     }
-};
 
-static inline void sprite_setcontext2(std::shared_ptr<sprite> s, int ctx) {
-    massert(s, "sprite_setcontext2: sprite is NULL");
-    const int nc = s->get_numcontexts();
-    massert(ctx >= 0, "sprite_setcontext2: context is less than 0: %d", ctx);
-    massert(ctx < nc, "sprite_setcontext2: context is greater than numcontexts: %d < %d", ctx, nc);
-    s->set_currentcontext(ctx % nc);
-    s->set_src_y(s->get_height() * s->get_currentcontext());
-    s->set_currentframe(0);
-    s->set_src_x(0);
-}
+    void set_context(int ctx) {
+        //const int nc = numcontexts;
+        massert(ctx >= 0, "set_context: ctx is less than 0: %d", ctx);
+        massert(ctx < numcontexts, "set_context: ctx is greater than numcontexts: %d < %d", ctx, numcontexts);
+        currentcontext = ctx % numcontexts;
+        src.y = height * currentcontext;
+        currentframe = 0;
+        src.x = 0;
+    }
+};

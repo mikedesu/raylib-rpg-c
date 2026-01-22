@@ -96,7 +96,7 @@ static inline void spritegroup_setcontexts(spritegroup_t* sg, int context) {
         auto s = sg->sprites2->at(i);
         if (!s || s->get_numcontexts() <= 0 || context < 0 || context >= s->get_numcontexts())
             continue;
-        sprite_setcontext2(s, context);
+        s->set_context(context);
     }
 }
 
