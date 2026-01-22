@@ -38,9 +38,8 @@ static inline void libdraw_update_sprite_context_ptr(gamestate& g, spritegroup* 
           : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_R_U  ? SPRITEGROUP_CONTEXT_L_U
           : dir == DIR_LEFT && ctx == SPRITEGROUP_CONTEXT_L_U  ? SPRITEGROUP_CONTEXT_L_U
                                                                : old_ctx;
-    if (ctx != old_ctx)
-        g.frame_dirty = true;
-    spritegroup_setcontexts(group, ctx);
+    if (ctx != old_ctx) g.frame_dirty = true;
+    group->setcontexts(ctx);
 }
 
 

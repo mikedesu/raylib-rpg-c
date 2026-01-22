@@ -64,7 +64,7 @@ static inline void draw_inventory_menu(gamestate& g) {
                 if (it != unpacked_inventory->end()) {
                     spritegroup* sg = spritegroups[*it];
                     if (!sg) continue;
-                    auto sprite = sg_get_current(sg);
+                    auto sprite = sg->get_current();
                     DrawTexturePro(*(sprite->get_texture()), Rectangle{10, 10, 12, 12}, grid_box2, Vector2{0, 0}, 0.0f, WHITE);
                     size_t index = j * cols + i;
                     if (index >= 0 && index < unpacked_inventory->size()) {
@@ -98,7 +98,8 @@ static inline void draw_inventory_menu(gamestate& g) {
                 itemtype_t item_type = g.ct.get<itemtype>(selection_id).value_or(ITEM_NONE);
 
                 if (sg) {
-                    auto sprite = sg_get_current(sg);
+                    //auto sprite = sg_get_current(sg);
+                    auto sprite = sg->get_current();
                     DrawTexturePro(*(sprite->get_texture()), (Rectangle){0, 0, 32, 32}, right_box, (Vector2){0, 0}, 0.0f, WHITE);
 
                     // new-style component table access

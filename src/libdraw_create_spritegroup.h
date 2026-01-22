@@ -32,10 +32,10 @@ static inline bool create_spritegroup(gamestate& g, entityid id, int* keys, int 
             const int k = keys[i];
             Texture2D* tex = &txinfo[k].texture;
             auto s = make_shared<sprite>(tex, txinfo[k].contexts, txinfo[k].num_frames);
-            spritegroup_add(group, s);
+            group->add(s);
         }
         group->id = id;
-        auto s = spritegroup_get(group, 0);
+        auto s = group->get( 0);
         massert(s, "sprite is NULL");
         group->current = 0;
         float x = loc.x * DEFAULT_TILE_SIZE + offset_x;
@@ -55,11 +55,12 @@ static inline bool create_spritegroup(gamestate& g, entityid id, int* keys, int 
         int k = keys[i];
         Texture2D* tex = &txinfo[k].texture;
         auto s = make_shared<sprite>(tex, txinfo[k].contexts, txinfo[k].num_frames);
-        spritegroup_add(group, s);
+        group->add(s);
     }
     group->id = id;
     group->current = 0;
-    auto s = spritegroup_get(group, 0);
+    //auto s = spritegroup_get(group, 0);
+    auto s = group->get(0);
     massert(s, "sprite is NULL");
     float x = -DEFAULT_TILE_SIZE + offset_x;
     float y = -DEFAULT_TILE_SIZE + offset_y;

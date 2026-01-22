@@ -46,72 +46,27 @@ public:
         visible = true;
     }
 
+    shared_ptr<sprite> get(int index) {return sprites2->at(index);}
+    shared_ptr<sprite> get_current() {return sprites2->at(current);}
+
+    void add(shared_ptr<sprite> s) {
+        if (!s || size >= capacity)
+            return;
+        sprites2->push_back(s);
+        size++;
+    }
+
+    // each sprite has a 'context' that corresponds to different directions
+    void setcontexts(int context) {
+        for (int i = 0; i < size; i++) {
+            auto s = sprites2->at(i);
+            if (!s || s->get_numcontexts() <= 0 || context < 0 || context >= s->get_numcontexts()) continue;
+            s->set_context(context);
+        }
+    }
 };
 
-//static inline spritegroup* spritegroup_create(int capacity) {
-//    massert(capacity > 0, "capacity must be greater than 0, got %d", capacity);
-//    if (capacity <= 0)
-//        return NULL;
-//    spritegroup* sg = (spritegroup*)malloc(sizeof(spritegroup));
-//    massert(sg, "spritegroup is NULL");
-//    if (!sg)
-//        return NULL;
-//    sg->current = sg->size = sg->off_x = sg->off_y = sg->default_anim = sg->id = 0;
-//    sg->alpha = 255;
-//    sg->capacity = capacity;
-//    sg->sprites2 = new vector<shared_ptr<sprite>>();
-//    sg->dest = sg->move = Rectangle{0, 0, 0, 0};
-//    sg->move_rate = 1.0;
-//    sg->visible = true;
-//    return sg;
-//}
 
-static inline shared_ptr<sprite> spritegroup_get(spritegroup* sg, int index) {
-    massert(sg, "spritegroup is NULL");
-    massert(index >= 0, "index is negative");
-    massert(index < sg->size, "index is out of bounds");
-    return sg->sprites2->at(index);
-}
-
-static inline shared_ptr<sprite> sg_get_current(spritegroup* sg) {
-    massert(sg, "spritegroup is NULL");
-    massert(sg->current >= 0, "current is negative");
-    massert(sg->current < sg->size, "current is out of bounds");
-    return sg->sprites2->at(sg->current);
-}
-
-static inline shared_ptr<sprite> sg_get_current_plus_one(spritegroup* sg) {
-    massert(sg, "spritegroup is NULL");
-    massert(sg->current >= 0, "current is negative");
-    if (sg->current + 1 >= sg->size)
-        return NULL;
-    return sg->sprites2->at(sg->current + 1);
-}
-
-static inline int spritegroup_get_first_context(spritegroup* sg) {
-    massert(sg, "spritegroup is NULL");
-    massert(sg->size > 0, "spritegroup is empty");
-    massert(sg->sprites2->at(0), "sprite is NULL");
-    return sg->sprites2->at(0)->get_currentcontext();
-}
-
-static inline void spritegroup_add(spritegroup* sg, shared_ptr<sprite> s) {
-    if (!sg || !s || sg->size >= sg->capacity)
-        return;
-    sg->sprites2->push_back(s);
-    sg->size++;
-}
-
-// each sprite has a 'context' that corresponds to different directions
-static inline void spritegroup_setcontexts(spritegroup* sg, int context) {
-    massert(sg, "spritegroup is NULL");
-    for (int i = 0; i < sg->size; i++) {
-        auto s = sg->sprites2->at(i);
-        if (!s || s->get_numcontexts() <= 0 || context < 0 || context >= s->get_numcontexts())
-            continue;
-        s->set_context(context);
-    }
-}
 
 static inline void spritegroup_destroy(spritegroup* sg) {
     if (!sg)
@@ -127,16 +82,14 @@ static inline void spritegroup_destroy(spritegroup* sg) {
 static inline void spritegroup_set_stop_on_last_frame(spritegroup* sg, bool do_stop) {
     massert(sg, "spritegroup is NULL");
     // get the current sprite
-    auto s = spritegroup_get(sg, sg->current);
+    auto s = sg->get(sg->current);
     massert(s, "sprite is NULL");
     s->set_stop_on_last_frame(do_stop);
     // lets also set stopframe on any possible shadow sprites
     // first make sure sg->current+1 does not exceed our bounds
-    if (sg->current + 1 >= sg->size)
-        return;
-    auto shadow = spritegroup_get(sg, sg->current + 1);
-    if (!shadow)
-        return;
+    if (sg->current + 1 >= sg->size) return;
+    auto shadow = sg->get(sg->current + 1);
+    if (!shadow) return;
     shadow->set_stop_on_last_frame(do_stop);
 }
 

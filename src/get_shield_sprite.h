@@ -18,7 +18,7 @@ static inline shared_ptr<sprite> get_shield_front_sprite(gamestate& g, entityid 
     if (it == spritegroups.end()) return retval;
     spritegroup* w_sg = it->second;
     if (!w_sg) return retval;
-    if (sg->current == SG_ANIM_NPC_GUARD_SUCCESS) retval = spritegroup_get(w_sg, SG_ANIM_BUCKLER_SUCCESS_FRONT);
+    if (sg->current == SG_ANIM_NPC_GUARD_SUCCESS) retval = w_sg->get( SG_ANIM_BUCKLER_SUCCESS_FRONT);
     return retval;
 }
 
@@ -34,6 +34,6 @@ static inline shared_ptr<sprite> get_shield_back_sprite(gamestate& g, entityid i
     if (it == spritegroups.end()) return retval;
     spritegroup* w_sg = it->second;
     if (!w_sg) return retval;
-    if (sg->current == SG_ANIM_NPC_GUARD_SUCCESS) retval = spritegroup_get(w_sg, SG_ANIM_BUCKLER_SUCCESS_BACK);
+    if (sg->current == SG_ANIM_NPC_GUARD_SUCCESS) retval = w_sg->get( SG_ANIM_BUCKLER_SUCCESS_BACK);
     return retval;
 }

@@ -12,7 +12,7 @@ static inline void draw_entity_sprite(gamestate& g, spritegroup* sg) {
     }
     unsigned char a = g.ct.get<txalpha>(sg->id).value_or(255);
     const Color c = {255, 255, 255, a};
-    auto s = sg_get_current(sg);
+    auto s = sg->get_current();
     massert(s, "sprite is NULL");
     if (sg->visible)
         DrawTexturePro(*s->get_texture(), s->get_src(), dest, (Vector2){0, 0}, 0, c);
