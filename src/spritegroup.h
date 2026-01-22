@@ -18,23 +18,17 @@ class spritegroup {
 public:
     int size;
     int capacity;
-    // the current animation sprite in the spritegroup
-    int current;
+    int current; // the current animation sprite in the spritegroup
     int off_x;
     int off_y;
-    // the default animation to return to after the timer expires
-    int default_anim;
+    int default_anim; // the default animation to return to after the timer expires
     int alpha;
-    // the id of the entity that this spritegroup belongs to
-    // note this allows for one entity to have multiple spritegroups
-    entityid id;
+    entityid id; // the id of the entity that this spritegroup belongs to
     Rectangle dest;
     Rectangle move;
     vector<shared_ptr<sprite>>* sprites2;
     float move_rate;
     bool visible;
-
-
 
     spritegroup(int cap) {
         massert(cap > 0, "cap must be greater than 0, got %d", cap);
@@ -58,8 +52,7 @@ public:
     shared_ptr<sprite> get_current() {return sprites2->at(current);}
 
     void add(shared_ptr<sprite> s) {
-        if (!s || size >= capacity)
-            return;
+        if (!s || size >= capacity) return;
         sprites2->push_back(s);
         size++;
     }
@@ -103,7 +96,6 @@ public:
         return true;
     }
 
-
     bool update_dest() {
         bool retval = false;
         if (move.x > 0) {
@@ -126,9 +118,5 @@ public:
         }
         return retval;
     }
-
-
 };
-
-
 

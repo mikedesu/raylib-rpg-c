@@ -50,6 +50,7 @@ I have already done the following:
 Previous analysis suggestions you've brought up that I will eventually implement, or ideas that I've realized I need to handle (**DO NOT BASED ANALYSIS ON THESE**)
 
 
+- [ ] **BUG** moving has a context-setting bug since upgrading `sprite` and `spritegroup` to classes...
 - [ ] **POLISH** camera movement should be bounded by the size of the dungeon floor
 - [ ] **BUG** standing on top of dead bodies causes the lighting system to treat it as if you can't see in any direction
 - [ ] **POLISH** draw tile updates can be moved over into draw entity
