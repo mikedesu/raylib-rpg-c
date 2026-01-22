@@ -106,13 +106,6 @@ public:
 
     bool update_dest() {
         bool retval = false;
-        //bool retval = move.x != 0 || move.y != 0;
-        //bool mx_pos = move.x > 0, mx_neg = move.x < 0;
-        //bool my_pos = move.y > 0, my_neg = move.y < 0;
-        //dest.x += mx_pos ? move_rate  : mx_neg ? -move_rate : 0;
-        //move.x += mx_pos ? -move_rate : mx_neg ? move_rate  : 0;
-        //dest.y += my_pos ? move_rate  : my_neg ? -move_rate : 0;
-        //move.y += my_pos ? -move_rate : my_neg ? move_rate  : 0;
         if (move.x > 0) {
             dest.x += move_rate;
             move.x -= move_rate;
