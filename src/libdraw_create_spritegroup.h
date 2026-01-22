@@ -9,14 +9,16 @@
 
 
 extern textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
-extern unordered_map<entityid, spritegroup_t*> spritegroups;
+extern unordered_map<entityid, spritegroup*> spritegroups;
 
 
 static inline bool create_spritegroup(gamestate& g, entityid id, int* keys, int num_keys, int offset_x, int offset_y) {
     minfo("BEGIN create_spritegroup");
     massert(txinfo, "txinfo is null");
     // can hold up to 32 sprites
-    spritegroup_t* group = spritegroup_create(SPRITEGROUP_DEFAULT_SIZE);
+    //spritegroup* group = spritegroup_create(SPRITEGROUP_DEFAULT_SIZE);
+    spritegroup* group = new spritegroup(SPRITEGROUP_DEFAULT_SIZE);
+    
     massert(group, "spritegroup is NULL");
     //disabling this check until dungeon_floor created
     auto df = g.d.get_current_floor();

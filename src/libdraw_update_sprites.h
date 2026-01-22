@@ -12,7 +12,7 @@
 
 
 extern Music music;
-extern unordered_map<entityid, spritegroup_t*> spritegroups;
+extern unordered_map<entityid, spritegroup*> spritegroups;
 extern int ANIM_SPEED;
 
 
@@ -60,7 +60,7 @@ static inline void libdraw_update_sprites_post(gamestate& g) {
         if (type == ENTITY_NONE)
             continue;
         // grab the sprite group for that entity
-        spritegroup_t* sg = spritegroups[id];
+        spritegroup* sg = spritegroups[id];
         if (!sg)
             continue;
         auto s = sg->sprites2->at(sg->current);

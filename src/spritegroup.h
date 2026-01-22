@@ -14,7 +14,8 @@ using std::shared_ptr;
 using std::unordered_map;
 using std::vector;
 
-typedef struct spritegroup_t {
+class spritegroup {
+public:
     int size;
     int capacity;
     // the current animation sprite in the spritegroup
@@ -32,42 +33,54 @@ typedef struct spritegroup_t {
     vector<shared_ptr<sprite>>* sprites2;
     float move_rate;
     bool visible;
-} spritegroup_t;
 
-constexpr static inline spritegroup_t* spritegroup_create(int capacity) {
-    massert(capacity > 0, "capacity must be greater than 0, got %d", capacity);
-    if (capacity <= 0)
-        return NULL;
-    spritegroup_t* sg = (spritegroup_t*)malloc(sizeof(spritegroup_t));
-    massert(sg, "spritegroup is NULL");
-    if (!sg)
-        return NULL;
-    sg->current = sg->size = sg->off_x = sg->off_y = sg->default_anim = sg->id = 0;
-    sg->alpha = 255;
-    sg->capacity = capacity;
-    sg->sprites2 = new vector<shared_ptr<sprite>>();
-    sg->dest = (Rectangle){0, 0, 0, 0};
-    sg->move = (Rectangle){0, 0, 0, 0};
-    sg->move_rate = 1.0;
-    sg->visible = true;
-    return sg;
-}
 
-static inline shared_ptr<sprite> spritegroup_get(spritegroup_t* sg, int index) {
+
+    spritegroup(int cap) {
+        massert(cap > 0, "cap must be greater than 0, got %d", cap);
+        current = size = off_x = off_y = default_anim = id = 0;
+        alpha = 255;
+        sprites2 = new vector<shared_ptr<sprite>>();
+        dest = move = Rectangle{0, 0, 0, 0};
+        move_rate = 1.0;
+        visible = true;
+    }
+
+};
+
+//static inline spritegroup* spritegroup_create(int capacity) {
+//    massert(capacity > 0, "capacity must be greater than 0, got %d", capacity);
+//    if (capacity <= 0)
+//        return NULL;
+//    spritegroup* sg = (spritegroup*)malloc(sizeof(spritegroup));
+//    massert(sg, "spritegroup is NULL");
+//    if (!sg)
+//        return NULL;
+//    sg->current = sg->size = sg->off_x = sg->off_y = sg->default_anim = sg->id = 0;
+//    sg->alpha = 255;
+//    sg->capacity = capacity;
+//    sg->sprites2 = new vector<shared_ptr<sprite>>();
+//    sg->dest = sg->move = Rectangle{0, 0, 0, 0};
+//    sg->move_rate = 1.0;
+//    sg->visible = true;
+//    return sg;
+//}
+
+static inline shared_ptr<sprite> spritegroup_get(spritegroup* sg, int index) {
     massert(sg, "spritegroup is NULL");
     massert(index >= 0, "index is negative");
     massert(index < sg->size, "index is out of bounds");
     return sg->sprites2->at(index);
 }
 
-static inline shared_ptr<sprite> sg_get_current(spritegroup_t* sg) {
+static inline shared_ptr<sprite> sg_get_current(spritegroup* sg) {
     massert(sg, "spritegroup is NULL");
     massert(sg->current >= 0, "current is negative");
     massert(sg->current < sg->size, "current is out of bounds");
     return sg->sprites2->at(sg->current);
 }
 
-static inline shared_ptr<sprite> sg_get_current_plus_one(spritegroup_t* sg) {
+static inline shared_ptr<sprite> sg_get_current_plus_one(spritegroup* sg) {
     massert(sg, "spritegroup is NULL");
     massert(sg->current >= 0, "current is negative");
     if (sg->current + 1 >= sg->size)
@@ -75,14 +88,14 @@ static inline shared_ptr<sprite> sg_get_current_plus_one(spritegroup_t* sg) {
     return sg->sprites2->at(sg->current + 1);
 }
 
-static inline int spritegroup_get_first_context(spritegroup_t* sg) {
+static inline int spritegroup_get_first_context(spritegroup* sg) {
     massert(sg, "spritegroup is NULL");
     massert(sg->size > 0, "spritegroup is empty");
     massert(sg->sprites2->at(0), "sprite is NULL");
     return sg->sprites2->at(0)->get_currentcontext();
 }
 
-static inline void spritegroup_add(spritegroup_t* sg, shared_ptr<sprite> s) {
+static inline void spritegroup_add(spritegroup* sg, shared_ptr<sprite> s) {
     if (!sg || !s || sg->size >= sg->capacity)
         return;
     sg->sprites2->push_back(s);
@@ -90,7 +103,7 @@ static inline void spritegroup_add(spritegroup_t* sg, shared_ptr<sprite> s) {
 }
 
 // each sprite has a 'context' that corresponds to different directions
-static inline void spritegroup_setcontexts(spritegroup_t* sg, int context) {
+static inline void spritegroup_setcontexts(spritegroup* sg, int context) {
     massert(sg, "spritegroup is NULL");
     for (int i = 0; i < sg->size; i++) {
         auto s = sg->sprites2->at(i);
@@ -100,7 +113,7 @@ static inline void spritegroup_setcontexts(spritegroup_t* sg, int context) {
     }
 }
 
-static inline void spritegroup_destroy(spritegroup_t* sg) {
+static inline void spritegroup_destroy(spritegroup* sg) {
     if (!sg)
         return;
     if (sg->sprites2) {
@@ -111,7 +124,7 @@ static inline void spritegroup_destroy(spritegroup_t* sg) {
     free(sg);
 }
 
-static inline void spritegroup_set_stop_on_last_frame(spritegroup_t* sg, bool do_stop) {
+static inline void spritegroup_set_stop_on_last_frame(spritegroup* sg, bool do_stop) {
     massert(sg, "spritegroup is NULL");
     // get the current sprite
     auto s = spritegroup_get(sg, sg->current);
@@ -127,7 +140,7 @@ static inline void spritegroup_set_stop_on_last_frame(spritegroup_t* sg, bool do
     shadow->set_stop_on_last_frame(do_stop);
 }
 
-static inline bool spritegroup_set_current(spritegroup_t* sg, int index) {
+static inline bool spritegroup_set_current(spritegroup* sg, int index) {
     minfo2("spritegroup set current");
     massert(sg, "spritegroup is NULL");
     massert(index >= 0, "index is negative: %d, %d", index, sg->size);
@@ -142,13 +155,13 @@ static inline bool spritegroup_set_current(spritegroup_t* sg, int index) {
     return true;
 }
 
-static inline bool spritegroup_is_animating(spritegroup_t* sg) {
+static inline bool spritegroup_is_animating(spritegroup* sg) {
     if (!sg || !sg->sprites2->at(sg->current))
         return false;
     return sg->sprites2->at(sg->current)->get_is_animating();
 }
 
-static inline bool spritegroup_update_dest(spritegroup_t* sg) {
+static inline bool spritegroup_update_dest(spritegroup* sg) {
     massert(sg, "spritegroup is NULL");
     bool retval = false;
     if (sg->move.x > 0) {
@@ -172,7 +185,7 @@ static inline bool spritegroup_update_dest(spritegroup_t* sg) {
     return retval;
 }
 
-static inline bool spritegroup_snap_dest(spritegroup_t* sg, int x, int y) {
+static inline bool spritegroup_snap_dest(spritegroup* sg, int x, int y) {
     massert(sg, "spritegroup is NULL");
     bool retval = false;
     if (sg->move.x == 0 && sg->move.y == 0) {
@@ -183,7 +196,7 @@ static inline bool spritegroup_snap_dest(spritegroup_t* sg, int x, int y) {
     return retval;
 }
 
-static inline void sg_set_default_anim(spritegroup_t* sg, int anim) {
+static inline void sg_set_default_anim(spritegroup* sg, int anim) {
     massert(sg, "spritegroup is NULL");
     sg->default_anim = anim;
 }

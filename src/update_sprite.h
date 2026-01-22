@@ -9,9 +9,9 @@
 #include "update_sprite.h"
 
 
-extern unordered_map<entityid, spritegroup_t*> spritegroups;
+extern unordered_map<entityid, spritegroup*> spritegroups;
 
-static inline void libdraw_update_sprite_context_ptr(gamestate& g, spritegroup_t* group, direction_t dir) {
+static inline void libdraw_update_sprite_context_ptr(gamestate& g, spritegroup* group, direction_t dir) {
     //massert(g, "gamestate is NULL");
     massert(group != NULL, "group is NULL");
     int old_ctx = group->sprites2->at(group->current)->get_currentcontext();
@@ -44,7 +44,7 @@ static inline void libdraw_update_sprite_context_ptr(gamestate& g, spritegroup_t
 }
 
 
-static inline void libdraw_update_sprite_position(gamestate& g, entityid id, spritegroup_t* sg) {
+static inline void libdraw_update_sprite_position(gamestate& g, entityid id, spritegroup* sg) {
     //massert(g, "gamestate is NULL");
     massert(sg, "spritegroup is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
@@ -72,7 +72,7 @@ static inline void libdraw_update_sprite_position(gamestate& g, entityid id, spr
 }
 
 
-static inline void libdraw_update_sprite_ptr(gamestate& g, entityid id, spritegroup_t* sg) {
+static inline void libdraw_update_sprite_ptr(gamestate& g, entityid id, spritegroup* sg) {
     minfo2("Begin update sprite ptr: %d", id);
     //massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");

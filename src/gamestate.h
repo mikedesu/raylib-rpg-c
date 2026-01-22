@@ -1230,7 +1230,7 @@ public:
         create_weapon_at_with(ct, df->get_random_loc(), axe_init());
         create_shield_at_with(ct, df->get_random_loc(), shield_init());
         //create_potion_at_with(d.floors[0].df_get_random_loc(), potion_init(POTION_HP_SMALL));
-        constexpr int num_boxes = 100;
+        constexpr int num_boxes = 10;
         for (int i = 0; i < num_boxes; i++)
             create_box_at_with(df->get_random_loc());
         constexpr int monster_count = 10;

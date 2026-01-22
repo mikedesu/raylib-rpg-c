@@ -3,7 +3,7 @@
 #include "gamestate.h"
 #include "spritegroup.h"
 
-static inline void draw_entity_sprite(gamestate& g, spritegroup_t* sg) {
+static inline void draw_entity_sprite(gamestate& g, spritegroup* sg) {
     massert(sg, "spritegroup is NULL");
     Rectangle dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
     if (dest.width == 0 || dest.height == 0) {

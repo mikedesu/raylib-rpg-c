@@ -6,16 +6,16 @@
 
 #include "spritegroup_anim.h"
 
-extern unordered_map<entityid, spritegroup_t*> spritegroups;
+extern unordered_map<entityid, spritegroup*> spritegroups;
 
-static inline void update_shield_for_entity(gamestate& g, entityid id, spritegroup_t* sg) {
+static inline void update_shield_for_entity(gamestate& g, entityid id, spritegroup* sg) {
     minfo("update shield for entity %d", id);
 
     //massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "entity id is -1");
     massert(sg, "spritegroup is NULL");
 
-    spritegroup_t* shield_sg = nullptr;
+    spritegroup* shield_sg = nullptr;
     entityid shield_id = ENTITYID_INVALID;
     int ctx = -1;
 

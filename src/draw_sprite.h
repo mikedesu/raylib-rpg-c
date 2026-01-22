@@ -8,7 +8,7 @@
 #include "spritegroup.h"
 
 
-extern unordered_map<entityid, spritegroup_t*> spritegroups;
+extern unordered_map<entityid, spritegroup*> spritegroups;
 
 static inline void draw_sprite_and_shadow(gamestate& g, entityid id) {
     //massert(g, "gamestate is NULL");
@@ -17,7 +17,7 @@ static inline void draw_sprite_and_shadow(gamestate& g, entityid id) {
         merror("NO SPRITE GROUP FOR ID %d", id);
         return;
     }
-    spritegroup_t* sg = spritegroups[id];
+    spritegroup* sg = spritegroups[id];
     // old
     //entitytype_t type = g_get_type(g, id);
     //massert(sg, "spritegroup is NULL: id %d type: %s", id, entitytype_to_string(type));

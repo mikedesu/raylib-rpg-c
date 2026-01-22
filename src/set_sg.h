@@ -9,7 +9,7 @@
 #include "spritegroup_anim.h"
 
 
-static inline void libdraw_set_sg_is_casting(gamestate& g, entityid id, spritegroup_t* const sg) {
+static inline void libdraw_set_sg_is_casting(gamestate& g, entityid id, spritegroup* const sg) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     massert(sg, "spritegroup is NULL");
     const int cur = SG_ANIM_NPC_ATTACK;
@@ -19,7 +19,7 @@ static inline void libdraw_set_sg_is_casting(gamestate& g, entityid id, spritegr
 }
 
 
-static inline void libdraw_set_sg_spell_casting(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg) {
+static inline void libdraw_set_sg_spell_casting(shared_ptr<gamestate> g, entityid id, spritegroup* const sg) {
     minfo("set sg spell casting");
     massert(id != ENTITYID_INVALID, "entity id is -1");
     massert(sg, "spritegroup is NULL");
@@ -27,7 +27,7 @@ static inline void libdraw_set_sg_spell_casting(shared_ptr<gamestate> g, entityi
     spritegroup_set_current(sg, 0);
 }
 
-static inline void libdraw_set_sg_spell_persisting(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg) {
+static inline void libdraw_set_sg_spell_persisting(shared_ptr<gamestate> g, entityid id, spritegroup* const sg) {
     minfo("set sg spell casting");
     massert(id != ENTITYID_INVALID, "entity id is -1");
     massert(sg, "spritegroup is NULL");
@@ -35,7 +35,7 @@ static inline void libdraw_set_sg_spell_persisting(shared_ptr<gamestate> g, enti
     spritegroup_set_current(sg, 1);
 }
 
-static inline void libdraw_set_sg_spell_ending(shared_ptr<gamestate> g, entityid id, spritegroup_t* const sg) {
+static inline void libdraw_set_sg_spell_ending(shared_ptr<gamestate> g, entityid id, spritegroup* const sg) {
     minfo("set sg spell casting");
     massert(id != ENTITYID_INVALID, "entity id is -1");
     massert(sg, "spritegroup is NULL");
@@ -44,7 +44,7 @@ static inline void libdraw_set_sg_spell_ending(shared_ptr<gamestate> g, entityid
 }
 
 
-static inline void libdraw_set_sg_block_success(gamestate& g, entityid id, spritegroup_t* const sg) {
+static inline void libdraw_set_sg_block_success(gamestate& g, entityid id, spritegroup* const sg) {
     minfo("set sg block success");
     massert(id != ENTITYID_INVALID, "entity id is -1");
     massert(sg, "spritegroup is NULL");
@@ -56,7 +56,7 @@ static inline void libdraw_set_sg_block_success(gamestate& g, entityid id, sprit
 }
 
 
-static inline void libdraw_set_sg_is_damaged(gamestate& g, entityid id, spritegroup_t* const sg) {
+static inline void libdraw_set_sg_is_damaged(gamestate& g, entityid id, spritegroup* const sg) {
     massert(id != ENTITYID_INVALID, "entity id is -1");
     massert(sg, "spritegroup is NULL");
     const race_t r = g.ct.get<race>(id).value_or(RACE_NONE);
@@ -65,7 +65,7 @@ static inline void libdraw_set_sg_is_damaged(gamestate& g, entityid id, spritegr
 }
 
 
-static inline void libdraw_set_sg_is_dead(gamestate& g, entityid id, spritegroup_t* const sg) {
+static inline void libdraw_set_sg_is_dead(gamestate& g, entityid id, spritegroup* const sg) {
     massert(id != ENTITYID_INVALID, "entity id is -1");
     massert(sg, "spritegroup is NULL");
 
@@ -97,7 +97,7 @@ static inline void libdraw_set_sg_is_dead(gamestate& g, entityid id, spritegroup
 }
 
 
-static inline void libdraw_set_sg_is_attacking(gamestate& g, entityid id, spritegroup_t* const sg) {
+static inline void libdraw_set_sg_is_attacking(gamestate& g, entityid id, spritegroup* const sg) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     massert(sg, "spritegroup is NULL");
     //weapontype wtype = g_get_weapontype(g, weapon);

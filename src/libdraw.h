@@ -19,7 +19,7 @@
 #include "unload_textures.h"
 
 
-unordered_map<entityid, spritegroup_t*> spritegroups;
+unordered_map<entityid, spritegroup*> spritegroups;
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 unordered_map<int, Shader> shaders;
 RenderTexture2D title_target_texture = {0};
