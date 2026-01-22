@@ -24,5 +24,5 @@ static inline void update_weapon_for_entity(gamestate& g, entityid id, spritegro
     // or rather we'll have a better way to select which animation joins the entity's attack
     // lets test this theory by changing it to the B anim
     //spritegroup_set_current(w_sg, SG_ANIM_LONGSWORD_SLASH_B);
-    spritegroup_set_current(w_sg, SG_ANIM_LONGSWORD_SLASH_F);
+    w_sg->set_current(SG_ANIM_LONGSWORD_SLASH_F);
 }

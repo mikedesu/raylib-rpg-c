@@ -88,49 +88,54 @@ public:
         return true;
     }
 
+    bool set_current(int index) {
+        minfo2("spritegroup set current");
+        //massert(sg, "spritegroup is NULL");
+        massert(index >= 0, "index is negative: %d, %d", index, size);
+        massert(index < size, "index is out of bounds for id %d: %d, %d", id, index, size);
+        current = index;
+        // lets update the sprite's current frame to 0
+        // since we prob want to start an animation at the beginning
+        // if we are changing current
+        sprites2->at(current)->set_currentframe(0);
+        // we might prob wanna reset numloops as well
+        sprites2->at(current)->set_num_loops(0);
+        return true;
+    }
+
+
+    bool update_dest() {
+        bool retval = false;
+        //bool retval = move.x != 0 || move.y != 0;
+        //bool mx_pos = move.x > 0, mx_neg = move.x < 0;
+        //bool my_pos = move.y > 0, my_neg = move.y < 0;
+        //dest.x += mx_pos ? move_rate  : mx_neg ? -move_rate : 0;
+        //move.x += mx_pos ? -move_rate : mx_neg ? move_rate  : 0;
+        //dest.y += my_pos ? move_rate  : my_neg ? -move_rate : 0;
+        //move.y += my_pos ? -move_rate : my_neg ? move_rate  : 0;
+        if (move.x > 0) {
+            dest.x += move_rate;
+            move.x -= move_rate;
+            retval = true;
+        } else if (move.x < 0) {
+            dest.x -= move_rate;
+            move.x += move_rate;
+            retval = true;
+        }
+        if (move.y > 0) {
+            dest.y += move_rate;
+            move.y -= move_rate;
+            retval = true;
+        } else if (move.y < 0) {
+            dest.y -= move_rate;
+            move.y += move_rate;
+            retval = true;
+        }
+        return retval;
+    }
+
+
 };
 
-static inline bool spritegroup_set_current(spritegroup* sg, int index) {
-    minfo2("spritegroup set current");
-    massert(sg, "spritegroup is NULL");
-    massert(index >= 0, "index is negative: %d, %d", index, sg->size);
-    massert(index < sg->size, "index is out of bounds for id %d: %d, %d", sg->id, index, sg->size);
-    sg->current = index;
-    // lets update the sprite's current frame to 0
-    // since we prob want to start an animation at the beginning
-    // if we are changing current
-    sg->sprites2->at(sg->current)->set_currentframe(0);
-    // we might prob wanna reset numloops as well
-    sg->sprites2->at(sg->current)->set_num_loops(0);
-    return true;
-}
-
-static inline bool spritegroup_is_animating(spritegroup* g) {
-    return (!g||!g->sprites2->at(g->current)) ? false : g->sprites2->at(g->current)->get_is_animating();
-}
-
-static inline bool spritegroup_update_dest(spritegroup* sg) {
-    massert(sg, "spritegroup is NULL");
-    bool retval = false;
-    if (sg->move.x > 0) {
-        sg->dest.x += sg->move_rate;
-        sg->move.x -= sg->move_rate;
-        retval = true;
-    } else if (sg->move.x < 0) {
-        sg->dest.x -= sg->move_rate;
-        sg->move.x += sg->move_rate;
-        retval = true;
-    }
-    if (sg->move.y > 0) {
-        sg->dest.y += sg->move_rate;
-        sg->move.y -= sg->move_rate;
-        retval = true;
-    } else if (sg->move.y < 0) {
-        sg->dest.y -= sg->move_rate;
-        sg->move.y += sg->move_rate;
-        retval = true;
-    }
-    return retval;
-}
 
 

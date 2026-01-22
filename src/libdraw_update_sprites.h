@@ -85,13 +85,13 @@ static inline void libdraw_update_sprites_post(gamestate& g) {
         // it works, but isnt quite what i want
         if (type == ENTITY_SPELL && s->get_num_loops() >= 1) {
             if (sg->current == 0) {
-                spritegroup_set_current(sg, 1);
+                sg->set_current(1);
                 g.ct.set<spell_casting>(id, false);
                 g.ct.set<spell_persisting>(id, true);
                 g.ct.set<spell_ending>(id, false);
                 g.ct.set<spell_complete>(id, false);
             } else if (sg->current == 1) {
-                spritegroup_set_current(sg, 2);
+                sg->set_current(2);
                 g.ct.set<spell_casting>(id, false);
                 g.ct.set<spell_persisting>(id, false);
                 g.ct.set<spell_ending>(id, true);

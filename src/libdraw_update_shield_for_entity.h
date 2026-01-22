@@ -19,5 +19,5 @@ static inline void update_shield_for_entity(gamestate& g, entityid id, spritegro
     ctx = sg->sprites2->at(sg->current)->get_currentcontext();
     shield_sg->setcontexts(ctx);
     //merror("I expect a crash here...");
-    spritegroup_set_current(shield_sg, SG_ANIM_BUCKLER_SUCCESS_FRONT);
+    sg->set_current(SG_ANIM_BUCKLER_SUCCESS_FRONT);
 }
