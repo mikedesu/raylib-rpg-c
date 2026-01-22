@@ -88,12 +88,10 @@ static inline void libdraw_update_sprite_ptr(gamestate& g, entityid id, spritegr
     //    libdraw_set_sg_spell_ending(g, id, sg);
     if (g.ct.get<dead>(id).value_or(false)) libdraw_set_sg_is_dead(g, id, sg);
     else if (g.ct.get<damaged>(id).value_or(false)) libdraw_set_sg_is_damaged(g, id, sg);
-
     const entitytype_t type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
     if (type == ENTITY_DOOR) {
         auto maybe_door_open = g.ct.get<door_open>(id);
-        if (maybe_door_open.has_value())
-            sg->set_current(maybe_door_open.value() ? 1 : 0);
+        if (maybe_door_open.has_value()) sg->set_current(maybe_door_open.value() ? 1 : 0);
     }
     // Update movement as long as sg->move.x/y is non-zero
     //if (spritegroup_update_dest(sg))

@@ -20,28 +20,21 @@ static inline void libdraw_update_sprites_pre(gamestate& g) {
     minfo2("BEGIN update sprites pre");
     handle_music_stream(g);
     if (g.current_scene == SCENE_GAMEPLAY) {
-        if (g.flag == GAMESTATE_FLAG_PLAYER_INPUT || g.flag == GAMESTATE_FLAG_PLAYER_ANIM) {
-            //ANIM_SPEED = DEFAULT_ANIM_SPEED * 2;
-            ANIM_SPEED = DEFAULT_ANIM_SPEED;
-        } else if (g.flag == GAMESTATE_FLAG_NPC_TURN || g.flag == GAMESTATE_FLAG_NPC_ANIM) {
-            //ANIM_SPEED = DEFAULT_ANIM_SPEED * 4;
-            ANIM_SPEED = DEFAULT_ANIM_SPEED;
-        }
-        minfo2("Begin handling dirty entities");
+        //if (g.flag == GAMESTATE_FLAG_PLAYER_INPUT || g.flag == GAMESTATE_FLAG_PLAYER_ANIM) ANIM_SPEED = DEFAULT_ANIM_SPEED;
+        //else if (g.flag == GAMESTATE_FLAG_NPC_TURN || g.flag == GAMESTATE_FLAG_NPC_ANIM)   ANIM_SPEED = DEFAULT_ANIM_SPEED;
+        //minfo2("Begin handling dirty entities");
         libdraw_handle_dirty_entities(g);
-        minfo2("End handling dirty entities");
-        minfo2("Begin update sprites pre loop");
-        for (entityid id = 0; id < g.next_entityid; id++) {
-            libdraw_update_sprite_pre(g, id);
-        }
-        msuccess2("End update sprites pre loop");
+        //minfo2("End handling dirty entities");
+        //minfo2("Begin update sprites pre loop");
+        for (entityid id = 0; id < g.next_entityid; id++) libdraw_update_sprite_pre(g, id);
+        //msuccess2("End update sprites pre loop");
     }
     msuccess2("END update sprites pre");
 }
 
 
 static inline void libdraw_update_sprites_post(gamestate& g) {
-    minfo2("BEGIN update sprites post");
+    //minfo2("BEGIN update sprites post");
     if (g.current_scene != SCENE_GAMEPLAY) {
         g.frame_dirty = false;
         return;
@@ -57,20 +50,14 @@ static inline void libdraw_update_sprites_post(gamestate& g) {
     for (entityid id = 0; id < g.next_entityid; id++) {
         // verify it has an entity type
         const entitytype_t type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
-        if (type == ENTITY_NONE)
-            continue;
+        if (type == ENTITY_NONE) continue;
         // grab the sprite group for that entity
         spritegroup* sg = spritegroups[id];
-        if (!sg)
-            continue;
+        if (!sg) continue;
         auto s = sg->sprites2->at(sg->current);
-        if (!s)
-            continue;
-
+        if (!s) continue;
         //sprite_incrframe2(s);
-
         s->incr_frame();
-
         // this condition for the animation reset seems incorrect
         // certain cases are causing animations to drop-off mid-sequence
         if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
@@ -105,7 +92,6 @@ static inline void libdraw_update_sprites_post(gamestate& g) {
                 sg->visible = false;
             }
         }
-
         // lets try something
         if (type == ENTITY_ITEM) {
             const itemtype_t itype = g.ct.get<itemtype>(id).value_or(ITEM_NONE);
@@ -118,10 +104,8 @@ static inline void libdraw_update_sprites_post(gamestate& g) {
                 auto s2 = sg->sprites2->at(sg->current + 1);
                 if (!s2)
                     break;
-
                 //sprite_incrframe2(s2);
                 s2->incr_frame();
-
                 g.frame_dirty = true;
                 if (s2->get_num_loops() >= 1) {
                     sg->current = sg->default_anim;

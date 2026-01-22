@@ -106,14 +106,12 @@ static inline void libdraw_init_rest(gamestate& g) {
     target_dest = (Rectangle){0, 0, DEFAULT_TARGET_WIDTH * 1.0f, DEFAULT_TARGET_HEIGHT * 1.0f};
     load_textures(txinfo);
     load_shaders();
-    const float x = DEFAULT_TARGET_WIDTH / 4.0f;
-    const float y = DEFAULT_TARGET_HEIGHT / 4.0f;
-    g.cam2d.offset = (Vector2){x, y};
+    const float x = DEFAULT_TARGET_WIDTH / 4.0f, y = DEFAULT_TARGET_HEIGHT / 4.0f;
+    g.cam2d.offset = Vector2{x, y};
     draw_title_screen_to_texture(g, false);
     draw_character_creation_screen_to_texture(g);
     InitAudioDevice();
-    while (!IsAudioDeviceReady())
-        ;
+    while (!IsAudioDeviceReady());
     libdraw_load_music(g);
     libdraw_load_sfx(g);
 }
@@ -130,19 +128,15 @@ static inline void libdraw_init_rest(gamestate& g) {
 
 
 static inline void libdraw_init(gamestate& g) {
-    const int w = DEFAULT_WIN_WIDTH;
-    const int h = DEFAULT_WIN_HEIGHT;
+    const int w = DEFAULT_WIN_WIDTH, h = DEFAULT_WIN_HEIGHT;
     const char* title = WINDOW_TITLE;
     char full_title[1024] = {0};
     snprintf(full_title, sizeof(full_title), "%s - %s", title, g.version.c_str());
     SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
     InitWindow(w, h, full_title);
-    g.windowwidth = w;
-    g.windowheight = h;
+    g.windowwidth = w, g.windowheight = h;
     SetWindowMinSize(320, 240);
-
     //load_font("fonts/departuremono.otf");
-
     libdraw_init_rest(g);
 }
 
