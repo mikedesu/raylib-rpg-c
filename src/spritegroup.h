@@ -46,6 +46,14 @@ public:
         visible = true;
     }
 
+    ~spritegroup() {
+        if (sprites2) {
+            sprites2->clear();
+            delete sprites2;
+            sprites2 = NULL;
+        }
+    }
+
     shared_ptr<sprite> get(int index) {return sprites2->at(index);}
     shared_ptr<sprite> get_current() {return sprites2->at(current);}
 
@@ -64,34 +72,23 @@ public:
             s->set_context(context);
         }
     }
-};
 
-
-
-static inline void spritegroup_destroy(spritegroup* sg) {
-    if (!sg)
-        return;
-    if (sg->sprites2) {
-        sg->sprites2->clear();
-        delete sg->sprites2;
-        sg->sprites2 = NULL;
+    void set_stop_on_last_frame(bool do_stop) {
+        auto s = get_current();
+        massert(s, "sprite is NULL");
+        s->set_stop_on_last_frame(do_stop);
     }
-    free(sg);
-}
 
-static inline void spritegroup_set_stop_on_last_frame(spritegroup* sg, bool do_stop) {
-    massert(sg, "spritegroup is NULL");
-    // get the current sprite
-    auto s = sg->get(sg->current);
-    massert(s, "sprite is NULL");
-    s->set_stop_on_last_frame(do_stop);
-    // lets also set stopframe on any possible shadow sprites
-    // first make sure sg->current+1 does not exceed our bounds
-    if (sg->current + 1 >= sg->size) return;
-    auto shadow = sg->get(sg->current + 1);
-    if (!shadow) return;
-    shadow->set_stop_on_last_frame(do_stop);
-}
+    void set_default_anim(int anim) {default_anim = anim;}
+
+    bool snap_dest(int x, int y) {
+        if (move.x != 0 || move.y != 0) return false;
+        dest.x = x * DEFAULT_TILE_SIZE + off_x;
+        dest.y = y * DEFAULT_TILE_SIZE + off_y;
+        return true;
+    }
+
+};
 
 static inline bool spritegroup_set_current(spritegroup* sg, int index) {
     minfo2("spritegroup set current");
@@ -108,10 +105,8 @@ static inline bool spritegroup_set_current(spritegroup* sg, int index) {
     return true;
 }
 
-static inline bool spritegroup_is_animating(spritegroup* sg) {
-    if (!sg || !sg->sprites2->at(sg->current))
-        return false;
-    return sg->sprites2->at(sg->current)->get_is_animating();
+static inline bool spritegroup_is_animating(spritegroup* g) {
+    return (!g||!g->sprites2->at(g->current)) ? false : g->sprites2->at(g->current)->get_is_animating();
 }
 
 static inline bool spritegroup_update_dest(spritegroup* sg) {
@@ -138,18 +133,4 @@ static inline bool spritegroup_update_dest(spritegroup* sg) {
     return retval;
 }
 
-static inline bool spritegroup_snap_dest(spritegroup* sg, int x, int y) {
-    massert(sg, "spritegroup is NULL");
-    bool retval = false;
-    if (sg->move.x == 0 && sg->move.y == 0) {
-        sg->dest.x = x * DEFAULT_TILE_SIZE + sg->off_x;
-        sg->dest.y = y * DEFAULT_TILE_SIZE + sg->off_y;
-        retval = true;
-    }
-    return retval;
-}
 
-static inline void sg_set_default_anim(spritegroup* sg, int anim) {
-    massert(sg, "spritegroup is NULL");
-    sg->default_anim = anim;
-}

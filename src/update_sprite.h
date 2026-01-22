@@ -125,7 +125,7 @@ static inline void libdraw_update_sprite_ptr(gamestate& g, entityid id, spritegr
     auto maybe_loc = g.ct.get<location>(id);
     if (maybe_loc.has_value()) {
         const vec3 loc = maybe_loc.value();
-        spritegroup_snap_dest(sg, loc.x, loc.y);
+        sg->snap_dest(loc.x, loc.y);
     }
 }
 
