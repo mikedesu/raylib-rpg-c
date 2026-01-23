@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "draw_character_creation_screen.h"
 #include "draw_hud.h"
 #include "draw_message_history.h"
@@ -18,7 +17,6 @@
 #include "shaders.h"
 #include "unload_textures.h"
 
-
 unordered_map<entityid, spritegroup*> spritegroups;
 textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 unordered_map<int, Shader> shaders;
@@ -33,7 +31,6 @@ Rectangle win_dest = {0, 0, DEFAULT_WIN_WIDTH, DEFAULT_WIN_HEIGHT};
 Music music;
 int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 int libdraw_restart_count = 0;
-
 
 static inline void drawframe(gamestate& g) {
     const double start_time = GetTime();
@@ -80,7 +77,6 @@ static inline void drawframe(gamestate& g) {
     libdraw_update_sprites_post(g);
 }
 
-
 static inline void libdraw_init_rest(gamestate& g) {
     SetExitKey(KEY_ESCAPE);
     SetTargetFPS(60);
@@ -111,11 +107,11 @@ static inline void libdraw_init_rest(gamestate& g) {
     draw_title_screen_to_texture(g, false);
     draw_character_creation_screen_to_texture(g);
     InitAudioDevice();
-    while (!IsAudioDeviceReady());
+    while (!IsAudioDeviceReady())
+        ;
     libdraw_load_music(g);
     libdraw_load_sfx(g);
 }
-
 
 //static inline void load_font(const char* path) {
 //gfont = LoadFont(path);
@@ -125,7 +121,6 @@ static inline void libdraw_init_rest(gamestate& g) {
 //gfont_30 = LoadFontEx(path, 30, 0, 0);
 //gfont_40 = LoadFontEx(path, 40, 0, 0);
 //}
-
 
 static inline void libdraw_init(gamestate& g) {
     const int w = DEFAULT_WIN_WIDTH, h = DEFAULT_WIN_HEIGHT;
@@ -140,11 +135,9 @@ static inline void libdraw_init(gamestate& g) {
     libdraw_init_rest(g);
 }
 
-
 static inline bool libdraw_windowshouldclose(gamestate& g) {
     return g.do_quit;
 }
-
 
 static inline void libdraw_close_partial() {
     UnloadMusicStream(music);
@@ -157,7 +150,6 @@ static inline void libdraw_close_partial() {
     UnloadRenderTexture(hud_target_texture);
     UnloadRenderTexture(target);
 }
-
 
 static inline void libdraw_close() {
     libdraw_close_partial();
