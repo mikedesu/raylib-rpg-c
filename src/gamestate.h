@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "ComponentTable.h"
 #include "attack_result.h"
 #include "biome.h"
@@ -36,7 +35,6 @@
 #include <raylib.h>
 #include <raymath.h>
 
-
 #define DEFAULT_MASTER_VOLUME 1.0f
 #define DEFAULT_MUSIC_VOLUME 0.35f
 #define GAMESTATE_SIZEOFTIMEBUF 64
@@ -56,7 +54,6 @@
 #define GAMESTATE_INIT_ENTITYIDS_MAX 3000000
 #define LAST_FRAME_TIMES_MAX 1000
 
-
 typedef ComponentTable CT;
 
 typedef function<void(CT& ct, const entityid)> with_fun;
@@ -72,7 +69,6 @@ using std::chrono::duration_cast;
 using std::chrono::nanoseconds;
 using std::chrono::system_clock;
 using std::chrono::time_point;
-
 
 class gamestate {
 public:
@@ -157,7 +153,6 @@ public:
     ComponentTable ct;
     option_menu options_menu;
 
-
     void set_seed() {
         srand(time(NULL));
         SetRandomSeed(time(NULL));
@@ -169,7 +164,6 @@ public:
         mt.seed(seedseq);
     }
 
-
     gamestate() {
         minfo2("Initializing gamestate");
         set_seed();
@@ -177,11 +171,9 @@ public:
         reset();
     }
 
-
     ~gamestate() {
         reset();
     }
-
 
     inline void init_music_paths() {
         const char* music_path_file = "music.txt";
@@ -205,14 +197,12 @@ public:
         fclose(file);
     }
 
-
     inline double get_avg_last_frame_time() {
         double sum = 0;
         for (int i = 0; i < LAST_FRAME_TIMES_MAX; i++)
             sum += last_frame_times[i];
         return sum / LAST_FRAME_TIMES_MAX;
     }
-
 
     inline void reset() {
         version = GAME_VERSION;
@@ -310,13 +300,11 @@ public:
         init_music_paths();
     }
 
-
     inline bool set_hero_id(const entityid id) {
         massert(id != ENTITYID_INVALID, "id is invalid");
         hero_id = id;
         return true;
     }
-
 
     inline entityid add_entity() {
         const entityid id = next_entityid;
@@ -330,11 +318,9 @@ public:
         return id;
     }
 
-
     inline shared_ptr<tile_t> tile_at_cur_floor(vec3 loc) {
         return d.get_current_floor()->tile_at(loc);
     }
-
 
     inline void init_dungeon(biome_t type, int df_count, int w, int h, float parts) {
         constexpr float min_room_w = 2;
@@ -463,14 +449,12 @@ public:
         d.is_initialized = true;
     }
 
-
     inline entityid create_door_with(with_fun doorInitFunction) {
         const entityid id = add_entity();
         ct.set<entitytype>(id, ENTITY_DOOR);
         doorInitFunction(ct, id);
         return id;
     }
-
 
     inline void recompute_entity_cache(shared_ptr<tile_t> t) {
         // Only recompute if cache is dirty
@@ -505,7 +489,6 @@ public:
         t->set_dirty_entities(false);
     }
 
-
     inline void recompute_entity_cache_at(vec3 l) {
         massert(l.x >= 0 && l.y >= 0 && l.z >= 0, "x, y, or z is out of bounds: %d, %d, %d", l.x, l.y, l.z);
         massert((size_t)l.z < d.floors.size(), "z is out of bounds");
@@ -514,18 +497,15 @@ public:
         recompute_entity_cache(t);
     }
 
-
     inline bool tile_has_live_npcs(shared_ptr<tile_t> t) {
         recompute_entity_cache(t);
         return t->get_cached_live_npcs() > 0;
     }
 
-
     inline bool tile_has_player(shared_ptr<tile_t> t) {
         recompute_entity_cache(t);
         return t->get_cached_player_present();
     }
-
 
     inline entityid create_door_at_with(const vec3 loc, with_fun doorInitFunction) {
         shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
@@ -544,7 +524,6 @@ public:
         ct.set<update>(id, true);
         return id;
     }
-
 
     inline size_t place_doors() {
         minfo2("gamestate.place_doors");
@@ -568,7 +547,6 @@ public:
         return placed_doors;
     }
 
-
     inline entityid create_prop_with(proptype_t type, with_fun initFun) {
         const entityid id = add_entity();
         ct.set<entitytype>(id, ENTITY_PROP);
@@ -578,7 +556,6 @@ public:
         initFun(ct, id);
         return id;
     }
-
 
     inline entityid create_prop_at_with(proptype_t type, vec3 loc, with_fun initFun) {
         shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
@@ -591,7 +568,6 @@ public:
         ct.set<location>(id, loc);
         return id;
     }
-
 
     inline int place_props() {
         //auto mydefault = [](gamestate& g, entityid id) {};
@@ -671,7 +647,6 @@ public:
         return placed_props;
     }
 
-
     inline entityid create_weapon_with(with_fun weaponInitFunction) {
         //minfo("create weapon with");
         const entityid id = add_entity();
@@ -682,7 +657,6 @@ public:
         weaponInitFunction(ct, id);
         return id;
     }
-
 
     inline with_fun dagger_init() {
         return [](CT& ct, const entityid id) {
@@ -696,7 +670,6 @@ public:
         };
     }
 
-
     inline with_fun axe_init() {
         return [](CT& ct, const entityid id) {
             ct.set<name>(id, "axe");
@@ -709,7 +682,6 @@ public:
         };
     }
 
-
     inline with_fun shield_init() {
         return [](CT& ct, const entityid id) {
             ct.set<name>(id, "kite shield");
@@ -718,7 +690,6 @@ public:
             ct.set<block_chance>(id, 90);
         };
     }
-
 
     inline with_fun potion_init(potiontype_t pt) {
         return [pt](CT& ct, const entityid id) {
@@ -730,7 +701,6 @@ public:
             }
         };
     }
-
 
     inline with_fun player_init(const int maxhp_roll) {
         return [this, maxhp_roll](CT& ct, const entityid id) {
@@ -745,7 +715,6 @@ public:
             ct.set<maxhp>(id, maxhp_roll);
         };
     }
-
 
     inline entityid create_weapon_at_with(ComponentTable& ct, const vec3 loc, with_fun weaponInitFunction) {
         minfo2("create weapon at with: %d %d %d", loc.x, loc.y, loc.z);
@@ -784,7 +753,6 @@ public:
         return id;
     }
 
-
     inline entityid create_weapon_at_random_loc_with(CT& ct, with_fun weaponInitFunction) {
         const vec3 loc = d.floors[d.current_floor]->get_random_loc();
         if (vec3_invalid(loc)) {
@@ -794,7 +762,6 @@ public:
         return create_weapon_at_with(ct, loc, dagger_init());
     }
 
-
     inline entityid create_shield_with(ComponentTable& ct, with_fun shieldInitFunction) {
         const entityid id = add_entity();
         ct.set<entitytype>(id, ENTITY_ITEM);
@@ -802,10 +769,10 @@ public:
         ct.set<durability>(id, 100);
         ct.set<max_durability>(id, 100);
         ct.set<rarity>(id, RARITY_COMMON);
+        ct.set<update>(id, false);
         shieldInitFunction(ct, id);
         return id;
     }
-
 
     inline entityid create_shield_at_with(ComponentTable& ct, const vec3 loc, with_fun shieldInitFunction) {
         if (d.floors.size() == 0)
@@ -818,15 +785,14 @@ public:
         return id;
     }
 
-
     inline entityid create_potion_with(with_fun potionInitFunction) {
         const entityid id = add_entity();
         ct.set<entitytype>(id, ENTITY_ITEM);
         ct.set<itemtype>(id, ITEM_POTION);
+        ct.set<update>(id, true);
         potionInitFunction(ct, id);
         return id;
     }
-
 
     inline entityid create_potion_at_with(const vec3 loc, with_fun potionInitFunction) {
         shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
@@ -845,14 +811,12 @@ public:
         return id;
     }
 
-
     inline race_t random_monster_type() {
         const vector<race_t> monster_races = {RACE_GOBLIN, RACE_ORC, RACE_BAT, RACE_WOLF, RACE_WARG, RACE_ZOMBIE, RACE_SKELETON, RACE_RAT, RACE_GREEN_SLIME};
         uniform_int_distribution<int> gen(0, monster_races.size() - 1);
         const int random_index = gen(mt);
         return monster_races[random_index];
     }
-
 
     inline void set_npc_starting_stats(const entityid id) {
         const race_t rt = ct.get<race>(id).value_or(RACE_NONE);
@@ -914,7 +878,6 @@ public:
         ct.set<hd>(id, hitdie);
     }
 
-
     inline void set_npc_defaults(const entityid id) {
         ct.set<entitytype>(id, ENTITY_NPC);
         ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
@@ -943,7 +906,6 @@ public:
         ct.set<tactics>(id, my_tactics);
     }
 
-
     inline entityid create_npc_with(const race_t rt, with_fun npcInitFunction) {
         const entityid id = add_entity();
         set_npc_defaults(id);
@@ -952,7 +914,6 @@ public:
         npcInitFunction(ct, id);
         return id;
     }
-
 
     inline entityid tile_has_box(const int x, const int y, const int z) {
         massert(z >= 0, "floor is out of bounds");
@@ -967,7 +928,6 @@ public:
         }
         return ENTITYID_INVALID;
     }
-
 
     inline entityid create_npc_at_with(const race_t rt, const vec3 loc, with_fun npcInitFunction) {
         minfo2("create npc at with: (%d, %d, %d)", loc.x, loc.y, loc.z);
@@ -1004,7 +964,6 @@ public:
         return id;
     }
 
-
     inline bool add_to_inventory(const entityid actor_id, const entityid item_id) {
         minfo2("adding %d to %d's inventory", actor_id, item_id);
         auto maybe_inventory = ct.get<inventory>(actor_id);
@@ -1018,14 +977,12 @@ public:
         return true;
     }
 
-
     inline entityid create_orc_with(with_fun monsterInitFunction) {
         constexpr race_t r = RACE_ORC;
         const entityid id = create_npc_with(r, monsterInitFunction);
         ct.set<name>(id, get_random_orc_name());
         return id;
     }
-
 
     inline entityid create_orc_at_with(const vec3 loc, with_fun monsterInitFunction) {
         if (vec3_invalid(loc))
@@ -1047,7 +1004,6 @@ public:
         return id;
     }
 
-
     inline bool add_message(const char* fmt, ...) {
         massert(fmt, "format string is NULL");
         char buffer[MAX_MSG_LENGTH];
@@ -1061,7 +1017,6 @@ public:
         return true;
     }
 
-
     inline void add_message_history(const char* fmt, ...) {
         massert(fmt, "format string is NULL");
         char buffer[MAX_MSG_LENGTH];
@@ -1073,12 +1028,10 @@ public:
         msg_history.push_back(s);
     }
 
-
     inline void update_tile(shared_ptr<tile_t> tile) {
         tile->set_explored(true);
         tile->set_visible(true);
     }
-
 
     inline bool path_blocked(vec3 a, vec3 b) {
         vector<vec3> path = calculate_path_with_thickness(a, b);
@@ -1101,7 +1054,6 @@ public:
         }
         return false;
     }
-
 
     inline bool update_player_tiles_explored() {
         if (current_scene != SCENE_GAMEPLAY)
@@ -1140,7 +1092,6 @@ public:
         return true;
     }
 
-
     inline bool update_player_state() {
         if (hero_id == ENTITYID_INVALID) {
             merror2("hero_id is invalid");
@@ -1159,7 +1110,6 @@ public:
         ct.set<damaged>(hero_id, false);
         return true;
     }
-
 
     inline void update_spells_state() {
         minfo2("update_spells_state");
@@ -1183,7 +1133,6 @@ public:
         }
     }
 
-
     inline void update_npcs_state() {
         minfo2("update_npcs_state");
         auto df_npcs = d.get_current_floor()->get_living_npcs();
@@ -1196,7 +1145,6 @@ public:
         }
     }
 
-
     inline size_t count_live_npcs_on_floor(size_t floor) {
         auto df = d.get_floor(floor);
         size_t count = 0;
@@ -1207,7 +1155,6 @@ public:
         }
         return count;
     }
-
 
     inline void logic_init() {
         minfo("gamestate.logic_init");
@@ -1276,7 +1223,6 @@ public:
         msuccess("liblogic_init: Game state initialized");
     }
 
-
     inline void handle_input_title_scene(const inputstate& is) {
         if (inputstate_is_pressed(is, KEY_ESCAPE)) {
             do_quit = true;
@@ -1288,7 +1234,6 @@ public:
             PlaySound(sfx[SFX_CONFIRM_01]);
         }
     }
-
 
     inline void handle_input_main_menu_scene(const inputstate& is) {
         if (inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_SPACE)) {
@@ -1316,7 +1261,6 @@ public:
         frame_dirty = true;
     }
 
-
     inline entityid create_player_at_with(const vec3 loc, const string n, with_fun playerInitFunction) {
         minfo2("create player with: loc=(%d, %d, %d), n=%s", loc.x, loc.y, loc.z, n.c_str());
         massert(n != "", "name is empty string");
@@ -1340,7 +1284,6 @@ public:
         return id;
     }
 
-
     inline entityid create_box_with() {
         const entityid id = add_entity();
         ct.set<entitytype>(id, ENTITY_BOX);
@@ -1351,7 +1294,6 @@ public:
         //boxInitFunction(g, id);
         return id;
     }
-
 
     inline entityid create_box_at_with(const vec3 loc) {
         shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
@@ -1377,7 +1319,6 @@ public:
         return id;
     }
 
-
     inline entityid create_spell_with() {
         const entityid id = add_entity();
         ct.set<entitytype>(id, ENTITY_SPELL);
@@ -1385,7 +1326,6 @@ public:
         ct.set<spellstate>(id, SPELLSTATE_NONE);
         return id;
     }
-
 
     inline entityid create_spell_at_with(const vec3 loc) {
         auto df = d.get_floor(loc.z);
@@ -1400,7 +1340,6 @@ public:
         return id;
     }
 
-
     inline void make_all_npcs_target_player() {
         massert(hero_id != ENTITYID_INVALID, "hero_id is invalid");
         for (entityid id = 0; id < next_entityid; id++) {
@@ -1410,7 +1349,6 @@ public:
             ct.set<target_id>(id, hero_id);
         }
     }
-
 
     inline void handle_input_character_creation_scene(const inputstate& is) {
         if (inputstate_is_pressed(is, KEY_ESCAPE)) {
@@ -1476,7 +1414,6 @@ public:
         frame_dirty = true;
     }
 
-
     inline bool remove_from_inventory(const entityid actor_id, const entityid item_id) {
         auto maybe_inventory = ct.get<inventory>(actor_id);
         if (!maybe_inventory.has_value()) {
@@ -1498,7 +1435,6 @@ public:
             msuccess("Successfully removed item id %d", item_id);
         return success;
     }
-
 
     inline bool drop_from_inventory(const entityid actor_id, const entityid item_id) {
         if (remove_from_inventory(actor_id, item_id)) {
@@ -1523,7 +1459,6 @@ public:
         return false;
     }
 
-
     inline bool drop_all_from_inventory(entityid actor_id) {
         auto maybe_inventory = ct.get<inventory>(actor_id);
         if (!maybe_inventory.has_value()) {
@@ -1537,7 +1472,6 @@ public:
         }
         return true;
     }
-
 
     inline void handle_hero_inventory_equip_weapon(const entityid item_id) {
         // Check if this is the currently equipped weapon
@@ -1553,7 +1487,6 @@ public:
         display_inventory_menu = false;
     }
 
-
     inline void handle_hero_inventory_equip_shield(const entityid item_id) {
         // Check if this is the currently equipped weapon
         const entityid current_shield = ct.get<equipped_shield>(hero_id).value_or(ENTITYID_INVALID);
@@ -1568,7 +1501,6 @@ public:
         display_inventory_menu = false;
     }
 
-
     inline void handle_hero_inventory_equip_item(const entityid item_id) {
         const itemtype_t item_type = ct.get<itemtype>(item_id).value_or(ITEM_NONE);
         switch (item_type) {
@@ -1578,7 +1510,6 @@ public:
         default: break;
         }
     }
-
 
     inline void handle_hero_inventory_equip() {
         PlaySound(sfx.at(SFX_EQUIP_01));
@@ -1597,7 +1528,6 @@ public:
         if (type == ENTITY_ITEM)
             handle_hero_inventory_equip_item(item_id);
     }
-
 
     inline bool drop_item_from_hero_inventory() {
         if (!ct.has<inventory>(hero_id))
@@ -1628,7 +1558,6 @@ public:
         return true;
     }
 
-
     inline bool is_in_inventory(const entityid actor_id, const entityid item_id) {
         auto maybe_inventory = ct.get<inventory>(actor_id);
         if (!maybe_inventory.has_value()) {
@@ -1642,7 +1571,6 @@ public:
         }
         return false;
     }
-
 
     inline bool use_potion(const entityid actor_id, const entityid item_id) {
         massert(actor_id != ENTITYID_INVALID, "actor_id is invalid");
@@ -1676,11 +1604,9 @@ public:
         return false;
     }
 
-
     inline void logic_close() {
         d.floors.clear();
     }
-
 
     inline void handle_camera_move(inputstate& is) {
         if (inputstate_is_held(is, KEY_RIGHT)) {
@@ -1698,7 +1624,6 @@ public:
         }
     }
 
-
     inline void handle_hero_potion_use(const entityid id) {
         const entitytype_t type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
         if (type != ENTITY_ITEM)
@@ -1712,7 +1637,6 @@ public:
             display_inventory_menu = false;
         }
     }
-
 
     inline void handle_hero_item_use() {
         const size_t index = inventory_cursor.y * 7 + inventory_cursor.x;
@@ -1734,7 +1658,6 @@ public:
         if (i_type == ITEM_POTION)
             handle_hero_potion_use(item_id);
     }
-
 
     inline void handle_input_inventory(const inputstate& is) {
         if (controlmode != CONTROLMODE_INVENTORY)
@@ -1782,7 +1705,6 @@ public:
         }
     }
 
-
     inline bool handle_quit_pressed(const inputstate& is) {
         if (inputstate_is_pressed(is, KEY_ESCAPE)) {
             do_quit = true;
@@ -1790,7 +1712,6 @@ public:
         }
         return false;
     }
-
 
     inline void cycle_messages() {
         if (msg_system.size() > 0) {
@@ -1810,7 +1731,6 @@ public:
             msg_system_is_active = false;
     }
 
-
     inline bool handle_cycle_messages(const inputstate& is) {
         if (msg_system_is_active && inputstate_is_pressed(is, KEY_ENTER)) {
             PlaySound(sfx[SFX_CONFIRM_01]);
@@ -1820,7 +1740,6 @@ public:
         return false;
     }
 
-
     inline bool handle_cycle_messages_test() {
         if (!msg_system_is_active)
             return false;
@@ -1828,7 +1747,6 @@ public:
         cycle_messages();
         return true;
     }
-
 
     inline void handle_camera_zoom(const inputstate& is) {
         if (inputstate_is_pressed(is, KEY_LEFT_BRACKET)) {
@@ -1840,7 +1758,6 @@ public:
         }
     }
 
-
     inline void change_player_dir(const direction_t dir) {
         if (ct.get<dead>(hero_id).value_or(true))
             return;
@@ -1849,7 +1766,6 @@ public:
         player_changing_dir = false;
         frame_dirty = true;
     }
-
 
     inline bool handle_change_dir(const inputstate& is) {
         if (!player_changing_dir)
@@ -1891,7 +1807,6 @@ public:
         return true;
     }
 
-
     inline bool handle_change_dir_intent(const inputstate& is) {
         if (inputstate_is_pressed(is, KEY_S)) {
             player_changing_dir = true;
@@ -1899,7 +1814,6 @@ public:
         }
         return false;
     }
-
 
     inline bool handle_display_inventory(const inputstate& is) {
         if (inputstate_is_pressed(is, KEY_I)) {
@@ -1911,7 +1825,6 @@ public:
         }
         return false;
     }
-
 
     inline bool tile_has_solid(const int x, const int y, const int z) {
         massert(z >= 0, "floor is out of bounds");
@@ -1927,14 +1840,12 @@ public:
         return false;
     }
 
-
     inline bool handle_box_push(const entityid id, const vec3 v) {
         const bool can_push = ct.get<pushable>(id).value_or(false);
         if (!can_push)
             return false;
         return try_entity_move(id, v);
     }
-
 
     inline entityid tile_has_pushable(const int x, const int y, const int z) {
         massert(z >= 0, "floor is out of bounds");
@@ -1950,7 +1861,6 @@ public:
         return ENTITYID_INVALID;
     }
 
-
     inline entityid tile_has_door(const vec3 v) {
         shared_ptr<dungeon_floor> df = d.get_current_floor();
         shared_ptr<tile_t> t = df->tile_at(v);
@@ -1962,7 +1872,6 @@ public:
         }
         return ENTITYID_INVALID;
     }
-
 
     inline bool check_hearing(const entityid id, const vec3 loc) {
         if (id == ENTITYID_INVALID || vec3_invalid(loc))
@@ -1976,7 +1885,6 @@ public:
         const float hearing = ct.get<hearing_distance>(hero_id).value_or(3);
         return dist <= hearing;
     }
-
 
     inline bool try_entity_move(entityid id, vec3 v) {
         massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
@@ -2061,7 +1969,6 @@ public:
         return true;
     }
 
-
     inline bool handle_move_up(const inputstate& is, const bool is_dead) {
         if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W)) {
             if (is_dead)
@@ -2072,7 +1979,6 @@ public:
         }
         return false;
     }
-
 
     inline bool handle_move_down(const inputstate& is, const bool is_dead) {
         if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X)) {
@@ -2085,7 +1991,6 @@ public:
         return false;
     }
 
-
     inline bool handle_move_left(const inputstate& is, const bool is_dead) {
         if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_A)) {
             if (is_dead)
@@ -2096,7 +2001,6 @@ public:
         }
         return false;
     }
-
 
     inline bool handle_move_right(const inputstate& is, const bool is_dead) {
         if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_D)) {
@@ -2109,7 +2013,6 @@ public:
         return false;
     }
 
-
     inline bool handle_move_up_left(const inputstate& is, const bool is_dead) {
         if (inputstate_is_pressed(is, KEY_Q)) {
             if (is_dead)
@@ -2120,7 +2023,6 @@ public:
         }
         return false;
     }
-
 
     inline bool handle_move_up_right(const inputstate& is, const bool is_dead) {
         if (inputstate_is_pressed(is, KEY_E)) {
@@ -2135,7 +2037,6 @@ public:
         return false;
     }
 
-
     inline bool handle_move_down_left(const inputstate& is, const bool is_dead) {
         if (inputstate_is_pressed(is, KEY_Z)) {
             if (is_dead)
@@ -2147,7 +2048,6 @@ public:
         return false;
     }
 
-
     inline bool handle_move_down_right(const inputstate& is, const bool is_dead) {
         if (inputstate_is_pressed(is, KEY_C)) {
             if (is_dead)
@@ -2158,7 +2058,6 @@ public:
         }
         return false;
     }
-
 
     inline vec3 get_loc_facing_player() {
         optional<vec3> maybe_loc = ct.get<location>(hero_id);
@@ -2191,12 +2090,10 @@ public:
         return vec3{-1, -1, -1};
     }
 
-
     inline entityid get_cached_npc(shared_ptr<tile_t> t) {
         recompute_entity_cache(t); // Force update
         return t->get_cached_npc();
     }
-
 
     inline int compute_armor_class(entityid id) {
         massert(ENTITYID_INVALID != id, "id is invalid");
@@ -2207,7 +2104,6 @@ public:
         return total_ac;
     }
 
-
     inline bool compute_attack_roll(entityid attacker, entityid target) {
         const int str = ct.get<strength>(attacker).value_or(10);
         const int bonus = get_stat_bonus(str);
@@ -2216,7 +2112,6 @@ public:
         const int ac = compute_armor_class(target);
         return roll >= ac;
     }
-
 
     inline int compute_attack_damage(const entityid attacker, const entityid target) {
         const int str = ct.get<strength>(attacker).value_or(10);
@@ -2227,7 +2122,6 @@ public:
         const int dmg = std::max(1, gen(mt));
         return dmg + bonus;
     }
-
 
     inline void handle_weapon_durability_loss(entityid atk_id, entityid tgt_id) {
         const entityid equipped_wpn = ct.get<equipped_weapon>(atk_id).value_or(ENTITYID_INVALID);
@@ -2250,7 +2144,6 @@ public:
         add_message_history("%s broke!", ct.get<name>(equipped_wpn).value_or("no-name-weapon").c_str());
     }
 
-
     inline void handle_shield_durability_loss(entityid defender, entityid attacker) {
         const entityid shield = ct.get<equipped_shield>(defender).value_or(ENTITYID_INVALID);
         optional<int> maybe_dura = ct.get<durability>(shield);
@@ -2272,11 +2165,9 @@ public:
         add_message_history("%s broke!", ct.get<name>(shield).value_or("no-name-shield").c_str());
     }
 
-
     inline int get_npc_xp(entityid id) {
         return ct.get<xp>(id).value_or(0);
     }
-
 
     inline void update_npc_xp(entityid id, entityid target_id) {
         const int old_xp = get_npc_xp(id);
@@ -2284,7 +2175,6 @@ public:
         const int new_xp = old_xp + reward_xp;
         ct.set<xp>(id, new_xp);
     }
-
 
     inline void process_attack_results(entityid atk_id, entityid tgt_id, bool atk_successful) {
         massert(atk_id != ENTITYID_INVALID, "attacker entity id is invalid");
@@ -2334,13 +2224,11 @@ public:
         }
     }
 
-
     inline void handle_shield_block_sfx(const entityid target_id) {
         const bool event_heard = check_hearing(hero_id, ct.get<location>(target_id).value_or((vec3){-1, -1, -1}));
         if (event_heard)
             PlaySound(sfx[SFX_HIT_METAL_ON_METAL]);
     }
-
 
     inline attack_result_t process_attack_entity(shared_ptr<tile_t> tile, const entityid attacker_id, const entityid target_id) {
         massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
@@ -2391,7 +2279,6 @@ public:
         return ATTACK_RESULT_BLOCK;
     }
 
-
     inline void handle_attack_sfx(const entityid attacker, const attack_result_t result) {
         if (test)
             return;
@@ -2414,7 +2301,6 @@ public:
         msuccess("attack sfx played");
     }
 
-
     inline void set_gamestate_flag_for_attack_animation(const entitytype_t type) {
         massert(type == ENTITY_PLAYER || type == ENTITY_NPC, "type is not player or npc!");
         if (type == ENTITY_PLAYER)
@@ -2422,7 +2308,6 @@ public:
         else if (type == ENTITY_NPC)
             flag = GAMESTATE_FLAG_NPC_ANIM;
     }
-
 
     inline attack_result_t try_entity_attack(const entityid id, const int x, const int y) {
         minfo2("entity %d is attacking location %d, %d", id, x, y);
@@ -2446,7 +2331,6 @@ public:
         return result;
     }
 
-
     inline bool handle_attack(const inputstate& is, const bool is_dead) {
         if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
             if (is_dead)
@@ -2461,12 +2345,10 @@ public:
         return false;
     }
 
-
     inline entityid tile_get_item(shared_ptr<tile_t> t) {
         recompute_entity_cache(t);
         return t->get_cached_item();
     }
-
 
     inline bool try_entity_pull(entityid id) {
         massert(id != ENTITYID_INVALID, "Entity is NULL!");
@@ -2571,7 +2453,6 @@ public:
         return true;
     }
 
-
     inline bool try_entity_pickup(entityid id) {
         massert(id != ENTITYID_INVALID, "Entity is NULL!");
         ct.set<update>(id, true);
@@ -2601,7 +2482,6 @@ public:
         return item_picked_up;
     }
 
-
     inline bool handle_pickup_item(const inputstate& is, const bool is_dead) {
         if (!inputstate_is_pressed(is, KEY_SLASH))
             return false;
@@ -2611,7 +2491,6 @@ public:
         flag = GAMESTATE_FLAG_PLAYER_ANIM;
         return true;
     }
-
 
     inline bool try_entity_stairs(const entityid id) {
         massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
@@ -2665,7 +2544,6 @@ public:
         return false;
     }
 
-
     inline bool handle_traverse_stairs(const inputstate& is, const bool is_dead) {
         if (inputstate_is_pressed(is, KEY_PERIOD)) {
             if (is_dead)
@@ -2675,7 +2553,6 @@ public:
         }
         return false;
     }
-
 
     inline bool try_entity_open_door(const entityid id, const vec3 loc) {
         massert(id != ENTITYID_INVALID, "id is invalid");
@@ -2697,7 +2574,6 @@ public:
         return false;
     }
 
-
     inline bool handle_open_door(const inputstate& is, const bool is_dead) {
         if (inputstate_is_pressed(is, KEY_O)) {
             if (is_dead)
@@ -2709,7 +2585,6 @@ public:
         }
         return false;
     }
-
 
     inline void try_entity_cast_spell(const entityid id, const int tgt_x, const int tgt_y) {
         optional<vec3> maybe_loc = ct.get<location>(id);
@@ -2809,7 +2684,6 @@ public:
             PlaySound(sfx[SFX_ITEM_FUSION]);
     }
 
-
     inline bool handle_test_cast_spell(const inputstate& is, const bool is_dead) {
         if (inputstate_is_pressed(is, KEY_M)) {
             if (is_dead) {
@@ -2826,7 +2700,6 @@ public:
         return false;
     }
 
-
     inline bool handle_restart(const inputstate& is, const bool is_dead) {
         if (inputstate_is_pressed(is, KEY_R) && is_dead) {
             do_restart = true;
@@ -2834,7 +2707,6 @@ public:
         }
         return false;
     }
-
 
     inline void handle_input_gameplay_controlmode_player(const inputstate& is) {
         if (flag != GAMESTATE_FLAG_PLAYER_INPUT)
@@ -2902,7 +2774,6 @@ public:
             return;
     }
 
-
     inline void handle_input_action_menu(const inputstate& is) {
         massert(controlmode == CONTROLMODE_ACTION_MENU, "controlmode isnt in action menu: %d", controlmode);
         if (inputstate_is_pressed(is, KEY_SPACE)) {
@@ -2914,7 +2785,6 @@ public:
         else if (inputstate_is_pressed(is, KEY_UP))
             action_selection--;
     }
-
 
     inline void handle_input_option_menu(inputstate& is) {
         massert(controlmode == CONTROLMODE_OPTION_MENU, "controlmode isnt in option menu: %d", controlmode);
@@ -2928,7 +2798,6 @@ public:
         else if (inputstate_is_pressed(is, KEY_ENTER))
             minfo("Enter pressed");
     }
-
 
     inline void handle_input_gameplay_scene(inputstate& is) {
         minfo2("handle input gameplay scene");
@@ -2951,7 +2820,6 @@ public:
             handle_input_option_menu(is);
     }
 
-
     inline void handle_input(inputstate& is) {
         // no matter which mode we are in, we can toggle the debug panel
         minfo2("handle input: current_scene: %d", current_scene);
@@ -2968,7 +2836,6 @@ public:
         else if (current_scene == SCENE_GAMEPLAY)
             handle_input_gameplay_scene(is);
     }
-
 
     inline void update_debug_panel_buffer(const inputstate& is) {
         minfo2("update debug panel buffer");
@@ -3052,7 +2919,6 @@ public:
             god_mode);
     }
 
-
     inline bool is_entity_adjacent(const entityid id0, const entityid id1) {
         massert(id0 != ENTITYID_INVALID, "id0 is invalid");
         massert(id1 != ENTITYID_INVALID, "id1 is invalid");
@@ -3066,7 +2932,6 @@ public:
         return (a.x - 1 == b.x && a.y - 1 == b.y) || (a.x == b.x && a.y - 1 == b.y) || (a.x + 1 == b.x && a.y - 1 == b.y) || (a.x - 1 == b.x && a.y == b.y) ||
                (a.x + 1 == b.x && a.y == b.y) || (a.x - 1 == b.x && a.y + 1 == b.y) || (a.x == b.x && a.y + 1 == b.y) || (a.x + 1 == b.x && a.y + 1 == b.y);
     }
-
 
     inline bool handle_npc(const entityid id) {
         minfo2("handle npc %d", id);
@@ -3119,7 +2984,6 @@ public:
         return false;
     }
 
-
     inline void handle_npcs() {
         minfo2("handle npcs");
         if (flag == GAMESTATE_FLAG_NPC_TURN) {
@@ -3146,7 +3010,6 @@ public:
 #endif
         }
     }
-
 
     inline void handle_test_flag() {
         minfo2(
@@ -3183,7 +3046,6 @@ public:
 #endif
         }
     }
-
 
     inline void tick(inputstate& is) {
         minfo2("tick");

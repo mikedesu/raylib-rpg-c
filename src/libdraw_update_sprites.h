@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "ComponentTraits.h"
 #include "draw_handle_gamestate_flag.h"
 #include "gamestate.h"
@@ -10,31 +9,22 @@
 #include "update_sprite.h"
 #include <raylib.h>
 
-
 extern Music music;
 extern unordered_map<entityid, spritegroup*> spritegroups;
 extern int ANIM_SPEED;
-
 
 static inline void libdraw_update_sprites_pre(gamestate& g) {
     minfo2("BEGIN update sprites pre");
     handle_music_stream(g);
     if (g.current_scene == SCENE_GAMEPLAY) {
-        //if (g.flag == GAMESTATE_FLAG_PLAYER_INPUT || g.flag == GAMESTATE_FLAG_PLAYER_ANIM) ANIM_SPEED = DEFAULT_ANIM_SPEED;
-        //else if (g.flag == GAMESTATE_FLAG_NPC_TURN || g.flag == GAMESTATE_FLAG_NPC_ANIM)   ANIM_SPEED = DEFAULT_ANIM_SPEED;
-        //minfo2("Begin handling dirty entities");
         libdraw_handle_dirty_entities(g);
-        //minfo2("End handling dirty entities");
-        //minfo2("Begin update sprites pre loop");
-        for (entityid id = 0; id < g.next_entityid; id++) libdraw_update_sprite_pre(g, id);
-        //msuccess2("End update sprites pre loop");
+        for (entityid id = 0; id < g.next_entityid; id++)
+            libdraw_update_sprite_pre(g, id);
     }
     msuccess2("END update sprites pre");
 }
 
-
 static inline void libdraw_update_sprites_post(gamestate& g) {
-    //minfo2("BEGIN update sprites post");
     if (g.current_scene != SCENE_GAMEPLAY) {
         g.frame_dirty = false;
         return;
@@ -50,12 +40,15 @@ static inline void libdraw_update_sprites_post(gamestate& g) {
     for (entityid id = 0; id < g.next_entityid; id++) {
         // verify it has an entity type
         const entitytype_t type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
-        if (type == ENTITY_NONE) continue;
+        if (type == ENTITY_NONE)
+            continue;
         // grab the sprite group for that entity
         spritegroup* sg = spritegroups[id];
-        if (!sg) continue;
+        if (!sg)
+            continue;
         auto s = sg->sprites2->at(sg->current);
-        if (!s) continue;
+        if (!s)
+            continue;
         //sprite_incrframe2(s);
         s->incr_frame();
         // this condition for the animation reset seems incorrect

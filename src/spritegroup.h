@@ -48,11 +48,16 @@ public:
         }
     }
 
-    shared_ptr<sprite> get(int index) {return sprites2->at(index);}
-    shared_ptr<sprite> get_current() {return sprites2->at(current);}
+    shared_ptr<sprite> get(int index) {
+        return sprites2->at(index);
+    }
+    shared_ptr<sprite> get_current() {
+        return sprites2->at(current);
+    }
 
     void add(shared_ptr<sprite> s) {
-        if (!s || size >= capacity) return;
+        if (!s || size >= capacity)
+            return;
         sprites2->push_back(s);
         size++;
     }
@@ -61,7 +66,8 @@ public:
     void setcontexts(int context) {
         for (int i = 0; i < size; i++) {
             auto s = sprites2->at(i);
-            if (!s || s->get_numcontexts() <= 0 || context < 0 || context >= s->get_numcontexts()) continue;
+            if (!s || s->get_numcontexts() <= 0 || context < 0 || context >= s->get_numcontexts())
+                continue;
             s->set_context(context);
         }
     }
@@ -72,10 +78,13 @@ public:
         s->set_stop_on_last_frame(do_stop);
     }
 
-    void set_default_anim(int anim) {default_anim = anim;}
+    void set_default_anim(int anim) {
+        default_anim = anim;
+    }
 
     bool snap_dest(int x, int y) {
-        if (move.x != 0 || move.y != 0) return false;
+        if (move.x != 0 || move.y != 0)
+            return false;
         dest.x = x * DEFAULT_TILE_SIZE + off_x;
         dest.y = y * DEFAULT_TILE_SIZE + off_y;
         return true;
@@ -119,4 +128,3 @@ public:
         return retval;
     }
 };
-
