@@ -1,15 +1,3 @@
 #pragma once
 
-
-typedef enum
-{
-    ITEM_NONE,
-    ITEM_WEAPON,
-    ITEM_SHIELD,
-    ITEM_POTION,
-    ITEM_ARROW,
-    ITEM_QUIVER,
-    ITEM_WAND,
-    ITEM_RING,
-    ITEM_TYPE_COUNT
-} itemtype_t;
+typedef enum { ITEM_NONE, ITEM_WEAPON, ITEM_SHIELD, ITEM_POTION, ITEM_ARROW, ITEM_QUIVER, ITEM_WAND, ITEM_RING, ITEM_FOOD, ITEM_TYPE_COUNT } itemtype_t;

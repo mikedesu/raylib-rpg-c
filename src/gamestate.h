@@ -15,6 +15,7 @@
 #include "gamestate_flag.h"
 #include "get_racial_hd.h"
 #include "get_racial_modifiers.h"
+#include "hunger_points.h"
 #include "inputstate.h"
 #include "libgame_defines.h"
 #include "magic_values.h"
@@ -878,9 +879,9 @@ public:
         ct.set<hd>(id, hitdie);
     }
 
-    inline void set_npc_defaults(const entityid id) {
+    inline void set_npc_defaults(entityid id) {
         ct.set<entitytype>(id, ENTITY_NPC);
-        ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
+        ct.set<spritemove>(id, Rectangle{0, 0, 0, 0});
         ct.set<dead>(id, false);
         ct.set<update>(id, true);
         ct.set<direction>(id, DIR_DOWN_RIGHT);
@@ -904,6 +905,8 @@ public:
         vector<tactic> my_tactics = {//{tactic_target::enemy, tactic_condition::adjacent, tactic_action::attack},
                                      {tactic_target::nil, tactic_condition::any, tactic_action::move}};
         ct.set<tactics>(id, my_tactics);
+
+        ct.set<hunger_points>(id, hunger_points_t{100, 100});
     }
 
     inline entityid create_npc_with(const race_t rt, with_fun npcInitFunction) {

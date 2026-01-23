@@ -3,6 +3,7 @@
 #include "direction.h"
 #include "entityid.h"
 #include "entitytype.h"
+#include "hunger_points.h"
 #include "item.h"
 #include "potion.h"
 #include "proptype.h"
@@ -97,7 +98,6 @@ struct ComponentTraits<casting> {
     using Type = bool;
 };
 
-
 // this casting is for spells
 struct spell_casting { }; // bool
 template <>
@@ -122,7 +122,6 @@ template <>
 struct ComponentTraits<spell_complete> {
     using Type = bool;
 };
-
 
 struct blocking { }; // bool
 template <>
@@ -202,13 +201,11 @@ struct ComponentTraits<equipped_shield> {
     using Type = entityid;
 };
 
-
 struct xp { }; // int
 template <>
 struct ComponentTraits<xp> {
     using Type = int;
 };
-
 
 struct hp { }; // int
 template <>
@@ -282,13 +279,11 @@ struct ComponentTraits<aggro> {
     using Type = bool;
 };
 
-
 struct damage { }; // vec3
 template <>
 struct ComponentTraits<damage> {
     using Type = vec3;
 };
-
 
 struct healing { }; // vec3
 template <>
@@ -296,20 +291,17 @@ struct ComponentTraits<healing> {
     using Type = vec3;
 };
 
-
 struct description { }; //string
 template <>
 struct ComponentTraits<description> {
     using Type = string;
 };
 
-
 struct durability { }; //string
 template <>
 struct ComponentTraits<durability> {
     using Type = int;
 };
-
 
 struct max_durability { }; //string
 template <>
@@ -323,13 +315,11 @@ struct ComponentTraits<destroyed> {
     using Type = bool;
 };
 
-
 struct door_open { }; //string
 template <>
 struct ComponentTraits<door_open> {
     using Type = bool;
 };
-
 
 struct hearing_distance { }; //string
 template <>
@@ -337,13 +327,11 @@ struct ComponentTraits<hearing_distance> {
     using Type = int;
 };
 
-
 struct block_chance { }; //int
 template <>
 struct ComponentTraits<block_chance> {
     using Type = int;
 };
-
 
 struct base_ac { }; //int
 template <>
@@ -351,13 +339,11 @@ struct ComponentTraits<base_ac> {
     using Type = int;
 };
 
-
 struct damage_reduction { }; //int
 template <>
 struct ComponentTraits<damage_reduction> {
     using Type = int;
 };
-
 
 struct hd { }; //int
 template <>
@@ -365,13 +351,11 @@ struct ComponentTraits<hd> {
     using Type = vec3;
 };
 
-
 struct rarity { }; //int
 template <>
 struct ComponentTraits<rarity> {
     using Type = rarity_t;
 };
-
 
 struct spelltype { }; //int
 template <>
@@ -379,13 +363,11 @@ struct ComponentTraits<spelltype> {
     using Type = spelltype_t;
 };
 
-
 struct spellstate { }; //int
 template <>
 struct ComponentTraits<spellstate> {
     using Type = spellstate_t;
 };
-
 
 struct proptype { }; //int
 template <>
@@ -393,13 +375,11 @@ struct ComponentTraits<proptype> {
     using Type = proptype_t;
 };
 
-
 struct solid { }; // bool
 template <>
 struct ComponentTraits<solid> {
     using Type = bool;
 };
-
 
 struct tactics { }; // vector of tactic
 template <>
@@ -407,16 +387,20 @@ struct ComponentTraits<tactics> {
     using Type = vector<tactic>;
 };
 
-
 struct steps_taken { };
 template <>
 struct ComponentTraits<steps_taken> {
     using Type = unsigned int;
 };
 
-
 struct zombie { }; // bool
 template <>
 struct ComponentTraits<zombie> {
     using Type = bool;
+};
+
+struct hunger_points { }; // hunger_points_t
+template <>
+struct ComponentTraits<hunger_points> {
+    using Type = hunger_points_t;
 };
