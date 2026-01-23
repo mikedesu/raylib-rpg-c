@@ -10,17 +10,13 @@
 #include "libgame_defines.h"
 #include "textureinfo.h"
 
-
 using std::for_each;
 
-
 extern textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
-
 
 constexpr static inline int manhattan_distance(vec3 a, vec3 b) {
     return abs(a.x - b.x) + abs(a.y - b.y);
 }
-
 
 static inline bool is_loc_too_far_to_draw(gamestate& g, vec3 loc, vec3 hero_loc) {
     // Get hero's vision distance and location
@@ -36,11 +32,14 @@ static inline bool is_loc_too_far_to_draw(gamestate& g, vec3 loc, vec3 hero_loc)
     return dist > dist_to_check;
 }
 
-
 static inline bool is_loc_path_blocked(gamestate& g, shared_ptr<dungeon_floor> df, vec3 loc, vec3 hero_loc) {
     vector<vec3> path = calculate_path_with_thickness(loc, hero_loc);
     bool blocked = false;
     for (auto v0 : path) {
+        // skip v0 if it is equal to hero_loc
+        if (vec3_equal(v0, hero_loc))
+            continue;
+
         auto v0_tile = df->tile_at(v0);
         auto v0_tiletype = v0_tile->get_type();
         if (tiletype_is_none(v0_tiletype) || tiletype_is_wall(v0_tiletype)) {
@@ -74,7 +73,6 @@ static inline bool is_loc_path_blocked(gamestate& g, shared_ptr<dungeon_floor> d
     }
     return blocked;
 }
-
 
 static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txinfo, int x, int y, int z) {
     minfo2("BEGIN draw dungeon floor tile");
@@ -122,7 +120,6 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txinfo, in
     return true;
 }
 
-
 static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type_0, function<bool(gamestate&, entityid)> extra_check) {
     auto df = g.d.get_current_floor();
     const int df_w = df->get_width(), df_h = df->get_height(), num_tiles = df_w * df_h;
@@ -158,7 +155,6 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
         });
     }
 }
-
 
 static inline bool draw_dungeon_floor(gamestate& g) {
     shared_ptr<dungeon_floor> df = g.d.get_current_floor();
