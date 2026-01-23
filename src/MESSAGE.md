@@ -45,22 +45,22 @@ I have already done the following:
 - [x] **BUG** `handle_test_flag` not properly incrementing turns
   - [ ] **i think its fixed**
 - [x] **FIXED** **BUG** pulling a box can result in the player moving into an empty/unknown/none-tiletype
+- [x] **FIXED** **BUG** moving has a context-setting bug since upgrading `sprite` and `spritegroup` to classes...
 
 
 Previous analysis suggestions you've brought up that I will eventually implement, or ideas that I've realized I need to handle (**DO NOT BASED ANALYSIS ON THESE**)
 
 
-- [ ] **BUG** moving has a context-setting bug since upgrading `sprite` and `spritegroup` to classes...
-- [ ] **POLISH** camera movement should be bounded by the size of the dungeon floor
 - [ ] **BUG** standing on top of dead bodies causes the lighting system to treat it as if you can't see in any direction
+- [ ] **BUG** hallways generated do not always connect on their adjacent rooms
+- [ ] **BUG** i've seen the player and NPCs move into tiles that are occupied by other entities, which violates the system
+- [ ] **BUG** i just saw an NPC orc push a box under the player
+- [ ] **PLAYER REQUEST** numpad movement controls
 - [ ] **POLISH** draw tile updates can be moved over into draw entity
   - [ ] there is a lot of code duplication, see if we cant use the manhattan dist function...
-- [ ] **BUG** hallways generated do not always connect on their adjacent rooms
 - [ ] **OPTIMIZATION** we need to start storing lists of entityids by type in `gamestate`
   - [ ] when looping thru handling entities, it would reduce comparisons and make the internal `tick` faster
 - [ ] **API** we need a proper create_monster-type function that allows for setting of the race 
-- [ ] **BUG** i've seen the player and NPCs move into tiles that are occupied by other entities, which violates the system
-- [ ] **PLAYER REQUEST** numpad movement controls
 - [ ] **FEATURE** volume control menu
   - [ ] press V key, pop-up volume control menu
     - [ ] select master
@@ -69,7 +69,6 @@ Previous analysis suggestions you've brought up that I will eventually implement
 - [ ] **FEATURE** text display that sits on top of each NPC
   - [ ] start with static text that simply gets rendered after NPC draw
 - [ ] **FEATURE** pop-up text display that sits on top of each NPC and rises up and fades away
-- [ ] **BUG** i just saw an NPC orc push a box under the player
 - [ ] **ALGORITHM BUG** it is possible that `solid` props are placed in a way that blocks access into another area. one of two possible fixes:
 - [ ] **CRASH** **BUG** unknown crash occuring, was moving onto a tile with an npc i just killed
 - [ ] **CRASH** **BUG** unknown crash occuring, was entering "room 3" with a table, statue, table in vertical pattern
@@ -102,4 +101,5 @@ Previous analysis suggestions you've brought up that I will eventually implement
     - [ ] piercing
     - [ ] poison
   - [ ] damage to attributes and stats
+- [ ] **POLISH** camera movement should be bounded by the size of the dungeon floor
 
