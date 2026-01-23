@@ -1173,14 +1173,14 @@ public:
         //const vec3 loc0 = d.floors[0].df_get_random_loc();
         auto df = d.get_current_floor();
         //auto rl0 = df->df_get_random_loc();
-        create_weapon_at_with(ct, df->get_random_loc(), dagger_init());
-        create_weapon_at_with(ct, df->get_random_loc(), axe_init());
-        create_shield_at_with(ct, df->get_random_loc(), shield_init());
+        //create_weapon_at_with(ct, df->get_random_loc(), dagger_init());
+        //create_weapon_at_with(ct, df->get_random_loc(), axe_init());
+        //create_shield_at_with(ct, df->get_random_loc(), shield_init());
         //create_potion_at_with(d.floors[0].df_get_random_loc(), potion_init(POTION_HP_SMALL));
-        constexpr int num_boxes = 10;
+        constexpr int num_boxes = 0;
         for (int i = 0; i < num_boxes; i++)
             create_box_at_with(df->get_random_loc());
-        constexpr int monster_count = 10;
+        constexpr int monster_count = 0;
         for (int j = 0; j < monster_count; j++) {
             const vec3 random_loc = d.get_floor(0)->get_random_loc();
             create_orc_at_with(random_loc, [this](CT& ct, const entityid id) {
@@ -2855,6 +2855,10 @@ public:
         const char* control_mode = controlmode == CONTROLMODE_CAMERA ? "Camera" : controlmode == CONTROLMODE_PLAYER ? "Player" : "Unknown";
         // zero out the buffer
         //memset(debugpanel.buffer, 0, sizeof(debugpanel.buffer));
+
+        direction_t player_dir = ct.get<direction>(hero_id).value_or(DIR_NONE);
+        //int player_ctx =
+
         bzero(debugpanel.buffer, sizeof(debugpanel.buffer));
         // Format the string in one pass
         snprintf(
@@ -2884,6 +2888,7 @@ public:
             "living npcs on floor: %lu\n"
             "dead npcs on floor: %lu\n"
             "god_mode: %d\n"
+            "player direction: %d\n"
             "\n",
             framecount,
             frame_updates,
@@ -2916,7 +2921,8 @@ public:
             df_h,
             d.get_current_floor()->get_living_npcs()->size(),
             d.get_current_floor()->get_dead_npcs()->size(),
-            god_mode);
+            god_mode,
+            player_dir);
     }
 
     inline bool is_entity_adjacent(const entityid id0, const entityid id1) {
