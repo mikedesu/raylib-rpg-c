@@ -1,7 +1,7 @@
 #pragma once
 
-#define GAME_VERSION "v0.0.6.2"
-#define GAME_VERSION_DATE "January 20, 2026"
+#define GAME_VERSION "v0.0.6.3"
+#define GAME_VERSION_DATE "January 23, 2026"
 
 #define WINDOW_TITLE "@evildojo666 presents: project.rpg"
 //#define DEFAULT_WIN_WIDTH 800
@@ -31,7 +31,6 @@
 #define DEFAULT_TILE_SIZE_FLOAT 32.0f
 #define DEFAULT_OFFSET -12
 
-
 #define DEFAULT_TARGET_FPS 60
 #define FRAMEINTERVAL 10
 #define DEFAULT_LOCK 30
@@ -59,6 +58,5 @@
 #define DEFAULT_CAMERA_ZOOM 10.0f
 
 #define DEFAULT_ANIM_SPEED 10
-
 
 #define DEFAULT_SPRITEGROUPS_SIZE 128
