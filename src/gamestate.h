@@ -920,13 +920,18 @@ public:
 
     inline entityid create_food_with(food_t ft, with_fun foodInitFunction) {
         const entityid id = add_entity();
+        ct.set<entitytype>(id, ENTITY_ITEM);
+        ct.set<itemtype>(id, ITEM_FOOD);
         ct.set<foodtype>(id, ft);
         ct.set<food_attribute>(id, food_attribute_t{75}); // test
+
+        ct.set<update>(id, false);
         foodInitFunction(ct, id);
         return id;
     }
 
     inline entityid create_food_at_with(food_t ft, vec3 loc, with_fun foodInitFunction) {
+        minfo("BEGIN create_food_at_with");
         auto df = d.get_floor(loc.z);
         auto tile = df->tile_at(loc);
         if (!tile_is_walkable(tile->get_type())) {
@@ -956,7 +961,7 @@ public:
         }
         minfo2("setting location for %d", id);
         ct.set<location>(id, loc);
-        msuccess2("created food %d", id);
+        msuccess("created food %d", id);
         return id;
     }
 
@@ -1221,7 +1226,13 @@ public:
         create_weapon_at_with(ct, df->get_random_loc(), dagger_init());
         create_weapon_at_with(ct, df->get_random_loc(), axe_init());
         create_shield_at_with(ct, df->get_random_loc(), shield_init());
-        create_food_at_with(FOOD_BURGER, df->get_random_loc(), [](CT& ct, entityid id) {});
+
+        constexpr int num_burgers = 10;
+        for (int i = 0; i < num_burgers; i++) {
+            create_food_at_with(FOOD_BURGER, df->get_random_loc(), [](CT& ct, entityid id) {});
+            create_food_at_with(FOOD_ONIGIRI, df->get_random_loc(), [](CT& ct, entityid id) {});
+            create_food_at_with(FOOD_COFFEE, df->get_random_loc(), [](CT& ct, entityid id) {});
+        }
 
         //create_potion_at_with(d.floors[0].df_get_random_loc(), potion_init(POTION_HP_SMALL));
         constexpr int num_boxes = 0;

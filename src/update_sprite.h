@@ -67,7 +67,7 @@ static inline void libdraw_update_sprite_position(gamestate& g, entityid id, spr
 }
 
 static inline void libdraw_update_sprite_ptr(gamestate& g, entityid id, spritegroup* sg) {
-    minfo2("Begin update sprite ptr: %d", id);
+    minfo2("BEGIN update sprite ptr: %d", id);
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     massert(sg, "spritegroup is NULL");
 
@@ -115,6 +115,8 @@ static inline void libdraw_update_sprite_ptr(gamestate& g, entityid id, spritegr
         return;
     const vec3 loc = maybe_loc.value();
     sg->snap_dest(loc.x, loc.y);
+
+    msuccess2("END update sprite ptr: %d", id);
 }
 
 static inline void libdraw_update_sprite_pre(gamestate& g, entityid id) {
