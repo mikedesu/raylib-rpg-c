@@ -27,7 +27,7 @@ game: main.cpp
 
 # Web build
 index.html: main.cpp
-	$(WEB_CC) -o $@ main.cpp $(WEB_INCLUDES) $(WEB_LINKS) $(EMCC_OPTIONS) $(SHELL_FILE) $(PRELOAD_FILES) $(WEB_OPTIONS) $(CFLAGS)
+	$(WEB_CC) -o $@ main.cpp $(WEB_INCLUDES) $(WEB_LINKS) $(EMCC_OPTIONS) $(SHELL_FILE) $(PRELOAD_FILES) $(WEB_OPTIONS) $(CFLAGS) $(CXXFLAGS)
 
 # Unit tests
 tests: tests.cpp
