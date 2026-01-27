@@ -32,9 +32,15 @@ public:
 
     spritegroup(int cap) {
         massert(cap > 0, "cap must be greater than 0, got %d", cap);
-        current = size = off_x = off_y = default_anim = id = 0;
+        current = 0;
+        capacity = cap;
+        size = 0;
+        off_x = 0;
+        off_y = 0;
+        default_anim = 0;
         alpha = 255;
-        sprites2 = new vector<shared_ptr<sprite>>();
+        id = 0;
+        sprites2 = new vector<shared_ptr<sprite>>(cap);
         dest = move = Rectangle{0, 0, 0, 0};
         move_rate = 1.0;
         visible = true;
@@ -51,13 +57,18 @@ public:
     shared_ptr<sprite> get(int index) {
         return sprites2->at(index);
     }
+
     shared_ptr<sprite> get_current() {
         return sprites2->at(current);
     }
 
     void add(shared_ptr<sprite> s) {
-        if (!s || size >= capacity)
-            return;
+        massert(s, "s is null");
+        massert(size < capacity, "size %d is >= capacity %d", size, capacity);
+
+        //if (!s || size >= capacity) {
+        //    return;
+        //}
         sprites2->push_back(s);
         size++;
     }

@@ -4,7 +4,6 @@
 #include "mprint.h"
 #include "textureinfo.h"
 
-
 static inline bool load_texture(textureinfo* txinfo, int txkey, int ctxs, int frames, bool do_dither, char* path) {
     massert(txinfo != NULL, "txinfo is NULL");
     massert(path, "path is NULL");
@@ -21,13 +20,13 @@ static inline bool load_texture(textureinfo* txinfo, int txkey, int ctxs, int fr
     if (do_dither)
         ImageDither(&image, 4, 4, 4, 4);
     Texture2D texture = LoadTextureFromImage(image);
+    massert(texture.id != 0, "texture.id is 0, load fail");
     UnloadImage(image);
     txinfo[txkey].texture = texture;
     txinfo[txkey].contexts = ctxs;
     txinfo[txkey].num_frames = frames;
     return true;
 }
-
 
 static inline bool load_textures(textureinfo* txinfo) {
     massert(txinfo != NULL, "txinfo is NULL");
