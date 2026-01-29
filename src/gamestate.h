@@ -902,8 +902,12 @@ public:
         //tactic t = {tactic_target::enemy, tactic_condition::adjacent, tactic_action::wait};
         //vector<tactic> my_tactics = {
         //    {tactic_target::enemy, tactic_condition::adjacent, tactic_action::attack}, {tactic_target::nil, tactic_condition::any, tactic_action::move}};
-        vector<tactic> my_tactics = {//{tactic_target::enemy, tactic_condition::adjacent, tactic_action::attack},
-                                     {tactic_target::nil, tactic_condition::any, tactic_action::move}};
+
+        vector<tactic> my_tactics = {
+            {tactic_target::enemy, tactic_condition::adjacent, tactic_action::attack}, {tactic_target::nil, tactic_condition::any, tactic_action::move}};
+
+        //vector<tactic> my_tactics = {{tactic_target::nil, tactic_condition::any, tactic_action::move}};
+
         ct.set<tactics>(id, my_tactics);
 
         ct.set<hunger_points>(id, hunger_points_t{100, 100});
@@ -1176,9 +1180,9 @@ public:
         //const vec3 loc0 = d.floors[0].df_get_random_loc();
         auto df = d.get_current_floor();
         //auto rl0 = df->df_get_random_loc();
-        //create_weapon_at_with(ct, df->get_random_loc(), dagger_init());
-        //create_weapon_at_with(ct, df->get_random_loc(), axe_init());
-        //create_shield_at_with(ct, df->get_random_loc(), shield_init());
+        create_weapon_at_with(ct, df->get_random_loc(), dagger_init());
+        create_weapon_at_with(ct, df->get_random_loc(), axe_init());
+        create_shield_at_with(ct, df->get_random_loc(), shield_init());
         //create_potion_at_with(d.floors[0].df_get_random_loc(), potion_init(POTION_HP_SMALL));
         constexpr int num_boxes = 0;
         for (int i = 0; i < num_boxes; i++)
