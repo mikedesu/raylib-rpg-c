@@ -3,7 +3,6 @@
 #include "direction.h"
 #include "entityid.h"
 #include "entitytype.h"
-#include "food.h"
 #include "hunger_points.h"
 #include "item.h"
 #include "potion.h"
@@ -404,16 +403,4 @@ struct hunger_points { }; // hunger_points_t
 template <>
 struct ComponentTraits<hunger_points> {
     using Type = hunger_points_t;
-};
-
-struct foodtype { };
-template <>
-struct ComponentTraits<foodtype> {
-    using Type = food_t;
-};
-
-struct food_attribute { };
-template <>
-struct ComponentTraits<food_attribute> {
-    using Type = food_attribute_t;
 };

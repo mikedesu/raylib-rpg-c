@@ -8,7 +8,6 @@
 #include "spell.h"
 #include "tx_keys_boxes.h"
 #include "tx_keys_doors.h"
-#include "tx_keys_food.h"
 #include "tx_keys_monsters.h"
 #include "tx_keys_npcs.h"
 #include "tx_keys_potions.h"
@@ -17,10 +16,13 @@
 #include "tx_keys_spells.h"
 #include "tx_keys_weapons.h"
 
+
 static inline void create_npc_sg_byid(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
+
     const race_t r = g.ct.get<race>(id).value_or(RACE_NONE);
     massert(r != RACE_NONE, "race is none for id %d", id);
+
     int* keys = NULL;
     int key_count = 0;
 
@@ -95,16 +97,6 @@ static inline void create_box_sg_byid(gamestate& g, entityid id) {
     create_spritegroup(g, id, TX_WOODEN_BOX_KEYS, TX_WOODEN_BOX_COUNT, -12, -12);
 }
 
-static inline void create_food_sg_byid(gamestate& g, entityid id) {
-    massert(id != ENTITYID_INVALID, "entityid is invalid");
-    food_t t = g.ct.get<foodtype>(id).value_or(FOOD_NONE);
-    switch (t) {
-    case FOOD_BURGER: create_spritegroup(g, id, TX_FOOD_BURGER_KEYS, TX_FOOD_BURGER_COUNT, -12, -12); break;
-    case FOOD_ONIGIRI: create_spritegroup(g, id, TX_FOOD_ONIGIRI_KEYS, TX_FOOD_ONIGIRI_COUNT, -12, -12); break;
-    case FOOD_COFFEE: create_spritegroup(g, id, TX_FOOD_COFFEE_KEYS, TX_FOOD_COFFEE_COUNT, -12, -12); break;
-    default: break;
-    }
-}
 
 static inline void create_potion_sg_byid(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
@@ -118,6 +110,7 @@ static inline void create_potion_sg_byid(gamestate& g, entityid id) {
     default: break;
     }
 }
+
 
 static inline void create_weapon_sg_byid(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
@@ -133,6 +126,7 @@ static inline void create_weapon_sg_byid(gamestate& g, entityid id) {
     }
 }
 
+
 static inline void create_shield_sg_byid(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     switch (g.ct.get<shieldtype>(id).value_or(SHIELD_NONE)) {
@@ -143,6 +137,7 @@ static inline void create_shield_sg_byid(gamestate& g, entityid id) {
     }
 }
 
+
 static inline void create_spell_sg_byid(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     switch (g.ct.get<spelltype>(id).value_or(SPELLTYPE_NONE)) {
@@ -151,16 +146,17 @@ static inline void create_spell_sg_byid(gamestate& g, entityid id) {
     }
 }
 
+
 static inline void create_item_sg_byid(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     switch (g.ct.get<itemtype>(id).value_or(ITEM_NONE)) {
     case ITEM_POTION: create_potion_sg_byid(g, id); break;
     case ITEM_WEAPON: create_weapon_sg_byid(g, id); break;
     case ITEM_SHIELD: create_shield_sg_byid(g, id); break;
-    case ITEM_FOOD: create_food_sg_byid(g, id); break;
     default: break;
     }
 }
+
 
 static inline void create_prop_sg_byid(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
@@ -176,6 +172,7 @@ static inline void create_prop_sg_byid(gamestate& g, entityid id) {
     }
 }
 
+
 static inline void create_sg_byid(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     switch (g.ct.get<entitytype>(id).value_or(ENTITY_NONE)) {
@@ -186,7 +183,6 @@ static inline void create_sg_byid(gamestate& g, entityid id) {
     case ENTITY_ITEM: create_item_sg_byid(g, id); break;
     case ENTITY_SPELL: create_spell_sg_byid(g, id); break;
     case ENTITY_PROP: create_prop_sg_byid(g, id); break;
-    //case ENTITY_FOOD: create_food_sg_byid(g, id); break;
     default: break;
     }
 }

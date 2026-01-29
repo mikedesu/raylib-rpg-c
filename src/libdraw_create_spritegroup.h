@@ -1,6 +1,5 @@
 #pragma once
 
-#include "debug_entity.h"
 #include "dungeon_floor.h"
 #include "gamestate.h"
 #include "libgame_defines.h"
@@ -14,7 +13,9 @@ static inline bool create_spritegroup(gamestate& g, entityid id, int* keys, int 
     minfo("BEGIN create_spritegroup");
     massert(txinfo, "txinfo is null");
     // can hold up to 32 sprites
+    //spritegroup* group = spritegroup_create(SPRITEGROUP_DEFAULT_SIZE);
     spritegroup* group = new spritegroup(SPRITEGROUP_DEFAULT_SIZE);
+
     massert(group, "spritegroup is NULL");
     //disabling this check until dungeon_floor created
     auto df = g.d.get_current_floor();
@@ -49,11 +50,8 @@ static inline bool create_spritegroup(gamestate& g, entityid id, int* keys, int 
         //string n = g.ct.get<name>(id).value_or("no-name");
         //minfo2("name: %s", n.c_str());
 
-        debug_entity(g, id);
-
         minfo2("group->get(0)");
         auto s = group->get(0);
-
         massert(s, "sprite is NULL");
         minfo2("group->current = 0");
         group->current = 0;
@@ -89,10 +87,10 @@ static inline bool create_spritegroup(gamestate& g, entityid id, int* keys, int 
     //auto s = spritegroup_get(group, 0);
     auto s = group->get(0);
     massert(s, "sprite is NULL");
-    const float x = -DEFAULT_TILE_SIZE + offset_x;
-    const float y = -DEFAULT_TILE_SIZE + offset_y;
-    const float w = s->get_width();
-    const float h = s->get_height();
+    float x = -DEFAULT_TILE_SIZE + offset_x;
+    float y = -DEFAULT_TILE_SIZE + offset_y;
+    float w = s->get_width();
+    float h = s->get_height();
     group->dest = Rectangle{x, y, w, h};
     group->off_x = offset_x;
     group->off_y = offset_y;

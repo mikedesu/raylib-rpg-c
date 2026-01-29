@@ -909,54 +909,12 @@ public:
         ct.set<hunger_points>(id, hunger_points_t{100, 100});
     }
 
-    inline entityid create_npc_with(race_t rt, with_fun npcInitFunction) {
+    inline entityid create_npc_with(const race_t rt, with_fun npcInitFunction) {
         const entityid id = add_entity();
         set_npc_defaults(id);
         ct.set<race>(id, rt);
         set_npc_starting_stats(id);
         npcInitFunction(ct, id);
-        return id;
-    }
-
-    inline entityid create_food_with(food_t ft, with_fun foodInitFunction) {
-        const entityid id = add_entity();
-        ct.set<foodtype>(id, ft);
-        ct.set<food_attribute>(id, food_attribute_t{75}); // test
-        foodInitFunction(ct, id);
-        return id;
-    }
-
-    inline entityid create_food_at_with(food_t ft, vec3 loc, with_fun foodInitFunction) {
-        auto df = d.get_floor(loc.z);
-        auto tile = df->tile_at(loc);
-        if (!tile_is_walkable(tile->get_type())) {
-            merror2("cannot create entity on non-walkable tile: tile.type: %s", tiletype2str(tile->get_type()).c_str());
-            return ENTITYID_INVALID;
-        }
-        if (tile_has_live_npcs(tile)) {
-            merror2("cannot create entity on tile with live NPCs");
-            return ENTITYID_INVALID;
-        }
-        if (tile_has_box(loc.x, loc.y, loc.z) != ENTITYID_INVALID) {
-            merror2("cannot create entity on tile with box");
-            return ENTITYID_INVALID;
-        }
-        if (tile_has_pushable(loc.x, loc.y, loc.z) != ENTITYID_INVALID) {
-            merror2("cannot create entity on tile with pushable");
-            return ENTITYID_INVALID;
-        }
-        const entityid id = create_food_with(ft, foodInitFunction);
-        if (id == ENTITYID_INVALID) {
-            merror("failed to create food");
-            return ENTITYID_INVALID;
-        }
-        if (df->df_add_at(id, loc) == ENTITYID_INVALID) {
-            merror("failed to add food %d to %d, %d", id, loc.x, loc.y);
-            return ENTITYID_INVALID;
-        }
-        minfo2("setting location for %d", id);
-        ct.set<location>(id, loc);
-        msuccess2("created food %d", id);
         return id;
     }
 
@@ -1218,11 +1176,9 @@ public:
         //const vec3 loc0 = d.floors[0].df_get_random_loc();
         auto df = d.get_current_floor();
         //auto rl0 = df->df_get_random_loc();
-        create_weapon_at_with(ct, df->get_random_loc(), dagger_init());
-        create_weapon_at_with(ct, df->get_random_loc(), axe_init());
-        create_shield_at_with(ct, df->get_random_loc(), shield_init());
-        create_food_at_with(FOOD_BURGER, df->get_random_loc(), [](CT& ct, entityid id) {});
-
+        //create_weapon_at_with(ct, df->get_random_loc(), dagger_init());
+        //create_weapon_at_with(ct, df->get_random_loc(), axe_init());
+        //create_shield_at_with(ct, df->get_random_loc(), shield_init());
         //create_potion_at_with(d.floors[0].df_get_random_loc(), potion_init(POTION_HP_SMALL));
         constexpr int num_boxes = 0;
         for (int i = 0; i < num_boxes; i++)
