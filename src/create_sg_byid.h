@@ -16,7 +16,6 @@
 #include "tx_keys_spells.h"
 #include "tx_keys_weapons.h"
 
-
 static inline void create_npc_sg_byid(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
 
@@ -89,6 +88,7 @@ static inline void create_npc_sg_byid(gamestate& g, entityid id) {
 
 static inline void create_door_sg_byid(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
+    minfo("create_door_sg_byid: %d", id);
     create_spritegroup(g, id, TX_WOODEN_DOOR_KEYS, TX_WOODEN_DOOR_COUNT, -12, -12);
 }
 
@@ -96,7 +96,6 @@ static inline void create_box_sg_byid(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     create_spritegroup(g, id, TX_WOODEN_BOX_KEYS, TX_WOODEN_BOX_COUNT, -12, -12);
 }
-
 
 static inline void create_potion_sg_byid(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
@@ -110,7 +109,6 @@ static inline void create_potion_sg_byid(gamestate& g, entityid id) {
     default: break;
     }
 }
-
 
 static inline void create_weapon_sg_byid(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
@@ -126,7 +124,6 @@ static inline void create_weapon_sg_byid(gamestate& g, entityid id) {
     }
 }
 
-
 static inline void create_shield_sg_byid(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     switch (g.ct.get<shieldtype>(id).value_or(SHIELD_NONE)) {
@@ -137,7 +134,6 @@ static inline void create_shield_sg_byid(gamestate& g, entityid id) {
     }
 }
 
-
 static inline void create_spell_sg_byid(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     switch (g.ct.get<spelltype>(id).value_or(SPELLTYPE_NONE)) {
@@ -145,7 +141,6 @@ static inline void create_spell_sg_byid(gamestate& g, entityid id) {
     default: break;
     }
 }
-
 
 static inline void create_item_sg_byid(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
@@ -156,7 +151,6 @@ static inline void create_item_sg_byid(gamestate& g, entityid id) {
     default: break;
     }
 }
-
 
 static inline void create_prop_sg_byid(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
@@ -171,7 +165,6 @@ static inline void create_prop_sg_byid(gamestate& g, entityid id) {
     default: break;
     }
 }
-
 
 static inline void create_sg_byid(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");

@@ -40,7 +40,8 @@ public:
         default_anim = 0;
         alpha = 255;
         id = 0;
-        sprites2 = new vector<shared_ptr<sprite>>(cap);
+        //sprites2 = new vector<shared_ptr<sprite>>(cap);
+        sprites2 = new vector<shared_ptr<sprite>>();
         dest = move = Rectangle{0, 0, 0, 0};
         move_rate = 1.0;
         visible = true;
@@ -56,6 +57,10 @@ public:
 
     shared_ptr<sprite> get(int index) {
         return sprites2->at(index);
+    }
+
+    size_t count() {
+        return sprites2->size();
     }
 
     shared_ptr<sprite> get_current() {

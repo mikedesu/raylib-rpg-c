@@ -1,6 +1,7 @@
 #pragma once
 
 #include "dungeon_floor.h"
+#include "entitytype.h"
 #include "gamestate.h"
 #include "libgame_defines.h"
 #include "spritegroup.h"
@@ -41,18 +42,24 @@ static inline bool create_spritegroup(gamestate& g, entityid id, int* keys, int 
             group->add(s);
             count++;
         }
-        //msuccess2("spritegroups created");
-        //minfo("count: %d", count);
-
-        //minfo2("setting id: %d", id);
+        msuccess2("spritegroups created");
+        minfo2("count: %d", count);
+        minfo2("setting id: %d", id);
         group->id = id;
 
-        //string n = g.ct.get<name>(id).value_or("no-name");
-        //minfo2("name: %s", n.c_str());
-
+        string n = g.ct.get<name>(id).value_or("no-name");
+        minfo2("name: %s", n.c_str());
+        entitytype_t t = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
+        string t_s = entitytype_to_str(t);
+        minfo2("type: %s", t_s.c_str());
         minfo2("group->get(0)");
+
+        // how many items are in the group?
+        minfo2("group->count(): %lu", group->count());
+
         auto s = group->get(0);
         massert(s, "sprite is NULL");
+
         minfo2("group->current = 0");
         group->current = 0;
 
