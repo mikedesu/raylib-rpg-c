@@ -35,7 +35,7 @@ AlignAfterOpenBracket: AlwaysBreak
 
 AlignConsecutiveAssignments: false
 AlignConsecutiveDeclarations: false
-AlignEscapedNewlinesLeft: false
+AlignEscapedNewlinesLeft: true
 AlignOperands: true
 AlignTrailingComments: false
 AllowAllParametersOfDeclarationOnNextLine: false

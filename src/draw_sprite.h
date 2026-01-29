@@ -7,17 +7,18 @@
 #include "gamestate.h"
 #include "spritegroup.h"
 
-
 extern unordered_map<entityid, spritegroup*> spritegroups;
 
 static inline void draw_sprite_and_shadow(gamestate& g, entityid id) {
     //massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    if (spritegroups.find(id) == spritegroups.end()) {
-        merror("NO SPRITE GROUP FOR ID %d", id);
-        return;
-    }
+    massert(spritegroups.find(id) != spritegroups.end(), "NO SPRITE GROUP FOR ID %d", id);
+    //if (spritegroups.find(id) == spritegroups.end()) {
+    //    merror("NO SPRITE GROUP FOR ID %d", id);
+    //    return;
+    //}
     spritegroup* sg = spritegroups[id];
+    massert(sg, "sg is NULL");
     // old
     //entitytype_t type = g_get_type(g, id);
     //massert(sg, "spritegroup is NULL: id %d type: %s", id, entitytype_to_string(type));

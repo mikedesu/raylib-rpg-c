@@ -128,19 +128,22 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
         const vec3 loc = {x, y, g.d.current_floor};
         auto tile = df->tile_at(loc);
         auto tiletype = tile->get_type();
-        if (tiletype_is_none(tiletype) || tiletype_is_wall(tiletype))
+        if (tiletype_is_none(tiletype) || tiletype_is_wall(tiletype)) {
             continue;
+        }
         auto hero_loc = g.ct.get<location>(g.hero_id).value_or(vec3{-1, -1, -1});
         massert(!vec3_invalid(hero_loc), "hero loc is invalid");
-        if (is_loc_too_far_to_draw(g, loc, hero_loc))
+        if (is_loc_too_far_to_draw(g, loc, hero_loc)) {
             continue;
+        }
         // bugfix for tall walls so entities do not draw on top:
         // check to see if the tile directly beneath this tile is a wall
         //if (tile2.type == TILE_STONE_WALL_00)
         //    continue;
         // render all entities if not blocked
-        if (is_loc_path_blocked(g, df, loc, hero_loc))
+        if (is_loc_path_blocked(g, df, loc, hero_loc)) {
             continue;
+        }
         auto entities_begin = tile->get_entities()->cbegin();
         auto entities_end = tile->get_entities()->cend();
         for_each(entities_begin, entities_end, [&g, type_0, &extra_check](entityid id) {
@@ -150,8 +153,9 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
             //if (sg->move.x != 0 || sg->move.y != 0) {
             //    draw_sprite_and_shadow(g, id);
             //}
-            if (type_0 == type && extra_check(g, id))
+            if (type_0 == type && extra_check(g, id)) {
                 draw_sprite_and_shadow(g, id);
+            }
         });
     }
 }
