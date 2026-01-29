@@ -13,12 +13,20 @@ static inline shared_ptr<sprite> get_shield_front_sprite(gamestate& g, entityid 
     massert(sg, "spritegroup is NULL");
     shared_ptr<sprite> retval = nullptr;
     const entityid shield = g.ct.get<equipped_shield>(id).value_or(ENTITYID_INVALID);
-    if (shield == ENTITYID_INVALID) return retval;
+    if (shield == ENTITYID_INVALID) {
+        return retval;
+    }
     auto it = spritegroups.find(shield);
-    if (it == spritegroups.end()) return retval;
+    if (it == spritegroups.end()) {
+        return retval;
+    }
     spritegroup* w_sg = it->second;
-    if (!w_sg) return retval;
-    if (sg->current == SG_ANIM_NPC_GUARD_SUCCESS) retval = w_sg->get( SG_ANIM_BUCKLER_SUCCESS_FRONT);
+    if (!w_sg) {
+        return retval;
+    }
+    if (sg->current == SG_ANIM_NPC_GUARD_SUCCESS) {
+        retval = w_sg->get( SG_ANIM_BUCKLER_SUCCESS_FRONT);
+    }
     return retval;
 }
 
@@ -29,11 +37,19 @@ static inline shared_ptr<sprite> get_shield_back_sprite(gamestate& g, entityid i
     massert(sg, "spritegroup is NULL");
     shared_ptr<sprite> retval = nullptr;
     const entityid shield = g.ct.get<equipped_shield>(id).value_or(ENTITYID_INVALID);
-    if (shield == ENTITYID_INVALID) return retval;
+    if (shield == ENTITYID_INVALID) {
+        return retval;
+    }
     auto it = spritegroups.find(shield);
-    if (it == spritegroups.end()) return retval;
+    if (it == spritegroups.end()) {
+        return retval;
+    }
     spritegroup* w_sg = it->second;
-    if (!w_sg) return retval;
-    if (sg->current == SG_ANIM_NPC_GUARD_SUCCESS) retval = w_sg->get( SG_ANIM_BUCKLER_SUCCESS_BACK);
+    if (!w_sg) {
+        return retval;
+    }
+    if (sg->current == SG_ANIM_NPC_GUARD_SUCCESS) {
+        retval = w_sg->get( SG_ANIM_BUCKLER_SUCCESS_BACK);
+    }
     return retval;
 }

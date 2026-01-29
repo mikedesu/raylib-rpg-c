@@ -19,9 +19,6 @@ static inline void draw_sprite_and_shadow(gamestate& g, entityid id) {
     //}
     spritegroup* sg = spritegroups[id];
     massert(sg, "sg is NULL");
-    // old
-    //entitytype_t type = g_get_type(g, id);
-    //massert(sg, "spritegroup is NULL: id %d type: %s", id, entitytype_to_string(type));
     // Draw components in correct order
     //draw_shadow_for_entity(g, sg, id);
     draw_shield_sprite_back(g, id, sg);
