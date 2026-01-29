@@ -46,12 +46,13 @@ I have already done the following:
   - [ ] **i think its fixed**
 - [x] **FIXED** **BUG** pulling a box can result in the player moving into an empty/unknown/none-tiletype
 - [x] **FIXED** **BUG** moving has a context-setting bug since upgrading `sprite` and `spritegroup` to classes...
-- [x] **FIXED** **BUG** standing on top of dead bodies causes the lighting system to treat it as if you can't see in any direction
 
 
 Previous analysis suggestions you've brought up that I will eventually implement, or ideas that I've realized I need to handle (**DO NOT BASED ANALYSIS ON THESE**)
 
 
+- [ ] **BUG** blocking attacks from the bac
+- [ ] **NOT-FIXED-YET** **BUG** standing on top of dead bodies causes the lighting system to treat it as if you can't see in any direction
 - [ ] **FEATURE** food, hunger component
 - [ ] **BUG** hallways generated do not always connect on their adjacent rooms
 - [ ] **BUG** i've seen the player and NPCs move into tiles that are occupied by other entities, which violates the system
