@@ -10,12 +10,19 @@ static inline void update_shield_for_entity(gamestate& g, entityid id, spritegro
     massert(id != ENTITYID_INVALID, "entity id is -1");
     massert(sg, "spritegroup is NULL");
     spritegroup* shield_sg = nullptr;
-    entityid shield_id = ENTITYID_INVALID;
     int ctx = -1;
-    shield_id = g.ct.get<equipped_shield>(id).value_or(ENTITYID_INVALID);
-    if (shield_id == ENTITYID_INVALID) return;
+    const entityid shield_id = g.ct.get<equipped_shield>(id).value_or(ENTITYID_INVALID);
+    if (shield_id == ENTITYID_INVALID) {
+        merror2("shield_id invalid");
+        return;
+    }
+    
     shield_sg = spritegroups[shield_id];
-    if (!shield_sg) return;
+    if (!shield_sg) {
+        merror2("shield_sg null");
+        return;
+    }
+
     ctx = sg->sprites2->at(sg->current)->get_currentcontext();
     shield_sg->setcontexts(ctx);
     //merror("I expect a crash here...");

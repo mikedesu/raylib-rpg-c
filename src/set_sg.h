@@ -49,9 +49,20 @@ static inline void libdraw_set_sg_block_success(gamestate& g, entityid id, sprit
     massert(id != ENTITYID_INVALID, "entity id is -1");
     massert(sg, "spritegroup is NULL");
     const race_t r = g.ct.get<race>(id).value_or(RACE_NONE);
-    const int anim_index = r == RACE_GREEN_SLIME ? SG_ANIM_SLIME_IDLE : r == RACE_WOLF ? SG_ANIM_WOLF_IDLE : SG_ANIM_NPC_GUARD_SUCCESS;
-    //spritegroup_set_current(sg, anim_index);
-    sg->set_current(anim_index);
+    //const int anim_index = r == RACE_GREEN_SLIME ? SG_ANIM_SLIME_IDLE : r == RACE_WOLF ? SG_ANIM_WOLF_IDLE : SG_ANIM_NPC_GUARD_SUCCESS;
+    //sg->set_current(anim_index);
+    if (r == RACE_GREEN_SLIME) {
+        minfo("setting SG_ANIM_SLIME_IDLE");
+        sg->set_current(SG_ANIM_SLIME_IDLE);
+    }
+    else if (r == RACE_WOLF) {
+        minfo("setting SG_ANIM_WOLF_IDLE");
+        sg->set_current(SG_ANIM_WOLF_IDLE);
+    }
+    else {
+        minfo("setting SG_ANIM_NPC_GUARD_SUCCESS");
+        sg->set_current(SG_ANIM_NPC_GUARD_SUCCESS);
+    }
     update_shield_for_entity(g, id, sg);
     g.ct.set<block_success>(id, false);
 }

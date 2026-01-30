@@ -11,8 +11,9 @@ static inline void draw_shield_sprite_back(gamestate& g, entityid id, spritegrou
     if (shield_back_s) {
         DrawTexturePro(*shield_back_s->get_texture(), shield_back_s->get_src(), sg->dest, Vector2{0, 0}, 0, WHITE);
     }
-    //else {
-    //}
+    else {
+        merror3("no shield back sprite");
+    }
 }
 
 static inline void draw_shield_sprite_front(gamestate& g, entityid id, spritegroup* sg) {
@@ -22,6 +23,7 @@ static inline void draw_shield_sprite_front(gamestate& g, entityid id, spritegro
     if (shield_front_s) {
         DrawTexturePro(*shield_front_s->get_texture(), shield_front_s->get_src(), sg->dest, Vector2{0, 0}, 0, WHITE);
     }
-    //else {
-    //}
+    else {
+        merror3("no shield front sprite");
+    }
 }
