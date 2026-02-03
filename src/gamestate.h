@@ -2607,23 +2607,26 @@ public:
             const string item_name = ct.get<name>(item_id).value_or("no-name-item");
             add_message_history("You picked up %s", item_name.c_str());
         }
-
-        else if (item_id == ENTITYID_INVALID)
+        else if (item_id == ENTITYID_INVALID) {
             mwarning("No item cached");
+        }
 
         const entitytype_t t = ct.get<entitytype>(id).value_or(ENTITY_NONE);
 
-        if (t == ENTITY_PLAYER)
+        if (t == ENTITY_PLAYER) {
             flag = GAMESTATE_FLAG_PLAYER_ANIM;
+        }
 
         return item_picked_up;
     }
 
     inline bool handle_pickup_item(const inputstate& is, bool is_dead) {
-        if (!inputstate_is_pressed(is, KEY_SLASH))
+        if (!inputstate_is_pressed(is, KEY_SLASH)) {
             return false;
-        if (is_dead)
+        }
+        if (is_dead) {
             return add_message("You cannot pick up items while dead");
+        }
         try_entity_pickup(hero_id);
         flag = GAMESTATE_FLAG_PLAYER_ANIM;
         return true;
