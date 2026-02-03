@@ -82,8 +82,9 @@ public:
     void setcontexts(int context) {
         for (int i = 0; i < size; i++) {
             auto s = sprites2->at(i);
-            if (!s || s->get_numcontexts() <= 0 || context < 0 || context >= s->get_numcontexts())
+            if (!s || s->get_numcontexts() <= 0 || context < 0 || context >= s->get_numcontexts()) {
                 continue;
+            }
             s->set_context(context);
         }
     }
@@ -108,16 +109,12 @@ public:
 
     bool set_current(int index) {
         minfo2("spritegroup set current");
-        //massert(sg, "spritegroup is NULL");
         massert(index >= 0, "index is negative: %d, %d", index, size);
         massert(index < size, "index is out of bounds for id %d: %d, %d", id, index, size);
         current = index;
-        // lets update the sprite's current frame to 0
-        // since we prob want to start an animation at the beginning
-        // if we are changing current
-        sprites2->at(current)->set_currentframe(0);
-        // we might prob wanna reset numloops as well
-        sprites2->at(current)->set_num_loops(0);
+        // lets update the sprite's current frame and numloops to 0
+        // since we prob want to start an animation at the beginning if we are changing current
+        sprites2->at(current)->zero_currentframe_numloops();
         return true;
     }
 
@@ -127,7 +124,8 @@ public:
             dest.x += move_rate;
             move.x -= move_rate;
             retval = true;
-        } else if (move.x < 0) {
+        }
+        else if (move.x < 0) {
             dest.x -= move_rate;
             move.x += move_rate;
             retval = true;
@@ -136,7 +134,8 @@ public:
             dest.y += move_rate;
             move.y -= move_rate;
             retval = true;
-        } else if (move.y < 0) {
+        }
+        else if (move.y < 0) {
             dest.y -= move_rate;
             move.y += move_rate;
             retval = true;

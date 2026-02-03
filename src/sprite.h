@@ -52,7 +52,8 @@ public:
             if (stop_on_last_frame && currentframe == numframes - 1) {
                 is_animating = false;
                 src.x = width * currentframe;
-            } else if (currentframe >= numframes) {
+            }
+            else if (currentframe >= numframes) {
                 currentframe = 0;
                 num_loops++;
             }
@@ -119,6 +120,11 @@ public:
 
     void set_num_loops(int n) {
         num_loops = n;
+    }
+
+    void zero_currentframe_numloops() {
+        currentframe = 0;
+        num_loops = 0;
     }
 
     Texture2D* get_texture() {
