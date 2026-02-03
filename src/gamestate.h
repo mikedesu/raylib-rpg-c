@@ -2357,36 +2357,43 @@ public:
 
     inline attack_result_t process_attack_entity(shared_ptr<tile_t> tile, entityid attacker_id, entityid target_id) {
         massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
-        if (target_id == ENTITYID_INVALID)
+
+        if (target_id == ENTITYID_INVALID) {
             return ATTACK_RESULT_MISS;
+        }
+
         const entitytype_t type = ct.get<entitytype>(target_id).value_or(ENTITY_NONE);
-        if (type != ENTITY_PLAYER && type != ENTITY_NPC)
+
+        if (type != ENTITY_PLAYER && type != ENTITY_NPC) {
             return ATTACK_RESULT_MISS;
-        if (ct.get<dead>(target_id).value_or(true))
+        }
+
+        if (ct.get<dead>(target_id).value_or(true)) {
             return ATTACK_RESULT_MISS;
-        const string attacker_name = ct.get<name>(attacker_id).value_or("no-name");
-        const string target_name = ct.get<name>(target_id).value_or("no-name");
-        const char* atk_name = attacker_name.c_str();
-        const char* tgt_name = target_name.c_str();
+        }
+
         // they have a shield
         // still need to do attack successful check
         const bool attack_successful = compute_attack_roll(attacker_id, target_id);
+
         // attack unsuccessful
         if (!attack_successful) {
             process_attack_results(attacker_id, target_id, false);
             return ATTACK_RESULT_MISS;
         }
+
         // check for shield
         const entityid shield_id = ct.get<equipped_shield>(target_id).value_or(ENTITYID_INVALID);
+
         // if no shield
         if (shield_id == ENTITYID_INVALID) {
             process_attack_results(attacker_id, target_id, true);
             return ATTACK_RESULT_HIT;
         }
+
         // if has shield
         // compute chance to block
         uniform_int_distribution<int> gen(1, MAX_BLOCK_CHANCE);
-        //const int roll = GetRandomValue(1, MAX_BLOCK_CHANCE);
         const int roll = gen(mt);
         const int chance = ct.get<block_chance>(shield_id).value_or(MAX_BLOCK_CHANCE);
         const int low_roll = MAX_BLOCK_CHANCE - chance;
@@ -2395,25 +2402,39 @@ public:
             process_attack_results(attacker_id, target_id, true);
             return ATTACK_RESULT_HIT;
         }
+
         // decrement shield durability
         handle_shield_durability_loss(target_id, attacker_id);
         handle_shield_block_sfx(target_id);
         ct.set<block_success>(target_id, true);
         ct.set<update>(target_id, true);
-        add_message_history("%s blocked an attack from %s", tgt_name, atk_name);
+
+        const string atk_name = ct.get<name>(attacker_id).value_or("no-name");
+        const string tgt_name = ct.get<name>(target_id).value_or("no-name");
+        add_message_history("%s blocked an attack from %s", tgt_name.c_str(), atk_name.c_str());
+
         return ATTACK_RESULT_BLOCK;
     }
 
     inline void handle_attack_sfx(entityid attacker, attack_result_t result) {
-        if (test)
+        if (test) {
             return;
-        if (!check_hearing(hero_id, ct.get<location>(attacker).value_or((vec3){-1, -1, -1})))
+        }
+
+        vec3 loc = ct.get<location>(attacker).value_or(vec3{-1, -1, -1});
+        massert(vec3_valid(loc), "loc is invalid");
+
+        if (!check_hearing(hero_id, loc)) {
             return;
+        }
+
         int index = SFX_SLASH_ATTACK_SWORD_1;
-        if (result == ATTACK_RESULT_BLOCK)
+        if (result == ATTACK_RESULT_BLOCK) {
             index = SFX_HIT_METAL_ON_METAL;
-        else if (result == ATTACK_RESULT_HIT)
+        }
+        else if (result == ATTACK_RESULT_HIT) {
             index = SFX_HIT_METAL_ON_FLESH;
+        }
         else if (result == ATTACK_RESULT_MISS) {
             const entityid weapon_id = ct.get<equipped_weapon>(attacker).value_or(ENTITYID_INVALID);
             const weapontype_t wpn_type = ct.get<weapontype>(weapon_id).value_or(WEAPON_NONE);
@@ -2428,10 +2449,12 @@ public:
 
     inline void set_gamestate_flag_for_attack_animation(entitytype_t type) {
         massert(type == ENTITY_PLAYER || type == ENTITY_NPC, "type is not player or npc!");
-        if (type == ENTITY_PLAYER)
+        if (type == ENTITY_PLAYER) {
             flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        else if (type == ENTITY_NPC)
+        }
+        else if (type == ENTITY_NPC) {
             flag = GAMESTATE_FLAG_NPC_ANIM;
+        }
     }
 
     inline attack_result_t try_entity_attack(entityid id, int x, int y) {
