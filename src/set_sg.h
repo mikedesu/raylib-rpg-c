@@ -43,7 +43,6 @@ static inline void libdraw_set_sg_spell_ending(shared_ptr<gamestate> g, entityid
     sg->set_current(2);
 }
 
-
 static inline void libdraw_set_sg_block_success(gamestate& g, entityid id, spritegroup* const sg) {
     minfo("set sg block success");
     massert(id != ENTITYID_INVALID, "entity id is -1");
@@ -67,7 +66,6 @@ static inline void libdraw_set_sg_block_success(gamestate& g, entityid id, sprit
     g.ct.set<block_success>(id, false);
 }
 
-
 static inline void libdraw_set_sg_is_damaged(gamestate& g, entityid id, spritegroup* const sg) {
     massert(id != ENTITYID_INVALID, "entity id is -1");
     massert(sg, "spritegroup is NULL");
@@ -77,28 +75,30 @@ static inline void libdraw_set_sg_is_damaged(gamestate& g, entityid id, spritegr
     sg->set_current(anim_index);
 }
 
-
 static inline void libdraw_set_sg_is_dead(gamestate& g, entityid id, spritegroup* const sg) {
     massert(id != ENTITYID_INVALID, "entity id is -1");
     massert(sg, "spritegroup is NULL");
-    if (!g.ct.get<dead>(id).has_value()) return;
-    if (!g.ct.get<dead>(id).value()) return;
+    if (!g.ct.get<dead>(id).has_value())
+        return;
+    if (!g.ct.get<dead>(id).value())
+        return;
     race_t r = g.ct.get<race>(id).value_or(RACE_NONE);
-    if (r == RACE_NONE) return;
+    if (r == RACE_NONE)
+        return;
     const int anim_index = r == RACE_BAT           ? SG_ANIM_BAT_DIE
                            : r == RACE_GREEN_SLIME ? SG_ANIM_SLIME_DIE
                            : r == RACE_SKELETON    ? SG_ANIM_SKELETON_DIE
                            : r == RACE_RAT         ? SG_ANIM_RAT_DIE
                            : r == RACE_ZOMBIE      ? SG_ANIM_ZOMBIE_DIE
                                                    : SG_ANIM_NPC_SPINDIE;
-    if (sg->current == anim_index) return;
+    if (sg->current == anim_index)
+        return;
     sg->set_default_anim(anim_index);
     //spritegroup_set_current(sg, sg->default_anim);
     sg->set_current(sg->default_anim);
     //sg_reset_anim(sg);
     sg->set_stop_on_last_frame(true);
 }
-
 
 static inline void libdraw_set_sg_is_attacking(gamestate& g, entityid id, spritegroup* const sg) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
@@ -111,10 +111,13 @@ static inline void libdraw_set_sg_is_attacking(gamestate& g, entityid id, sprite
     //    cur = SG_ANIM_BAT_ATTACK;
     const race_t r = g.ct.get<race>(id).value_or(RACE_NONE);
     massert(r != RACE_NONE, "race cant be none");
-    sg->set_current(r == RACE_GREEN_SLIME ? SG_ANIM_SLIME_JUMP_ATTACK : r == RACE_SKELETON  ? SG_ANIM_SKELETON_ATTACK
-                    : r == RACE_RAT       ? SG_ANIM_RAT_ATTACK        : r == RACE_ZOMBIE    ? SG_ANIM_ZOMBIE_ATTACK
-                    : r == RACE_BAT       ? SG_ANIM_BAT_ATTACK        :                       SG_ANIM_NPC_ATTACK
-    );
+    sg->set_current(
+        r == RACE_GREEN_SLIME ? SG_ANIM_SLIME_JUMP_ATTACK
+        : r == RACE_SKELETON  ? SG_ANIM_SKELETON_ATTACK
+        : r == RACE_RAT       ? SG_ANIM_RAT_ATTACK
+        : r == RACE_ZOMBIE    ? SG_ANIM_ZOMBIE_ATTACK
+        : r == RACE_BAT       ? SG_ANIM_BAT_ATTACK
+                              : SG_ANIM_NPC_ATTACK);
     update_weapon_for_entity(g, id, sg);
     g.ct.set<attacking>(id, false);
 }

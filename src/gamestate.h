@@ -1868,10 +1868,12 @@ public:
 
     inline void handle_camera_zoom(inputstate& is) {
         if (inputstate_is_pressed(is, KEY_LEFT_BRACKET)) {
+            minfo("camera zoom in");
             cam2d.zoom += DEFAULT_ZOOM_INCR;
             frame_dirty = true;
         }
         else if (inputstate_is_pressed(is, KEY_RIGHT_BRACKET)) {
+            minfo("camera zoom out");
             cam2d.zoom -= (cam2d.zoom > 1.0) * DEFAULT_ZOOM_INCR;
             frame_dirty = true;
         }

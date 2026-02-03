@@ -83,10 +83,15 @@ static inline void libdraw_update_sprite_ptr(gamestate& g, entityid id, spritegr
     }
     // Copy movement intent from sprite_move_x/y if present
     libdraw_update_sprite_position(g, id, sg);
-    if (g.ct.get<block_success>(id).value_or(false))
+
+    if (g.ct.get<block_success>(id).value_or(false)) {
         libdraw_set_sg_block_success(g, id, sg);
-    if (g.ct.get<attacking>(id).value_or(false))
+    }
+
+    if (g.ct.get<attacking>(id).value_or(false)) {
         libdraw_set_sg_is_attacking(g, id, sg);
+    }
+
     //if (g.ct.get<casting>(id).value_or(false))
     //    libdraw_set_sg_is_casting(g, id, sg);
     //if (g->ct.get<spell_casting>(id).value_or(false))
@@ -102,23 +107,28 @@ static inline void libdraw_update_sprite_ptr(gamestate& g, entityid id, spritegr
     const entitytype_t type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
     if (type == ENTITY_DOOR) {
         auto maybe_door_open = g.ct.get<door_open>(id);
-        if (maybe_door_open.has_value())
+        if (maybe_door_open.has_value()) {
             sg->set_current(maybe_door_open.value() ? 1 : 0);
+        }
     }
     // Update movement as long as sg->move.x/y is non-zero
     //if (spritegroup_update_dest(sg))
-    if (sg->update_dest())
+    if (sg->update_dest()) {
         g.frame_dirty = true;
+    }
     // Snap to the tile position only when movement is fully complete
     auto maybe_loc = g.ct.get<location>(id);
-    if (!maybe_loc.has_value())
+    if (!maybe_loc.has_value()) {
         return;
+    }
     const vec3 loc = maybe_loc.value();
     sg->snap_dest(loc.x, loc.y);
 }
 
 static inline void libdraw_update_sprite_pre(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
-    if (spritegroups.find(id) != spritegroups.end())
+
+    if (spritegroups.find(id) != spritegroups.end()) {
         libdraw_update_sprite_ptr(g, id, spritegroups[id]);
+    }
 }
