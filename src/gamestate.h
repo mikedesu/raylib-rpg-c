@@ -2644,8 +2644,9 @@ public:
         if (t->get_type() == TILE_UPSTAIRS) {
             // can't go up on the top floor
             // otherwise...
-            if (current_floor == 0)
+            if (current_floor == 0) {
                 add_message("You are already on the top floor!");
+            }
             else {
                 // go upstairs
                 // we have to remove the player from the old tile
@@ -2679,16 +2680,18 @@ public:
                 return true;
             }
             // bottom floor
-            else
+            else {
                 add_message("You can't go downstairs anymore!");
+            }
         }
         return false;
     }
 
     inline bool handle_traverse_stairs(const inputstate& is, bool is_dead) {
         if (inputstate_is_pressed(is, KEY_PERIOD)) {
-            if (is_dead)
+            if (is_dead) {
                 return add_message("You cannot traverse stairs while dead");
+            }
             try_entity_stairs(hero_id);
             return true;
         }
@@ -2697,15 +2700,17 @@ public:
 
     inline bool try_entity_open_door(const entityid id, const vec3 loc) {
         massert(id != ENTITYID_INVALID, "id is invalid");
-        if (!tile_has_door(loc))
+        if (!tile_has_door(loc)) {
             return false;
+        }
         shared_ptr<dungeon_floor> df = d.get_current_floor();
         shared_ptr<tile_t> t = df->tile_at(loc);
         for (size_t i = 0; i < t->get_entity_count(); i++) {
             const entityid myid = t->get_entity_at(i);
             const entitytype_t type = ct.get<entitytype>(myid).value_or(ENTITY_NONE);
-            if (type != ENTITY_DOOR)
+            if (type != ENTITY_DOOR) {
                 continue;
+            }
             optional<bool> maybe_is_open = ct.get<door_open>(myid);
             massert(maybe_is_open.has_value(), "door %d has no `is_open` component", myid);
             ct.set<door_open>(myid, !maybe_is_open.value());
@@ -2717,8 +2722,9 @@ public:
 
     inline bool handle_open_door(const inputstate& is, bool is_dead) {
         if (inputstate_is_pressed(is, KEY_O)) {
-            if (is_dead)
+            if (is_dead) {
                 return add_message("You cannot open doors while dead");
+            }
             const vec3 loc = get_loc_facing_player();
             try_entity_open_door(hero_id, loc);
             flag = GAMESTATE_FLAG_PLAYER_ANIM;
@@ -2799,8 +2805,9 @@ public:
                     // handle item drops
                     drop_all_from_inventory(npcid);
                 }
-                else if (tgttype == ENTITY_PLAYER)
+                else if (tgttype == ENTITY_PLAYER) {
                     add_message("You died");
+                }
             }
             if (tile_has_door(spell_loc)) {
                 // find the door id
@@ -2822,8 +2829,9 @@ public:
         }
         // did the hero hear this event?
         const bool event_heard = check_hearing(hero_id, (vec3){tgt_x, tgt_y, loc.z});
-        if (ok && event_heard)
+        if (ok && event_heard) {
             PlaySound(sfx[SFX_ITEM_FUSION]);
+        }
     }
 
     inline bool handle_test_cast_spell(const inputstate& is, bool is_dead) {
