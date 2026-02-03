@@ -6,3 +6,4 @@ typedef int entityid;
 #define E_INVALID -1
 #define ID_INVALID -1
 #define INVALID -1
+#define INVALID_ENTITY -1

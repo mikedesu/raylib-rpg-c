@@ -53,12 +53,15 @@ BinPackParameters: false
 
 # Configure each individual brace in BraceWrapping
 #BreakBeforeBraces: Allman 
-BreakBeforeBraces: Attach
+
+BreakBeforeBraces: Custom
+#BreakBeforeBraces: Attach
+
 #BreakBeforeBraces: false
 # Control of individual brace wrapping cases
 BraceWrapping: {
-    AfterClass: 'true'
-    AfterControlStatement: 'true'
+    AfterControlStatement: 'false'
+    AfterClass: 'false'
     #AfterEnum: true
     AfterFunction: 'false'
     AfterNamespace: 'true'
