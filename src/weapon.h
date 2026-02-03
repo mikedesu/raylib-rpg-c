@@ -1,11 +1,13 @@
 #pragma once
 
-typedef enum
-{
+typedef enum {
     WEAPON_NONE,
     WEAPON_DAGGER,
-    WEAPON_SWORD,
+    WEAPON_SHORT_SWORD,
+    WEAPON_LONG_SWORD,
+    WEAPON_GREAT_SWORD,
     WEAPON_AXE,
+    WEAPON_SPEAR,
     //WEAPON_BOW,
     //WEAPON_TWO_HANDED_SWORD,
     //WEAPON_WARHAMMER,

@@ -105,3 +105,7 @@ static inline bool create_spritegroup(gamestate& g, entityid id, int* keys, int 
     msuccess("END create spritegroup");
     return true;
 }
+
+static inline bool create_sg(gamestate& g, entityid id, int* keys, int num_keys) {
+    return create_spritegroup(g, id, keys, num_keys, -12, -12);
+}

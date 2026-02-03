@@ -1,14 +1,11 @@
 #pragma once
 
-
 #include "gamestate.h"
 #include "texture_ids.h"
 #include "textureinfo.h"
 #include <raylib.h>
 
-
 extern textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
-
 
 static inline void draw_title_screen(gamestate& g, bool show_menu) {
     char buffer[1024] = {0};
@@ -88,9 +85,9 @@ static inline void draw_title_screen(gamestate& g, bool show_menu) {
     // draw the first frame of one of our hero textures
     const float mx = frame.x;
     const float my = frame.y + sw / 2;
-    const Texture t1 = txinfo[TX_ACTIONS_SLASH_SWORD_B].texture;
+    const Texture t1 = txinfo[TX_ACTIONS_SLASH_SHORT_SWORD_B].texture;
     const Texture t2 = txinfo[TX_CHAR_HUMAN_ATTACK_SLASH].texture;
-    const Texture t3 = txinfo[TX_ACTIONS_SLASH_SWORD_F].texture;
+    const Texture t3 = txinfo[TX_ACTIONS_SLASH_SHORT_SWORD_F].texture;
     const Texture t4 = txinfo[TX_ACTIONS_SLASH_AXE_B].texture;
     const Texture t5 = txinfo[TX_CHAR_ORC_ATTACK].texture;
     const Texture t6 = txinfo[TX_ACTIONS_SLASH_AXE_F].texture;
@@ -121,7 +118,8 @@ static inline void draw_title_screen(gamestate& g, bool show_menu) {
         const float menu_x = (g.targetwidth - MeasureText(menu_text[i], sm_font_size)) / 2.0f, menu_y = start_y + (i * (sm_font_size + menu_spacing));
         if (i == current_selection_index) {
             snprintf(buffer, sizeof(buffer), "> %s", menu_text[i]);
-        } else {
+        }
+        else {
             snprintf(buffer, sizeof(buffer), "  %s", menu_text[i]);
         }
         const Color selection_color = i == 0 ? active_color : disabled_color; // First item is always active
