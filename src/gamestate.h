@@ -1243,9 +1243,9 @@ public:
         // 8x8   = 4 4x4 areas
         // 16x16 = 4 8x8 areas
         // 32x32 = 4 16x16 areas = 8 8x8 areas
-        const int w = 32; // 4x4 4x4 areas
-        const int h = 32;
-        constexpr float parts = 4.0;
+        const int w = 8; // 4x4 4x4 areas
+        const int h = 8;
+        constexpr float parts = 1.0;
         init_dungeon(BIOME_STONE, 1, w, h, parts);
         massert(d.floors.size() > 0, "dungeon.floors.size is 0");
         place_doors();
