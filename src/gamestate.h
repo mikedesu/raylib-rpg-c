@@ -323,22 +323,17 @@ public:
         return d.get_current_floor()->tile_at(loc);
     }
 
-
-
-
     inline void create_and_add_df_0(biome_t type, int df_count, int w, int h, float parts) {
         auto df = d.create_floor(type, w, h);
         const float dw = df->get_width();
         const float dh = df->get_height();
         vector<room> rooms;
 
-        room r(0, TextFormat("room-%d", 0), TextFormat("room-%d description", 0), Rectangle{0, 0, dw, dh});;
+        room r(0, TextFormat("room-%d", 0), TextFormat("room-%d description", 0), Rectangle{0, 0, dw, dh});
+        ;
         df->set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, r.get_area());
         d.add_floor(df);
     }
-
-
-
 
     inline void create_and_add_df_1(biome_t type, int df_count, int w, int h, float parts) {
         constexpr float min_room_w = 2;
@@ -418,8 +413,6 @@ public:
         d.add_floor(df);
     }
 
-
-
     inline void init_dungeon(biome_t type, int df_count, int w, int h, float parts) {
         //constexpr float min_room_w = 2;
         minfo2("init_dungeon");
@@ -434,9 +427,7 @@ public:
             return;
         }
         for (int i = 0; i < df_count; i++) {
-          
             create_and_add_df_0(type, df_count, w, h, parts);
-
 
             /*
             auto df = d.create_floor(type, w, h);
@@ -977,17 +968,14 @@ public:
         //    {tactic_target::enemy, tactic_condition::adjacent, tactic_action::attack}, {tactic_target::nil, tactic_condition::any, tactic_action::move}};
 
         //vector<tactic> my_tactics = {
-        //    { tactic_target::enemy, tactic_condition::adjacent, tactic_action::attack }, 
-        //    { tactic_target::nil, tactic_condition::any, tactic_action::move } 
+        //    { tactic_target::enemy, tactic_condition::adjacent, tactic_action::attack },
+        //    { tactic_target::nil, tactic_condition::any, tactic_action::move }
         //};
 
         vector<tactic> my_tactics = {
-            { tactic_target::enemy, tactic_condition::adjacent, tactic_action::attack }, 
-            //{ tactic_target::nil, tactic_condition::any, tactic_action::move } 
+            {tactic_target::enemy, tactic_condition::adjacent, tactic_action::attack},
+            //{ tactic_target::nil, tactic_condition::any, tactic_action::move }
         };
-
-
-
 
         //vector<tactic> my_tactics = {{tactic_target::nil, tactic_condition::any, tactic_action::move}};
 
@@ -1268,7 +1256,7 @@ public:
         create_shield_at_with(ct, df->get_random_loc(), shield_init());
         create_shield_at_with(ct, df->get_random_loc(), shield_init());
         create_shield_at_with(ct, df->get_random_loc(), shield_init());
-                //create_potion_at_with(d.floors[0].df_get_random_loc(), potion_init(POTION_HP_SMALL));
+        //create_potion_at_with(d.floors[0].df_get_random_loc(), potion_init(POTION_HP_SMALL));
         constexpr int num_boxes = 0;
         for (int i = 0; i < num_boxes; i++)
             create_box_at_with(df->get_random_loc());
@@ -1851,7 +1839,8 @@ public:
     }
 
     inline void change_player_dir(direction_t dir) {
-        if (ct.get<dead>(hero_id).value_or(true)) return;
+        if (ct.get<dead>(hero_id).value_or(true))
+            return;
         ct.set<direction>(hero_id, dir);
         ct.set<update>(hero_id, true);
         player_changing_dir = false;
@@ -1859,9 +1848,11 @@ public:
     }
 
     inline bool handle_change_dir(inputstate& is) {
-        if (!player_changing_dir) return false;
+        if (!player_changing_dir)
+            return false;
         optional<bool> maybe_player_is_dead = ct.get<dead>(hero_id);
-        if (!maybe_player_is_dead.has_value()) return true;
+        if (!maybe_player_is_dead.has_value())
+            return true;
         const bool is_dead = maybe_player_is_dead.value();
         // double 's' is wait one turn
         if (inputstate_is_pressed(is, KEY_S)) {
@@ -1923,14 +1914,16 @@ public:
         for (int i = 0; (size_t)i < t->get_entity_count(); i++) {
             const entityid id = t->tile_get_entity(i);
             const bool is_solid = ct.get<solid>(id).value_or(false);
-            if (id != ENTITYID_INVALID && is_solid) return true;
+            if (id != ENTITYID_INVALID && is_solid)
+                return true;
         }
         return false;
     }
 
     inline bool handle_box_push(const entityid id, const vec3 v) {
         const bool can_push = ct.get<pushable>(id).value_or(false);
-        if (!can_push) return false;
+        if (!can_push)
+            return false;
         return try_entity_move(id, v);
     }
 
@@ -1942,7 +1935,8 @@ public:
         for (int i = 0; (size_t)i < t->get_entity_count(); i++) {
             const entityid id = t->tile_get_entity(i);
             const bool is_pushable = ct.get<pushable>(id).value_or(false);
-            if (id != ENTITYID_INVALID && is_pushable) return id;
+            if (id != ENTITYID_INVALID && is_pushable)
+                return id;
         }
         return ENTITYID_INVALID;
     }
@@ -1953,7 +1947,8 @@ public:
         for (size_t i = 0; i < t->get_entity_count(); i++) {
             const entityid id = t->get_entity_at(i);
             const entitytype_t type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
-            if (type == ENTITY_DOOR) return id;
+            if (type == ENTITY_DOOR)
+                return id;
         }
         return ENTITYID_INVALID;
     }
@@ -2552,7 +2547,7 @@ public:
         shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
         shared_ptr<tile_t> tile = df->tile_at(loc);
         bool item_picked_up = false;
-        
+
         // lets try using our new cached_item via tile_get_item
         const entityid item_id = tile_get_item(tile);
         if (item_id != ENTITYID_INVALID && add_to_inventory(id, item_id)) {
@@ -2561,20 +2556,24 @@ public:
             item_picked_up = true;
             const string item_name = ct.get<name>(item_id).value_or("no-name-item");
             add_message_history("You picked up %s", item_name.c_str());
-        } 
-        
-        else if (item_id == ENTITYID_INVALID) mwarning("No item cached");
-        
+        }
+
+        else if (item_id == ENTITYID_INVALID)
+            mwarning("No item cached");
+
         const entitytype_t t = ct.get<entitytype>(id).value_or(ENTITY_NONE);
-        
-        if (t == ENTITY_PLAYER) flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        
+
+        if (t == ENTITY_PLAYER)
+            flag = GAMESTATE_FLAG_PLAYER_ANIM;
+
         return item_picked_up;
     }
 
     inline bool handle_pickup_item(const inputstate& is, const bool is_dead) {
-        if (!inputstate_is_pressed(is, KEY_SLASH)) return false;
-        if (is_dead) return add_message("You cannot pick up items while dead");
+        if (!inputstate_is_pressed(is, KEY_SLASH))
+            return false;
+        if (is_dead)
+            return add_message("You cannot pick up items while dead");
         try_entity_pickup(hero_id);
         flag = GAMESTATE_FLAG_PLAYER_ANIM;
         return true;
@@ -2592,7 +2591,8 @@ public:
         if (t->get_type() == TILE_UPSTAIRS) {
             // can't go up on the top floor
             // otherwise...
-            if (current_floor == 0) add_message("You are already on the top floor!");
+            if (current_floor == 0)
+                add_message("You are already on the top floor!");
             else {
                 // go upstairs
                 // we have to remove the player from the old tile
@@ -3032,7 +3032,8 @@ public:
         auto maybe_dead = ct.get<dead>(id);
         massert(maybe_dead.has_value(), "npc has no dead component");
         const bool is_dead = maybe_dead.value();
-        if (is_dead) return false;
+        if (is_dead)
+            return false;
         // this is a heuristic for handling entity actions
         // originally, we were just moving randomly
         // this example shows how, if the player is not adjacent to an NPC,
@@ -3044,13 +3045,12 @@ public:
         for (tactic t : npc_tactics) {
             if (t.target == tactic_target::nil && t.condition == tactic_condition::any && t.action == tactic_action::move) {
                 // handle random move
-                if (try_entity_move(id, vec3{dist(mt), dist(mt), 0})) msuccess2("try entity move succeeded");
-                else merror2("try entity move FAILED");
+                if (try_entity_move(id, vec3{dist(mt), dist(mt), 0}))
+                    msuccess2("try entity move succeeded");
+                else
+                    merror2("try entity move FAILED");
                 return true;
-            } else if (
-                    t.target == tactic_target::enemy && 
-                    t.condition == tactic_condition::adjacent && 
-                    t.action == tactic_action::attack) {
+            } else if (t.target == tactic_target::enemy && t.condition == tactic_condition::adjacent && t.action == tactic_action::attack) {
                 // handle attack adjacent enemy
                 if (is_entity_adjacent(id, tgt_id)) {
                     const vec3 loc = ct.get<location>(tgt_id).value();
@@ -3072,13 +3072,12 @@ public:
                     return true;
                 }
             } else if (t.target == tactic_target::nil && t.condition == tactic_condition::nil && t.action == tactic_action::attack) {
-                // just attack directly in front of you 
+                // just attack directly in front of you
                 massert(ct.has<direction>(id), "id %d has no direction", id);
                 direction_t dir = ct.get<direction>(id).value_or(DIR_NONE);
                 massert(dir != DIR_NONE, "dir cannot be none");
-                
 
-                vec3 loc = ct.get<location>(id).value_or(vec3{-1,-1,-1});
+                vec3 loc = ct.get<location>(id).value_or(vec3{-1, -1, -1});
                 massert(vec3_valid(loc), "id %d location is invalid", id);
 
                 vec3 dir_vec = get_loc_from_dir(dir);
@@ -3086,7 +3085,6 @@ public:
 
                 try_entity_attack(id, new_loc.x, new_loc.y);
             }
-
         }
         merror2("failed to handle npc %d", id);
         return false;
@@ -3140,13 +3138,17 @@ public:
             //minfo("npc anim");
 #ifndef NPCS_ALL_AT_ONCE
             entity_turn++;
-            if (entity_turn >= next_entityid)
+
+            if (entity_turn >= next_entityid) {
                 entity_turn = 0;
+            }
+
             if (entity_turn == hero_id) {
                 flag = GAMESTATE_FLAG_PLAYER_INPUT;
                 turn_count++;
-            } else
+            } else {
                 flag = GAMESTATE_FLAG_NPC_TURN;
+            }
 #else
             flag = GAMESTATE_FLAG_PLAYER_INPUT;
             //minfo("handle test flag: %d", turn_count);
@@ -3160,8 +3162,12 @@ public:
         // Spawn NPCs periodically
         //try_spawn_npc(g);
         //massert(r0, "update player tiles explored failed");
-        if (!update_player_tiles_explored()) merror3("update player tiles explored failed");
-        if (!update_player_state()) merror3("update player state failed");
+        if (!update_player_tiles_explored()) {
+            merror3("update player tiles explored failed");
+        }
+        if (!update_player_state()) {
+            merror3("update player state failed");
+        }
         update_npcs_state();
         update_spells_state();
         handle_input(is);
@@ -3172,7 +3178,9 @@ public:
         currenttime = time(NULL);
         currenttimetm = localtime(&currenttime);
         strftime(currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", currenttimetm);
-        if (test) handle_test_flag();
+        if (test) {
+            handle_test_flag();
+        }
         ticks++;
         minfo2("end tick");
     }
