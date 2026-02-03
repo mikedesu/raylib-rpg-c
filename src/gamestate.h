@@ -1253,8 +1253,8 @@ public:
         // 8x8   = 4 4x4 areas
         // 16x16 = 4 8x8 areas
         // 32x32 = 4 16x16 areas = 8 8x8 areas
-        const int w = 8; // 4x4 4x4 areas
-        const int h = 8;
+        const int w = 4; // 4x4 4x4 areas
+        const int h = 4;
         constexpr float parts = 1.0;
         init_dungeon(BIOME_STONE, 1, w, h, parts);
         massert(d.floors.size() > 0, "dungeon.floors.size is 0");
@@ -1268,15 +1268,7 @@ public:
         create_shield_at_with(ct, df->get_random_loc(), shield_init());
         create_shield_at_with(ct, df->get_random_loc(), shield_init());
         create_shield_at_with(ct, df->get_random_loc(), shield_init());
-        create_shield_at_with(ct, df->get_random_loc(), shield_init());
-        create_shield_at_with(ct, df->get_random_loc(), shield_init());
-        create_shield_at_with(ct, df->get_random_loc(), shield_init());
-        create_shield_at_with(ct, df->get_random_loc(), shield_init());
-        create_shield_at_with(ct, df->get_random_loc(), shield_init());
-        create_shield_at_with(ct, df->get_random_loc(), shield_init());
-        create_shield_at_with(ct, df->get_random_loc(), shield_init());
-        create_shield_at_with(ct, df->get_random_loc(), shield_init());
-        //create_potion_at_with(d.floors[0].df_get_random_loc(), potion_init(POTION_HP_SMALL));
+                //create_potion_at_with(d.floors[0].df_get_random_loc(), potion_init(POTION_HP_SMALL));
         constexpr int num_boxes = 0;
         for (int i = 0; i < num_boxes; i++)
             create_box_at_with(df->get_random_loc());
