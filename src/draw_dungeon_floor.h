@@ -75,7 +75,7 @@ static inline bool is_loc_path_blocked(gamestate& g, shared_ptr<dungeon_floor> d
 }
 
 static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txinfo, int x, int y, int z) {
-    minfo2("BEGIN draw dungeon floor tile");
+    minfo3("BEGIN draw dungeon floor tile");
     massert(txinfo, "txinfo is null");
     massert(z >= 0 && static_cast<size_t>(z) < g.d.get_floor_count(), "z is oob");
     auto df = g.d.get_floor(z);
@@ -97,7 +97,7 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txinfo, in
     const int light_dist = g.ct.get<light_radius>(g.hero_id).value_or(1);
     auto maybe_hero_loc = g.ct.get<location>(g.hero_id);
     if (!maybe_hero_loc.has_value()) {
-        minfo2("END draw dungeon floor tile 1");
+        minfo3("END draw dungeon floor tile 1");
         return false;
     }
     const vec3 hero_loc = maybe_hero_loc.value();
@@ -116,7 +116,7 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txinfo, in
     const unsigned char a = blocking ? 31 : distance > light_dist ? 102 : 255;
     const Color draw_color = Color{255, 255, 255, a};
     DrawTexturePro(*texture, src, dest, Vector2{0, 0}, 0, draw_color);
-    minfo2("END draw dungeon floor tile 5");
+    minfo3("END draw dungeon floor tile 5");
     return true;
 }
 

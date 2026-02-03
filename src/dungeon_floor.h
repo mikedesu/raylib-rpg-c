@@ -163,12 +163,12 @@ public:
     }
 
 
-    inline shared_ptr<tile_t> tile_at(const vec3 loc) {
+    inline shared_ptr<tile_t> tile_at(vec3 loc) {
         // given that tiles is a 2D vector of shared pointers to tile_t
         // we can access the tile using the x and y coordinates
         // and calculate the index
         const size_t index = loc.y * width + loc.x;
-        minfo2("tile_at: (%d, %d, %d)", loc.x, loc.y, loc.z);
+        minfo3("tile_at: (%d, %d, %d)", loc.x, loc.y, loc.z);
         massert(index < tiles.size(), "index is out-of-bounds: %d, %d", loc.x, loc.y);
         const tile_id id = tiles[index];
         // Check if the tile_id exists in the map

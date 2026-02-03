@@ -67,7 +67,7 @@ static inline void libdraw_update_sprite_position(gamestate& g, entityid id, spr
 }
 
 static inline void libdraw_update_sprite_ptr(gamestate& g, entityid id, spritegroup* sg) {
-    minfo2("Begin update sprite ptr: %d", id);
+    minfo3("Begin update sprite ptr: %d", id);
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     massert(sg, "spritegroup is NULL");
 
