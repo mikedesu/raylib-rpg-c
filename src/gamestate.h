@@ -2547,10 +2547,12 @@ public:
             merror("id %d has no location", id);
             return false;
         }
+
         const vec3 loc = maybe_loc.value();
         shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
         shared_ptr<tile_t> tile = df->tile_at(loc);
         bool item_picked_up = false;
+        
         // lets try using our new cached_item via tile_get_item
         const entityid item_id = tile_get_item(tile);
         if (item_id != ENTITYID_INVALID && add_to_inventory(id, item_id)) {
@@ -2559,19 +2561,20 @@ public:
             item_picked_up = true;
             const string item_name = ct.get<name>(item_id).value_or("no-name-item");
             add_message_history("You picked up %s", item_name.c_str());
-        } else if (item_id == ENTITYID_INVALID)
-            merror("No item cached");
+        } 
+        
+        else if (item_id == ENTITYID_INVALID) mwarning("No item cached");
+        
         const entitytype_t t = ct.get<entitytype>(id).value_or(ENTITY_NONE);
-        if (t == ENTITY_PLAYER)
-            flag = GAMESTATE_FLAG_PLAYER_ANIM;
+        
+        if (t == ENTITY_PLAYER) flag = GAMESTATE_FLAG_PLAYER_ANIM;
+        
         return item_picked_up;
     }
 
     inline bool handle_pickup_item(const inputstate& is, const bool is_dead) {
-        if (!inputstate_is_pressed(is, KEY_SLASH))
-            return false;
-        if (is_dead)
-            return add_message("You cannot pick up items while dead");
+        if (!inputstate_is_pressed(is, KEY_SLASH)) return false;
+        if (is_dead) return add_message("You cannot pick up items while dead");
         try_entity_pickup(hero_id);
         flag = GAMESTATE_FLAG_PLAYER_ANIM;
         return true;
@@ -2589,8 +2592,7 @@ public:
         if (t->get_type() == TILE_UPSTAIRS) {
             // can't go up on the top floor
             // otherwise...
-            if (current_floor == 0)
-                add_message("You are already on the top floor!");
+            if (current_floor == 0) add_message("You are already on the top floor!");
             else {
                 // go upstairs
                 // we have to remove the player from the old tile
