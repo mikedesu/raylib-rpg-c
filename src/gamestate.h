@@ -2451,15 +2451,17 @@ public:
         const attack_result_t result = process_attack_entity(tile, id, npc_id);
         // did the hero hear this event?
         handle_attack_sfx(id, result);
-        if (!test)
+        if (!test) {
             set_gamestate_flag_for_attack_animation(ct.get<entitytype>(id).value_or(ENTITY_NONE));
+        }
         return result;
     }
 
     inline bool handle_attack(const inputstate& is, bool is_dead) {
         if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
-            if (is_dead)
+            if (is_dead) {
                 return add_message("You cannot attack while dead");
+            }
             if (ct.has<location>(hero_id) && ct.has<direction>(hero_id)) {
                 const vec3 loc = get_loc_facing_player();
                 try_entity_attack(hero_id, loc.x, loc.y);
@@ -2540,8 +2542,9 @@ public:
         }
 
         const entityid box_id2 = tile_has_box(bloc.x, bloc.y, bloc.z);
-        if (box_id2 == ENTITYID_INVALID)
+        if (box_id2 == ENTITYID_INVALID) {
             return false;
+        }
 
         // remove the entity from the current tile
         if (!df->df_remove_at(id, loc)) {
