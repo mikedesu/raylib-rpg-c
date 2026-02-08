@@ -46,20 +46,24 @@ I have already done the following:
   - [ ] **i think its fixed**
 - [x] **FIXED** **BUG** pulling a box can result in the player moving into an empty/unknown/none-tiletype
 - [x] **FIXED** **BUG** moving has a context-setting bug since upgrading `sprite` and `spritegroup` to classes...
+- [x] **BUG** **FIXED** blocking attacks animation bug 
 
 
 Previous analysis suggestions you've brought up that I will eventually implement, or ideas that I've realized I need to handle (**DO NOT BASED ANALYSIS ON THESE**)
 
-
-- [ ] **UPDATE** I am cons
-- [ ] **BUG** blocking attacks animation bug 
-  - [ ] only happens on successful block, verified not-happening on miss or hit
+- [ ] **PLAYER REQUEST** numpad movement controls
+- [ ] **IDEA** **FEATURE** village every 10 floors?
+  - [ ] mining caravan
+  - [ ] dwarf village
+  - [ ] elf town (forest/grassland)
+- [ ] **IDEA** **FEATURE** dynamically-generated "encounters" by generating floors and populating them
+  - [ ] orc thieves kidnapping someone / highway robbers
 - [ ] **NOT-FIXED-YET** **BUG** standing on top of dead bodies causes the lighting system to treat it as if you can't see in any direction
+- [ ] **FEATURE** stats screen on death
 - [ ] **FEATURE** food, hunger component
 - [ ] **BUG** hallways generated do not always connect on their adjacent rooms
 - [ ] **BUG** i've seen the player and NPCs move into tiles that are occupied by other entities, which violates the system
 - [ ] **BUG** i just saw an NPC orc push a box under the player
-- [ ] **PLAYER REQUEST** numpad movement controls
 - [ ] **POLISH** draw tile updates can be moved over into draw entity
   - [ ] there is a lot of code duplication, see if we cant use the manhattan dist function...
 - [ ] **OPTIMIZATION** we need to start storing lists of entityids by type in `gamestate`
