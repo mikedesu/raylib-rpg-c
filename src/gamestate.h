@@ -259,8 +259,8 @@ public:
         god_mode = true;
 #endif
         gameplay_settings_menu_selection = 0;
-        cam2d.target = cam2d.offset = (Vector2){0, 0};
-        cam2d.zoom = 2.0f;
+        cam2d.target = cam2d.offset = Vector2{0, 0};
+        cam2d.zoom = DEFAULT_ZOOM_LEVEL;
         cam2d.rotation = 0.0;
         fadealpha = 0.0;
         controlmode = CONTROLMODE_PLAYER;
@@ -1110,19 +1110,24 @@ public:
     }
 
     inline entityid create_orc_at_with(vec3 loc, with_fun monsterInitFunction) {
-        if (vec3_invalid(loc))
+        if (vec3_invalid(loc)) {
             return ENTITYID_INVALID;
+        }
         auto df = d.get_floor(loc.z);
         auto t = df->tile_at(loc);
-        if (!tile_is_walkable(t->get_type()))
+        if (!tile_is_walkable(t->get_type())) {
             return ENTITYID_INVALID;
-        if (tile_has_live_npcs(t))
+        }
+        if (tile_has_live_npcs(t)) {
             return ENTITYID_INVALID;
+        }
         const entityid id = create_orc_with(monsterInitFunction);
-        if (id == ENTITYID_INVALID)
+        if (id == ENTITYID_INVALID) {
             return ENTITYID_INVALID;
-        if (!df->df_add_at(id, loc))
+        }
+        if (!df->df_add_at(id, loc)) {
             return ENTITYID_INVALID;
+        }
         df->add_living_npc(id);
         ct.set<location>(id, loc);
         ct.set<update>(id, true);
@@ -1163,17 +1168,20 @@ public:
         auto df = d.get_current_floor();
         for (auto loc : path) {
             auto t = df->tile_at(loc);
-            if (tiletype_is_none(t->get_type()))
+            if (tiletype_is_none(t->get_type())) {
                 return true;
-            else if (tiletype_is_wall(t->get_type()))
+            }
+            else if (tiletype_is_wall(t->get_type())) {
                 return true;
+            }
             // also need to check for a door or other blockades
             for (auto id : *t->get_entities()) {
                 const bool door_present = ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_DOOR;
                 if (door_present) {
                     const bool door_is_open = ct.get<door_open>(id).value_or(false);
-                    if (!door_is_open)
+                    if (!door_is_open) {
                         return true;
+                    }
                 }
             }
         }
@@ -1181,8 +1189,9 @@ public:
     }
 
     inline bool update_player_tiles_explored() {
-        if (current_scene != SCENE_GAMEPLAY)
+        if (current_scene != SCENE_GAMEPLAY) {
             return false;
+        }
         if (hero_id == ENTITYID_INVALID) {
             merror2("hero_id is invalid");
             return false;
@@ -1203,13 +1212,15 @@ public:
         for (int y = min_y; y <= max_y; y++) {
             for (int x = min_x; x <= max_x; x++) {
                 // Calculate Manhattan distance for diamond shape
-                if (abs(x - hero_loc.x) + abs(y - hero_loc.y) > light_radius0)
+                if (abs(x - hero_loc.x) + abs(y - hero_loc.y) > light_radius0) {
                     continue;
+                }
                 // we need to see if there is anything blocking us between the player and this hero_location
                 const vec3 loc = {x, y, hero_loc.z};
                 const bool blocked = path_blocked(hero_loc, loc);
-                if (blocked)
+                if (blocked) {
                     continue;
+                }
                 auto t = df->tile_at(loc);
                 update_tile(t);
             }
@@ -1223,8 +1234,9 @@ public:
             return false;
         }
         const unsigned char a = ct.get<txalpha>(hero_id).value_or(255);
-        if (a < 255)
+        if (a < 255) {
             ct.set<txalpha>(hero_id, a + 1);
+        }
         if (ct.get<dead>(hero_id).value_or(true)) {
             merror2("hero_id is dead");
             gameover = true;
@@ -1239,11 +1251,13 @@ public:
     inline void update_spells_state() {
         minfo2("update_spells_state");
         for (entityid id = 0; id < next_entityid; id++) {
-            if (id == hero_id || ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_SPELL)
+            if (id == hero_id || ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_SPELL) {
                 continue;
+            }
             unsigned char a = ct.get<txalpha>(id).value_or(255);
-            if (a < 255)
+            if (a < 255) {
                 a++;
+            }
             ct.set<txalpha>(id, a);
             const bool is_complete = ct.get<spell_complete>(id).value_or(false);
             const bool is_destroyed = ct.get<destroyed>(id).value_or(false);
@@ -1252,8 +1266,9 @@ public:
                 auto df = d.get_current_floor();
                 const vec3 loc = ct.get<location>(id).value_or(vec3{-1, -1, -1});
                 massert(!vec3_invalid(loc), "location is invalid");
-                if (!df->df_remove_at(id, loc))
+                if (!df->df_remove_at(id, loc)) {
                     merror("failed to remove id %d at %d, %d", id, loc.x, loc.y);
+                }
             }
         }
     }
@@ -1263,8 +1278,9 @@ public:
         auto df_npcs = d.get_current_floor()->get_living_npcs();
         for (entityid id : *df_npcs) {
             unsigned char a = ct.get<txalpha>(id).value_or(255);
-            if (a < 255)
+            if (a < 255) {
                 a++;
+            }
             ct.set<txalpha>(id, a);
             ct.set<damaged>(id, false);
         }
@@ -1275,8 +1291,9 @@ public:
         size_t count = 0;
         for (int i = 0; i < df->get_width(); i++) {
             for (int j = 0; j < df->get_height(); j++)
-                if (tile_has_live_npcs(df->tile_at(vec3{i, j, -1})))
+                if (tile_has_live_npcs(df->tile_at(vec3{i, j, -1}))) {
                     count++;
+                }
         }
         return count;
     }
@@ -1313,8 +1330,9 @@ public:
 
         //create_potion_at_with(d.floors[0].df_get_random_loc(), potion_init(POTION_HP_SMALL));
         constexpr int num_boxes = 9;
-        for (int i = 0; i < num_boxes; i++)
+        for (int i = 0; i < num_boxes; i++) {
             create_box_at_with(df->get_random_loc());
+        }
         constexpr int monster_count = 9;
         for (int j = 0; j < monster_count; j++) {
             const vec3 random_loc = d.get_floor(0)->get_random_loc();
@@ -1468,11 +1486,13 @@ public:
     inline entityid create_spell_at_with(vec3 loc) {
         auto df = d.get_floor(loc.z);
         auto tile = df->tile_at(loc);
-        if (!tile_is_walkable(tile->get_type()))
+        if (!tile_is_walkable(tile->get_type())) {
             return ENTITYID_INVALID;
+        }
         const entityid id = create_spell_with();
-        if (df->df_add_at(id, loc) == ENTITYID_INVALID)
+        if (df->df_add_at(id, loc) == ENTITYID_INVALID) {
             return ENTITYID_INVALID;
+        }
         ct.set<location>(id, loc);
         ct.set<update>(id, true);
         return id;
@@ -1482,8 +1502,9 @@ public:
         massert(hero_id != ENTITYID_INVALID, "hero_id is invalid");
         for (entityid id = 0; id < next_entityid; id++) {
             const entitytype_t t = ct.get<entitytype>(id).value_or(ENTITY_NONE);
-            if (t != ENTITY_NPC)
+            if (t != ENTITY_NPC) {
                 continue;
+            }
             ct.set<target_id>(id, hero_id);
         }
     }
@@ -1499,8 +1520,9 @@ public:
             // hero has already been created, so its id is available
             const int myhd = chara_creation.hitdie;
             int maxhp_roll = -1;
-            while (maxhp_roll < 1)
+            while (maxhp_roll < 1) {
                 maxhp_roll = do_roll_best_of_3(vec3{1, myhd, 0}) + get_stat_bonus(chara_creation.constitution);
+            }
             shared_ptr<dungeon_floor> df = d.floors[0];
             const vec3 start_loc = df->get_random_loc();
             massert(!vec3_invalid(start_loc), "start_loc is (-1,-1,-1)");
@@ -1535,10 +1557,12 @@ public:
         else if (inputstate_is_pressed(is, KEY_LEFT)) {
             PlaySound(sfx.at(SFX_CONFIRM_01));
             int race = chara_creation.race;
-            if (chara_creation.race > 1)
+            if (chara_creation.race > 1) {
                 race--;
-            else
+            }
+            else {
                 race = RACE_COUNT - 1;
+            }
             chara_creation.race = (race_t)race;
             chara_creation.hitdie = get_racial_hd(chara_creation.race);
         }
@@ -1850,13 +1874,13 @@ public:
         }
     }
 
-    inline bool handle_quit_pressed(const inputstate& is) {
-        if (inputstate_is_pressed(is, KEY_ESCAPE)) {
-            do_quit = true;
-            return true;
-        }
-        return false;
-    }
+    //inline bool handle_quit_pressed(const inputstate& is) {
+    //    if (inputstate_is_pressed(is, KEY_ESCAPE)) {
+    //        do_quit = true;
+    //        return true;
+    //    }
+    //    return false;
+    //}
 
     inline void cycle_messages() {
         if (msg_system.size() > 0) {
@@ -2287,8 +2311,9 @@ public:
             return;
         const int dura = maybe_dura.value();
         ct.set<durability>(equipped_wpn, dura - 1 < 0 ? 0 : dura - 1);
-        if (dura > 0)
+        if (dura > 0) {
             return;
+        }
         // unequip item
         ct.set<equipped_weapon>(atk_id, ENTITYID_INVALID);
         // remove item from attacker's inventory
@@ -2887,8 +2912,8 @@ public:
         return false;
     }
 
-    inline bool handle_restart(const inputstate& is, bool is_dead) {
-        if (inputstate_is_pressed(is, KEY_R) && is_dead) {
+    inline bool handle_restart(const inputstate& is) {
+        if (inputstate_is_pressed(is, KEY_R)) {
             do_restart = true;
             return true;
         }
@@ -2896,22 +2921,37 @@ public:
     }
 
     inline void handle_input_gameplay_controlmode_player(inputstate& is) {
-        if (flag != GAMESTATE_FLAG_PLAYER_INPUT)
-            return;
-        handle_camera_zoom(is);
-        // make sure player isnt dead
-        const bool is_dead = ct.get<dead>(hero_id).value_or(true);
-        if (is_dead) {
-            static bool showed_msg = false;
-            if (!showed_msg) {
-                minfo("Player is dead");
-                showed_msg = true;
-            }
+        if (flag != GAMESTATE_FLAG_PLAYER_INPUT) {
             return;
         }
+
+        if (inputstate_is_pressed(is, KEY_ESCAPE)) {
+            do_quit = true;
+            return;
+        }
+
+        handle_camera_zoom(is);
+        // make sure player isnt dead
+
+        if (handle_cycle_messages(is)) {
+            return;
+        }
+
+        const bool is_dead = ct.get<dead>(hero_id).value_or(true);
+        if (is_dead) {
+            handle_restart(is);
+            //static bool showed_msg = false;
+            //if (!showed_msg) {
+            //    minfo("Player is dead");
+            //    showed_msg = true;
+            //}
+            return;
+        }
+
         if (test && framecount % 20 == 0) {
-            if (handle_cycle_messages_test())
+            if (handle_cycle_messages_test()) {
                 return;
+            }
             // special handler
             // move randomly for now
             const bool is_dead = ct.get<dead>(hero_id).value_or(true);
@@ -2926,10 +2966,12 @@ public:
                 vx = dist(mt);
                 vy = dist(mt);
             }
-            if (try_entity_move(hero_id, vec3{vx, vy, 0}))
+            if (try_entity_move(hero_id, vec3{vx, vy, 0})) {
                 msuccess2("hero moved randomly successfully");
-            else
+            }
+            else {
                 minfo2("hero failed to move randomly");
+            }
             flag = GAMESTATE_FLAG_PLAYER_ANIM;
             return;
         }
@@ -2946,23 +2988,33 @@ public:
             flag = GAMESTATE_FLAG_PLAYER_ANIM;
             return;
         }
-        else if (handle_quit_pressed(is))
+        else if (inputstate_is_pressed(is, KEY_ESCAPE)) {
+            do_quit = true;
             return;
-        else if (handle_cycle_messages(is))
+        }
+        //else if (handle_cycle_messages(is)) {
+        //    return;
+        //}
+        if (handle_change_dir(is) || handle_change_dir_intent(is) || handle_display_inventory(is)) {
             return;
-        if (handle_change_dir(is) || handle_change_dir_intent(is) || handle_display_inventory(is))
+        }
+        else if (handle_move_up(is, is_dead) || handle_move_down(is, is_dead) || handle_move_left(is, is_dead) || handle_move_right(is, is_dead)) {
             return;
-        else if (handle_move_up(is, is_dead) || handle_move_down(is, is_dead) || handle_move_left(is, is_dead) || handle_move_right(is, is_dead))
-            return;
+        }
         else if (
-            handle_move_up_left(is, is_dead) || handle_move_up_right(is, is_dead) || handle_move_down_left(is, is_dead) || handle_move_down_right(is, is_dead))
+            handle_move_up_left(is, is_dead) || handle_move_up_right(is, is_dead) || handle_move_down_left(is, is_dead) ||
+            handle_move_down_right(is, is_dead)) {
             return;
-        else if (handle_attack(is, is_dead) || handle_pickup_item(is, is_dead) || handle_traverse_stairs(is, is_dead) || handle_open_door(is, is_dead))
+        }
+        else if (handle_attack(is, is_dead) || handle_pickup_item(is, is_dead) || handle_traverse_stairs(is, is_dead) || handle_open_door(is, is_dead)) {
             return;
-        else if (handle_test_cast_spell(is, is_dead))
+        }
+        else if (handle_test_cast_spell(is, is_dead)) {
             return;
-        else if (handle_restart(is, is_dead))
-            return;
+        }
+        //else if (handle_restart(is, is_dead)) {
+        //    return;
+        //}
     }
 
     inline void handle_input_action_menu(const inputstate& is) {

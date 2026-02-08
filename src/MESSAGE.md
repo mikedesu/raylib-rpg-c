@@ -51,6 +51,7 @@ I have already done the following:
 Previous analysis suggestions you've brought up that I will eventually implement, or ideas that I've realized I need to handle (**DO NOT BASED ANALYSIS ON THESE**)
 
 
+- [ ] **UPDATE** I am cons
 - [ ] **BUG** blocking attacks animation bug 
   - [ ] only happens on successful block, verified not-happening on miss or hit
 - [ ] **NOT-FIXED-YET** **BUG** standing on top of dead bodies causes the lighting system to treat it as if you can't see in any direction
