@@ -1333,7 +1333,7 @@ public:
         for (int i = 0; i < num_boxes; i++) {
             create_box_at_with(df->get_random_loc());
         }
-        constexpr int monster_count = 9;
+        constexpr int monster_count = 4;
         for (int j = 0; j < monster_count; j++) {
             const vec3 random_loc = d.get_floor(0)->get_random_loc();
             create_orc_at_with(random_loc, [this](CT& ct, const entityid id) {
@@ -2145,9 +2145,10 @@ public:
     }
 
     inline bool handle_move_up(const inputstate& is, bool is_dead) {
-        if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W)) {
-            if (is_dead)
+        if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W) || inputstate_is_pressed(is, KEY_KP_8)) {
+            if (is_dead) {
                 return add_message("You cannot move while dead");
+            }
             try_entity_move(hero_id, (vec3){0, -1, 0});
             flag = GAMESTATE_FLAG_PLAYER_ANIM;
             return true;
@@ -2156,7 +2157,7 @@ public:
     }
 
     inline bool handle_move_down(const inputstate& is, bool is_dead) {
-        if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X)) {
+        if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X) || inputstate_is_pressed(is, KEY_KP_2)) {
             if (is_dead)
                 return add_message("You cannot move while dead");
             try_entity_move(hero_id, (vec3){0, 1, 0});
@@ -2167,7 +2168,7 @@ public:
     }
 
     inline bool handle_move_left(const inputstate& is, bool is_dead) {
-        if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_A)) {
+        if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_A) || inputstate_is_pressed(is, KEY_KP_4)) {
             if (is_dead)
                 return add_message("You cannot move while dead");
             try_entity_move(hero_id, (vec3){-1, 0, 0});
@@ -2178,7 +2179,7 @@ public:
     }
 
     inline bool handle_move_right(const inputstate& is, bool is_dead) {
-        if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_D)) {
+        if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_D) || inputstate_is_pressed(is, KEY_KP_6)) {
             if (is_dead)
                 return add_message("You cannot move while dead");
             try_entity_move(hero_id, (vec3){1, 0, 0});
@@ -2189,9 +2190,10 @@ public:
     }
 
     inline bool handle_move_up_left(const inputstate& is, bool is_dead) {
-        if (inputstate_is_pressed(is, KEY_Q)) {
-            if (is_dead)
+        if (inputstate_is_pressed(is, KEY_Q) || inputstate_is_pressed(is, KEY_KP_7)) {
+            if (is_dead) {
                 return add_message("You cannot move while dead");
+            }
             try_entity_move(hero_id, (vec3){-1, -1, 0});
             flag = GAMESTATE_FLAG_PLAYER_ANIM;
             return true;
@@ -2200,7 +2202,7 @@ public:
     }
 
     inline bool handle_move_up_right(const inputstate& is, bool is_dead) {
-        if (inputstate_is_pressed(is, KEY_E)) {
+        if (inputstate_is_pressed(is, KEY_E) || inputstate_is_pressed(is, KEY_KP_9)) {
             if (is_dead) {
                 add_message("You cannot move while dead");
                 return true;
@@ -2213,7 +2215,7 @@ public:
     }
 
     inline bool handle_move_down_left(const inputstate& is, bool is_dead) {
-        if (inputstate_is_pressed(is, KEY_Z)) {
+        if (inputstate_is_pressed(is, KEY_Z) || inputstate_is_pressed(is, KEY_KP_1)) {
             if (is_dead)
                 return add_message("You cannot move while dead");
             try_entity_move(hero_id, (vec3){-1, 1, 0});
@@ -2224,7 +2226,7 @@ public:
     }
 
     inline bool handle_move_down_right(const inputstate& is, bool is_dead) {
-        if (inputstate_is_pressed(is, KEY_C)) {
+        if (inputstate_is_pressed(is, KEY_C) || inputstate_is_pressed(is, KEY_KP_3)) {
             if (is_dead)
                 return add_message("You cannot move while dead");
             try_entity_move(hero_id, (vec3){1, 1, 0});
@@ -2307,8 +2309,9 @@ public:
     inline void handle_weapon_durability_loss(entityid atk_id, entityid tgt_id) {
         const entityid equipped_wpn = ct.get<equipped_weapon>(atk_id).value_or(ENTITYID_INVALID);
         optional<int> maybe_dura = ct.get<durability>(equipped_wpn);
-        if (!maybe_dura.has_value())
+        if (!maybe_dura.has_value()) {
             return;
+        }
         const int dura = maybe_dura.value();
         ct.set<durability>(equipped_wpn, dura - 1 < 0 ? 0 : dura - 1);
         if (dura > 0) {
@@ -2321,8 +2324,9 @@ public:
         // item destroyed
         ct.set<destroyed>(equipped_wpn, true);
         const bool event_heard = check_hearing(hero_id, ct.get<location>(tgt_id).value_or((vec3){-1, -1, -1}));
-        if (event_heard)
+        if (event_heard) {
             PlaySound(sfx[SFX_05_ALCHEMY_GLASS_BREAK]);
+        }
         add_message_history("%s broke!", ct.get<name>(equipped_wpn).value_or("no-name-weapon").c_str());
     }
 
