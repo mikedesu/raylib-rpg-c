@@ -1940,38 +1940,49 @@ public:
     }
 
     inline bool handle_change_dir(inputstate& is) {
-        if (!player_changing_dir)
+        if (!player_changing_dir) {
             return false;
+        }
         optional<bool> maybe_player_is_dead = ct.get<dead>(hero_id);
-        if (!maybe_player_is_dead.has_value())
+        if (!maybe_player_is_dead.has_value()) {
             return true;
+        }
         const bool is_dead = maybe_player_is_dead.value();
         // double 's' is wait one turn
-        if (inputstate_is_pressed(is, KEY_S)) {
+        if (inputstate_is_pressed(is, KEY_S) || inputstate_is_pressed(is, KEY_KP_5)) {
             player_changing_dir = false;
             flag = GAMESTATE_FLAG_PLAYER_ANIM;
         }
-        else if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W))
+        else if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W) || inputstate_is_pressed(is, KEY_KP_8)) {
             change_player_dir(DIR_UP);
-        else if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X))
+        }
+        else if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X) || inputstate_is_pressed(is, KEY_KP_2)) {
             change_player_dir(DIR_DOWN);
-        else if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_A))
+        }
+        else if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_A) || inputstate_is_pressed(is, KEY_KP_4)) {
             change_player_dir(DIR_LEFT);
-        else if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_D))
+        }
+        else if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_D) || inputstate_is_pressed(is, KEY_KP_6)) {
             change_player_dir(DIR_RIGHT);
-        else if (inputstate_is_pressed(is, KEY_Q))
+        }
+        else if (inputstate_is_pressed(is, KEY_Q) || inputstate_is_pressed(is, KEY_KP_7)) {
             change_player_dir(DIR_UP_LEFT);
-        else if (inputstate_is_pressed(is, KEY_E))
+        }
+        else if (inputstate_is_pressed(is, KEY_E) || inputstate_is_pressed(is, KEY_KP_9)) {
             change_player_dir(DIR_UP_RIGHT);
-        else if (inputstate_is_pressed(is, KEY_Z))
+        }
+        else if (inputstate_is_pressed(is, KEY_Z) || inputstate_is_pressed(is, KEY_KP_1)) {
             change_player_dir(DIR_DOWN_LEFT);
-        else if (inputstate_is_pressed(is, KEY_C))
+        }
+        else if (inputstate_is_pressed(is, KEY_C) || inputstate_is_pressed(is, KEY_KP_3)) {
             change_player_dir(DIR_DOWN_RIGHT);
+        }
         else if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
             // this is incorrect
             // this should be a regular attack
-            if (is_dead)
+            if (is_dead) {
                 return add_message("You cannot attack while dead");
+            }
             ct.set<attacking>(hero_id, true);
             ct.set<update>(hero_id, true);
             flag = GAMESTATE_FLAG_PLAYER_ANIM;
@@ -1981,7 +1992,7 @@ public:
     }
 
     inline bool handle_change_dir_intent(const inputstate& is) {
-        if (inputstate_is_pressed(is, KEY_S)) {
+        if (inputstate_is_pressed(is, KEY_S) || inputstate_is_pressed(is, KEY_KP_5)) {
             player_changing_dir = true;
             return true;
         }
@@ -2007,16 +2018,18 @@ public:
         for (int i = 0; (size_t)i < t->get_entity_count(); i++) {
             const entityid id = t->tile_get_entity(i);
             const bool is_solid = ct.get<solid>(id).value_or(false);
-            if (id != ENTITYID_INVALID && is_solid)
+            if (id != ENTITYID_INVALID && is_solid) {
                 return true;
+            }
         }
         return false;
     }
 
     inline bool handle_box_push(entityid id, vec3 v) {
         const bool can_push = ct.get<pushable>(id).value_or(false);
-        if (!can_push)
+        if (!can_push) {
             return false;
+        }
         return try_entity_move(id, v);
     }
 
@@ -2028,8 +2041,9 @@ public:
         for (int i = 0; (size_t)i < t->get_entity_count(); i++) {
             const entityid id = t->tile_get_entity(i);
             const bool is_pushable = ct.get<pushable>(id).value_or(false);
-            if (id != ENTITYID_INVALID && is_pushable)
+            if (id != ENTITYID_INVALID && is_pushable) {
                 return id;
+            }
         }
         return ENTITYID_INVALID;
     }
@@ -2040,22 +2054,34 @@ public:
         for (size_t i = 0; i < t->get_entity_count(); i++) {
             const entityid id = t->get_entity_at(i);
             const entitytype_t type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
-            if (type == ENTITY_DOOR)
+            if (type == ENTITY_DOOR) {
                 return id;
+            }
         }
         return ENTITYID_INVALID;
     }
 
     inline bool check_hearing(entityid id, vec3 loc) {
-        if (id == ENTITYID_INVALID || vec3_invalid(loc))
+        if (id == ENTITYID_INVALID || vec3_invalid(loc)) {
             return false;
-        const vec3 hero_loc = ct.get<location>(hero_id).value_or((vec3){-1, -1, -1});
+        }
+        const vec3 hero_loc = ct.get<location>(hero_id).value_or(vec3{-1, -1, -1});
         // is the hero on the same floor as loc?
-        if (vec3_invalid(hero_loc) || hero_loc.z != loc.z)
+        if (vec3_invalid(hero_loc) || hero_loc.z != loc.z) {
             return false;
-        const Vector2 p0 = {static_cast<float>(hero_loc.x), static_cast<float>(hero_loc.y)}, p1 = {static_cast<float>(loc.x), static_cast<float>(loc.y)};
+        }
+
+        const float x0 = hero_loc.x;
+        const float y0 = hero_loc.y;
+        const float x1 = loc.x;
+        const float y1 = loc.y;
+        const Vector2 p0 = {x0, y0};
+        const Vector2 p1 = {x1, y1};
+
         const float dist = Vector2Distance(p0, p1);
+
         const float hearing = ct.get<hearing_distance>(hero_id).value_or(3);
+
         return dist <= hearing;
     }
 

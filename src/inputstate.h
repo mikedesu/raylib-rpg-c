@@ -53,8 +53,9 @@ static inline void inputstate_update(inputstate& is) {
 
 // Check if a key was pressed this frame
 static inline const bool inputstate_is_pressed(const inputstate& is, int key) {
-    if (key < 0 || key >= MAX_KEYS)
+    if (key < 0 || key >= MAX_KEYS) {
         return false;
+    }
     const int idx = key / BITS_PER_LONG, bit = key % BITS_PER_LONG;
     return (is.pressed[idx] & (1ULL << bit)) != 0;
 }
@@ -62,16 +63,18 @@ static inline const bool inputstate_is_pressed(const inputstate& is, int key) {
 // Check if ANY key was pressed this frame
 static inline bool inputstate_any_pressed(const inputstate& is) {
     for (int idx = 0; idx < NUM_LONGS; idx++) {
-        if (is.pressed[idx] != 0)
+        if (is.pressed[idx] != 0) {
             return true; // At least one key pressed
+        }
     }
     return false;
 }
 
 // Check if a key is held down
 static inline const bool inputstate_is_held(const inputstate& is, int key) {
-    if (key < 0 || key >= MAX_KEYS)
+    if (key < 0 || key >= MAX_KEYS) {
         return false;
+    }
     const int idx = key / BITS_PER_LONG, bit = key % BITS_PER_LONG;
     return (is.held[idx] & (1ULL << bit)) != 0;
 }

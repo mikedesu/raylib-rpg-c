@@ -47,11 +47,14 @@ I have already done the following:
 - [x] **FIXED** **BUG** pulling a box can result in the player moving into an empty/unknown/none-tiletype
 - [x] **FIXED** **BUG** moving has a context-setting bug since upgrading `sprite` and `spritegroup` to classes...
 - [x] **BUG** **FIXED** blocking attacks animation bug 
+- [x] **PLAYER REQUEST** numpad movement controls
+  - [x] basics implemented
+  - [ ] want to introduce "laptop" vs "full-kb" modes
+  - [ ] want to also introduce full customization of keys and meanings
 
 
 Previous analysis suggestions you've brought up that I will eventually implement, or ideas that I've realized I need to handle (**DO NOT BASED ANALYSIS ON THESE**)
 
-- [ ] **PLAYER REQUEST** numpad movement controls
 - [ ] **IDEA** **FEATURE** village every 10 floors?
   - [ ] mining caravan
   - [ ] dwarf village
