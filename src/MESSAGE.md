@@ -55,6 +55,7 @@ I have already done the following:
 
 Previous analysis suggestions you've brought up that I will eventually implement, or ideas that I've realized I need to handle (**DO NOT BASED ANALYSIS ON THESE**)
 
+- [ ] **BUG** the switch to turn off `-DNPCS_ALL_AT_ONCE` isn't working and there's active bugginess/freezing/lock-up going on
 - [ ] **IDEA** **FEATURE** village every 10 floors?
   - [ ] mining caravan
   - [ ] dwarf village

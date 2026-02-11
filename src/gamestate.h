@@ -218,7 +218,9 @@ public:
         debugpanel.bg_color = RED;
         debugpanel.font_size = GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE;
         targetwidth = targetheight = windowwidth = windowheight = -1;
-        hero_id = entity_turn = new_entityid_begin = new_entityid_end = ENTITYID_INVALID;
+        hero_id = INVALID;
+        entity_turn = 1;
+        new_entityid_begin = new_entityid_end = ENTITYID_INVALID;
         timebegan = currenttime = time(NULL);
         timebegantm = localtime(&timebegan);
         currenttimetm = localtime(&currenttime);
@@ -3217,11 +3219,17 @@ public:
     inline bool handle_npc(entityid id) {
         minfo2("handle npc %d", id);
         massert(id != ENTITYID_INVALID, "Entity is NULL!");
+
+        auto id_name = ct.get<name>(id).value_or("no-name");
+
         auto maybe_dead = ct.get<dead>(id);
-        massert(maybe_dead.has_value(), "npc has no dead component");
+        massert(maybe_dead.has_value(), "npc id %d name %s has no dead component", id, id_name.c_str());
+
         const bool is_dead = maybe_dead.value();
-        if (is_dead)
+        if (is_dead) {
             return false;
+        }
+
         // this is a heuristic for handling entity actions
         // originally, we were just moving randomly
         // this example shows how, if the player is not adjacent to an NPC,
@@ -3286,8 +3294,10 @@ public:
         minfo2("handle npcs");
         if (flag == GAMESTATE_FLAG_NPC_TURN) {
 #ifndef NPCS_ALL_AT_ONCE
-            if (entity_turn >= 0 && entity_turn < next_entityid) {
-                const bool result = handle_npc(entity_turn);
+            //if (entity_turn >= 0 && entity_turn < next_entityid) {
+            if (entity_turn >= 1 && entity_turn < next_entityid) {
+                //const bool result = handle_npc(entity_turn);
+                handle_npc(entity_turn);
                 //if (result) {
                 //    msuccess("npc %d handled successfully", entity_turn);
                 //} else {
@@ -3324,7 +3334,7 @@ public:
 #ifndef NPCS_ALL_AT_ONCE
             entity_turn++;
             if (entity_turn >= next_entityid) {
-                entity_turn = 0;
+                entity_turn = 1;
             }
 #endif
             //minfo("handle test flag: %d", turn_count);
@@ -3336,7 +3346,7 @@ public:
             entity_turn++;
 
             if (entity_turn >= next_entityid) {
-                entity_turn = 0;
+                entity_turn = 1;
             }
 
             if (entity_turn == hero_id) {
