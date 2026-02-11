@@ -1041,6 +1041,9 @@ public:
         return id;
     }
 
+
+
+
     inline entityid tile_has_box(int x, int y, int z) {
         massert(z >= 0, "floor is out of bounds");
         massert((size_t)z < d.floors.size(), "floor is out of bounds");
@@ -1055,6 +1058,28 @@ public:
         }
         return INVALID;
     }
+
+
+
+
+    inline entityid tile_has_pullable(int x, int y, int z) {
+        minfo("tile_has_pullable(%d, %d, %d)", x, y, z);
+        massert(z >= 0, "floor is out of bounds");
+        massert((size_t)z < d.floors.size(), "floor is out of bounds");
+        shared_ptr<dungeon_floor> df = d.get_floor(z);
+        shared_ptr<tile_t> t = df->tile_at(vec3{x, y, z});
+        for (size_t i = 0; i < t->get_entity_count(); i++) {
+            const entityid id = t->tile_get_entity(i);
+            const bool is_pullable = ct.get<pullable>(id).value_or(false);
+            if (id != ENTITYID_INVALID && is_pullable) {
+                return id;
+            }
+        }
+        return ENTITYID_INVALID;
+    }
+
+
+
 
     inline entityid create_npc_at_with(race_t rt, vec3 loc, with_fun npcInitFunction) {
         minfo2("create npc at with: (%d, %d, %d)", loc.x, loc.y, loc.z);
@@ -2390,41 +2415,61 @@ public:
         ct.set<xp>(id, new_xp);
     }
 
+
+
+
     inline void process_attack_results(entityid atk_id, entityid tgt_id, bool atk_successful) {
         massert(atk_id != ENTITYID_INVALID, "attacker entity id is invalid");
         massert(tgt_id != ENTITYID_INVALID, "target entity id is invalid");
+
         const string attacker_name = ct.get<name>(atk_id).value_or("no-name");
         const string target_name = ct.get<name>(tgt_id).value_or("no-name");
         const char* atk_name = attacker_name.c_str();
         const char* tgt_name = target_name.c_str();
+
         if (ct.get<dead>(tgt_id).value_or(false)) {
             add_message_history("%s swings at a dead target", atk_name);
             return;
         }
+
         if (!atk_successful) {
             add_message_history("%s swings at %s and misses!", atk_name, tgt_name);
             return;
         }
+
         const int dmg = compute_attack_damage(atk_id, tgt_id);
+
         ct.set<damaged>(tgt_id, true);
         ct.set<update>(tgt_id, true);
+
         optional<int> maybe_tgt_hp = ct.get<hp>(tgt_id);
         if (!maybe_tgt_hp.has_value()) {
             merror("target has no HP component");
             return;
         }
+
         const int tgt_hp = maybe_tgt_hp.value() - dmg;
+
         add_message_history("%s deals %d damage to %s", atk_name, dmg, tgt_name);
+
         ct.set<hp>(tgt_id, tgt_hp);
+
         // decrement weapon durability
         handle_weapon_durability_loss(atk_id, tgt_id);
-        if (tgt_hp > 0)
+        if (tgt_hp > 0) {
             return;
+        }
+
         ct.set<dead>(tgt_id, true);
+
+        // testing marking corpses as pullable objects
+        ct.set<pullable>(tgt_id, true);
+
         // we need to remove tgt_id from the floor's living npcs and add it to dead npcs
         shared_ptr<dungeon_floor> df = d.get_current_floor();
         df->remove_living_npc(tgt_id);
         df->add_dead_npc(tgt_id);
+
         // when an npc target is killed, the attacker gains xp
         // when an npc target is killed, it drops its inventory
         switch (ct.get<entitytype>(tgt_id).value_or(ENTITY_NONE)) {
@@ -2438,11 +2483,18 @@ public:
         }
     }
 
+
+
+
     inline void handle_shield_block_sfx(entityid target_id) {
         const bool event_heard = check_hearing(hero_id, ct.get<location>(target_id).value_or((vec3){-1, -1, -1}));
-        if (event_heard)
+        if (event_heard) {
             PlaySound(sfx[SFX_HIT_METAL_ON_METAL]);
+        }
     }
+
+
+
 
     inline attack_result_t process_attack_entity(shared_ptr<tile_t> tile, entityid attacker_id, entityid target_id) {
         massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
@@ -2509,6 +2561,9 @@ public:
         return ATTACK_RESULT_BLOCK;
     }
 
+
+
+
     inline void handle_attack_sfx(entityid attacker, attack_result_t result) {
         if (test) {
             return;
@@ -2550,28 +2605,41 @@ public:
         }
     }
 
+
+
+
     inline attack_result_t try_entity_attack(entityid id, int x, int y) {
         minfo2("entity %d is attacking location %d, %d", id, x, y);
         massert(!ct.get<dead>(id).value_or(false), "attacker entity is dead");
         massert(ct.has<location>(id), "entity %d has no location", id);
+
         const vec3 loc = ct.get<location>(id).value();
         shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
         shared_ptr<tile_t> tile = df->tile_at(vec3{x, y, loc.z});
+
         // Calculate direction based on target position
         const int dx = x - loc.x;
         const int dy = y - loc.y;
+
         ct.set<direction>(id, get_dir_from_xy(dx, dy));
         ct.set<attacking>(id, true);
         ct.set<update>(id, true);
+
         const entityid npc_id = get_cached_npc(tile);
         const attack_result_t result = process_attack_entity(tile, id, npc_id);
+
         // did the hero hear this event?
         handle_attack_sfx(id, result);
+
         if (!test) {
             set_gamestate_flag_for_attack_animation(ct.get<entitytype>(id).value_or(ENTITY_NONE));
         }
+
         return result;
     }
+
+
+
 
     inline bool handle_attack(const inputstate& is, bool is_dead) {
         if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
@@ -2593,16 +2661,26 @@ public:
         return t->get_cached_item();
     }
 
+
+
+
     inline bool try_entity_pull(entityid id) {
+        minfo("try_entity_pull(%d)", id);
+
         massert(id != ENTITYID_INVALID, "Entity is NULL!");
+
         ct.set<update>(id, true);
         vec3 loc = ct.get<location>(id).value_or(vec3{-1, -1, -1});
+
         massert(!vec3_invalid(loc), "loc is invalid");
+
         auto df = d.get_floor(loc.z);
         auto tile = df->tile_at(loc);
         // get the id's direction
         direction_t facing_d = ct.get<direction>(id).value_or(DIR_NONE);
+
         massert(facing_d != DIR_NONE, "direction d is none");
+
         // opposite dir
         direction_t d = get_opposite_dir(facing_d);
         vec3 v = get_loc_from_dir(d);
@@ -2646,10 +2724,19 @@ public:
                 return false;
             }
         }
-        const entityid box_id2 = tile_has_box(bloc.x, bloc.y, bloc.z);
+
+
+
+
+        //const entityid box_id2 = tile_has_box(bloc.x, bloc.y, bloc.z);
+        const entityid box_id2 = tile_has_pullable(bloc.x, bloc.y, bloc.z);
         if (box_id2 == ENTITYID_INVALID) {
             return false;
         }
+
+
+
+
         // remove the entity from the current tile
         if (!df->df_remove_at(id, loc)) {
             merror2("Failed to remove %d from (%d, %d)", id, loc.x, loc.y);
@@ -2670,17 +2757,24 @@ public:
         ct.set<spritemove>(id, (Rectangle){mx, my, 0, 0});
         if (check_hearing(hero_id, aloc)) {
             // crashes in unittest if missing this check
-            if (IsAudioDeviceReady())
+            if (IsAudioDeviceReady()) {
                 PlaySound(sfx[SFX_STEP_STONE_1]);
+            }
         }
         ct.set<steps_taken>(id, ct.get<steps_taken>(id).value_or(0) + 1);
+
         msuccess2("npc %d moved to (%d,%d,%d)", id, aloc.x, aloc.y, aloc.z);
+
         // check to see if pullable
         // for now i will be lazy
         // and skip this check
         try_entity_move(box_id2, v);
+        msuccess("try_entity_pull(%d)", id);
         return true;
     }
+
+
+
 
     inline bool try_entity_pickup(entityid id) {
         massert(id != ENTITYID_INVALID, "Entity is NULL!");
@@ -2864,27 +2958,32 @@ public:
                         break;
                     }
                 }
+
                 uniform_int_distribution<int> gen(1, 6);
                 const int dmg = gen(mt);
                 ct.set<damaged>(npcid, true);
                 ct.set<update>(npcid, true);
+
                 optional<int> maybe_tgt_hp = ct.get<hp>(npcid);
                 if (!maybe_tgt_hp.has_value()) {
                     merror("target has no HP component");
                     return;
                 }
+
                 int tgt_hp = maybe_tgt_hp.value();
                 if (tgt_hp <= 0) {
                     merror("Target is already dead, hp was: %d", tgt_hp);
                     ct.set<dead>(npcid, true);
                     return;
                 }
+
                 tgt_hp -= dmg;
                 ct.set<hp>(npcid, tgt_hp);
                 if (tgt_hp > 0) {
                     ct.set<dead>(npcid, false);
                     return;
                 }
+
                 const entitytype_t tgttype = ct.get<entitytype>(npcid).value_or(ENTITY_NONE);
                 ct.set<dead>(npcid, true);
                 shared_ptr<dungeon_floor> df = d.get_current_floor();
