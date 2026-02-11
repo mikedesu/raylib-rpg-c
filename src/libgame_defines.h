@@ -28,14 +28,9 @@
 
 #define SPRITEGROUP_DEFAULT_SIZE 32
 
-//#define DEFAULT_WIN_WIDTH 800
-//#define DEFAULT_WIN_HEIGHT 480
-//#define DEFAULT_WIN_WIDTH 640
-//#define DEFAULT_WIN_HEIGHT 360
-//#define DEFAULT_WIN_WIDTH 1280
-//#define DEFAULT_WIN_HEIGHT 720
-//#define DEFAULT_WIN_WIDTH 960
-//#define DEFAULT_WIN_HEIGHT 540
+#define COMPANYSCENE 0
+#define TITLESCENE 1
+#define GAMEPLAYSCENE 2
 
 //#define DEFAULT_TARGET_WIDTH 1920
 //#define DEFAULT_TARGET_HEIGHT 1080
@@ -47,16 +42,5 @@
 //#define DEFAULT_TARGET_WIDTH 640
 //#define DEFAULT_TARGET_HEIGHT 360
 //#define SPRITEGROUP_DEFAULT_SIZE 32
-
-//-------------------------------------------------------------------------------
-
-//-------------------------------------------------------------------------------
-
-#define COMPANYSCENE 0
-#define TITLESCENE 1
-#define GAMEPLAYSCENE 2
-
-#define COMPANYNAME "@evildojo666"
-#define COMPANYFILL "   x  x x   "
 
 //#define DEFAULT_HASHTABLE_ENTITYID_SPRITEGROUP_SIZE 16
