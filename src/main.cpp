@@ -5,10 +5,8 @@
 #include <emscripten/emscripten.h>
 #endif
 
-
 inputstate is;
 gamestate g;
-
 
 static inline void gameloop() {
     inputstate_update(is);
@@ -25,7 +23,6 @@ static inline void gameloop() {
         g.restart_count++;
     }
 }
-
 
 int main() {
     g.logic_init();
