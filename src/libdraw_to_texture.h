@@ -18,7 +18,7 @@ static inline void draw_hud_to_texture(gamestate& g) {
     EndTextureMode();
 }
 
-static inline void draw_character_creation_screen_to_texture(gamestate& g) {
+static inline void draw_char_creation_to_texture(gamestate& g) {
     BeginTextureMode(char_creation_target_texture);
     draw_character_creation_screen(g);
     handle_debug_panel(g);

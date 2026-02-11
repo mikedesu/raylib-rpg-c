@@ -17,20 +17,19 @@
 #include "shaders.h"
 #include "unload_textures.h"
 
-unordered_map<entityid, spritegroup*> spritegroups;
-textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
-unordered_map<int, Shader> shaders;
-RenderTexture2D title_target_texture = {0};
-RenderTexture2D char_creation_target_texture = {0};
-RenderTexture2D main_game_target_texture = {0};
-RenderTexture2D hud_target_texture = {0};
-RenderTexture2D target = {0};
-Rectangle target_src = {0, 0, DEFAULT_TARGET_WIDTH, DEFAULT_TARGET_HEIGHT};
-Rectangle target_dest = {0, 0, DEFAULT_TARGET_WIDTH, DEFAULT_TARGET_HEIGHT};
-Rectangle win_dest = {0, 0, DEFAULT_WIN_WIDTH, DEFAULT_WIN_HEIGHT};
-Music music;
-int ANIM_SPEED = DEFAULT_ANIM_SPEED;
-int libdraw_restart_count = 0;
+extern unordered_map<entityid, spritegroup*> spritegroups;
+extern textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
+extern unordered_map<int, Shader> shaders;
+extern RenderTexture2D title_target_texture;
+extern RenderTexture2D char_creation_target_texture;
+extern RenderTexture2D main_game_target_texture;
+extern RenderTexture2D hud_target_texture;
+extern RenderTexture2D target;
+extern Rectangle target_src;
+extern Rectangle target_dest;
+extern Rectangle win_dest;
+extern Music music;
+extern int ANIM_SPEED;
 
 static inline void drawframe(gamestate& g) {
     const double start_time = GetTime();
@@ -41,7 +40,7 @@ static inline void drawframe(gamestate& g) {
         switch (g.current_scene) {
         case SCENE_TITLE: draw_title_screen_to_texture(g, false); break;
         case SCENE_MAIN_MENU: draw_title_screen_to_texture(g, true); break;
-        case SCENE_CHARACTER_CREATION: draw_character_creation_screen_to_texture(g); break;
+        case SCENE_CHARACTER_CREATION: draw_char_creation_to_texture(g); break;
         case SCENE_GAMEPLAY: libdraw_drawframe_2d_to_texture(g); break;
         default: break;
         }
@@ -54,7 +53,7 @@ static inline void drawframe(gamestate& g) {
     switch (g.current_scene) {
     case SCENE_TITLE: draw_title_screen_from_texture(g); break;
     case SCENE_MAIN_MENU: draw_title_screen_from_texture(g); break;
-    case SCENE_CHARACTER_CREATION: draw_character_creation_screen_from_texture(g); break;
+    case SCENE_CHARACTER_CREATION: draw_char_creation_from_texture(g); break;
     case SCENE_GAMEPLAY: libdraw_drawframe_2d_from_texture(g); break;
     default: break;
     }
@@ -105,22 +104,13 @@ static inline void libdraw_init_rest(gamestate& g) {
     const float x = DEFAULT_TARGET_WIDTH / 4.0f, y = DEFAULT_TARGET_HEIGHT / 4.0f;
     g.cam2d.offset = Vector2{x, y};
     draw_title_screen_to_texture(g, false);
-    draw_character_creation_screen_to_texture(g);
+    draw_char_creation_to_texture(g);
     InitAudioDevice();
     while (!IsAudioDeviceReady())
         ;
     libdraw_load_music(g);
     libdraw_load_sfx(g);
 }
-
-//static inline void load_font(const char* path) {
-//gfont = LoadFont(path);
-//gfont = LoadFontEx(path, 10, 0, 0);
-//gfont_10 = LoadFontEx(path, 10, 0, 0);
-//gfont_20 = LoadFontEx(path, 20, 0, 0);
-//gfont_30 = LoadFontEx(path, 30, 0, 0);
-//gfont_40 = LoadFontEx(path, 40, 0, 0);
-//}
 
 static inline void libdraw_init(gamestate& g) {
     const int w = DEFAULT_WIN_WIDTH, h = DEFAULT_WIN_HEIGHT;
