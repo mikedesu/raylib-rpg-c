@@ -168,6 +168,11 @@ public:
         massert(ctx < numcontexts, "set_context: ctx is greater than numcontexts: %d < %d", ctx, numcontexts);
         currentcontext = ctx % numcontexts;
         src.y = height * currentcontext;
-        currentframe = src.x = 0;
+
+        // we dont want to reset frame or src.x IFF...the sprite/entity is dead or set to not animating
+        if (is_animating) {
+            currentframe = 0;
+            src.x = 0;
+        }
     }
 };

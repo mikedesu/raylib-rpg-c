@@ -9,6 +9,7 @@
 
 extern unordered_map<entityid, spritegroup*> spritegroups;
 
+
 static inline void libdraw_update_sprite_context_ptr(gamestate& g, spritegroup* group, direction_t dir) {
     massert(group != NULL, "group is NULL");
     int old_ctx = group->sprites2->at(group->current)->get_currentcontext();
@@ -41,6 +42,9 @@ static inline void libdraw_update_sprite_context_ptr(gamestate& g, spritegroup* 
     group->setcontexts(ctx);
 }
 
+
+
+
 static inline void libdraw_update_sprite_position(gamestate& g, entityid id, spritegroup* sg) {
     massert(sg, "spritegroup is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
@@ -71,12 +75,17 @@ static inline void libdraw_update_sprite_position(gamestate& g, entityid id, spr
     }
 }
 
+
+
+
 static inline void libdraw_update_sprite_ptr(gamestate& g, entityid id, spritegroup* sg) {
     minfo3("Begin update sprite ptr: %d", id);
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     massert(sg, "spritegroup is NULL");
     massert(g.ct.has<update>(id), "id %d has no update component, name %s", id, g.ct.get<name>(id).value().c_str());
+
     const bool do_update = g.ct.get<update>(id).value();
+
     if (do_update) {
         if (g.ct.has<direction>(id)) {
             const direction_t d = g.ct.get<direction>(id).value();
@@ -84,14 +93,18 @@ static inline void libdraw_update_sprite_ptr(gamestate& g, entityid id, spritegr
         }
         g.ct.set<update>(id, false);
     }
+
     // Copy movement intent from sprite_move_x/y if present
     libdraw_update_sprite_position(g, id, sg);
+
     if (g.ct.get<block_success>(id).value_or(false)) {
         libdraw_set_sg_block_success(g, id, sg);
     }
+
     if (g.ct.get<attacking>(id).value_or(false)) {
         libdraw_set_sg_is_attacking(g, id, sg);
     }
+
     //if (g.ct.get<casting>(id).value_or(false))
     //    libdraw_set_sg_is_casting(g, id, sg);
     //if (g->ct.get<spell_casting>(id).value_or(false))
@@ -100,13 +113,16 @@ static inline void libdraw_update_sprite_ptr(gamestate& g, entityid id, spritegr
     //    libdraw_set_sg_spell_persisting(g, id, sg);
     //else if (g->ct.get<spell_ending>(id).value_or(false))
     //    libdraw_set_sg_spell_ending(g, id, sg);
+
+    const entitytype_t type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
+
     if (g.ct.get<dead>(id).value_or(false)) {
         libdraw_set_sg_is_dead(g, id, sg);
     }
     else if (g.ct.get<damaged>(id).value_or(false)) {
         libdraw_set_sg_is_damaged(g, id, sg);
     }
-    const entitytype_t type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
+
     if (type == ENTITY_DOOR) {
         auto maybe_door_open = g.ct.get<door_open>(id);
         if (maybe_door_open.has_value()) {
@@ -126,6 +142,9 @@ static inline void libdraw_update_sprite_ptr(gamestate& g, entityid id, spritegr
     const vec3 loc = maybe_loc.value();
     sg->snap_dest(loc.x, loc.y);
 }
+
+
+
 
 static inline void libdraw_update_sprite_pre(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");

@@ -9,48 +9,65 @@
 #include "update_sprite.h"
 #include <raylib.h>
 
+
 extern Music music;
 extern unordered_map<entityid, spritegroup*> spritegroups;
 extern int ANIM_SPEED;
+
 
 static inline void libdraw_update_sprites_pre(gamestate& g) {
     minfo2("BEGIN update sprites pre");
     handle_music_stream(g);
     if (g.current_scene == SCENE_GAMEPLAY) {
         libdraw_handle_dirty_entities(g);
-        for (entityid id = 0; id < g.next_entityid; id++)
+        for (entityid id = 0; id < g.next_entityid; id++) {
             libdraw_update_sprite_pre(g, id);
+        }
     }
     msuccess2("END update sprites pre");
 }
+
+
+
 
 static inline void libdraw_update_sprites_post(gamestate& g) {
     if (g.current_scene != SCENE_GAMEPLAY) {
         g.frame_dirty = false;
         return;
     }
+
     // for the gameplay scene...
     if (g.framecount % ANIM_SPEED != 0) {
         libdraw_handle_gamestate_flag(g);
         return;
     }
+
     libdraw_handle_dirty_entities(g);
+
     g.frame_dirty = true;
+
     // For every entity...
     for (entityid id = 0; id < g.next_entityid; id++) {
         // verify it has an entity type
         const entitytype_t type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
-        if (type == ENTITY_NONE)
+        if (type == ENTITY_NONE) {
             continue;
+        }
+
         // grab the sprite group for that entity
         spritegroup* sg = spritegroups[id];
-        if (!sg)
+        if (!sg) {
             continue;
+        }
+
         auto s = sg->sprites2->at(sg->current);
-        if (!s)
+        if (!s) {
             continue;
+        }
+
         //sprite_incrframe2(s);
         s->incr_frame();
+
         // this condition for the animation reset seems incorrect
         // certain cases are causing animations to drop-off mid-sequence
         if (type == ENTITY_PLAYER || type == ENTITY_NPC) {
@@ -59,24 +76,27 @@ static inline void libdraw_update_sprites_post(gamestate& g) {
                 s->set_num_loops(0);
             }
         }
+
         // this will fire off an infinite loop of spell transitions
         // from cast, to persist, to end
         // then repeat
         // it works, but isnt quite what i want
-        if (type == ENTITY_SPELL && s->get_num_loops() >= 1) {
+        else if (type == ENTITY_SPELL && s->get_num_loops() >= 1) {
             if (sg->current == 0) {
                 sg->set_current(1);
                 g.ct.set<spell_casting>(id, false);
                 g.ct.set<spell_persisting>(id, true);
                 g.ct.set<spell_ending>(id, false);
                 g.ct.set<spell_complete>(id, false);
-            } else if (sg->current == 1) {
+            }
+            else if (sg->current == 1) {
                 sg->set_current(2);
                 g.ct.set<spell_casting>(id, false);
                 g.ct.set<spell_persisting>(id, false);
                 g.ct.set<spell_ending>(id, true);
                 g.ct.set<spell_complete>(id, false);
-            } else if (sg->current == 2) {
+            }
+            else if (sg->current == 2) {
                 //spritegroup_set_current(sg, 0);
                 g.ct.set<spell_casting>(id, false);
                 g.ct.set<spell_persisting>(id, false);
@@ -85,8 +105,9 @@ static inline void libdraw_update_sprites_post(gamestate& g) {
                 sg->visible = false;
             }
         }
+
         // lets try something
-        if (type == ENTITY_ITEM) {
+        else if (type == ENTITY_ITEM) {
             const itemtype_t itype = g.ct.get<itemtype>(id).value_or(ITEM_NONE);
             switch (itype) {
             case ITEM_WEAPON: {
@@ -106,12 +127,14 @@ static inline void libdraw_update_sprites_post(gamestate& g) {
                 }
             } break;
             case ITEM_SHIELD: {
-                if (sg->current == 0)
+                if (sg->current == 0) {
                     break;
+                }
                 minfo("shield appears to be equipped...");
                 auto s2 = sg->sprites2->at(sg->current + 1);
-                if (!s2)
+                if (!s2) {
                     break;
+                }
                 //sprite_incrframe2(s2);
                 s2->incr_frame();
                 g.frame_dirty = true;
@@ -123,6 +146,7 @@ static inline void libdraw_update_sprites_post(gamestate& g) {
             default: break;
             }
         }
+
         //if (s_shadow) {
         //    sprite_incrframe(s_shadow);
         //    if (s_shadow->num_loops >= 1) {
