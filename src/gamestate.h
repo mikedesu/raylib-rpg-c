@@ -1869,46 +1869,51 @@ public:
     }
 
     inline void handle_input_inventory(const inputstate& is) {
-        if (controlmode != CONTROLMODE_INVENTORY)
-            return;
-        if (!display_inventory_menu)
-            return;
-        if (inputstate_is_pressed(is, KEY_ESCAPE)) {
-            do_quit = true;
+        if (controlmode != CONTROLMODE_INVENTORY || !display_inventory_menu) {
             return;
         }
-        if (inputstate_is_pressed(is, KEY_I)) {
+
+        //if (inputstate_is_pressed(is, KEY_ESCAPE)) {
+        //    do_quit = true;
+        //    return;
+        //}
+
+        if (inputstate_is_pressed(is, KEY_I) || inputstate_is_pressed(is, KEY_ESCAPE)) {
             controlmode = CONTROLMODE_PLAYER;
             display_inventory_menu = false;
             PlaySound(sfx[SFX_BAG_CLOSE]);
             return;
         }
-        if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_A)) {
+
+        if (inputstate_is_pressed(is, KEY_LEFT)) {
             PlaySound(sfx[SFX_CONFIRM_01]);
-            if (inventory_cursor.x > 0)
+            if (inventory_cursor.x > 0) {
                 inventory_cursor.x--;
+            }
         }
-        if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_D)) {
+        else if (inputstate_is_pressed(is, KEY_RIGHT)) {
             PlaySound(sfx[SFX_CONFIRM_01]);
             inventory_cursor.x++;
         }
-        if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W)) {
+        else if (inputstate_is_pressed(is, KEY_UP)) {
             PlaySound(sfx[SFX_CONFIRM_01]);
-            if (inventory_cursor.y > 0)
+            if (inventory_cursor.y > 0) {
                 inventory_cursor.y--;
+            }
         }
-        if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X)) {
+        else if (inputstate_is_pressed(is, KEY_DOWN)) {
             PlaySound(sfx[SFX_CONFIRM_01]);
             inventory_cursor.y++;
         }
-        if (inputstate_is_pressed(is, KEY_E))
+        else if (inputstate_is_pressed(is, KEY_E)) {
             handle_hero_inventory_equip();
-        if (inputstate_is_pressed(is, KEY_Q)) {
+        }
+        else if (inputstate_is_pressed(is, KEY_Q)) {
             // drop item
             PlaySound(sfx[SFX_DISCARD_ITEM]);
             drop_item_from_hero_inventory();
         }
-        if (inputstate_is_pressed(is, KEY_ENTER)) {
+        else if (inputstate_is_pressed(is, KEY_ENTER)) {
             handle_hero_item_use();
             PlaySound(sfx[SFX_CONFIRM_01]);
         }
@@ -2032,7 +2037,8 @@ public:
     }
 
     inline bool handle_change_dir_intent(const inputstate& is) {
-        if (inputstate_is_pressed(is, KEY_S) || inputstate_is_pressed(is, KEY_KP_5)) {
+        //if (inputstate_is_pressed(is, KEY_S) || inputstate_is_pressed(is, KEY_KP_5)) {
+        if (inputstate_is_pressed(is, KEY_KP_5)) {
             player_changing_dir = true;
             return true;
         }
@@ -2211,7 +2217,8 @@ public:
     }
 
     inline bool handle_move_up(const inputstate& is, bool is_dead) {
-        if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W) || inputstate_is_pressed(is, KEY_KP_8)) {
+        //if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W) || inputstate_is_pressed(is, KEY_KP_8)) {
+        if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_KP_8)) {
             if (is_dead) {
                 return add_message("You cannot move while dead");
             }
@@ -2223,7 +2230,8 @@ public:
     }
 
     inline bool handle_move_down(const inputstate& is, bool is_dead) {
-        if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X) || inputstate_is_pressed(is, KEY_KP_2)) {
+        //if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X) || inputstate_is_pressed(is, KEY_KP_2)) {
+        if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_KP_2)) {
             if (is_dead)
                 return add_message("You cannot move while dead");
             try_entity_move(hero_id, (vec3){0, 1, 0});
@@ -2234,7 +2242,8 @@ public:
     }
 
     inline bool handle_move_left(const inputstate& is, bool is_dead) {
-        if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_A) || inputstate_is_pressed(is, KEY_KP_4)) {
+        //if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_A) || inputstate_is_pressed(is, KEY_KP_4)) {
+        if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_KP_4)) {
             if (is_dead)
                 return add_message("You cannot move while dead");
             try_entity_move(hero_id, (vec3){-1, 0, 0});
@@ -2245,7 +2254,8 @@ public:
     }
 
     inline bool handle_move_right(const inputstate& is, bool is_dead) {
-        if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_D) || inputstate_is_pressed(is, KEY_KP_6)) {
+        //if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_D) || inputstate_is_pressed(is, KEY_KP_6)) {
+        if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_KP_6)) {
             if (is_dead)
                 return add_message("You cannot move while dead");
             try_entity_move(hero_id, (vec3){1, 0, 0});
@@ -2256,7 +2266,8 @@ public:
     }
 
     inline bool handle_move_up_left(const inputstate& is, bool is_dead) {
-        if (inputstate_is_pressed(is, KEY_Q) || inputstate_is_pressed(is, KEY_KP_7)) {
+        //if (inputstate_is_pressed(is, KEY_Q) || inputstate_is_pressed(is, KEY_KP_7)) {
+        if (inputstate_is_pressed(is, KEY_KP_7)) {
             if (is_dead) {
                 return add_message("You cannot move while dead");
             }
@@ -2268,7 +2279,8 @@ public:
     }
 
     inline bool handle_move_up_right(const inputstate& is, bool is_dead) {
-        if (inputstate_is_pressed(is, KEY_E) || inputstate_is_pressed(is, KEY_KP_9)) {
+        //if (inputstate_is_pressed(is, KEY_E) || inputstate_is_pressed(is, KEY_KP_9)) {
+        if (inputstate_is_pressed(is, KEY_KP_9)) {
             if (is_dead) {
                 add_message("You cannot move while dead");
                 return true;
@@ -2281,7 +2293,8 @@ public:
     }
 
     inline bool handle_move_down_left(const inputstate& is, bool is_dead) {
-        if (inputstate_is_pressed(is, KEY_Z) || inputstate_is_pressed(is, KEY_KP_1)) {
+        //if (inputstate_is_pressed(is, KEY_Z) || inputstate_is_pressed(is, KEY_KP_1)) {
+        if (inputstate_is_pressed(is, KEY_KP_1)) {
             if (is_dead)
                 return add_message("You cannot move while dead");
             try_entity_move(hero_id, (vec3){-1, 1, 0});
@@ -2292,7 +2305,8 @@ public:
     }
 
     inline bool handle_move_down_right(const inputstate& is, bool is_dead) {
-        if (inputstate_is_pressed(is, KEY_C) || inputstate_is_pressed(is, KEY_KP_3)) {
+        //if (inputstate_is_pressed(is, KEY_C) || inputstate_is_pressed(is, KEY_KP_3)) {
+        if (inputstate_is_pressed(is, KEY_KP_3)) {
             if (is_dead)
                 return add_message("You cannot move while dead");
             try_entity_move(hero_id, (vec3){1, 1, 0});
@@ -2655,7 +2669,8 @@ public:
 
 
     inline bool handle_attack(const inputstate& is, bool is_dead) {
-        if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
+        //if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
+        if (inputstate_is_pressed(is, KEY_A)) {
             if (is_dead) {
                 return add_message("You cannot attack while dead");
             }
@@ -2822,7 +2837,8 @@ public:
     }
 
     inline bool handle_pickup_item(const inputstate& is, bool is_dead) {
-        if (!inputstate_is_pressed(is, KEY_SLASH)) {
+        //if (!inputstate_is_pressed(is, KEY_SLASH)) {
+        if (!inputstate_is_pressed(is, KEY_S)) {
             return false;
         }
         if (is_dead) {
@@ -2889,7 +2905,8 @@ public:
     }
 
     inline bool handle_traverse_stairs(const inputstate& is, bool is_dead) {
-        if (inputstate_is_pressed(is, KEY_PERIOD)) {
+        //if (inputstate_is_pressed(is, KEY_PERIOD)) {
+        if (inputstate_is_pressed(is, KEY_Z)) {
             if (is_dead) {
                 return add_message("You cannot traverse stairs while dead");
             }
@@ -3158,9 +3175,9 @@ public:
         else if (handle_attack(is, is_dead) || handle_pickup_item(is, is_dead) || handle_traverse_stairs(is, is_dead) || handle_open_door(is, is_dead)) {
             return;
         }
-        else if (handle_test_cast_spell(is, is_dead)) {
-            return;
-        }
+        //else if (handle_test_cast_spell(is, is_dead)) {
+        //    return;
+        //}
         //else if (handle_restart(is, is_dead)) {
         //    return;
         //}
