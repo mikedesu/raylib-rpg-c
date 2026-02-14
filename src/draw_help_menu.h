@@ -4,9 +4,15 @@
 #include "libgame_defines.h"
 
 static inline void draw_help_menu(gamestate& g) {
-    const char* text = "help menu\nlonger line than previously\n@evildojo666";
+    const char* text =
+        "Help Menu\n\nxxxxxxxxxxxxxxxxxxxx\nxxxxxxxxxxxxxxxxxxxx\nxxxxxxxxxxxxxxxxxxxx\nxxxxxxxxxxxxxxxxxxxx\nxxxxxxxxxxxxxxxxxxxx\n\n@evildojo666";
+
+
     constexpr int font_size = 10;
-    constexpr int text_height = font_size * 3;
+    constexpr int line_count = 10;
+
+    constexpr int text_height = font_size * line_count;
+
     const int text_width = MeasureText(text, font_size);
 
     const int box_x = DEFAULT_TARGET_WIDTH / 2 - text_width / 2 - DEFAULT_PAD * 2;
@@ -14,6 +20,7 @@ static inline void draw_help_menu(gamestate& g) {
 
     const int box_width = text_width + DEFAULT_PAD * 2;
     const int box_height = text_height + DEFAULT_PAD * 2;
+
     constexpr Color box_color = Color{0, 0, 255, 127};
     DrawRectangle(box_x, box_y, box_width, box_height, box_color);
 
