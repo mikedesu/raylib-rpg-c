@@ -5,8 +5,10 @@
 #include "gamestate.h"
 
 static inline void handle_debug_panel(gamestate& g) {
+    minfo3("handle debug panel");
     if (g.debugpanelon) {
         update_debug_panel(g);
         draw_debug_panel(g);
     }
+    msuccess3("handle debug panel");
 }

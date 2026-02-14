@@ -8,6 +8,9 @@
 extern textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
 static inline void draw_title_screen(gamestate& g, bool show_menu) {
+    constexpr int sm_font_size = 20;
+    constexpr int font_size = 80;
+
     char buffer[1024] = {0};
     const char* menu_text[2] = {"New Game", "Continue (coming soon)"};
     // Space between title texts
@@ -16,8 +19,6 @@ static inline void draw_title_screen(gamestate& g, bool show_menu) {
     constexpr Color title_text_0_color = {0x66, 0x66, 0x66, 0xFF};
     constexpr Color title_text_1_color = {0xFF, 0xFF, 0xFF, 0xFF};
     constexpr int spacing = 2;
-    constexpr int sm_font_size = 10;
-    constexpr int font_size = 40;
     constexpr Vector2 origin = {0, 0};
     constexpr float sw = 128;
     constexpr float rx = 0;

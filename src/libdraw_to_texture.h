@@ -19,10 +19,12 @@ static inline void draw_hud_to_texture(gamestate& g) {
 }
 
 static inline void draw_char_creation_to_texture(gamestate& g) {
+    minfo3("draw char creation to texture");
     BeginTextureMode(char_creation_target_texture);
     draw_character_creation_screen(g);
     handle_debug_panel(g);
     EndTextureMode();
+    msuccess3("draw char creation to texture");
 }
 
 static inline void draw_title_screen_to_texture(gamestate& g, bool show_menu) {

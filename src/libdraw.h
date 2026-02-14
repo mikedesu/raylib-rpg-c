@@ -32,22 +32,39 @@ extern Music music;
 extern int ANIM_SPEED;
 
 static inline void drawframe(gamestate& g) {
+    minfo3("drawframe");
     const double start_time = GetTime();
     libdraw_update_sprites_pre(g);
+
+    minfo3("begin drawing");
     BeginDrawing();
     ClearBackground(RED);
     if (g.frame_dirty) {
+        minfo3("frame is dirty");
         switch (g.current_scene) {
-        case SCENE_TITLE: draw_title_screen_to_texture(g, false); break;
-        case SCENE_MAIN_MENU: draw_title_screen_to_texture(g, true); break;
-        case SCENE_CHARACTER_CREATION: draw_char_creation_to_texture(g); break;
-        case SCENE_GAMEPLAY: libdraw_drawframe_2d_to_texture(g); break;
+        case SCENE_TITLE: {
+            draw_title_screen_to_texture(g, false);
+        } break;
+        case SCENE_MAIN_MENU: {
+            draw_title_screen_to_texture(g, true);
+        } break;
+        case SCENE_CHARACTER_CREATION: {
+            minfo3("draw character creation scene to texture");
+            draw_char_creation_to_texture(g);
+        } break;
+        case SCENE_GAMEPLAY: {
+            libdraw_drawframe_2d_to_texture(g);
+        } break;
         default: break;
         }
         g.frame_dirty = false;
         g.frame_updates++;
+
+        msuccess3("frame is no longer dirty");
     }
+
     // draw to the target texture
+    minfo3("Begin Texture Mode target");
     BeginTextureMode(target);
     ClearBackground(BLUE);
     switch (g.current_scene) {
@@ -57,12 +74,14 @@ static inline void drawframe(gamestate& g) {
     case SCENE_GAMEPLAY: libdraw_drawframe_2d_from_texture(g); break;
     default: break;
     }
+    msuccess3("End Texture Mode target");
     EndTextureMode();
     // draw the target texture to the window
     win_dest.width = GetScreenWidth();
     win_dest.height = GetScreenHeight();
     DrawTexturePro(target.texture, target_src, win_dest, (Vector2){0, 0}, 0.0f, WHITE);
     EndDrawing();
+    msuccess3("end drawing");
 #ifdef DEBUG
     g.last_frame_time = GetTime() - start_time;
     g.last_frame_times[g.last_frame_times_current] = g.last_frame_time;
@@ -74,6 +93,7 @@ static inline void drawframe(gamestate& g) {
 #endif
 
     libdraw_update_sprites_post(g);
+    msuccess3("drawframe");
 }
 
 static inline void libdraw_init_rest(gamestate& g) {

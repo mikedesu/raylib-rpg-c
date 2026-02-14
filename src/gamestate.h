@@ -3233,7 +3233,6 @@ public:
         //memset(debugpanel.buffer, 0, sizeof(debugpanel.buffer));
 
         direction_t player_dir = ct.get<direction>(hero_id).value_or(DIR_NONE);
-        //int player_ctx =
 
         bzero(debugpanel.buffer, sizeof(debugpanel.buffer));
         // Format the string in one pass
@@ -3299,6 +3298,8 @@ public:
             d.get_current_floor()->get_dead_npcs()->size(),
             god_mode,
             player_dir);
+
+        msuccess2("successfully updated debug panel buffer");
     }
 
     inline bool is_entity_adjacent(entityid id0, entityid id1) {
