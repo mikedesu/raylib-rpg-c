@@ -4,12 +4,29 @@
 #include "libgame_defines.h"
 
 static inline void draw_help_menu(gamestate& g) {
-    const char* text =
-        "Help Menu\n\nxxxxxxxxxxxxxxxxxxxx\nxxxxxxxxxxxxxxxxxxxx\nxxxxxxxxxxxxxxxxxxxx\nxxxxxxxxxxxxxxxxxxxx\nxxxxxxxxxxxxxxxxxxxx\n\n@evildojo666";
+    const char* text = "Help Menu\n"
+                       "\n"
+                       "Movement: numpad\n"
+                       "Change direction: numpad 5\n"
+                       "Wait one turn: numpad 5 twice\n"
+                       "\n"
+                       "Pick up item: s\n"
+                       "Attack: a\n"
+                       "\n"
+                       "Open Inventory: i\n"
+                       "Equip item: e\n"
+                       "Drop item: \n"
+                       "Leave Inventory: escape -or- i"
+                       "\n"
+                       "Open this help menu: ?\n"
+                       "\n"
+                       "@evildojo666";
 
 
     constexpr int font_size = 10;
-    constexpr int line_count = 10;
+
+    constexpr int line_count_0 = 17;
+    constexpr int line_count = line_count_0 + 2;
 
     constexpr int text_height = font_size * line_count;
 
