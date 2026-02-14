@@ -3081,6 +3081,11 @@ public:
             return;
         }
 
+        if (inputstate_is_pressed(is, KEY_SLASH)) {
+            display_help_menu = true;
+            controlmode = CONTROLMODE_HELP_MENU;
+        }
+
         const bool is_dead = ct.get<dead>(hero_id).value_or(true);
         if (is_dead) {
             handle_restart(is);
@@ -3174,6 +3179,9 @@ public:
             action_selection--;
     }
 
+
+
+
     inline void handle_input_option_menu(inputstate& is) {
         massert(controlmode == CONTROLMODE_OPTION_MENU, "controlmode isnt in option menu: %d", controlmode);
         if (inputstate_is_pressed(is, KEY_GRAVE)) {
@@ -3188,6 +3196,34 @@ public:
             minfo("Enter pressed");
     }
 
+
+
+
+    inline void handle_input_help_menu(inputstate& is) {
+        massert(controlmode == CONTROLMODE_HELP_MENU, "controlmode isnt in help menu: %d", controlmode);
+
+        //if (inputstate_is_pressed(is, KEY_GRAVE)) {
+        if (inputstate_any_pressed(is)) {
+            display_help_menu = false;
+            controlmode = CONTROLMODE_PLAYER;
+        }
+
+        //if (inputstate_is_pressed(is, KEY_GRAVE)) {
+        //    display_option_menu = false;
+        //    controlmode = CONTROLMODE_PLAYER;
+        //}
+
+        //else if (inputstate_is_pressed(is, KEY_UP))
+        //    options_menu.decr_selection();
+        //else if (inputstate_is_pressed(is, KEY_DOWN))
+        //    options_menu.incr_selection();
+        //else if (inputstate_is_pressed(is, KEY_ENTER))
+        //    minfo("Enter pressed");
+    }
+
+
+
+
     inline void handle_input_gameplay_scene(inputstate& is) {
         minfo2("handle input gameplay scene");
         if (inputstate_is_pressed(is, KEY_B)) {
@@ -3197,16 +3233,25 @@ public:
                 controlmode = CONTROLMODE_PLAYER;
             frame_dirty = true;
         }
-        if (controlmode == CONTROLMODE_CAMERA)
+
+        if (controlmode == CONTROLMODE_CAMERA) {
             handle_camera_move(is);
-        else if (controlmode == CONTROLMODE_PLAYER)
+        }
+        else if (controlmode == CONTROLMODE_PLAYER) {
             handle_input_gameplay_controlmode_player(is);
-        else if (controlmode == CONTROLMODE_INVENTORY)
+        }
+        else if (controlmode == CONTROLMODE_INVENTORY) {
             handle_input_inventory(is);
-        else if (controlmode == CONTROLMODE_ACTION_MENU)
+        }
+        else if (controlmode == CONTROLMODE_ACTION_MENU) {
             handle_input_action_menu(is);
-        else if (controlmode == CONTROLMODE_OPTION_MENU)
+        }
+        else if (controlmode == CONTROLMODE_OPTION_MENU) {
             handle_input_option_menu(is);
+        }
+        else if (controlmode == CONTROLMODE_HELP_MENU) {
+            handle_input_help_menu(is);
+        }
     }
 
     inline void handle_input(inputstate& is) {
