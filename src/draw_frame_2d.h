@@ -26,26 +26,33 @@ static inline void libdraw_drawframe_2d(gamestate& g) {
     draw_dungeon_floor(g);
     EndMode2D();
     draw_hud(g);
-    draw_look_panel(g);
+    //draw_look_panel(g);
     draw_message_history(g);
     draw_message_box(g);
-    if (g.display_inventory_menu)
+
+    if (g.display_inventory_menu) {
         draw_inventory_menu(g);
-    if (g.display_action_menu)
+    }
+
+    if (g.display_action_menu) {
         draw_action_menu(g);
-    if (g.display_option_menu)
+    }
+
+    if (g.display_option_menu) {
         draw_option_menu(g);
-        //else if (g.display_gameplay_settings_menu) {
-        //    draw_gameplay_settings_menu(g);
-        //}
-        //minfo("handle debug panel");
+    }
+    //else if (g.display_gameplay_settings_menu) {
+    //    draw_gameplay_settings_menu(g);
+    //}
+    //minfo("handle debug panel");
 #ifdef DEBUG
     handle_debug_panel(g);
 #endif
     //draw_version(g);
     //int x = 0;
-    if (g.display_help_menu)
+    if (g.display_help_menu) {
         draw_help_menu(g);
+    }
 
     //if (g.gameover) {
     //    draw_gameover_menu(g);

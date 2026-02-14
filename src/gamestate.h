@@ -280,22 +280,32 @@ public:
         frame_updates = framecount = restart_count = 0;
         last_frame_time = last_frame_times_current = 0;
         last_frame_times.reserve(LAST_FRAME_TIMES_MAX);
-        for (size_t i = 0; i < last_frame_times.size(); i++)
+        for (size_t i = 0; i < last_frame_times.size(); i++) {
             last_frame_times[i] = 0;
+        }
         turn_count = 0;
-        action_selection = inventory_menu_selection = 0;
-        msg_history_max_len_msg_measure = msg_history_max_len_msg = 0;
-        debugpanel.pad_top = debugpanel.pad_left = debugpanel.pad_right = debugpanel.pad_bottom = 0;
+        action_selection = 0;
+        inventory_menu_selection = 0;
+        msg_history_max_len_msg_measure = 0;
+        msg_history_max_len_msg = 0;
+        debugpanel.pad_top = 0;
+        debugpanel.pad_left = 0;
+        debugpanel.pad_right = 0;
+        debugpanel.pad_bottom = 0;
         max_title_screen_selections = 2;
         // initialize character creation
         chara_creation.name = "hero";
-        chara_creation.strength = chara_creation.dexterity = chara_creation.intelligence = chara_creation.wisdom = chara_creation.constitution =
-            chara_creation.charisma = 10;
+        chara_creation.strength = 10;
+        chara_creation.dexterity = 10;
+        chara_creation.intelligence = 10;
+        chara_creation.wisdom = 10;
+        chara_creation.constitution = 10;
+        chara_creation.charisma = 10;
         chara_creation.race = RACE_HUMAN;
         chara_creation.hitdie = get_racial_hd(RACE_HUMAN);
         current_scene = SCENE_TITLE;
         music_volume = DEFAULT_MUSIC_VOLUME;
-        last_click_screen_pos = (Vector2){-1, -1};
+        last_click_screen_pos = Vector2{-1, -1};
         msg_system.clear();
         msg_history.clear();
         ct.clear();
@@ -1388,18 +1398,21 @@ public:
         //}
         msuccess("end creating monsters...");
         add_message("Welcome to the game! Press enter to cycle messages.");
-#ifdef START_MESSAGES
-        add_message("To move around, press [q w e a d z x c]");
-        add_message("To pick up items, press / ");
-        add_message("To manage inventory, press i ");
-        add_message("To equip/unequip an item, highlight and press e ");
-        add_message("To drop an item, highlight and press q ");
-        add_message("To attack, press ' ");
-        add_message("To go up/down a floor, press . ");
-        add_message("To wait a turn, press s s ");
-        add_message("To change direction, press s and then [q w e a d z x c] ");
-        add_message("To open a door, face it and press o ");
-#endif
+        add_message("For help, press ?");
+        // lets not deal with "multi-line" messages...
+        //add_message("This is a multi-line test\nHow will my game handle newlines?");
+        //add_message("This is a multi-line test\nHow will my game handle newlines again?\nOh no lol");
+        //#ifdef START_MESSAGES
+        //add_message("To pick up items, press / ");
+        //add_message("To manage inventory, press i ");
+        //add_message("To equip/unequip an item, highlight and press e ");
+        //add_message("To drop an item, highlight and press q ");
+        //add_message("To attack, press ' ");
+        //add_message("To go up/down a floor, press . ");
+        //add_message("To wait a turn, press s s ");
+        //add_message("To change direction, press s and then [q w e a d z x c] ");
+        //add_message("To open a door, face it and press o ");
+        //#endif
         msuccess("liblogic_init: Game state initialized");
     }
 
