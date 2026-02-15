@@ -1343,8 +1343,8 @@ public:
         // 16x16 = 4 8x8 areas
         // 32x32 = 4 16x16 areas = 8 8x8 areas
 
-        const int w = 8; // 4x4 4x4 areas
-        const int h = 8;
+        const int w = 4; // 4x4 4x4 areas
+        const int h = 4;
         constexpr float parts = 1.0;
 
         //const int w = 32; // 4x4 4x4 areas
@@ -1358,18 +1358,18 @@ public:
         //const vec3 loc0 = d.floors[0].df_get_random_loc();
         auto df = d.get_current_floor();
         //auto rl0 = df->df_get_random_loc();
-        create_weapon_at_with(ct, df->get_random_loc(), dagger_init());
+        //create_weapon_at_with(ct, df->get_random_loc(), dagger_init());
         create_weapon_at_with(ct, df->get_random_loc(), axe_init());
 
         create_shield_at_with(ct, df->get_random_loc(), shield_init());
-        create_shield_at_with(ct, df->get_random_loc(), shield_init());
-        create_shield_at_with(ct, df->get_random_loc(), shield_init());
+        //create_shield_at_with(ct, df->get_random_loc(), shield_init());
+        //create_shield_at_with(ct, df->get_random_loc(), shield_init());
 
         //create_potion_at_with(d.floors[0].df_get_random_loc(), potion_init(POTION_HP_SMALL));
-        constexpr int num_boxes = 4;
-        for (int i = 0; i < num_boxes; i++) {
-            create_box_at_with(df->get_random_loc());
-        }
+        //constexpr int num_boxes = 4;
+        //for (int i = 0; i < num_boxes; i++) {
+        //    create_box_at_with(df->get_random_loc());
+        //}
         constexpr int monster_count = 1;
         for (int j = 0; j < monster_count; j++) {
             const vec3 random_loc = d.get_floor(0)->get_random_loc();
@@ -1919,7 +1919,7 @@ public:
         }
     }
 
-    //inline bool handle_quit_pressed(const inputstate& is) {
+    //inlinline_count_0 + 2bool handle_quit_pressed(const inputstate& is) {
     //    if (inputstate_is_pressed(is, KEY_ESCAPE)) {
     //        do_quit = true;
     //        return true;
