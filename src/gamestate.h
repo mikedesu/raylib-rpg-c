@@ -1233,20 +1233,27 @@ public:
         return false;
     }
 
+
+
+
     inline bool update_player_tiles_explored() {
         if (current_scene != SCENE_GAMEPLAY) {
             return false;
         }
+
         if (hero_id == ENTITYID_INVALID) {
             merror2("hero_id is invalid");
             return false;
         }
+
         auto df = d.get_current_floor();
         auto maybe_loc = ct.get<location>(hero_id);
+
         if (!maybe_loc.has_value()) {
             merror2("hero location lacks value");
             return false;
         }
+
         const vec3 hero_loc = maybe_loc.value();
         const int light_radius0 = ct.get<light_radius>(hero_id).value_or(1);
         // Precompute bounds for the loops
@@ -1254,6 +1261,7 @@ public:
         const int max_x = std::min(df->get_width() - 1, hero_loc.x + light_radius0);
         const int min_y = std::max(0, hero_loc.y - light_radius0);
         const int max_y = std::min(df->get_height() - 1, hero_loc.y + light_radius0);
+
         for (int y = min_y; y <= max_y; y++) {
             for (int x = min_x; x <= max_x; x++) {
                 // Calculate Manhattan distance for diamond shape
@@ -1272,6 +1280,9 @@ public:
         }
         return true;
     }
+
+
+
 
     inline bool update_player_state() {
         if (hero_id == ENTITYID_INVALID) {
