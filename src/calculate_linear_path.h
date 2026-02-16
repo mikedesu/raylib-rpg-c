@@ -20,13 +20,13 @@ static inline vector<vec3> calculate_path_with_thickness(vec3 start, vec3 end) {
 
     int x1 = start.x;
     int y1 = start.y;
-    int x2 = end.x;
-    int y2 = end.y;
-    int z = start.z;
-    int dx = abs(x2 - x1);
-    int dy = abs(y2 - y1);
-    int sx = (x1 < x2) ? 1 : -1;
-    int sy = (y1 < y2) ? 1 : -1;
+    const int x2 = end.x;
+    const int y2 = end.y;
+    const int z = start.z;
+    const int dx = abs(x2 - x1);
+    const int dy = abs(y2 - y1);
+    const int sx = (x1 < x2) ? 1 : -1;
+    const int sy = (y1 < y2) ? 1 : -1;
     int err = dx - dy;
 
     while (true) {

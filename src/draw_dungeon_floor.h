@@ -41,6 +41,7 @@ static inline bool is_loc_too_far_to_draw(gamestate& g, vec3 loc, vec3 hero_loc)
 static inline bool is_loc_path_blocked(gamestate& g, shared_ptr<dungeon_floor> df, vec3 loc, vec3 hero_loc) {
     vector<vec3> path = calculate_path_with_thickness(loc, hero_loc);
     bool blocked = false;
+
     for (auto v0 : path) {
         // skip v0 if it is equal to hero_loc
         if (vec3_equal(v0, hero_loc)) {
@@ -49,6 +50,7 @@ static inline bool is_loc_path_blocked(gamestate& g, shared_ptr<dungeon_floor> d
 
         auto v0_tile = df->tile_at(v0);
         auto v0_tiletype = v0_tile->get_type();
+
         if (tiletype_is_none(v0_tiletype) || tiletype_is_wall(v0_tiletype)) {
             blocked = true;
             break;
@@ -86,13 +88,14 @@ static inline bool is_loc_path_blocked(gamestate& g, shared_ptr<dungeon_floor> d
 
 
 
-//static inline bool draw_dungeon_floor_tile(gamestate& g, textureinfo* txinfo, int x, int y, int z) {
 static inline bool draw_dungeon_floor_tile(gamestate& g, int x, int y, int z) {
-    minfo3("BEGIN draw dungeon floor tile");
+    //minfo3("BEGIN draw dungeon floor tile");
     //massert(txinfo, "txinfo is null");
+
     massert(z >= 0 && static_cast<size_t>(z) < g.d.get_floor_count(), "z is oob");
 
     auto df = g.d.get_floor(z);
+
     massert(df, "dungeon_floor is NULL");
     massert(x >= 0 && x < df->get_width(), "x is oob");
     massert(y >= 0 && y < df->get_height(), "y is oob");
@@ -122,13 +125,15 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, int x, int y, int z) {
     auto maybe_hero_loc = g.ct.get<location>(g.hero_id);
 
     if (!maybe_hero_loc.has_value()) {
-        minfo3("END draw dungeon floor tile 1");
+        //minfo3("END draw dungeon floor tile 1");
         return false;
     }
 
     const vec3 hero_loc = maybe_hero_loc.value();
+
     // Calculate Manhattan distance from hero to this tile (diamond pattern)
     const int distance = manhattan_distance(loc, hero_loc);
+
     // Calculate drawing position
     const float px = x * DEFAULT_TILE_SIZE + DEFAULT_OFFSET;
     const float py = y * DEFAULT_TILE_SIZE + DEFAULT_OFFSET;
@@ -136,8 +141,6 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, int x, int y, int z) {
     const Rectangle dest = {px, py, DEFAULT_TILE_SIZE_FLOAT, DEFAULT_TILE_SIZE_FLOAT};
 
     // Draw tile with fade ALSO if path between tile and hero is blocked
-    //auto path = calculate_path_with_thickness({x, y, z}, hero_loc);
-
     // Check for blocking walls/doors in path
     const bool blocking = is_loc_path_blocked(g, df, loc, hero_loc);
 
@@ -147,8 +150,7 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, int x, int y, int z) {
 
     DrawTexturePro(*texture, src, dest, Vector2{0, 0}, 0, draw_color);
 
-    minfo3("END draw dungeon floor tile 5");
-
+    //minfo3("END draw dungeon floor tile 5");
     return true;
 }
 
@@ -249,23 +251,19 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
 static inline bool draw_dungeon_floor(gamestate& g) {
     shared_ptr<dungeon_floor> df = g.d.get_current_floor();
     const int z = g.d.current_floor;
-    // render tiles
-    // const int dw = df->get_width();
-    // const int dh = df->get_height();
 
-    //for (int i = 0; i < dh * dw; i++) {
-    //const int y = i / dw;
-    //const int x = i - (y * dw);
+    // render tiles
     for (int y = 0; y < df->get_height(); y++) {
-        for (int x = 0; x < df->get_width(); x++) {
-            //draw_dungeon_floor_tile(g, txinfo, x, y, z);
+        //for (int x = 0; x < df->get_width(); x++) {
+
+        // example simple loop unrolling
+        for (int x = 0; x < df->get_width(); x += 4) {
             draw_dungeon_floor_tile(g, x, y, z);
+            draw_dungeon_floor_tile(g, x + 1, y, z);
+            draw_dungeon_floor_tile(g, x + 2, y, z);
+            draw_dungeon_floor_tile(g, x + 3, y, z);
         }
     }
-    //}
-
-
-
 
     auto mydefault = [](gamestate& g, entityid id) { return true; };
 
