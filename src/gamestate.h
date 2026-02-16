@@ -1031,8 +1031,16 @@ public:
         //vector<tactic> my_tactics = {
         //    {tactic_target::enemy, tactic_condition::adjacent, tactic_action::attack}, {tactic_target::nil, tactic_condition::any, tactic_action::move}};
 
-        vector<tactic> my_tactics = {
-            {tactic_target::enemy, tactic_condition::adjacent, tactic_action::attack}, {tactic_target::nil, tactic_condition::any, tactic_action::move}};
+        //vector<tactic> my_tactics = {
+        //    {tactic_target::enemy, tactic_condition::adjacent, tactic_action::attack},
+        //    {tactic_target::nil, tactic_condition::any, tactic_action::move}
+        //};
+
+        vector<tactic> my_tactics = {//{tactic_target::enemy, tactic_condition::adjacent, tactic_action::attack},
+                                     {tactic_target::nil, tactic_condition::any, tactic_action::move}};
+
+
+
 
         //vector<tactic> my_tactics = {
         //    {tactic_target::enemy, tactic_condition::adjacent, tactic_action::attack},
@@ -1343,8 +1351,8 @@ public:
         // 16x16 = 4 8x8 areas
         // 32x32 = 4 16x16 areas = 8 8x8 areas
 
-        const int w = 4; // 4x4 4x4 areas
-        const int h = 4;
+        const int w = 128; // 4x4 4x4 areas
+        const int h = 128;
         constexpr float parts = 1.0;
 
         //const int w = 32; // 4x4 4x4 areas
@@ -1370,7 +1378,7 @@ public:
         //for (int i = 0; i < num_boxes; i++) {
         //    create_box_at_with(df->get_random_loc());
         //}
-        constexpr int monster_count = 1;
+        constexpr int monster_count = 10;
         for (int j = 0; j < monster_count; j++) {
             const vec3 random_loc = d.get_floor(0)->get_random_loc();
             create_orc_at_with(random_loc, [this](CT& ct, const entityid id) {

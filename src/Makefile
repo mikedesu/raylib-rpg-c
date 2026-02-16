@@ -1,12 +1,32 @@
+
+
 CXX = g++
+
+
 OBJ = -c
-WFLAGS = -Wall -std=c++23
+
+
+WFLAGS = -Wall -Werror -std=c++23
+
+
 SHARED = -shared
+
+
 STATIC_LINK_RAYLIB = -l:libraylib.a  # Desktop Raylib
+
+
 MAIN_C = main.cpp
+
+
 LINK_MATH = -lm
+
+
 RAYLIB_LIBS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
+
+
 CFLAGS ?= # Allow override
+
+
 # Web build setup
 WEB_CC = emcc
 WEB_SOURCES=main.cpp 
@@ -16,6 +36,8 @@ EMCC_OPTIONS = -s USE_GLFW=3 -s EXPORTED_RUNTIME_METHODS=ccall -s ALLOW_MEMORY_G
 SHELL_FILE = --shell-file minshell.html
 PRELOAD_FILES = --preload-file ./fonts --preload-file ./textures.txt --preload-file ./img  --preload-file ./audio/music --preload-file ./music.txt --preload-file ./audio/sfx --preload-file ./sfx.txt --preload-file ./shaders
 WEB_OPTIONS = -DPLATFORM_WEB -DWEB -DSPAWN_MONSTERS -DNPCS_ALL_AT_ONCE -DSTART_MESSAGES
+
+
 
 # Targets
 all: game index.html tests

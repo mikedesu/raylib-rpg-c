@@ -152,6 +152,7 @@ public:
 
         //massert(index < tiles.size(), "index is out-of-bounds: %d, %d", loc.x, loc.y);
 
+
         if (index >= tiles.size()) {
             merror("index is out-of-bounds: %d, %d", loc.x, loc.y);
             return nullptr;

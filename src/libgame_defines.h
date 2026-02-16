@@ -1,8 +1,9 @@
 #pragma once
 
-#define GAME_VERSION "v0.0.6.10"
-#define GAME_VERSION_DATE "February 13, 2026"
+#define GAME_VERSION "v0.0.6.11"
+#define GAME_VERSION_DATE "February 16, 2026"
 #define WINDOW_TITLE "@evildojo666 presents: project.rpg"
+
 
 #define DEFAULT_WIN_WIDTH 1920
 #define DEFAULT_WIN_HEIGHT 1080
