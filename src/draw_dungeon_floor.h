@@ -10,7 +10,6 @@
 #include "libgame_defines.h"
 #include "textureinfo.h"
 
-using std::for_each;
 
 extern textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
@@ -157,7 +156,7 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, int x, int y, int z) {
 
 
 
-static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type_0, function<bool(gamestate&, entityid)> extra_check) {
+static inline void draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type_0, function<bool(gamestate&, entityid)> extra_check) {
     auto df = g.d.get_current_floor();
     const int df_w = df->get_width();
     const int df_h = df->get_height();
@@ -204,45 +203,8 @@ static inline void libdraw_draw_dungeon_floor_entitytype(gamestate& g, entitytyp
                     draw_sprite_and_shadow(g, id);
                 }
             }
-
-            //for_each(entities_begin, entities_end, [&g, type_0, &extra_check](entityid id) {
-            //    const entitytype_t type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
-            //    if (type_0 == type && extra_check(g, id)) {
-            //        draw_sprite_and_shadow(g, id);
-            //    }
-            //});
         }
     }
-
-
-
-    //for (int i = 0; i < num_tiles; i++) {
-    //    const int y = i / df_w;
-    //    const int x = i - (y * df_w);
-    //    const vec3 loc = {x, y, g.d.current_floor};
-    //    auto tile = df->tile_at(loc);
-    //    auto tiletype = tile->get_type();
-    //    if (tiletype_is_none(tiletype) || tiletype_is_wall(tiletype)) {
-    //        continue;
-    //    }
-    //    if (is_loc_too_far_to_draw(g, loc, hero_loc)) {
-    //        continue;
-    //    }
-    //    // bugfix for tall walls so entities do not draw on top: check to see if the tile directly beneath this tile is a wall
-    //    //if (tile2.type == TILE_STONE_WALL_00) continue;
-    //    // render all entities if not blocked
-    //    if (is_loc_path_blocked(g, df, loc, hero_loc)) {
-    //        continue;
-    //    }
-    //    auto entities_begin = tile->get_entities()->cbegin();
-    //    auto entities_end = tile->get_entities()->cend();
-    //    for_each(entities_begin, entities_end, [&g, type_0, &extra_check](entityid id) {
-    //        const entitytype_t type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
-    //        if (type_0 == type && extra_check(g, id)) {
-    //            draw_sprite_and_shadow(g, id);
-    //        }
-    //    });
-    //}
 }
 
 
@@ -254,8 +216,6 @@ static inline bool draw_dungeon_floor(gamestate& g) {
 
     // render tiles
     for (int y = 0; y < df->get_height(); y++) {
-        //for (int x = 0; x < df->get_width(); x++) {
-
         // example simple loop unrolling
         for (int x = 0; x < df->get_width(); x += 4) {
             draw_dungeon_floor_tile(g, x, y, z);
@@ -283,23 +243,23 @@ static inline bool draw_dungeon_floor(gamestate& g) {
         return false;
     };
 
-    libdraw_draw_dungeon_floor_entitytype(g, ENTITY_DOOR, mydefault);
+    draw_dungeon_floor_entitytype(g, ENTITY_DOOR, mydefault);
 
-    libdraw_draw_dungeon_floor_entitytype(g, ENTITY_PROP, mydefault);
+    draw_dungeon_floor_entitytype(g, ENTITY_PROP, mydefault);
 
     libdraw_draw_player_target_box(g);
 
-    libdraw_draw_dungeon_floor_entitytype(g, ENTITY_SPELL, mydefault);
+    draw_dungeon_floor_entitytype(g, ENTITY_SPELL, mydefault);
 
-    libdraw_draw_dungeon_floor_entitytype(g, ENTITY_NPC, dead_check);
+    draw_dungeon_floor_entitytype(g, ENTITY_NPC, dead_check);
 
-    libdraw_draw_dungeon_floor_entitytype(g, ENTITY_BOX, mydefault);
+    draw_dungeon_floor_entitytype(g, ENTITY_BOX, mydefault);
 
-    libdraw_draw_dungeon_floor_entitytype(g, ENTITY_ITEM, mydefault);
+    draw_dungeon_floor_entitytype(g, ENTITY_ITEM, mydefault);
 
-    libdraw_draw_dungeon_floor_entitytype(g, ENTITY_NPC, alive_check);
+    draw_dungeon_floor_entitytype(g, ENTITY_NPC, alive_check);
 
-    libdraw_draw_dungeon_floor_entitytype(g, ENTITY_PLAYER, mydefault);
+    draw_dungeon_floor_entitytype(g, ENTITY_PLAYER, mydefault);
 
     return true;
 }
