@@ -26,7 +26,6 @@
 #include "scene.h"
 #include "sfx.h"
 #include "stat_bonus.h"
-//#include "tactics.h"
 #include <algorithm>
 #include <chrono>
 #include <cmath>
@@ -1027,26 +1026,10 @@ public:
         // all NPCs begin at level 1. level-up mechanisms will be determined elsewhere
         ct.set<level>(id, 1);
         ct.set<xp>(id, 0);
-        //tactic t = {tactic_target::enemy, tactic_condition::adjacent, tactic_action::wait};
-        //vector<tactic> my_tactics = {
-        //    {tactic_target::enemy, tactic_condition::adjacent, tactic_action::attack}, {tactic_target::nil, tactic_condition::any, tactic_action::move}};
-
-        //vector<tactic> my_tactics = {
-        //    {tactic_target::enemy, tactic_condition::adjacent, tactic_action::attack},
-        //    {tactic_target::nil, tactic_condition::any, tactic_action::move}
-        //};
-
-        //vector<tactic> my_tactics = {//{tactic_target::enemy, tactic_condition::adjacent, tactic_action::attack},
-        //                             {tactic_target::nil, tactic_condition::any, tactic_action::move}};
 
 
 
 
-        //vector<tactic> my_tactics = {
-        //    {tactic_target::enemy, tactic_condition::adjacent, tactic_action::attack},
-        //};
-
-        //ct.set<tactics>(id, my_tactics);
         ct.set<hunger_points>(id, hunger_points_t{100, 100});
     }
 
@@ -3430,12 +3413,8 @@ public:
         // they will just move randomly. otherwise, they attack the player
         //const entityid tgt_id = ct.get<target_id>(id).value_or(hero_id);
 
-        //vector<tactic> default_tactics = {{tactic_target::nil, tactic_condition::any, tactic_action::move}};
-        //const vector<tactic> npc_tactics = ct.get<tactics>(id).value_or(default_tactics);
         uniform_int_distribution<int> dist(-1, 1);
 
-        //for (tactic t : npc_tactics) {
-        //if (t.target == tactic_target::nil && t.condition == tactic_condition::any && t.action == tactic_action::move) {
         // handle random move
         if (try_entity_move(id, vec3{dist(mt), dist(mt), 0})) {
             msuccess2("try entity move succeeded");
