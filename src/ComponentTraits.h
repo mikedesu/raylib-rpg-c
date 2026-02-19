@@ -1,6 +1,7 @@
 #pragma once
 
 #include "direction.h"
+#include "entity_actions.h"
 #include "entityid.h"
 #include "entitytype.h"
 #include "hunger_points.h"
@@ -396,4 +397,12 @@ struct hunger_points { }; // hunger_points_t
 template <>
 struct ComponentTraits<hunger_points> {
     using Type = hunger_points_t;
+};
+
+
+
+struct entity_action { };
+template <>
+struct ComponentTraits<entity_action> {
+    using Type = entity_action_t; // enum
 };
