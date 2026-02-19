@@ -26,7 +26,7 @@
 #include "scene.h"
 #include "sfx.h"
 #include "stat_bonus.h"
-#include "tactics.h"
+//#include "tactics.h"
 #include <algorithm>
 #include <chrono>
 #include <cmath>
@@ -1036,8 +1036,8 @@ public:
         //    {tactic_target::nil, tactic_condition::any, tactic_action::move}
         //};
 
-        vector<tactic> my_tactics = {//{tactic_target::enemy, tactic_condition::adjacent, tactic_action::attack},
-                                     {tactic_target::nil, tactic_condition::any, tactic_action::move}};
+        //vector<tactic> my_tactics = {//{tactic_target::enemy, tactic_condition::adjacent, tactic_action::attack},
+        //                             {tactic_target::nil, tactic_condition::any, tactic_action::move}};
 
 
 
@@ -1046,7 +1046,7 @@ public:
         //    {tactic_target::enemy, tactic_condition::adjacent, tactic_action::attack},
         //};
 
-        ct.set<tactics>(id, my_tactics);
+        //ct.set<tactics>(id, my_tactics);
         ct.set<hunger_points>(id, hunger_points_t{100, 100});
     }
 
@@ -1362,8 +1362,8 @@ public:
         // 16x16 = 4 8x8 areas
         // 32x32 = 4 16x16 areas = 8 8x8 areas
 
-        const int w = 32; // 4x4 4x4 areas
-        const int h = 32;
+        const int w = 8; // 4x4 4x4 areas
+        const int h = 8;
         constexpr float parts = 1.0;
 
         //const int w = 32; // 4x4 4x4 areas
@@ -3428,58 +3428,59 @@ public:
         // originally, we were just moving randomly
         // this example shows how, if the player is not adjacent to an NPC,
         // they will just move randomly. otherwise, they attack the player
-        const entityid tgt_id = ct.get<target_id>(id).value_or(hero_id);
-        vector<tactic> default_tactics = {{tactic_target::nil, tactic_condition::any, tactic_action::move}};
-        const vector<tactic> npc_tactics = ct.get<tactics>(id).value_or(default_tactics);
+        //const entityid tgt_id = ct.get<target_id>(id).value_or(hero_id);
+
+        //vector<tactic> default_tactics = {{tactic_target::nil, tactic_condition::any, tactic_action::move}};
+        //const vector<tactic> npc_tactics = ct.get<tactics>(id).value_or(default_tactics);
         uniform_int_distribution<int> dist(-1, 1);
-        for (tactic t : npc_tactics) {
-            if (t.target == tactic_target::nil && t.condition == tactic_condition::any && t.action == tactic_action::move) {
-                // handle random move
-                if (try_entity_move(id, vec3{dist(mt), dist(mt), 0})) {
-                    msuccess2("try entity move succeeded");
-                }
-                else {
-                    merror2("try entity move FAILED");
-                }
-                return true;
-            }
-            else if (t.target == tactic_target::enemy && t.condition == tactic_condition::adjacent && t.action == tactic_action::attack) {
-                // handle attack adjacent enemy
-                if (is_entity_adjacent(id, tgt_id)) {
-                    const vec3 loc = ct.get<location>(tgt_id).value();
-                    try_entity_attack(id, loc.x, loc.y);
-                    //const attack_result_t result = try_entity_attack(id, loc.x, loc.y);
-                    //if (result == ATTACK_RESULT_BLOCK) {
-                    //    minfo2("attack result: blocked");
-                    //} else if (result == ATTACK_RESULT_HIT) {
-                    //    minfo2("attack result: hit");
-                    //} else if (result == ATTACK_RESULT_MISS) {
-                    //    minfo2("attack result: miss");
-                    //} else if (result == ATTACK_RESULT_NONE) {
-                    //    minfo2("attack result: none");
-                    //} else if (result == ATTACK_RESULT_COUNT) {
-                    //    minfo2("attack result: count");
-                    //} else {
-                    //    minfo2("attack result: unknown");
-                    //}
-                    return true;
-                }
-            }
-            else if (t.target == tactic_target::nil && t.condition == tactic_condition::nil && t.action == tactic_action::attack) {
-                // just attack directly in front of you
-                massert(ct.has<direction>(id), "id %d has no direction", id);
-                direction_t dir = ct.get<direction>(id).value_or(DIR_NONE);
-                massert(dir != DIR_NONE, "dir cannot be none");
 
-                vec3 loc = ct.get<location>(id).value_or(vec3{-1, -1, -1});
-                massert(vec3_valid(loc), "id %d location is invalid", id);
-
-                vec3 dir_vec = get_loc_from_dir(dir);
-                vec3 new_loc = vec3_add(loc, dir_vec);
-
-                try_entity_attack(id, new_loc.x, new_loc.y);
-            }
+        //for (tactic t : npc_tactics) {
+        //if (t.target == tactic_target::nil && t.condition == tactic_condition::any && t.action == tactic_action::move) {
+        // handle random move
+        if (try_entity_move(id, vec3{dist(mt), dist(mt), 0})) {
+            msuccess2("try entity move succeeded");
+            return true;
         }
+        //}
+        //else {
+        //    merror2("try entity move FAILED");
+        //}
+        //return true;
+        //}
+        //else if (t.target == tactic_target::enemy && t.condition == tactic_condition::adjacent && t.action == tactic_action::attack) {
+        // handle attack adjacent enemy
+        //if (is_entity_adjacent(id, tgt_id)) {
+        //const vec3 loc = ct.get<location>(tgt_id).value();
+        //try_entity_attack(id, loc.x, loc.y);
+        //const attack_result_t result = try_entity_attack(id, loc.x, loc.y);
+        //if (result == ATTACK_RESULT_BLOCK) {
+        //    minfo2("attack result: blocked");
+        //} else if (result == ATTACK_RESULT_HIT) {
+        //    minfo2("attack result: hit");
+        //} else if (result == ATTACK_RESULT_MISS) {
+        //    minfo2("attack result: miss");
+        //} else if (result == ATTACK_RESULT_NONE) {
+        //    minfo2("attack result: none");
+        //} else if (result == ATTACK_RESULT_COUNT) {
+        //    minfo2("attack result: count");
+        //} else {
+        //    minfo2("attack result: unknown");
+        //}
+        //return true;
+        //}
+        //}
+        //else if (t.target == tactic_target::nil && t.condition == tactic_condition::nil && t.action == tactic_action::attack) {
+        // just attack directly in front of you
+        //massert(ct.has<direction>(id), "id %d has no direction", id);
+        //direction_t dir = ct.get<direction>(id).value_or(DIR_NONE);
+        //massert(dir != DIR_NONE, "dir cannot be none");
+        //vec3 loc = ct.get<location>(id).value_or(vec3{-1, -1, -1});
+        //massert(vec3_valid(loc), "id %d location is invalid", id);
+        //vec3 dir_vec = get_loc_from_dir(dir);
+        //vec3 new_loc = vec3_add(loc, dir_vec);
+        //try_entity_attack(id, new_loc.x, new_loc.y);
+        //}
+        //}
         merror2("failed to handle npc %d", id);
         return false;
     }
