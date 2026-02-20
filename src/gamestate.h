@@ -32,7 +32,9 @@
 #include <chrono>
 #include <cmath>
 #include <ctime>
+#include <map>
 #include <memory>
+#include <queue>
 #include <random>
 #include <raylib.h>
 #include <raymath.h>
@@ -61,8 +63,10 @@ typedef ComponentTable CT;
 typedef function<void(CT& ct, const entityid)> with_fun;
 
 using std::make_pair;
+using std::map;
 using std::mt19937;
 using std::pair;
+using std::priority_queue;
 using std::round;
 using std::seed_seq;
 using std::uniform_int_distribution;
@@ -1036,7 +1040,8 @@ public:
 
 
 
-        ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_RANDOM_MOVE);
+        //ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_RANDOM_MOVE);
+        ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_MOVE_TO_TARGET);
 
 
 
@@ -1594,6 +1599,7 @@ public:
             massert(hero_id != ENTITYID_INVALID, "heroid is invalid");
             // temporary wedge-in code
             // set all the NPCs to target the hero
+
             make_all_npcs_target_player();
             current_scene = SCENE_GAMEPLAY;
         }
@@ -3438,19 +3444,19 @@ public:
         }
 
         shared_ptr<dungeon_floor> df = d.floors[start.z];
-        
+
         // A* algorithm implementation
         struct Node {
             vec3 pos;
             float gScore;
             float fScore;
             vec3 cameFrom;
-            bool operator>(const Node& other) const { return fScore > other.fScore; }
+            bool operator>(const Node& other) const {
+                return fScore > other.fScore;
+            }
         };
 
-        auto heuristic = [](vec3 a, vec3 b) {
-            return sqrtf((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
-        };
+        auto heuristic = [](vec3 a, vec3 b) { return sqrtf((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y)); };
 
         map<vec3, Node> openSet;
         map<vec3, Node> cameFrom;
@@ -3460,7 +3466,7 @@ public:
         priority_queue<Node, vector<Node>, decltype(node_cmp)> pq(node_cmp);
 
         // Initialize starting node
-        Node startNode = {start, 0, heuristic(start, goal), {-1,-1,-1}};
+        Node startNode = {start, 0, heuristic(start, goal), {-1, -1, -1}};
         openSet[start] = startNode;
         pq.push(startNode);
         gScore[start] = 0;
@@ -3481,17 +3487,13 @@ public:
             openSet.erase(current.pos);
 
             // Check all 8 possible directions
-            vec3 directions[8] = {
-                {1,0,0}, {-1,0,0}, {0,1,0}, {0,-1,0},
-                {1,1,0}, {-1,1,0}, {1,-1,0}, {-1,-1,0}
-            };
+            vec3 directions[8] = {{1, 0, 0}, {-1, 0, 0}, {0, 1, 0}, {0, -1, 0}, {1, 1, 0}, {-1, 1, 0}, {1, -1, 0}, {-1, -1, 0}};
 
             for (vec3 dir : directions) {
                 vec3 neighbor = {current.pos.x + dir.x, current.pos.y + dir.y, current.pos.z};
-                
+
                 // Bounds check
-                if (neighbor.x < 0 || neighbor.x >= df->get_width() || 
-                    neighbor.y < 0 || neighbor.y >= df->get_height()) {
+                if (neighbor.x < 0 || neighbor.x >= df->get_width() || neighbor.y < 0 || neighbor.y >= df->get_height()) {
                     continue;
                 }
 
@@ -3503,16 +3505,11 @@ public:
 
                 float tentative_gScore = gScore[current.pos] + 1;
                 if (dir.x != 0 && dir.y != 0) { // Diagonal costs more
-                    tentative_gScore = gScore[current.pos] + 1.414f; 
+                    tentative_gScore = gScore[current.pos] + 1.414f;
                 }
 
                 if (gScore.find(neighbor) == gScore.end() || tentative_gScore < gScore[neighbor]) {
-                    Node neighborNode = {
-                        neighbor,
-                        tentative_gScore,
-                        tentative_gScore + heuristic(neighbor, goal),
-                        current.pos
-                    };
+                    Node neighborNode = {neighbor, tentative_gScore, tentative_gScore + heuristic(neighbor, goal), current.pos};
 
                     cameFrom[neighbor] = current;
                     gScore[neighbor] = tentative_gScore;
@@ -3573,10 +3570,27 @@ public:
             update_path_to_target(id);
             // at this point, target_path is updated, and we can just figure out which tile to move to from here
             // TODO: darkmage should handle this section
+            massert(ct.has<target_path>(id), "id has no target_path");
+            auto path = ct.get<target_path>(id).value();
+            if (path->size() > 0) {
+                // assuming path[0] == id's location
+                // path[1] will be the next location we want to move to
+                // however, try_entity_move(id, vec3) takes an offset vec3
+                // for instance, {1, 1} will move you right and down.
+                // {-1, 1} will move you left and down
+                // and the list of vec3s in target_path are real locations, not offsets
+                // however, calculating the difference should give us what we want
+                massert(ct.has<location>(id), "id has no location");
+                vec3 id_location = ct.get<location>(id).value();
+                vec3 next_location = path->at(0);
+                vec3 diff_location = vec3_sub(next_location, id_location);
+                // handle random move
+                if (try_entity_move(id, diff_location)) {
+                    msuccess2("try entity move succeeded");
+                    return true;
+                }
+            }
         }
-
-
-
 
         //}
         //else {
