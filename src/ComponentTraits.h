@@ -406,3 +406,12 @@ template <>
 struct ComponentTraits<entity_default_action> {
     using Type = entity_default_action_t; // enum
 };
+
+
+
+
+//struct target_path { };
+//template <>
+//struct ComponentTraits<target_path> {
+//    using Type = shared_ptr<vector<vec3>>; // enum
+//};
