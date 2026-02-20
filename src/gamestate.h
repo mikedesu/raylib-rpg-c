@@ -3416,15 +3416,121 @@ public:
         }
 
         auto path_to_target = ct.get<target_path>(id).value();
-
-        // in all cases, we likely want to clear the vector to start fresh
         path_to_target->clear();
 
-        // at this point, we just need to ->push_back(vec3{x,y,z}) elements
-        // we could build this recursively...
-        //  something like A* or djikstra's would be highly appropriate here.
+        entityid target = ct.get<target_id>(id).value_or(ENTITYID_INVALID);
+        if (target == ENTITYID_INVALID) {
+            return;
+        }
 
-        // TODO: Aider should handle this section
+        optional<vec3> start_opt = ct.get<location>(id);
+        optional<vec3> goal_opt = ct.get<location>(target);
+        if (!start_opt.has_value() || !goal_opt.has_value()) {
+            return;
+        }
+
+        vec3 start = start_opt.value();
+        vec3 goal = goal_opt.value();
+
+        // Must be on same floor
+        if (start.z != goal.z) {
+            return;
+        }
+
+        shared_ptr<dungeon_floor> df = d.floors[start.z];
+        
+        // A* algorithm implementation
+        struct Node {
+            vec3 pos;
+            float gScore;
+            float fScore;
+            vec3 cameFrom;
+            bool operator>(const Node& other) const { return fScore > other.fScore; }
+        };
+
+        auto heuristic = [](vec3 a, vec3 b) {
+            return sqrtf((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
+        };
+
+        map<vec3, Node> openSet;
+        map<vec3, Node> cameFrom;
+        map<vec3, float> gScore;
+
+        auto node_cmp = [](const Node& a, const Node& b) { return a > b; };
+        priority_queue<Node, vector<Node>, decltype(node_cmp)> pq(node_cmp);
+
+        // Initialize starting node
+        Node startNode = {start, 0, heuristic(start, goal), {-1,-1,-1}};
+        openSet[start] = startNode;
+        pq.push(startNode);
+        gScore[start] = 0;
+
+        bool found = false;
+        while (!pq.empty()) {
+            Node current = pq.top();
+            pq.pop();
+
+            if (vec3_equal(current.pos, goal)) {
+                found = true;
+                break;
+            }
+
+            if (openSet.find(current.pos) == openSet.end()) {
+                continue; // Skip if no longer in open set
+            }
+            openSet.erase(current.pos);
+
+            // Check all 8 possible directions
+            vec3 directions[8] = {
+                {1,0,0}, {-1,0,0}, {0,1,0}, {0,-1,0},
+                {1,1,0}, {-1,1,0}, {1,-1,0}, {-1,-1,0}
+            };
+
+            for (vec3 dir : directions) {
+                vec3 neighbor = {current.pos.x + dir.x, current.pos.y + dir.y, current.pos.z};
+                
+                // Bounds check
+                if (neighbor.x < 0 || neighbor.x >= df->get_width() || 
+                    neighbor.y < 0 || neighbor.y >= df->get_height()) {
+                    continue;
+                }
+
+                // Tile check
+                shared_ptr<tile_t> tile = df->tile_at(neighbor);
+                if (!tile_is_walkable(tile->get_type()) || tile_has_pushable(neighbor.x, neighbor.y, neighbor.z) != ENTITYID_INVALID) {
+                    continue;
+                }
+
+                float tentative_gScore = gScore[current.pos] + 1;
+                if (dir.x != 0 && dir.y != 0) { // Diagonal costs more
+                    tentative_gScore = gScore[current.pos] + 1.414f; 
+                }
+
+                if (gScore.find(neighbor) == gScore.end() || tentative_gScore < gScore[neighbor]) {
+                    Node neighborNode = {
+                        neighbor,
+                        tentative_gScore,
+                        tentative_gScore + heuristic(neighbor, goal),
+                        current.pos
+                    };
+
+                    cameFrom[neighbor] = current;
+                    gScore[neighbor] = tentative_gScore;
+                    openSet[neighbor] = neighborNode;
+                    pq.push(neighborNode);
+                }
+            }
+        }
+
+        // Reconstruct path if found
+        if (found) {
+            vec3 current = goal;
+            while (!vec3_equal(current, start) && cameFrom.find(current) != cameFrom.end()) {
+                path_to_target->push_back(current);
+                current = cameFrom[current].pos;
+            }
+            reverse(path_to_target->begin(), path_to_target->end());
+        }
     }
 
 
