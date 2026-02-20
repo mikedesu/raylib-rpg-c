@@ -1037,6 +1037,11 @@ public:
 
 
         ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_RANDOM_MOVE);
+
+
+
+
+        ct.set<target_path>(id, make_shared<vector<vec3>>());
     }
 
     inline entityid create_npc_with(const race_t rt, with_fun npcInitFunction) {
@@ -3431,6 +3436,22 @@ public:
                 msuccess2("try entity move succeeded");
                 return true;
             }
+        }
+        else if (d_action == ENTITY_DEFAULT_ACTION_MOVE_TO_TARGET) {
+            // TODO: Aider should fill-in this block
+            // it should contain a call to `find_path()`
+            // `find_path() should modify the `target_path` component such that
+            // if the `target_id` for an entity `id` is not -1 or invalid or ENTITYID_INVALID or INVALID etc
+            //    then it should generate the `vec3{x,y,z}` series necessary to navigate from
+            //    `id`'s location to `target_id`'s and store it in the `target_path` component.
+            //    the way it should do this is by getting the `target_path` shared_ptr, and then
+            //    calling `->push_back()` for every `vec3` needed
+            //
+            //  the pathfinding algorithm should be rather simple at first because the initial testing room
+            //  is only a rectangle. however, the plan is to incorporate maze-like structures that will require
+            //  navigating around obstacles, invalid tiles, etc.
+            //
+            //  something like A* or djikstra's would be highly appropriate here.
         }
 
 

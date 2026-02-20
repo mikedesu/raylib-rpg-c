@@ -410,8 +410,8 @@ struct ComponentTraits<entity_default_action> {
 
 
 
-//struct target_path { };
-//template <>
-//struct ComponentTraits<target_path> {
-//    using Type = shared_ptr<vector<vec3>>; // enum
-//};
+struct target_path { };
+template <>
+struct ComponentTraits<target_path> {
+    using Type = shared_ptr<vector<vec3>>; // enum
+};
