@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ComponentTable.h"
+#include "ComponentTraits.h"
 #include "attack_result.h"
 #include "biome.h"
 #include "calculate_linear_path.h"
@@ -10,6 +11,7 @@
 #include "dungeon.h"
 #include "dungeon_floor.h"
 #include "dungeon_tile_type.h"
+#include "entity_actions.h"
 #include "entityid.h"
 #include "entitytype.h"
 #include "gamestate_flag.h"
@@ -1031,6 +1033,10 @@ public:
 
 
         ct.set<hunger_points>(id, hunger_points_t{100, 100});
+
+
+
+        ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_RANDOM_MOVE);
     }
 
     inline entityid create_npc_with(const race_t rt, with_fun npcInitFunction) {
@@ -3413,13 +3419,23 @@ public:
         // they will just move randomly. otherwise, they attack the player
         //const entityid tgt_id = ct.get<target_id>(id).value_or(hero_id);
 
-        uniform_int_distribution<int> dist(-1, 1);
+        auto d_action = ct.get<entity_default_action>(id).value_or(ENTITY_DEFAULT_ACTION_NONE);
 
-        // handle random move
-        if (try_entity_move(id, vec3{dist(mt), dist(mt), 0})) {
-            msuccess2("try entity move succeeded");
-            return true;
+        //if (d_action == ENTITY_DEFAULT_ACTION_NONE) {
+        //}
+        //else if (d_action == ENTITY_DEFAULT_ACTION_RANDOM_MOVE) {
+        if (d_action == ENTITY_DEFAULT_ACTION_RANDOM_MOVE) {
+            uniform_int_distribution<int> dist(-1, 1);
+            // handle random move
+            if (try_entity_move(id, vec3{dist(mt), dist(mt), 0})) {
+                msuccess2("try entity move succeeded");
+                return true;
+            }
         }
+
+
+
+
         //}
         //else {
         //    merror2("try entity move FAILED");
