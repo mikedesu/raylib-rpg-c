@@ -401,8 +401,8 @@ struct ComponentTraits<hunger_points> {
 
 
 
-struct entity_action { };
+struct entity_default_action { };
 template <>
-struct ComponentTraits<entity_action> {
-    using Type = entity_action_t; // enum
+struct ComponentTraits<entity_default_action> {
+    using Type = entity_default_action_t; // enum
 };
