@@ -3404,6 +3404,32 @@ public:
                (a.x + 1 == b.x && a.y == b.y) || (a.x - 1 == b.x && a.y + 1 == b.y) || (a.x == b.x && a.y + 1 == b.y) || (a.x + 1 == b.x && a.y + 1 == b.y);
     }
 
+
+
+
+    inline void update_path_to_target(entityid id) {
+        massert(id != INVALID, "id is invalid");
+
+        if (!ct.has<target_path>(id)) {
+            merror("id doesn't have a target_path");
+            return;
+        }
+
+        auto path_to_target = ct.get<target_path>(id).value();
+
+        // in all cases, we likely want to clear the vector to start fresh
+        path_to_target->clear();
+
+        // at this point, we just need to ->push_back(vec3{x,y,z}) elements
+        // we could build this recursively...
+        //  something like A* or djikstra's would be highly appropriate here.
+
+        // TODO: Aider should handle this section
+    }
+
+
+
+
     inline bool handle_npc(entityid id) {
         minfo2("handle npc %d", id);
         massert(id != ENTITYID_INVALID, "Entity is NULL!");
@@ -3438,20 +3464,9 @@ public:
             }
         }
         else if (d_action == ENTITY_DEFAULT_ACTION_MOVE_TO_TARGET) {
-            // TODO: Aider should fill-in this block
-            // it should contain a call to `find_path()`
-            // `find_path() should modify the `target_path` component such that
-            // if the `target_id` for an entity `id` is not -1 or invalid or ENTITYID_INVALID or INVALID etc
-            //    then it should generate the `vec3{x,y,z}` series necessary to navigate from
-            //    `id`'s location to `target_id`'s and store it in the `target_path` component.
-            //    the way it should do this is by getting the `target_path` shared_ptr, and then
-            //    calling `->push_back()` for every `vec3` needed
-            //
-            //  the pathfinding algorithm should be rather simple at first because the initial testing room
-            //  is only a rectangle. however, the plan is to incorporate maze-like structures that will require
-            //  navigating around obstacles, invalid tiles, etc.
-            //
-            //  something like A* or djikstra's would be highly appropriate here.
+            update_path_to_target(id);
+            // at this point, target_path is updated, and we can just figure out which tile to move to from here
+            // TODO: darkmage should handle this section
         }
 
 
