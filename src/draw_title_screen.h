@@ -29,8 +29,8 @@ static inline void draw_title_screen(gamestate& g, bool show_menu) {
 
     // this will go above the title text
     const char* evildojo_presents_text = "@evildojo666 presents";
-    const char* title_text_0 = "project.";
-    const char* title_text_1 = "rpg";
+    const char* title_text_0 = "project.rpg";
+    const char* title_text_1 = "          rpg";
     const char* start_text = "Press enter or space to begin";
     const char* programming_by = "programming by darkmage";
     const char* art_by = "art by Krishna Palacio";
@@ -44,7 +44,7 @@ static inline void draw_title_screen(gamestate& g, bool show_menu) {
     ClearBackground(BLACK);
     // Draw the "evildojo666 presents" text at the top
     const Vector2 m = MeasureTextEx(GetFontDefault(), title_text_0, font_size, spacing);
-    const Vector2 m2 = MeasureTextEx(GetFontDefault(), title_text_1, font_size, spacing);
+    //const Vector2 m2 = MeasureTextEx(GetFontDefault(), title_text_1, font_size, spacing);
     const Vector2 start_measure = MeasureTextEx(GetFontDefault(), start_text, sm_font_size, spacing);
     const Vector2 version_measure = MeasureTextEx(GetFontDefault(), version_text, sm_font_size, spacing);
     const Vector2 date_measure = MeasureTextEx(GetFontDefault(), date_text, sm_font_size, spacing);
@@ -53,17 +53,30 @@ static inline void draw_title_screen(gamestate& g, bool show_menu) {
     const Vector2 art_m = MeasureTextEx(GetFontDefault(), art_by, sm_font_size, spacing);
     const Vector2 music_m = MeasureTextEx(GetFontDefault(), music_by, sm_font_size, spacing);
     const Vector2 sfx_m = MeasureTextEx(GetFontDefault(), sound_effects_by, sm_font_size, spacing);
-    const float x = frame.x + frame.width / 2.0f - (m.x + m2.x) / 2.0f;
+
+
+    //const float x = frame.x + frame.width / 2.0f - (m.x + m2.x) / 2.0f;
+    const float x = frame.x + frame.width / 2.0f - m.x / 2.0f;
     const float y = frame.y;
-    const float title_text_1_x = x + m.x + pad;
-    Vector2 pos = {x, y};
+
+    //const float title_text_1_x = x + m.x + pad + pad;
+
+    //Vector2 pos = {x, y};
+
     const float placeholder_y = y + font_size + sm_font_size + 10;
-    pos = {g.targetwidth / 2.0f - evildojo_presents_measure.x / 2.0f, y - sm_font_size - pad};
+
+    Vector2 pos = {g.targetwidth / 2.0f - evildojo_presents_measure.x / 2.0f, y - sm_font_size - pad};
+
     DrawText(evildojo_presents_text, pos.x, pos.y, sm_font_size, WHITE);
+
     pos = {x, y};
     DrawText(title_text_0, pos.x, pos.y, font_size, title_text_0_color);
-    pos = {title_text_1_x, y};
+    //pos = {title_text_1_x, y};
     DrawText(title_text_1, pos.x, pos.y, font_size, title_text_1_color);
+
+
+
+
     // Draw the date text
     pos = {g.targetwidth / 2.0f - date_measure.x / 2.0f, placeholder_y};
     DrawText(date_text, pos.x, pos.y, sm_font_size, WHITE);

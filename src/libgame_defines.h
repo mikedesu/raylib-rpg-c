@@ -1,7 +1,7 @@
 #pragma once
 
-#define GAME_VERSION "v0.0.6.11"
-#define GAME_VERSION_DATE "February 16, 2026"
+#define GAME_VERSION "v0.0.6.12"
+#define GAME_VERSION_DATE "February 24, 2026"
 #define WINDOW_TITLE "@evildojo666 presents: project.rpg"
 
 
