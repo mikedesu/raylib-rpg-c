@@ -1012,6 +1012,8 @@ public:
         ct.set<hd>(id, hitdie);
     }
 
+
+
     inline void set_npc_defaults(entityid id) {
         ct.set<entitytype>(id, ENTITY_NPC);
         ct.set<spritemove>(id, Rectangle{0, 0, 0, 0});
@@ -1041,7 +1043,9 @@ public:
 
 
         //ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_RANDOM_MOVE);
-        ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_MOVE_TO_TARGET);
+        //ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_MOVE_TO_TARGET);
+        //ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_ATTACK_TARGET_IF_ADJACENT);
+        ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_RANDOM_MOVE_AND_ATTACK_TARGET_IF_ADJACENT);
 
 
 
@@ -1981,18 +1985,25 @@ public:
         return true;
     }
 
+
+
+
     inline void handle_camera_zoom(inputstate& is) {
-        if (inputstate_is_pressed(is, KEY_LEFT_BRACKET)) {
+        //if (inputstate_is_pressed(is, KEY_LEFT_BRACKET)) {
+        if (inputstate_is_pressed(is, KEY_MINUS)) {
             minfo("camera zoom in");
             cam2d.zoom += DEFAULT_ZOOM_INCR;
             frame_dirty = true;
         }
-        else if (inputstate_is_pressed(is, KEY_RIGHT_BRACKET)) {
+        //else if (inputstate_is_pressed(is, KEY_RIGHT_BRACKET)) {
+        else if (inputstate_is_pressed(is, KEY_EQUAL)) {
             minfo("camera zoom out");
             cam2d.zoom -= (cam2d.zoom > 1.0) * DEFAULT_ZOOM_INCR;
             frame_dirty = true;
         }
     }
+
+
 
     inline void change_player_dir(direction_t dir) {
         if (ct.get<dead>(hero_id).value_or(true))
@@ -3533,64 +3544,110 @@ public:
 
 
 
-    inline bool handle_npc(entityid id) {
-        minfo2("handle npc %d", id);
-        massert(id != ENTITYID_INVALID, "Entity is NULL!");
-
-        auto id_name = ct.get<name>(id).value_or("no-name");
-
-        auto maybe_dead = ct.get<dead>(id);
-        massert(maybe_dead.has_value(), "npc id %d name %s has no dead component", id, id_name.c_str());
-
-        const bool is_dead = maybe_dead.value();
-        if (is_dead) {
-            return false;
-        }
-
-        // this is a heuristic for handling entity actions
-        // originally, we were just moving randomly
-        // this example shows how, if the player is not adjacent to an NPC,
-        // they will just move randomly. otherwise, they attack the player
-        //const entityid tgt_id = ct.get<target_id>(id).value_or(hero_id);
-
-        auto d_action = ct.get<entity_default_action>(id).value_or(ENTITY_DEFAULT_ACTION_NONE);
-
-        //if (d_action == ENTITY_DEFAULT_ACTION_NONE) {
-        //}
-        //else if (d_action == ENTITY_DEFAULT_ACTION_RANDOM_MOVE) {
-        if (d_action == ENTITY_DEFAULT_ACTION_RANDOM_MOVE) {
-            uniform_int_distribution<int> dist(-1, 1);
+    inline bool try_entity_move_to_target(entityid id) {
+        massert(ct.has<target_path>(id), "id has no target_path");
+        update_path_to_target(id);
+        auto path = ct.get<target_path>(id).value();
+        if (path->size() > 0) {
+            massert(ct.has<location>(id), "id has no location");
+            vec3 id_location = ct.get<location>(id).value();
+            vec3 next_location = path->at(0);
+            vec3 diff_location = vec3_sub(next_location, id_location);
             // handle random move
-            if (try_entity_move(id, vec3{dist(mt), dist(mt), 0})) {
+            if (try_entity_move(id, diff_location)) {
                 msuccess2("try entity move succeeded");
                 return true;
             }
         }
-        else if (d_action == ENTITY_DEFAULT_ACTION_MOVE_TO_TARGET) {
-            update_path_to_target(id);
-            // at this point, target_path is updated, and we can just figure out which tile to move to from here
-            // TODO: darkmage should handle this section
-            massert(ct.has<target_path>(id), "id has no target_path");
-            auto path = ct.get<target_path>(id).value();
-            if (path->size() > 0) {
-                // assuming path[0] == id's location
-                // path[1] will be the next location we want to move to
-                // however, try_entity_move(id, vec3) takes an offset vec3
-                // for instance, {1, 1} will move you right and down.
-                // {-1, 1} will move you left and down
-                // and the list of vec3s in target_path are real locations, not offsets
-                // however, calculating the difference should give us what we want
-                massert(ct.has<location>(id), "id has no location");
-                vec3 id_location = ct.get<location>(id).value();
-                vec3 next_location = path->at(0);
-                vec3 diff_location = vec3_sub(next_location, id_location);
-                // handle random move
-                if (try_entity_move(id, diff_location)) {
-                    msuccess2("try entity move succeeded");
-                    return true;
-                }
+        return false;
+    }
+
+
+
+    inline bool try_entity_move_random(entityid id) {
+        uniform_int_distribution<int> dist(-1, 1);
+        if (try_entity_move(id, vec3{dist(mt), dist(mt), 0})) {
+            msuccess2("try entity move succeeded");
+            return true;
+        }
+        return false;
+    }
+
+
+
+
+    inline bool handle_npc(entityid id) {
+        minfo2("handle npc %d", id);
+        massert(id != ENTITYID_INVALID, "Entity is NULL!");
+        auto id_name = ct.get<name>(id).value_or("no-name");
+        auto maybe_dead = ct.get<dead>(id);
+        massert(maybe_dead.has_value(), "npc id %d name %s has no dead component", id, id_name.c_str());
+        const bool is_dead = maybe_dead.value();
+        if (is_dead) {
+            return false;
+        }
+        // this is a heuristic for handling entity actions
+        // originally, we were just moving randomly
+        // this example shows how, if the player is not adjacent to an NPC,
+        // they will just move randomly. otherwise, they attack the player
+        const entityid tgt_id = ct.get<target_id>(id).value_or(hero_id);
+        //auto d_action = ct.get<entity_default_action>(id).value_or(ENTITY_DEFAULT_ACTION_NONE);
+        entity_default_action_t d_action = ct.get<entity_default_action>(id).value_or(ENTITY_DEFAULT_ACTION_NONE);
+        //if (d_action == ENTITY_DEFAULT_ACTION_NONE) {
+        //}
+        //else if (d_action == ENTITY_DEFAULT_ACTION_RANDOM_MOVE) {
+        if (d_action == ENTITY_DEFAULT_ACTION_RANDOM_MOVE) {
+            // handle random move
+            //uniform_int_distribution<int> dist(-1, 1);
+            //if (try_entity_move(id, vec3{dist(mt), dist(mt), 0})) {
+            //    msuccess2("try entity move succeeded");
+            //    return true;
+            //}
+            if (try_entity_move_random(id)) {
+                return true;
             }
         }
+        else if (d_action == ENTITY_DEFAULT_ACTION_MOVE_TO_TARGET) {
+            if (try_entity_move_to_target(id)) {
+                return true;
+            }
+        }
+        else if (d_action == ENTITY_DEFAULT_ACTION_ATTACK_TARGET_IF_ADJACENT) {
+            if (is_entity_adjacent(id, tgt_id)) {
+                // attack target
+                const vec3 loc = ct.get<location>(tgt_id).value();
+                try_entity_attack(id, loc.x, loc.y);
+                //const attack_result_t result = try_entity_attack(id, loc.x, loc.y);
+                // try_entity_attack(id, loc.x, loc.y);
+                return true;
+            }
+        }
+        else if (d_action == ENTITY_DEFAULT_ACTION_RANDOM_MOVE_AND_ATTACK_TARGET_IF_ADJACENT) {
+            if (is_entity_adjacent(id, tgt_id)) {
+                // attack target
+                const vec3 loc = ct.get<location>(tgt_id).value();
+                try_entity_attack(id, loc.x, loc.y);
+                //const attack_result_t result = try_entity_attack(id, loc.x, loc.y);
+                // try_entity_attack(id, loc.x, loc.y);
+                return true;
+            }
+            else if (try_entity_move_random(id)) {
+                return true;
+            }
+        }
+        else if (d_action == ENTITY_DEFAULT_ACTION_MOVE_TO_TARGET_AND_ATTACK_TARGET_IF_ADJACENT) {
+            if (is_entity_adjacent(id, tgt_id)) {
+                // attack target
+                const vec3 loc = ct.get<location>(tgt_id).value();
+                try_entity_attack(id, loc.x, loc.y);
+                //const attack_result_t result = try_entity_attack(id, loc.x, loc.y);
+                return true;
+            }
+            else if (try_entity_move_to_target(id)) {
+                return true;
+            }
+        }
+
 
         //}
         //else {

@@ -41,11 +41,12 @@ static inline void draw_character_creation_screen(gamestate& g) {
     constexpr int y13 = y12 + font_size_1 + 8;
 
     constexpr float pad = -40;
-    constexpr float dst2_x = cx - 210 + pad;
     constexpr float dst2_y = sy + pad;
-    constexpr float dst2_wh = 200 - pad * 2;
+    constexpr float dst2_wh = 400;
+    constexpr float dst2_x = cx - dst2_wh;
 
     constexpr Rectangle src = {0, 0, 32, 32};
+
     constexpr Rectangle dst2 = Rectangle{dst2_x, dst2_y, dst2_wh, dst2_wh};
 
     constexpr Vector2 zero_vec = Vector2{0, 0};
