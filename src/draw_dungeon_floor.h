@@ -41,6 +41,10 @@ static inline bool is_loc_path_blocked(gamestate& g, shared_ptr<dungeon_floor> d
     vector<vec3> path = calculate_path_with_thickness(loc, hero_loc);
     bool blocked = false;
 
+    if (path.size() == 0) {
+        return blocked;
+    }
+
     for (auto v0 : path) {
         // skip v0 if it is equal to hero_loc
         if (vec3_equal(v0, hero_loc)) {
@@ -53,6 +57,10 @@ static inline bool is_loc_path_blocked(gamestate& g, shared_ptr<dungeon_floor> d
         if (tiletype_is_none(v0_tiletype) || tiletype_is_wall(v0_tiletype)) {
             blocked = true;
             break;
+        }
+
+        if (v0_tile->get_entities()->size() == 0) {
+            continue;
         }
 
         for (entityid id : *v0_tile->get_entities()) {
@@ -86,6 +94,9 @@ static inline bool is_loc_path_blocked(gamestate& g, shared_ptr<dungeon_floor> d
             break;
         }
     }
+
+
+
     return blocked;
 }
 
@@ -179,11 +190,9 @@ static inline void draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type
             const vec3 loc = {x, y, g.d.current_floor};
             auto tile = df->tile_at(loc);
             auto tiletype = tile->get_type();
-
             if (tiletype_is_none(tiletype) || tiletype_is_wall(tiletype)) {
                 continue;
             }
-
             if (is_loc_too_far_to_draw(g, loc, hero_loc)) {
                 continue;
             }
@@ -193,10 +202,12 @@ static inline void draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type
             if (is_loc_path_blocked(g, df, loc, hero_loc)) {
                 continue;
             }
-
+            if (tile->get_entities()->size() == 0) {
+                continue;
+                //break;
+            }
             auto entities_begin = tile->get_entities()->cbegin();
             auto entities_end = tile->get_entities()->cend();
-
             //auto entities = tile->get_entities();
             entityid id = INVALID;
             entitytype_t type = ENTITY_NONE;
@@ -222,11 +233,13 @@ static inline bool draw_dungeon_floor(gamestate& g) {
     // render tiles
     for (int y = 0; y < df->get_height(); y++) {
         // example simple loop unrolling
-        for (int x = 0; x < df->get_width(); x += 4) {
+        //for (int x = 0; x < df->get_width(); x += 4) {
+        for (int x = 0; x < df->get_width(); x += 2) {
             draw_dungeon_floor_tile(g, x, y, z);
             draw_dungeon_floor_tile(g, x + 1, y, z);
-            draw_dungeon_floor_tile(g, x + 2, y, z);
-            draw_dungeon_floor_tile(g, x + 3, y, z);
+            //draw_dungeon_floor_tile(g, x + 1, y, z);
+            //draw_dungeon_floor_tile(g, x + 2, y, z);
+            //draw_dungeon_floor_tile(g, x + 3, y, z);
         }
     }
 
