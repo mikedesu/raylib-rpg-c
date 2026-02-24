@@ -3,6 +3,7 @@
 
 #include "ComponentTraits.h"
 #include "gamestate.h"
+#include "libgame_defines.h"
 #include "stat_bonus.h"
 
 
@@ -10,10 +11,12 @@ using std::max;
 
 
 static inline void draw_hud(gamestate& g) {
-    char bf[4][1024];
-    bzero(bf,4096);
-    const int font_size = 10;
-    const int line_thickness = 1;
+    char bf[DEFAULT_HUD_LINE_COUNT][DEFAULT_HUD_BUFFER_LINE_SIZE];
+    bzero(bf, DEFAULT_HUD_LINE_COUNT * DEFAULT_HUD_BUFFER_LINE_SIZE);
+
+    constexpr int font_size = DEFAULT_HUD_FONT_SIZE;
+    constexpr int line_thickness = 2;
+
     const int turn = g.turn_count;
     const int myhp = g.ct.get<hp>(g.hero_id).value_or(-1), mymaxhp = g.ct.get<maxhp>(g.hero_id).value_or(-1);
     const int mylevel = g.ct.get<level>(g.hero_id).value_or(0), myxp = g.ct.get<xp>(g.hero_id).value_or(0);
@@ -40,7 +43,7 @@ static inline void draw_hud(gamestate& g) {
     const int max_w = max({b0_w, b1_w, b2_w, b3_w});
     // Calculate box dimensions based on widest line
     const float box_w = max_w + g.pad;
-    const float box_h = font_size + g.pad * 3; // 3 lines
+    const float box_h = font_size + g.pad * DEFAULT_HUD_LINE_COUNT; // 3 lines
     // Position box at bottom center
     const float box_x = g.targetwidth / 2.0f - (box_w / 2.0f), box_y = g.targetheight - box_h - g.pad * 1.0f;
     // Draw background box

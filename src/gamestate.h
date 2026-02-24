@@ -1957,15 +1957,17 @@ public:
             // measure the length of the message as calculated by MeasureText
             if (len > msg_history_max_len_msg) {
                 msg_history_max_len_msg = len;
-                constexpr int font_size = 10;
+
+                constexpr int font_size = DEFAULT_MSG_HISTORY_FONT_SIZE;
                 const int measure = MeasureText(msg.c_str(), font_size);
                 msg_history_max_len_msg_measure = measure;
             }
             msg_history.push_back(msg_system.front());
             msg_system.erase(msg_system.begin());
         }
-        if (msg_system.size() == 0)
+        if (msg_system.size() == 0) {
             msg_system_is_active = false;
+        }
     }
 
     inline bool handle_cycle_messages(const inputstate& is) {

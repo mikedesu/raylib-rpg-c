@@ -10,7 +10,7 @@ static inline void draw_message_box(gamestate& g) {
 
 
     constexpr int w = DEFAULT_TARGET_WIDTH;
-    constexpr int font_size = 10;
+    constexpr int font_size = DEFAULT_MSG_WINDOW_FONT_SIZE;
     constexpr Color message_bg = Color{0, 0, 0xff, 127};
     constexpr float text_height = font_size;
     constexpr float y = (DEFAULT_TARGET_HEIGHT - text_height) / 2.0 - DEFAULT_PAD;
