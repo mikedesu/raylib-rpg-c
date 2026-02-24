@@ -561,10 +561,9 @@ public:
             return;
         }
         // Reset counters
-        t->set_cached_live_npcs(0);
         t->set_cached_item_count(0);
         t->set_cached_player_present(false);
-        t->set_cached_npc(ENTITYID_INVALID);
+        t->set_cached_live_npc(ENTITYID_INVALID);
         t->set_cached_item(ENTITYID_INVALID);
         // Iterate through all entities on the tile
         for (size_t i = 0; i < t->get_entity_count(); i++) {
@@ -576,12 +575,11 @@ public:
             // Check entity type
             const entitytype_t type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
             if (type == ENTITY_NPC) {
-                t->set_cached_live_npcs(t->get_cached_live_npcs() + 1);
-                t->set_cached_npc(id);
+                t->set_cached_live_npc(id);
             }
             else if (type == ENTITY_PLAYER) {
                 t->set_cached_player_present(true);
-                t->set_cached_npc(id);
+                t->set_cached_live_npc(id);
             }
             else if (type == ENTITY_ITEM) {
                 t->set_cached_item_count(t->get_cached_item_count() + 1);
@@ -592,6 +590,9 @@ public:
         t->set_dirty_entities(false);
     }
 
+
+
+
     inline void recompute_entity_cache_at(vec3 l) {
         massert(l.x >= 0 && l.y >= 0 && l.z >= 0, "x, y, or z is out of bounds: %d, %d, %d", l.x, l.y, l.z);
         massert((size_t)l.z < d.floors.size(), "z is out of bounds");
@@ -600,23 +601,29 @@ public:
         recompute_entity_cache(t);
     }
 
-    inline bool tile_has_live_npcs(shared_ptr<tile_t> t) {
-        recompute_entity_cache(t);
-        return t->get_cached_live_npcs() > 0;
-    }
+
+
+
+    //inline bool tile_has_live_npcs(shared_ptr<tile_t> t) {
+    //recompute_entity_cache(t);
+    //return t->get_cached_live_npcs() > 0;
+    //}
+
+
+
 
     inline bool tile_has_player(shared_ptr<tile_t> t) {
         recompute_entity_cache(t);
         return t->get_cached_player_present();
     }
 
+
+
+
     inline entityid create_door_at_with(const vec3 loc, with_fun doorInitFunction) {
         shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
         shared_ptr<tile_t> tile = df->tile_at(loc);
         if (!tile_is_walkable(tile->get_type())) {
-            return INVALID;
-        }
-        if (tile_has_live_npcs(tile)) {
             return INVALID;
         }
         const entityid id = create_door_with(doorInitFunction);
@@ -631,6 +638,9 @@ public:
         ct.set<update>(id, true);
         return id;
     }
+
+
+
 
     inline size_t place_doors() {
         minfo2("gamestate.place_doors");
@@ -656,6 +666,9 @@ public:
         return placed_doors;
     }
 
+
+
+
     inline entityid create_prop_with(proptype_t type, with_fun initFun) {
         const entityid id = add_entity();
         ct.set<entitytype>(id, ENTITY_PROP);
@@ -665,6 +678,9 @@ public:
         initFun(ct, id);
         return id;
     }
+
+
+
 
     inline entityid create_prop_at_with(proptype_t type, vec3 loc, with_fun initFun) {
         shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
@@ -873,10 +889,12 @@ public:
             merror2("cannot create entity on non-walkable tile");
             return INVALID;
         }
-        if (tile_has_live_npcs(tile)) {
-            merror2("cannot create entity on tile with live NPCs");
-            return INVALID;
-        }
+
+        //if (tile_has_live_npcs(tile)) {
+        //    merror2("cannot create entity on tile with live NPCs");
+        //    return INVALID;
+        //}
+
         const entityid id = create_weapon_with(weaponInitFunction);
         if (id == ENTITYID_INVALID) {
             minfo2("failed to create weapon");
@@ -939,9 +957,11 @@ public:
         if (!tile_is_walkable(tile->get_type())) {
             return INVALID;
         }
-        if (tile_has_live_npcs(tile)) {
-            return INVALID;
-        }
+
+        //if (tile_has_live_npcs(tile)) {
+        //    return INVALID;
+        //}
+
         const entityid id = create_potion_with(potionInitFunction);
         if (id == INVALID) {
             return INVALID;
@@ -1120,10 +1140,11 @@ public:
             merror2("cannot create entity on non-walkable tile: tile.type: %s", tiletype2str(tile->get_type()).c_str());
             return INVALID;
         }
-        if (tile_has_live_npcs(tile)) {
-            merror2("cannot create entity on tile with live NPCs");
-            return INVALID;
-        }
+
+        //if (tile_has_live_npcs(tile)) {
+        //    merror2("cannot create entity on tile with live NPCs");
+        //    return INVALID;
+        //}
         if (tile_has_box(loc.x, loc.y, loc.z) != ENTITYID_INVALID) {
             merror2("cannot create entity on tile with box");
             return INVALID;
@@ -1176,9 +1197,9 @@ public:
         if (!tile_is_walkable(t->get_type())) {
             return ENTITYID_INVALID;
         }
-        if (tile_has_live_npcs(t)) {
-            return ENTITYID_INVALID;
-        }
+        //if (tile_has_live_npcs(t)) {
+        //    return ENTITYID_INVALID;
+        //}
         const entityid id = create_orc_with(monsterInitFunction);
         if (id == ENTITYID_INVALID) {
             return ENTITYID_INVALID;
@@ -1355,17 +1376,17 @@ public:
         }
     }
 
-    inline size_t count_live_npcs_on_floor(size_t floor) {
-        auto df = d.get_floor(floor);
-        size_t count = 0;
-        for (int i = 0; i < df->get_width(); i++) {
-            for (int j = 0; j < df->get_height(); j++)
-                if (tile_has_live_npcs(df->tile_at(vec3{i, j, -1}))) {
-                    count++;
-                }
-        }
-        return count;
-    }
+    //inline size_t count_live_npcs_on_floor(size_t floor) {
+    //    auto df = d.get_floor(floor);
+    //    size_t count = 0;
+    //    for (int i = 0; i < df->get_width(); i++) {
+    //        for (int j = 0; j < df->get_height(); j++)
+    //            if (tile_has_live_npcs(df->tile_at(vec3{i, j, -1}))) {
+    //                count++;
+    //            }
+    //    }
+    //    return count;
+    //}
 
     inline void logic_init() {
         minfo("gamestate.logic_init");
@@ -1531,10 +1552,10 @@ public:
             merror("cannot create entity on non-walkable tile");
             return ENTITYID_INVALID;
         }
-        if (tile_has_live_npcs(tile)) {
-            merror("cannot create entity on tile with live NPCs");
-            return ENTITYID_INVALID;
-        }
+        //if (tile_has_live_npcs(tile)) {
+        //    merror("cannot create entity on tile with live NPCs");
+        //    return ENTITYID_INVALID;
+        //}
         if (tile_has_box(loc.x, loc.y, loc.z) != ENTITYID_INVALID) {
             merror("cannot create entity on tile with box");
             return ENTITYID_INVALID;
@@ -2214,14 +2235,18 @@ public:
             merror2("solid present, cannot move");
             return false;
         }
-        else if (tile_has_live_npcs(tile_at_cur_floor(aloc))) {
+        else if (get_cached_live_npc(tile) != INVALID) {
             merror2("live npcs present, cannot move");
             return false;
         }
-        else if (tile_has_player(tile_at_cur_floor(aloc))) {
-            merror2("player present, cannot move");
-            return false;
-        }
+        //else if (tile_has_live_npcs(tile_at_cur_floor(aloc))) {
+        //    merror2("live npcs present, cannot move");
+        //    return false;
+        //}
+        //else if (tile_has_player(tile_at_cur_floor(aloc))) {
+        //    merror2("player present, cannot move");
+        //    return false;
+        //}
         const entityid door_id = tile_has_door(aloc);
         if (door_id != ENTITYID_INVALID) {
             massert(ct.has<door_open>(door_id), "door_id %d doesnt have a door_open component", door_id);
@@ -2393,12 +2418,12 @@ public:
         return vec3{-1, -1, -1};
     }
 
-    inline entityid get_cached_npc(shared_ptr<tile_t> t) {
+    inline entityid get_cached_live_npc(shared_ptr<tile_t> t) {
         if (t == nullptr) {
             return INVALID;
         }
         recompute_entity_cache(t); // Force update
-        return t->get_cached_npc();
+        return t->get_cached_live_npc();
     }
 
     inline int compute_armor_class(entityid id) {
@@ -2695,7 +2720,7 @@ public:
         ct.set<attacking>(id, true);
         ct.set<update>(id, true);
 
-        const entityid npc_id = get_cached_npc(tile);
+        const entityid npc_id = get_cached_live_npc(tile);
         const attack_result_t result = process_attack_entity(tile, id, npc_id);
 
         // did the hero hear this event?
@@ -2779,10 +2804,16 @@ public:
             merror2("solid present, cannot move");
             return false;
         }
-        else if (tile_has_live_npcs(tile_at_cur_floor(aloc))) {
+        else if (get_cached_live_npc(tile_dest)) {
             merror2("live npcs present, cannot move");
             return false;
         }
+
+
+        //else if (tile_has_live_npcs(tile_at_cur_floor(aloc))) {
+        //    merror2("live npcs present, cannot move");
+        //    return false;
+        //}
         else if (tile_has_player(tile_at_cur_floor(aloc))) {
             merror2("player present, cannot move");
             return false;
@@ -3023,58 +3054,55 @@ public:
             // lets do an example of processing a spell effect immediately
             // first we need to iterate the entities on the tile
             // if there's an NPC we damage it
-            if (tile_has_live_npcs(tile)) {
-                entityid npcid = ENTITYID_INVALID;
-                for (const entityid id : *tile->get_entities()) {
-                    if (ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_NPC) {
-                        npcid = id;
-                        break;
-                    }
-                }
 
-                uniform_int_distribution<int> gen(1, 6);
-                const int dmg = gen(mt);
-                ct.set<damaged>(npcid, true);
-                ct.set<update>(npcid, true);
+            //if (tile_has_live_npcs(tile)) {
+            //    entityid npcid = ENTITYID_INVALID;
+            //    for (const entityid id : *tile->get_entities()) {
+            //        if (ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_NPC) {
+            //            npcid = id;
+            //            break;
+            //        }
+            //    }
+            //    uniform_int_distribution<int> gen(1, 6);
+            //    const int dmg = gen(mt);
+            //    ct.set<damaged>(npcid, true);
+            //    ct.set<update>(npcid, true);
+            //    optional<int> maybe_tgt_hp = ct.get<hp>(npcid);
+            //    if (!maybe_tgt_hp.has_value()) {
+            //        merror("target has no HP component");
+            //        return;
+            //    }
+            //    int tgt_hp = maybe_tgt_hp.value();
+            //    if (tgt_hp <= 0) {
+            //        merror("Target is already dead, hp was: %d", tgt_hp);
+            //        ct.set<dead>(npcid, true);
+            //        return;
+            //    }
+            //    tgt_hp -= dmg;
+            //    ct.set<hp>(npcid, tgt_hp);
+            //    if (tgt_hp > 0) {
+            //        ct.set<dead>(npcid, false);
+            //        return;
+            //    }
+            //    const entitytype_t tgttype = ct.get<entitytype>(npcid).value_or(ENTITY_NONE);
+            //    ct.set<dead>(npcid, true);
+            //    shared_ptr<dungeon_floor> df = d.get_current_floor();
+            //    shared_ptr<tile_t> target_tile = df->tile_at(spell_loc);
+            //    target_tile->set_dirty_entities(true);
+            //    if (tgttype == ENTITY_NPC) {
+            //        // increment attacker's xp
+            //        const int old_xp = ct.get<xp>(id).value_or(0);
+            //        const int reward_xp = 1;
+            //        const int new_xp = old_xp + reward_xp;
+            //        ct.set<xp>(id, new_xp);
+            //        // handle item drops
+            //        drop_all_from_inventory(npcid);
+            //    }
+            //    else if (tgttype == ENTITY_PLAYER) {
+            //        add_message("You died");
+            //    }
+            //}
 
-                optional<int> maybe_tgt_hp = ct.get<hp>(npcid);
-                if (!maybe_tgt_hp.has_value()) {
-                    merror("target has no HP component");
-                    return;
-                }
-
-                int tgt_hp = maybe_tgt_hp.value();
-                if (tgt_hp <= 0) {
-                    merror("Target is already dead, hp was: %d", tgt_hp);
-                    ct.set<dead>(npcid, true);
-                    return;
-                }
-
-                tgt_hp -= dmg;
-                ct.set<hp>(npcid, tgt_hp);
-                if (tgt_hp > 0) {
-                    ct.set<dead>(npcid, false);
-                    return;
-                }
-
-                const entitytype_t tgttype = ct.get<entitytype>(npcid).value_or(ENTITY_NONE);
-                ct.set<dead>(npcid, true);
-                shared_ptr<dungeon_floor> df = d.get_current_floor();
-                shared_ptr<tile_t> target_tile = df->tile_at(spell_loc);
-                target_tile->set_dirty_entities(true);
-                if (tgttype == ENTITY_NPC) {
-                    // increment attacker's xp
-                    const int old_xp = ct.get<xp>(id).value_or(0);
-                    const int reward_xp = 1;
-                    const int new_xp = old_xp + reward_xp;
-                    ct.set<xp>(id, new_xp);
-                    // handle item drops
-                    drop_all_from_inventory(npcid);
-                }
-                else if (tgttype == ENTITY_PLAYER) {
-                    add_message("You died");
-                }
-            }
             if (tile_has_door(spell_loc)) {
                 // find the door id
                 entityid doorid = ENTITYID_INVALID;

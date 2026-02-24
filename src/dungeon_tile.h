@@ -31,10 +31,10 @@ private:
     bool explored;
     bool cached_player_present;
     bool dirty_entities;
-    int cached_live_npcs;
+    //int cached_live_npcs;
     int cached_item_count;
 
-    entityid cached_npc;
+    entityid cached_live_npc;
     entityid cached_item;
     entityid cached_box;
     entityid cached_door;
@@ -105,15 +105,15 @@ public:
 
 
 
-    void set_cached_npc(entityid id) {
-        cached_npc = id;
+    void set_cached_live_npc(entityid id) {
+        cached_live_npc = id;
     }
 
 
 
 
-    entityid get_cached_npc() {
-        return cached_npc;
+    entityid get_cached_live_npc() {
+        return cached_live_npc;
     }
 
 
@@ -133,16 +133,16 @@ public:
 
 
 
-    void set_cached_live_npcs(int n) {
-        cached_live_npcs = n;
-    }
+    //void set_cached_live_npcs(int n) {
+    //    cached_live_npcs = n;
+    //}
 
 
 
 
-    int get_cached_live_npcs() {
-        return cached_live_npcs;
-    }
+    //int get_cached_live_npcs() {
+    //    return cached_live_npcs;
+    //}
 
 
 
@@ -278,10 +278,10 @@ public:
         cached_player_present = false;
         can_have_door = false;
         dirty_entities = true;
-        cached_live_npcs = 0;
+        //cached_live_npcs = 0;
         cached_item_count = 0;
 
-        cached_npc = ENTITYID_INVALID;
+        cached_live_npc = ENTITYID_INVALID;
         cached_item = ENTITYID_INVALID;
         cached_box = ENTITYID_INVALID;
         cached_door = ENTITYID_INVALID;
