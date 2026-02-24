@@ -109,8 +109,33 @@ static inline bool is_loc_path_blocked(gamestate& g, shared_ptr<dungeon_floor> d
 static inline bool draw_dungeon_floor_tile(gamestate& g, int x, int y, int z) {
     //minfo3("BEGIN draw dungeon floor tile");
     //massert(txinfo, "txinfo is null");
-
     massert(z >= 0 && static_cast<size_t>(z) < g.d.get_floor_count(), "z is oob");
+
+    // Calculate drawing position
+    const float px = x * DEFAULT_TILE_SIZE + DEFAULT_OFFSET;
+    const float py = y * DEFAULT_TILE_SIZE + DEFAULT_OFFSET;
+    const Rectangle src = {0, 0, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
+    const Rectangle dest = {px, py, DEFAULT_TILE_SIZE_FLOAT, DEFAULT_TILE_SIZE_FLOAT};
+
+    //const float cx = g.cam2d.target.x;
+    //const float cy = g.cam2d.target.y;
+    //const float cw = cx + DEFAULT_TARGET_WIDTH;
+    //const float ch = cy + DEFAULT_TARGET_HEIGHT;
+
+    //const float tile_right_x = px + DEFAULT_TILE_SIZE_FLOAT;
+    //const float tile_left_x = px;
+
+    //const float tile_top_y = py;
+    //const float tile_bottom_y = py + DEFAULT_TILE_SIZE_FLOAT;
+
+    //if (px + DEFAULT_TILE_SIZE_FLOAT < 0 || px > DEFAULT_TARGET_WIDTH) {
+    //if (tile_right_x < cx || tile_left_x > cw || tile_top_y < cy || tile_bottom_y > ch) {
+    // tile is outside the camera view
+    //    return false;
+    //}
+    //}
+
+
 
     auto df = g.d.get_floor(z);
 
@@ -149,14 +174,11 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, int x, int y, int z) {
 
     const vec3 hero_loc = maybe_hero_loc.value();
 
+
+
     // Calculate Manhattan distance from hero to this tile (diamond pattern)
     const int distance = manhattan_distance(loc, hero_loc);
 
-    // Calculate drawing position
-    const float px = x * DEFAULT_TILE_SIZE + DEFAULT_OFFSET;
-    const float py = y * DEFAULT_TILE_SIZE + DEFAULT_OFFSET;
-    const Rectangle src = {0, 0, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
-    const Rectangle dest = {px, py, DEFAULT_TILE_SIZE_FLOAT, DEFAULT_TILE_SIZE_FLOAT};
 
     // Draw tile with fade ALSO if path between tile and hero is blocked
     // Check for blocking walls/doors in path

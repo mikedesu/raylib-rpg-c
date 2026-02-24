@@ -32,7 +32,7 @@ private:
     bool cached_player_present;
     bool dirty_entities;
     //int cached_live_npcs;
-    int cached_item_count;
+    //int cached_item_count;
 
     entityid cached_live_npc;
     entityid cached_item;
@@ -119,16 +119,16 @@ public:
 
 
 
-    void set_cached_item_count(int n) {
-        cached_item_count = n;
-    }
+    //void set_cached_item_count(int n) {
+    //    cached_item_count = n;
+    //}
 
 
 
 
-    int get_cached_item_count() {
-        return cached_item_count;
-    }
+    //int get_cached_item_count() {
+    //    return cached_item_count;
+    //}
 
 
 
@@ -266,6 +266,17 @@ public:
 
 
 
+    inline void tile_reset_cache() {
+        cached_player_present = false;
+        cached_live_npc = ENTITYID_INVALID;
+        cached_item = ENTITYID_INVALID;
+        cached_box = ENTITYID_INVALID;
+        cached_door = ENTITYID_INVALID;
+    }
+
+
+
+
     inline void tile_init(tiletype_t t) {
         minfo2("tile_init(%d)", t);
         type = t;
@@ -275,16 +286,17 @@ public:
         //visible = false;
         //explored = false;
 
-        cached_player_present = false;
         can_have_door = false;
         dirty_entities = true;
         //cached_live_npcs = 0;
-        cached_item_count = 0;
+        //cached_item_count = 0;
 
-        cached_live_npc = ENTITYID_INVALID;
-        cached_item = ENTITYID_INVALID;
-        cached_box = ENTITYID_INVALID;
-        cached_door = ENTITYID_INVALID;
+        tile_reset_cache();
+        //cached_player_present = false;
+        //cached_live_npc = ENTITYID_INVALID;
+        //cached_item = ENTITYID_INVALID;
+        //cached_box = ENTITYID_INVALID;
+        //cached_door = ENTITYID_INVALID;
 
         entities = make_shared<vector<entityid>>();
         entities->reserve(DUNGEON_TILE_ENTITIES_RESERVE);
@@ -293,14 +305,33 @@ public:
 
 
 
-    inline entityid tile_add(entityid id) {
+    inline entityid tile_add(entityid id, entitytype_t type) {
         // Check if the entity already exists
         //minfo("tile_add: %d", id);
         if (find(entities->begin(), entities->end(), id) != entities->end()) {
             merror("tile_add: entity already exists on tile");
             return ENTITYID_INVALID;
         }
+
         entities->push_back(id);
+
+        tile_reset_cache();
+
+        if (type == ENTITY_PLAYER) {
+            cached_player_present = true;
+            cached_live_npc = id;
+        }
+        else if (type == ENTITY_NPC) {
+            cached_live_npc = id;
+        }
+        else if (type == ENTITY_ITEM) {
+            cached_item = id;
+        }
+        else if (type == ENTITY_BOX) {
+            cached_box = id;
+        }
+
+
         dirty_entities = true;
         return id;
     }
@@ -318,6 +349,7 @@ public:
         }
         entities->erase(it);
         dirty_entities = true;
+        tile_reset_cache();
         return id;
     }
 

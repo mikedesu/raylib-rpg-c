@@ -421,7 +421,7 @@ public:
     }
 
     //inline entityid df_add_at(entityid id, int x, int y)
-    inline entityid df_add_at(entityid id, vec3 loc) {
+    inline entityid df_add_at(entityid id, entitytype_t type, vec3 loc) {
         if (id == ENTITYID_INVALID) {
             minfo("id is invalid");
             return ENTITYID_INVALID;
@@ -434,12 +434,15 @@ public:
 
         //shared_ptr<tile_t> tile = df_tile_at(vec3{x, y, -1});
         shared_ptr<tile_t> tile = tile_at(loc);
-        const entityid result = tile->tile_add(id);
+        const entityid result = tile->tile_add(id, type);
         if (result == ENTITYID_INVALID) {
             minfo("tile_add returned %d", result);
         }
         return result;
     }
+
+
+
 
     //inline bool df_remove_at(entityid id, int x, int y)
     inline bool df_remove_at(entityid id, vec3 l) {

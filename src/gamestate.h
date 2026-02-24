@@ -561,7 +561,7 @@ public:
             return;
         }
         // Reset counters
-        t->set_cached_item_count(0);
+        //t->set_cached_item_count(0);
         t->set_cached_player_present(false);
         t->set_cached_live_npc(ENTITYID_INVALID);
         t->set_cached_item(ENTITYID_INVALID);
@@ -582,7 +582,7 @@ public:
                 t->set_cached_live_npc(id);
             }
             else if (type == ENTITY_ITEM) {
-                t->set_cached_item_count(t->get_cached_item_count() + 1);
+                //t->set_cached_item_count(t->get_cached_item_count() + 1);
                 t->set_cached_item(id);
             }
         }
@@ -630,9 +630,12 @@ public:
         if (id == INVALID) {
             return INVALID;
         }
-        if (!df->df_add_at(id, loc)) {
+
+        if (!df->df_add_at(id, ENTITY_DOOR, loc)) {
             return INVALID;
         }
+
+
         ct.set<location>(id, loc);
         ct.set<door_open>(id, false);
         ct.set<update>(id, true);
@@ -688,7 +691,7 @@ public:
         if (id == ENTITYID_INVALID) {
             return ENTITYID_INVALID;
         }
-        const entityid result = df->df_add_at(id, loc);
+        const entityid result = df->df_add_at(id, ENTITY_PROP, loc);
         if (result == ENTITYID_INVALID) {
             return ENTITYID_INVALID;
         }
@@ -900,7 +903,7 @@ public:
             minfo2("failed to create weapon");
             return INVALID;
         }
-        if (df->df_add_at(id, loc) == ENTITYID_INVALID) {
+        if (df->df_add_at(id, ENTITY_ITEM, loc) == ENTITYID_INVALID) {
             minfo2("failed to add weapon to df");
             return INVALID;
         }
@@ -935,7 +938,7 @@ public:
         }
         const entityid id = create_shield_with(ct, shieldInitFunction);
         shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
-        if (!df->df_add_at(id, loc)) {
+        if (!df->df_add_at(id, ENTITY_ITEM, loc)) {
             return INVALID;
         }
         ct.set<location>(id, loc);
@@ -966,7 +969,7 @@ public:
         if (id == INVALID) {
             return INVALID;
         }
-        if (!df->df_add_at(id, loc)) {
+        if (!df->df_add_at(id, ENTITY_ITEM, loc)) {
             return INVALID;
         }
         ct.set<location>(id, loc);
@@ -1158,7 +1161,7 @@ public:
             merror("failed to create npc");
             return INVALID;
         }
-        if (df->df_add_at(id, loc) == INVALID) {
+        if (df->df_add_at(id, ENTITY_NPC, loc) == INVALID) {
             merror("failed to add npc %d to %d, %d", id, loc.x, loc.y);
             return INVALID;
         }
@@ -1204,7 +1207,7 @@ public:
         if (id == ENTITYID_INVALID) {
             return ENTITYID_INVALID;
         }
-        if (!df->df_add_at(id, loc)) {
+        if (!df->df_add_at(id, ENTITY_NPC, loc)) {
             return ENTITYID_INVALID;
         }
         df->add_living_npc(id);
@@ -1561,7 +1564,7 @@ public:
             return ENTITYID_INVALID;
         }
         const entityid id = create_box_with();
-        if (df->df_add_at(id, loc) == ENTITYID_INVALID) {
+        if (df->df_add_at(id, ENTITY_BOX, loc) == ENTITYID_INVALID) {
             merror("failed df_add_at: %d, %d, %d", id, loc.x, loc.y);
             return ENTITYID_INVALID;
         }
@@ -1584,7 +1587,7 @@ public:
             return ENTITYID_INVALID;
         }
         const entityid id = create_spell_with();
-        if (df->df_add_at(id, loc) == ENTITYID_INVALID) {
+        if (df->df_add_at(id, ENTITY_SPELL, loc) == ENTITYID_INVALID) {
             return ENTITYID_INVALID;
         }
         ct.set<location>(id, loc);
@@ -1705,7 +1708,7 @@ public:
             }
             vec3 loc = maybe_loc.value();
             auto df = d.get_current_floor();
-            const entityid retval = df->df_add_at(item_id, loc);
+            const entityid retval = df->df_add_at(item_id, ENTITY_ITEM, loc);
             if (retval == ENTITYID_INVALID) {
                 merror("Failed to add to tile");
                 return false;
@@ -1808,7 +1811,7 @@ public:
         const vec3 loc = ct.get<location>(hero_id).value();
         // get the tile at the player's location
         auto df = d.get_current_floor();
-        if (!df->df_add_at(item_id, loc)) {
+        if (!df->df_add_at(item_id, ENTITY_ITEM, loc)) {
             merror("Failed to add to %d, %d, %d", loc.x, loc.y, loc.z);
             return false;
         }
@@ -2257,17 +2260,25 @@ public:
         }
         // if door, door is open
         // remove the entity from the current tile
+
         if (!df->df_remove_at(id, loc)) {
             merror2("Failed to remove %d from (%d, %d)", id, loc.x, loc.y);
             return false;
         }
+
         // force cache update
         recompute_entity_cache_at(loc);
         // add the entity to the new tile
-        if (df->df_add_at(id, aloc) == ENTITYID_INVALID) {
+
+
+        auto type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
+
+        if (df->df_add_at(id, type, aloc) == ENTITYID_INVALID) {
             merror2("Failed to add %d to (%d, %d)", id, aloc.x, aloc.y);
             return false;
         }
+
+
         // force cache update
         recompute_entity_cache_at(aloc);
         ct.set<location>(id, aloc);
@@ -2847,7 +2858,9 @@ public:
         // force cache update
         recompute_entity_cache_at(loc);
         // add the entity to the new tile
-        if (df->df_add_at(id, aloc) == ENTITYID_INVALID) {
+
+        auto type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
+        if (df->df_add_at(id, type, aloc) == ENTITYID_INVALID) {
             merror2("Failed to add %d to (%d, %d)", id, aloc.x, aloc.y);
             return false;
         }
@@ -2946,7 +2959,7 @@ public:
                 const int new_floor = d.current_floor;
                 shared_ptr<dungeon_floor> df2 = d.floors[new_floor];
                 const vec3 uloc = df2->get_downstairs_loc();
-                df2->df_add_at(hero_id, uloc);
+                df2->df_add_at(hero_id, ENTITY_PLAYER, uloc);
                 ct.set<location>(hero_id, uloc);
                 flag = GAMESTATE_FLAG_PLAYER_ANIM;
                 PlaySound(sfx.at(SFX_STEP_STONE_1));
@@ -2964,7 +2977,7 @@ public:
                 const int new_floor = d.current_floor;
                 shared_ptr<dungeon_floor> df2 = d.floors[new_floor];
                 const vec3 uloc = df2->get_upstairs_loc();
-                df2->df_add_at(hero_id, uloc);
+                df2->df_add_at(hero_id, ENTITY_PLAYER, uloc);
                 ct.set<location>(hero_id, uloc);
                 flag = GAMESTATE_FLAG_PLAYER_ANIM;
                 PlaySound(sfx.at(SFX_STEP_STONE_1));
