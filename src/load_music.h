@@ -4,6 +4,7 @@
 #include <random>
 
 extern Music music;
+extern float music_volume;
 
 
 static inline void load_random_music(gamestate& g) {
@@ -27,11 +28,35 @@ static inline void handle_music_stream(gamestate& g) {
         StopMusicStream(music);
         UnloadMusicStream(music);
         load_random_music(g);
-#ifdef MUSIC_OFF
-        SetMusicVolume(music, 0.0f); // Set initial music volume
-#else
-        SetMusicVolume(music, DEFAULT_MUSIC_VOLUME); // Set initial music volume
+
+        //#ifdef MUSIC_OFF
+        //        SetMusicVolume(music, 0.0f); // Set initial music volume
+        //#else
+        //        SetMusicVolume(music, DEFAULT_MUSIC_VOLUME); // Set initial music volume
+        //#endif
+        //        PlayMusicStream(music);
+
+
+        // if MUSIC_OFF is undefined, or MUSIC_ON is defined
+        //#ifndef MUSIC_OFF
+        //        SetMusicVolume(music, music_volume); // Set initial music volume
+        //#endif
+        //#ifdef MUSIC_ON
+        //        SetMusicVolume(music, music_volume); // Set initial music volume
+        //#endif
+
+#ifdef MUSIC_VOLUME
+        music_volume = MUSIC_VOLUME;
 #endif
+
+
+// if MUSIC_OFF is defined
+#ifdef MUSIC_OFF
+        music_volume = 0.0f;
+        //SetMusicVolume(music, music_volume); // Set initial music volume
+#endif
+
+        SetMusicVolume(music, music_volume); // Set initial music volume
         PlayMusicStream(music);
     }
 }
