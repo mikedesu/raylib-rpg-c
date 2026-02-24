@@ -136,9 +136,12 @@ public:
     size_t action_selection;
     float line_spacing;
     float music_volume;
+
     double last_frame_time;
-    vector<double> last_frame_times;
+    double max_frame_time;
     size_t last_frame_times_current;
+    vector<double> last_frame_times;
+
     dungeon d;
     char frame_time_str[32];
     gamestate_flag_t flag;
@@ -280,8 +283,13 @@ public:
         do_restart = 0;
         title_screen_selection = 0;
         lock = 0;
-        frame_updates = framecount = restart_count = 0;
-        last_frame_time = last_frame_times_current = 0;
+        frame_updates = 0;
+        framecount = 0;
+        restart_count = 0;
+        last_frame_time = 0;
+        max_frame_time = 0;
+
+        last_frame_times_current = 0;
         last_frame_times.reserve(LAST_FRAME_TIMES_MAX);
         for (size_t i = 0; i < last_frame_times.size(); i++) {
             last_frame_times[i] = 0;
@@ -3351,8 +3359,9 @@ public:
             "frame : %d\n"
             "update: %d\n"
             "frame dirty: %d\n"
-            "draw time: %.1fms\n"
-            "avg last %d draw time: %.1fms\n"
+            "draw time: %.2fms\n"
+            "avg last %d draw time: %.2fms\n"
+            "max draw time: %.2fms\n"
             "cam: (%.0f,%.0f) Zoom: %.1f\n"
             "controlmode: %s \n"
             "floor: %d/%d \n"
@@ -3376,6 +3385,7 @@ public:
             last_frame_time * 1000,
             LAST_FRAME_TIMES_MAX,
             (get_avg_last_frame_time() * 1000),
+            max_frame_time * 1000,
             cam2d.offset.x,
             cam2d.offset.y,
             cam2d.zoom,

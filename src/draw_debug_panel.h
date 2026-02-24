@@ -7,7 +7,9 @@ static inline void draw_debug_panel(gamestate& g) {
     minfo3("draw debug panel");
     constexpr Color bg = {0, 0, 255, 255};
     constexpr Color fg = WHITE;
+
     constexpr int fontsize = 20;
+
     constexpr float yp = 10;
     constexpr float wp = 20;
     constexpr float hp = 20;

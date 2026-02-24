@@ -90,6 +90,10 @@ static inline void drawframe(gamestate& g) {
         g.last_frame_times_current = 0;
     }
     g.framecount++;
+
+    if (g.last_frame_time > g.max_frame_time) {
+        g.max_frame_time = g.last_frame_time;
+    }
 #endif
 
     libdraw_update_sprites_post(g);
