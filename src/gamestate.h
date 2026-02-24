@@ -223,10 +223,14 @@ public:
         debugpanel.fg_color = RAYWHITE;
         debugpanel.bg_color = RED;
         debugpanel.font_size = GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE;
-        targetwidth = targetheight = windowwidth = windowheight = -1;
+        targetwidth = -1;
+        targetheight = -1;
+        windowwidth = -1;
+        windowheight = -1;
         hero_id = INVALID;
         entity_turn = 1;
-        new_entityid_begin = new_entityid_end = ENTITYID_INVALID;
+        new_entityid_begin = ENTITYID_INVALID;
+        new_entityid_end = ENTITYID_INVALID;
         timebegan = currenttime = time(NULL);
         timebegantm = localtime(&timebegan);
         currenttimetm = localtime(&currenttime);
@@ -3782,9 +3786,11 @@ public:
         // Spawn NPCs periodically
         //try_spawn_npc(g);
         //massert(r0, "update player tiles explored failed");
-        if (!update_player_tiles_explored()) {
-            merror3("update player tiles explored failed");
-        }
+
+        //if (!update_player_tiles_explored()) {
+        //    merror3("update player tiles explored failed");
+        //}
+
         if (!update_player_state()) {
             merror3("update player state failed");
         }

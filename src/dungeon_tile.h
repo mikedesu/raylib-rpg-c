@@ -269,8 +269,12 @@ public:
     inline void tile_init(tiletype_t t) {
         minfo2("tile_init(%d)", t);
         type = t;
-        visible = false;
-        explored = false;
+
+        visible = true;
+        explored = true;
+        //visible = false;
+        //explored = false;
+
         cached_player_present = false;
         can_have_door = false;
         dirty_entities = true;
