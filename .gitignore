@@ -57,3 +57,5 @@ old_stats
 stats
 tests
 tests.cpp
+*.perf
+perf.data.old

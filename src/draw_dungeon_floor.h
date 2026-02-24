@@ -20,10 +20,13 @@ constexpr static inline int manhattan_distance(vec3 a, vec3 b) {
 
 
 
-static inline bool is_loc_too_far_to_draw(gamestate& g, vec3 loc, vec3 hero_loc) {
+//static inline bool is_loc_too_far_to_draw(gamestate& g, vec3 loc, vec3 hero_loc) {
+static inline bool is_loc_too_far_to_draw(gamestate& g, vec3 loc, vec3 hero_loc, int vision_dist, int light_rad) {
     // Get hero's vision distance and location
-    const int vision_dist = g.ct.get<vision_distance>(g.hero_id).value_or(0);
-    const int light_rad = g.ct.get<light_radius>(g.hero_id).value_or(0);
+
+    //const int vision_dist = g.ct.get<vision_distance>(g.hero_id).value_or(0);
+    //const int light_rad = g.ct.get<light_radius>(g.hero_id).value_or(0);
+
     massert(!vec3_invalid(hero_loc), "hero_loc invalid");
     massert(!vec3_invalid(loc), "loc invalid");
     const int dist_to_check = std::max(vision_dist, light_rad);
@@ -172,7 +175,8 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, int x, int y, int z) {
 
 
 
-static inline void draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type_0, function<bool(gamestate&, entityid)> extra_check) {
+static inline void
+draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type_0, int vision_dist, int light_rad, function<bool(gamestate&, entityid)> extra_check) {
     auto df = g.d.get_current_floor();
     const int df_w = df->get_width();
     const int df_h = df->get_height();
@@ -180,11 +184,12 @@ static inline void draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type
 
     auto hero_loc = g.ct.get<location>(g.hero_id).value_or(vec3{-1, -1, -1});
     //massert(!vec3_invalid(hero_loc), "hero loc is invalid");
+    //const int vision_dist = g.ct.get<vision_distance>(g.hero_id).value_or(0);
+    //const int light_rad = g.ct.get<light_radius>(g.hero_id).value_or(0);
 
     //for (int i = 0; i < num_tiles; i++) {
     for (int y = 0; y < df_h; y++) {
         //const int y = i / df_w;
-
         for (int x = 0; x < df_w; x++) {
             //const int x = i - (y * df_w);
             const vec3 loc = {x, y, g.d.current_floor};
@@ -193,9 +198,11 @@ static inline void draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type
             if (tiletype_is_none(tiletype) || tiletype_is_wall(tiletype)) {
                 continue;
             }
-            if (is_loc_too_far_to_draw(g, loc, hero_loc)) {
+
+            if (is_loc_too_far_to_draw(g, loc, hero_loc, vision_dist, light_rad)) {
                 continue;
             }
+
             // bugfix for tall walls so entities do not draw on top: check to see if the tile directly beneath this tile is a wall
             //if (tile2.type == TILE_STONE_WALL_00) continue;
             // render all entities if not blocked
@@ -230,6 +237,9 @@ static inline bool draw_dungeon_floor(gamestate& g) {
     shared_ptr<dungeon_floor> df = g.d.get_current_floor();
     const int z = g.d.current_floor;
 
+    const int vision_dist = g.ct.get<vision_distance>(g.hero_id).value_or(0);
+    const int light_rad = g.ct.get<light_radius>(g.hero_id).value_or(0);
+
     // render tiles
     for (int y = 0; y < df->get_height(); y++) {
         // example simple loop unrolling
@@ -261,23 +271,17 @@ static inline bool draw_dungeon_floor(gamestate& g) {
         return false;
     };
 
-    draw_dungeon_floor_entitytype(g, ENTITY_DOOR, mydefault);
-
-    draw_dungeon_floor_entitytype(g, ENTITY_PROP, mydefault);
+    draw_dungeon_floor_entitytype(g, ENTITY_DOOR, vision_dist, light_rad, mydefault);
+    draw_dungeon_floor_entitytype(g, ENTITY_PROP, vision_dist, light_rad, mydefault);
 
     libdraw_draw_player_target_box(g);
 
-    draw_dungeon_floor_entitytype(g, ENTITY_SPELL, mydefault);
-
-    draw_dungeon_floor_entitytype(g, ENTITY_NPC, dead_check);
-
-    draw_dungeon_floor_entitytype(g, ENTITY_BOX, mydefault);
-
-    draw_dungeon_floor_entitytype(g, ENTITY_ITEM, mydefault);
-
-    draw_dungeon_floor_entitytype(g, ENTITY_NPC, alive_check);
-
-    draw_dungeon_floor_entitytype(g, ENTITY_PLAYER, mydefault);
+    draw_dungeon_floor_entitytype(g, ENTITY_SPELL, vision_dist, light_rad, mydefault);
+    draw_dungeon_floor_entitytype(g, ENTITY_NPC, vision_dist, light_rad, dead_check);
+    draw_dungeon_floor_entitytype(g, ENTITY_BOX, vision_dist, light_rad, mydefault);
+    draw_dungeon_floor_entitytype(g, ENTITY_ITEM, vision_dist, light_rad, mydefault);
+    draw_dungeon_floor_entitytype(g, ENTITY_NPC, vision_dist, light_rad, alive_check);
+    draw_dungeon_floor_entitytype(g, ENTITY_PLAYER, vision_dist, light_rad, mydefault);
 
     return true;
 }
