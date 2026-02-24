@@ -72,8 +72,13 @@ static inline bool is_loc_path_blocked(gamestate& g, shared_ptr<dungeon_floor> d
             }
             // Check if tile has an NPC
             else if (type == ENTITY_NPC) {
-                blocked = true;
-                break;
+                // Check if NPC is dead or alive
+                massert(g.ct.has<dead>(id), "id %d doesn't have a dead component", id);
+                const bool is_dead = g.ct.get<dead>(id).value();
+                if (!is_dead) {
+                    blocked = true;
+                    break;
+                }
             }
         }
 
