@@ -99,6 +99,24 @@ static inline void draw_character_creation_screen(gamestate& g) {
     case RACE_WARG: {
         DrawTexturePro(txinfo[TX_MONSTER_WARG_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
     } break;
+
+    case RACE_ZOMBIE: {
+        DrawTexturePro(txinfo[TX_MONSTER_ZOMBIE_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
+    } break;
+
+
+    case RACE_SKELETON: {
+        DrawTexturePro(txinfo[TX_MONSTER_SKELETON_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
+    } break;
+
+
+    case RACE_RAT: {
+        DrawTexturePro(txinfo[TX_MONSTER_RAT_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
+    } break;
+
+
+
+
     default: break;
     }
 
