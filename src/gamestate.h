@@ -1371,8 +1371,8 @@ public:
         // 16x16 = 4 8x8 areas
         // 32x32 = 4 16x16 areas = 8 8x8 areas
 
-        const int w = 8; // 4x4 4x4 areas
-        const int h = 8;
+        const int w = 64; // 4x4 4x4 areas
+        const int h = 64;
         constexpr float parts = 1.0;
 
         //const int w = 32; // 4x4 4x4 areas
