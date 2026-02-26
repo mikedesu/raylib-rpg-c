@@ -141,11 +141,11 @@ struct ComponentTraits<damaged> {
     using Type = bool;
 };
 
-struct txalpha { }; // int
-template <>
-struct ComponentTraits<txalpha> {
-    using Type = int;
-};
+//struct txalpha { }; // int
+//template <>
+//struct ComponentTraits<txalpha> {
+//    using Type = int;
+//};
 
 struct pushable { }; // bool
 template <>

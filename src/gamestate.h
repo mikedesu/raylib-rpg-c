@@ -1058,7 +1058,7 @@ public:
         ct.set<blocking>(id, false);
         ct.set<block_success>(id, false);
         ct.set<damaged>(id, false);
-        ct.set<txalpha>(id, 0);
+        //ct.set<txalpha>(id, 255);
         ct.set<inventory>(id, make_shared<vector<entityid>>());
         ct.set<equipped_weapon>(id, ENTITYID_INVALID);
         ct.set<aggro>(id, false);
@@ -1174,12 +1174,15 @@ public:
             merror("failed to create npc");
             return INVALID;
         }
+
         if (df->df_add_at(id, ENTITY_NPC, loc) == INVALID) {
             merror("failed to add npc %d to %d, %d", id, loc.x, loc.y);
             return INVALID;
         }
+        
         minfo2("setting location for %d", id);
         ct.set<location>(id, loc);
+        
         msuccess2("created npc %d", id);
         return id;
     }
@@ -1348,10 +1351,10 @@ public:
             merror2("hero_id is invalid");
             return false;
         }
-        const unsigned char a = ct.get<txalpha>(hero_id).value_or(255);
-        if (a < 255) {
-            ct.set<txalpha>(hero_id, a + 1);
-        }
+        //const unsigned char a = ct.get<txalpha>(hero_id).value_or(255);
+        //if (a < 255) {
+        //    ct.set<txalpha>(hero_id, a + 1);
+        //}
         if (ct.get<dead>(hero_id).value_or(true)) {
             merror2("hero_id is dead");
             gameover = true;
@@ -1369,11 +1372,12 @@ public:
             if (id == hero_id || ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_SPELL) {
                 continue;
             }
-            unsigned char a = ct.get<txalpha>(id).value_or(255);
-            if (a < 255) {
-                a++;
-            }
-            ct.set<txalpha>(id, a);
+            //unsigned char a = 255;
+            //unsigned char a = ct.get<txalpha>(id).value_or(255);
+            //if (a < 255) {
+            //    a++;
+            //}
+            //ct.set<txalpha>(id, a);
             const bool is_complete = ct.get<spell_complete>(id).value_or(false);
             const bool is_destroyed = ct.get<destroyed>(id).value_or(false);
             if (is_complete && is_destroyed) {
@@ -1404,11 +1408,12 @@ public:
         for (entityid id = 0; id < next_entityid; id++) {
             auto type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
             if (type == ENTITY_NPC) {
-                unsigned char a = ct.get<txalpha>(id).value_or(255);
-                if (a < 255) {
-                    a++;
-                }
-                ct.set<txalpha>(id, a);
+                //unsigned char a = 255;
+                //unsigned char a = ct.get<txalpha>(id).value_or(255);
+                //if (a < 255) {
+                //    a++;
+                //}
+                //ct.set<txalpha>(id, a);
                 ct.set<damaged>(id, false);
             }
         }
@@ -1563,18 +1568,32 @@ public:
         frame_dirty = true;
     }
 
+
+
+
     inline entityid create_player_at_with(vec3 loc, string n, with_fun playerInitFunction) {
         minfo2("create player with: loc=(%d, %d, %d), n=%s", loc.x, loc.y, loc.z, n.c_str());
         massert(n != "", "name is empty string");
         const race_t rt = chara_creation.race;
         const entityid id = create_npc_at_with(rt, loc, [](CT& ct, const entityid id) {});
         massert(id != ENTITYID_INVALID, "id is invalid");
-        constexpr int hp_ = 10, maxhp_ = 10;
-        constexpr int vis_dist = 5, light_rad = 5, hear_dist = 3;
-        constexpr entitytype_t type = ENTITY_PLAYER;
+        constexpr int hp_ = 10;
+        constexpr int maxhp_ = 10;
+        constexpr int vis_dist = 5;
+        constexpr int light_rad = 5;
+        constexpr int hear_dist = 3;
+        //constexpr entitytype_t type = ENTITY_PLAYER;
         set_hero_id(id);
-        ct.set<entitytype>(id, type);
-        ct.set<txalpha>(id, 0);
+        ct.set<entitytype>(id, ENTITY_PLAYER);
+
+        auto df = d.get_current_floor();
+        auto tile = df->tile_at(loc);
+        tile->set_cached_player_present(true);
+        tile->set_cached_live_npc(id);
+
+
+
+        //ct.set<txalpha>(id, 0);
         ct.set<hp>(id, hp_);
         ct.set<maxhp>(id, maxhp_);
         ct.set<vision_distance>(id, vis_dist);
@@ -1585,6 +1604,9 @@ public:
         playerInitFunction(ct, id);
         return id;
     }
+
+
+
 
     inline entityid create_box_with() {
         const entityid id = add_entity();

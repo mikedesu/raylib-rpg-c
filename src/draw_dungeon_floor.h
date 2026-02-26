@@ -302,6 +302,14 @@ draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type_0, int vision_dist
             if (type_0 == ENTITY_NPC && npc_id != INVALID && extra_check(g, npc_id)) {
                 draw_sprite_and_shadow(g, npc_id);
             }
+            
+
+
+            bool player_present = tile->get_cached_player_present();
+            if (type_0 == ENTITY_PLAYER && player_present && extra_check(g, g.hero_id)) {
+                draw_sprite_and_shadow(g, g.hero_id);
+            }
+
 
             entityid box_id = tile->get_cached_box();
             if (type_0 == ENTITY_BOX && box_id != INVALID && extra_check(g, box_id)) {
@@ -346,21 +354,21 @@ static inline bool draw_dungeon_floor(gamestate& g) {
 
     auto mydefault = [](gamestate& g, entityid id) { return true; };
 
-    auto alive_check = [](gamestate& g, entityid id) {
-        auto maybe_dead = g.ct.get<dead>(id);
-        if (maybe_dead.has_value()) {
-            return !maybe_dead.value();
-        }
-        return false;
-    };
+    //auto alive_check = [](gamestate& g, entityid id) {
+    //    auto maybe_dead = g.ct.get<dead>(id);
+    //    if (maybe_dead.has_value()) {
+    //        return !maybe_dead.value();
+    //    }
+    //    return false;
+    //};
 
-    auto dead_check = [](gamestate& g, entityid id) {
-        auto maybe_dead = g.ct.get<dead>(id);
-        if (maybe_dead.has_value()) {
-            return maybe_dead.value();
-        }
-        return false;
-    };
+    //auto dead_check = [](gamestate& g, entityid id) {
+    //    auto maybe_dead = g.ct.get<dead>(id);
+    //    if (maybe_dead.has_value()) {
+    //        return maybe_dead.value();
+    //    }
+    //    return false;
+    //};
 
     //draw_dungeon_floor_entitytype(g, ENTITY_DOOR, vision_dist, light_rad, mydefault);
     //draw_dungeon_floor_entitytype(g, ENTITY_PROP, vision_dist, light_rad, mydefault);
@@ -370,7 +378,7 @@ static inline bool draw_dungeon_floor(gamestate& g) {
     //draw_dungeon_floor_entitytype(g, ENTITY_SPELL, vision_dist, light_rad, mydefault);
     //draw_dungeon_floor_entitytype(g, ENTITY_NPC, vision_dist, light_rad, dead_check);
     //draw_dungeon_floor_entitytype(g, ENTITY_BOX, vision_dist, light_rad, mydefault);
-    draw_dungeon_floor_entitytype(g, ENTITY_ITEM, vision_dist, light_rad, mydefault);
+    //draw_dungeon_floor_entitytype(g, ENTITY_ITEM, vision_dist, light_rad, mydefault);
     //draw_dungeon_floor_entitytype(g, ENTITY_NPC, vision_dist, light_rad, alive_check);
     draw_dungeon_floor_entitytype(g, ENTITY_PLAYER, vision_dist, light_rad, mydefault);
 
