@@ -15,8 +15,8 @@
 #include <unordered_map>
 #include <vector>
 
-#define DEFAULT_DUNGEON_FLOOR_WIDTH (16)
-#define DEFAULT_DUNGEON_FLOOR_HEIGHT (12)
+//#define DEFAULT_DUNGEON_FLOOR_WIDTH (16)
+//#define DEFAULT_DUNGEON_FLOOR_HEIGHT (12)
 
 using std::function;
 using std::make_shared;
@@ -39,6 +39,9 @@ private:
     //shared_ptr<vector<entityid>> dead_npcs;
     //shared_ptr<vector<room>> room_metadatas;
     shared_ptr<unordered_map<tile_id, shared_ptr<tile_t>>> tile_map; // Maps tile_id to tile_t pointer
+
+    tile_t grid[64][64];
+
 
 public:
     //bool room_id_exists(room_id id) {
@@ -267,52 +270,50 @@ public:
         }
     }
 
-    inline void init(const int f, const biome_t t, const int w, const int h) {
+
+
+
+
+    //inline void init(const int f, const biome_t t, const int w, const int h) {
+    inline void init(const int f, const biome_t t) {
         minfo2("df init: f=%d, t=%d, w=%d, h=%d", f, t, w, h);
-        massert(w > 0, "width must be greater than zero");
-        massert(h > 0, "height must be greater than zero");
+        //massert(w > 0, "width must be greater than zero");
+        //massert(h > 0, "height must be greater than zero");
         massert(f >= 0, "floor must be greater than or equal to zero");
         // creating a new dungeon floor
         // init floor vars
         floor = f;
-        width = w;
-        height = h;
+        width = 64;
+        height = 64;
         biome = t;
-
-        //living_npcs = make_shared<vector<entityid>>();
-        //dead_npcs = make_shared<vector<entityid>>();
-        //room_metadatas = make_shared<vector<room>>();
-
         // alloc the tile map
         tile_map = make_shared<unordered_map<tile_id, shared_ptr<tile_t>>>();
         massert(tile_map, "failed to create tile map");
         // create all the tiles and add to the tile vector and tile map
-        //minfo2("pushing tiles...");
         for (tile_id i = 0; i < width * height; i++) {
             minfo2("Begin loop %d", i);
             tiles.push_back(i);
-            //tile_map->emplace(i, tile_t(TILE_NONE, i));
-            //tile_map->emplace(i, tile_t(TILE_NONE, i));
-
             shared_ptr<tile_t> tile = make_shared<tile_t>(TILE_NONE, i);
             tile_map->insert({i, tile});
         }
-        //msuccess2("tiles pushed.");
-        //df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_09, (Rectangle){x, y, w2, h2});
-        //df_set_perimeter(TILE_STONE_WALL_01, TILE_STONE_WALL_01, (Rectangle){x - 1, y - 1, w2 + 2, h2 + 2});
-        //df_set_area(TILE_STONE_WALL_01, TILE_STONE_WALL_01, (Rectangle){x + w2 / 2.0f, y, 1, h2});
-        //df_set_area(TILE_STONE_WALL_01, TILE_STONE_WALL_01, (Rectangle){x, y + h2 / 2.0f, w2, 1});
-        //df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_00, (Rectangle){x + w2 / 2.0f, y + 1, 1, 1});
-        //df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_00, (Rectangle){x + w2 / 2.0f + 2, y + 4, 1, 2});
         //df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_00, (Rectangle){x + w2 / 2.0f, y + 6, 1, 2});
         //df_set_tile(TILE_UPSTAIRS, loc_u.x, loc_u.y);
         //df_set_tile(TILE_DOWNSTAIRS, loc_d.x, loc_d.y);
         msuccess2("Created dungeon floor %d with dimensions %dx%d", floor, width, height);
     }
 
+
+
+
+
     inline void df_xform(function<void()> mLambda) {
         mLambda();
     }
+
+
+
+
+
 
     inline int df_get_possible_downstairs_count_in_area(const Rectangle r) {
         massert(r.x >= 0, "x is less than zero");
@@ -336,6 +337,11 @@ public:
         return count;
     }
 
+
+
+
+
+
     inline int df_get_possible_upstairs_count_in_area(const Rectangle r) {
         massert(r.x >= 0, "x is less than zero");
         massert(r.x < width, "x is out of bounds");
@@ -358,6 +364,11 @@ public:
         return count;
     }
 
+
+
+
+
+
     inline shared_ptr<vector<vec3>> df_get_possible_upstairs_locs_in_area(const Rectangle r) {
         auto locations = make_shared<vector<vec3>>();
         massert(locations, "failed to make_shared locations");
@@ -373,6 +384,11 @@ public:
         }
         return locations;
     }
+
+
+
+
+
 
     inline shared_ptr<vector<vec3>> df_get_possible_downstairs_locs_in_area(const Rectangle r) {
         massert(r.x >= 0, "x is less than zero");
@@ -394,13 +410,28 @@ public:
         return locations;
     }
 
+
+
+
+
+
     inline int df_get_possible_upstairs_count() {
         return df_get_possible_upstairs_count_in_area((Rectangle){0, 0, (float)width, (float)height});
     }
 
+
+
+
+
+
     inline int df_get_possible_downstairs_count() {
         return df_get_possible_downstairs_count_in_area((Rectangle){0, 0, (float)width, (float)height});
     }
+
+
+
+
+
 
     inline shared_ptr<vector<vec3>> df_get_possible_upstairs_locs() {
         auto locs = df_get_possible_upstairs_locs_in_area((Rectangle){0, 0, (float)width, (float)height});
@@ -408,17 +439,32 @@ public:
         return locs;
     }
 
+
+
+
+
+
     inline shared_ptr<vector<vec3>> df_get_possible_downstairs_locs() {
         auto locs = df_get_possible_downstairs_locs_in_area((Rectangle){0, 0, (float)width, (float)height});
         massert(locs, "failed to get possible downstairs locations");
         return locs;
     }
 
+
+
+
+
+
     inline void df_free() {
         //minfo("df_free");
         tiles.clear();
         tile_map->clear();
     }
+
+
+
+
+
 
     //inline entityid df_add_at(entityid id, int x, int y)
     inline entityid df_add_at(entityid id, entitytype_t type, vec3 loc) {
@@ -466,10 +512,18 @@ public:
         return true;
     }
 
+
+
+
+
     inline void df_set_all_tiles(const tiletype_t type) {
         //minfo("df_set_all_tiles: Setting all tiles to type %d", type);
         set_area(type, type, (Rectangle){0, 0, (float)width, (float)height});
     }
+
+
+
+
 
     const inline vec3 get_random_loc() {
         vector<vec3> tmp;
@@ -497,6 +551,10 @@ public:
         return tmp[GetRandomValue(0, tmp.size() - 1)];
     }
 
+
+
+
+
     const inline vec3 df_get_random_loc_of_type(const tiletype_t type) {
         vector<vec3> tmp;
         for (int x = 0; x < width; x++) {
@@ -521,10 +579,12 @@ public:
         return loc;
     }
 
+
     dungeon_floor() {
         upstairs_loc = {-1, -1, -1};
         downstairs_loc = {-1, -1, -1};
     }
+
 
     ~dungeon_floor() {
         minfo2("dungeon floor destroyed");

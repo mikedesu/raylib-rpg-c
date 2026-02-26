@@ -356,8 +356,10 @@ public:
         return d.get_current_floor()->tile_at(loc);
     }
 
-    inline void create_and_add_df_0(biome_t type, int df_count, int w, int h, float parts) {
-        auto df = d.create_floor(type, w, h);
+    //inline void create_and_add_df_0(biome_t type, int df_count, int w, int h, float parts) {
+    inline void create_and_add_df_0(biome_t type, int df_count, float parts) {
+        //auto df = d.create_floor(type, w, h);
+        auto df = d.create_floor(type);
         const float dw = df->get_width();
         const float dh = df->get_height();
         vector<room> rooms;
@@ -366,9 +368,11 @@ public:
         d.add_floor(df);
     }
 
-    inline void create_and_add_df_1(biome_t type, int df_count, int w, int h, float parts) {
+    //inline void create_and_add_df_1(biome_t type, int df_count, int w, int h, float parts) {
+    inline void create_and_add_df_1(biome_t type, int df_count, float parts) {
         constexpr float min_room_w = 2;
-        auto df = d.create_floor(type, w, h);
+        //auto df = d.create_floor(type, w, h);
+        auto df = d.create_floor(type);
         const float dw = df->get_width();
         const float dh = df->get_height();
         vector<room> rooms;
@@ -459,7 +463,8 @@ public:
             return;
         }
         for (int i = 0; i < df_count; i++) {
-            create_and_add_df_0(type, df_count, w, h, parts);
+            create_and_add_df_0(type, df_count,parts);
+            //create_and_add_df_0(type, df_count, w, h, parts);
             //create_and_add_df_1(type, df_count, w, h, parts);
 
             /*
