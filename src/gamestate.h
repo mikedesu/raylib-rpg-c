@@ -1463,9 +1463,10 @@ public:
         auto df = d.get_current_floor();
         //auto rl0 = df->df_get_random_loc();
         //create_weapon_at_with(ct, df->get_random_loc(), dagger_init());
-        create_weapon_at_with(ct, df->get_random_loc(), axe_init());
-
-        create_shield_at_with(ct, df->get_random_loc(), shield_init());
+        
+        //create_weapon_at_with(ct, df->get_random_loc(), axe_init());
+        //create_shield_at_with(ct, df->get_random_loc(), shield_init());
+        
         //create_shield_at_with(ct, df->get_random_loc(), shield_init());
         //create_shield_at_with(ct, df->get_random_loc(), shield_init());
 
