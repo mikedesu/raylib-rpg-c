@@ -19,6 +19,7 @@
 #define DEFAULT_DUNGEON_FLOOR_HEIGHT (12)
 
 using std::function;
+using std::make_shared;
 using std::shared_ptr;
 using std::unordered_map;
 using std::vector;
@@ -33,7 +34,8 @@ private:
     vec3 upstairs_loc;
 
     vector<tile_id> tiles;
-    shared_ptr<vector<entityid>> living_npcs;
+
+    //shared_ptr<vector<entityid>> living_npcs;
     shared_ptr<vector<entityid>> dead_npcs;
     shared_ptr<vector<room>> room_metadatas;
     shared_ptr<unordered_map<tile_id, shared_ptr<tile_t>>> tile_map; // Maps tile_id to tile_t pointer
@@ -83,9 +85,9 @@ public:
         return dead_npcs;
     }
 
-    shared_ptr<vector<entityid>> get_living_npcs() {
-        return living_npcs;
-    }
+    //shared_ptr<vector<entityid>> get_living_npcs() {
+    //return living_npcs;
+    //}
 
     void add_dead_npc(entityid id) {
         massert(id != ENTITYID_INVALID, "id is invalid");
@@ -103,21 +105,21 @@ public:
         return true;
     }
 
-    void add_living_npc(entityid id) {
-        massert(id != ENTITYID_INVALID, "id is invalid");
-        living_npcs->push_back(id);
-    }
+    //void add_living_npc(entityid id) {
+    //massert(id != ENTITYID_INVALID, "id is invalid");
+    //living_npcs->push_back(id);
+    //}
 
-    bool remove_living_npc(entityid id) {
-        massert(id != ENTITYID_INVALID, "id is invalid");
+    //bool remove_living_npc(entityid id) {
+    //massert(id != ENTITYID_INVALID, "id is invalid");
 
-        auto it = find(living_npcs->cbegin(), living_npcs->cend(), id);
-        if (it == living_npcs->cend()) {
-            return false;
-        }
-        living_npcs->erase(it);
-        return true;
-    }
+    //auto it = find(living_npcs->cbegin(), living_npcs->cend(), id);
+    //if (it == living_npcs->cend()) {
+    //return false;
+    //}
+    //living_npcs->erase(it);
+    //return true;
+    //}
 
     const vec3 get_upstairs_loc() {
         return upstairs_loc;
@@ -279,9 +281,9 @@ public:
         height = h;
         biome = t;
 
-        living_npcs = make_shared<vector<entityid>>();
-        dead_npcs = make_shared<vector<entityid>>();
-        room_metadatas = make_shared<vector<room>>();
+        //living_npcs = make_shared<vector<entityid>>();
+        //dead_npcs = make_shared<vector<entityid>>();
+        //room_metadatas = make_shared<vector<room>>();
 
         // alloc the tile map
         tile_map = make_shared<unordered_map<tile_id, shared_ptr<tile_t>>>();
@@ -479,7 +481,7 @@ public:
                     //merror("loc at (%d, %d, %d) type invalid. type is: %d", x, y, floor, tile.type);
                     continue;
                 }
-                if (tile->get_entity_count() > 0) {
+                if (tile->entity_count() > 0) {
                     //merror("loc at (%d, %d, %d) type invalid. tile has %ld entities", x, y, floor, tile.entities->size());
                     continue;
                 }

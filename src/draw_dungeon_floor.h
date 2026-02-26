@@ -62,40 +62,68 @@ static inline bool is_loc_path_blocked(gamestate& g, shared_ptr<dungeon_floor> d
             break;
         }
 
-        if (v0_tile->get_entities()->size() == 0) {
+        if (v0_tile->entity_count() == 0) {
             continue;
         }
 
-        for (entityid id : *v0_tile->get_entities()) {
-            auto type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
-            // check if tile has a DOOR
-            if (type == ENTITY_DOOR) {
-                auto is_open = g.ct.get<door_open>(id).value_or(false);
-                if (!is_open) {
-                    blocked = true;
-                    break;
-                }
-            }
-            // Check if tile has a box
-            else if (type == ENTITY_BOX) {
+
+
+        // check if tile has a DOOR
+        entityid door_id = v0_tile->get_cached_door();
+        if (door_id != INVALID) {
+            auto is_open = g.ct.get<door_open>(door_id).value_or(false);
+            if (!is_open) {
                 blocked = true;
                 break;
             }
-            // Check if tile has an NPC
-            else if (type == ENTITY_NPC) {
-                // Check if NPC is dead or alive
-                massert(g.ct.has<dead>(id), "id %d doesn't have a dead component", id);
-                const bool is_dead = g.ct.get<dead>(id).value();
-                if (!is_dead) {
-                    blocked = true;
-                    break;
-                }
+        }
+
+        entityid box_id = v0_tile->get_cached_box();
+        if (box_id != INVALID) {
+            blocked = true;
+            break;
+        }
+
+        entityid npc_id = v0_tile->get_cached_live_npc();
+        if (npc_id != INVALID) {
+            massert(g.ct.has<dead>(npc_id), "id %d doesn't have a dead component", npc_id);
+            const bool is_dead = g.ct.get<dead>(npc_id).value();
+            if (!is_dead) {
+                blocked = true;
+                break;
             }
         }
 
-        if (blocked) {
-            break;
-        }
+        //for (entityid id : *v0_tile->get_entities()) {
+        //auto type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
+        // check if tile has a DOOR
+        //if (type == ENTITY_DOOR) {
+        //    auto is_open = g.ct.get<door_open>(id).value_or(false);
+        //    if (!is_open) {
+        //        blocked = true;
+        //        break;
+        //    }
+        //}
+        // Check if tile has a box
+        //else if (type == ENTITY_BOX) {
+        //    blocked = true;
+        //    break;
+        //}
+        // Check if tile has an NPC
+        //else if (type == ENTITY_NPC) {
+        // Check if NPC is dead or alive
+        //massert(g.ct.has<dead>(id), "id %d doesn't have a dead component", id);
+        //const bool is_dead = g.ct.get<dead>(id).value();
+        //if (!is_dead) {
+        //    blocked = true;
+        //    break;
+        //}
+        //}
+        //}
+
+        //if (blocked) {
+        //    break;
+        //}
     }
 
 
@@ -231,22 +259,63 @@ draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type_0, int vision_dist
             if (is_loc_path_blocked(g, df, loc, hero_loc)) {
                 continue;
             }
-            if (tile->get_entities()->size() == 0) {
+
+
+
+            // previously, we got the entity vector's size
+            // if empty, skip this tile
+            // now, because we have no vector, and instead
+            // manage individual integer values for the ids,
+            // we will have to call a new method...
+            //if (tile->get_entities()->size() == 0) {
+            if (tile->entity_count() == 0) {
                 continue;
                 //break;
             }
-            auto entities_begin = tile->get_entities()->cbegin();
-            auto entities_end = tile->get_entities()->cend();
+
+
+
+            // previously, we iterated over entities vector...
+            //auto entities_begin = tile->get_entities()->cbegin();
+            //auto entities_end = tile->get_entities()->cend();
             //auto entities = tile->get_entities();
-            entityid id = INVALID;
-            entitytype_t type = ENTITY_NONE;
-            for (auto it = entities_begin; it != entities_end; it++) {
-                id = *it;
-                //const entitytype_t type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
-                type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
-                if (type_0 == type && extra_check(g, id)) {
-                    draw_sprite_and_shadow(g, id);
-                }
+            //entityid id = INVALID;
+            //entitytype_t type = ENTITY_NONE;
+            //for (auto it = entities_begin; it != entities_end; it++) {
+            //id = *it;
+            //const entitytype_t type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
+            // we got the type of the entity
+            // generally this function is called when rendering
+            // specific entity types
+            // so if a type corresponded to that entity type,
+            // we'd draw it
+            // so you could have lots of items, followed by an NPC, or a box, or a door, etc.
+            //type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
+            //if (type_0 == type && extra_check(g, id)) {
+            //draw_sprite_and_shadow(g, id);
+            //}
+            //}
+
+            // now, since we have these 'cached' values on the tile...
+
+            entityid npc_id = tile->get_cached_live_npc();
+            if (type_0 == ENTITY_NPC && npc_id != INVALID && extra_check(g, npc_id)) {
+                draw_sprite_and_shadow(g, npc_id);
+            }
+
+            entityid box_id = tile->get_cached_box();
+            if (type_0 == ENTITY_BOX && box_id != INVALID && extra_check(g, box_id)) {
+                draw_sprite_and_shadow(g, box_id);
+            }
+
+            entityid item_id = tile->get_cached_item();
+            if (type_0 == ENTITY_ITEM && item_id != INVALID && extra_check(g, item_id)) {
+                draw_sprite_and_shadow(g, item_id);
+            }
+
+            entityid door_id = tile->get_cached_door();
+            if (type_0 == ENTITY_DOOR && door_id != INVALID && extra_check(g, door_id)) {
+                draw_sprite_and_shadow(g, door_id);
             }
         }
     }

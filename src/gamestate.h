@@ -551,55 +551,56 @@ public:
         return id;
     }
 
-    inline void recompute_entity_cache(shared_ptr<tile_t> t) {
-        // Only recompute if cache is dirty
-        if (t == nullptr) {
-            return;
-        }
 
-        if (!t->get_dirty_entities()) {
-            return;
-        }
-        // Reset counters
-        //t->set_cached_item_count(0);
-        t->set_cached_player_present(false);
-        t->set_cached_live_npc(ENTITYID_INVALID);
-        t->set_cached_item(ENTITYID_INVALID);
-        // Iterate through all entities on the tile
-        for (size_t i = 0; i < t->get_entity_count(); i++) {
-            const entityid id = t->get_entity_at(i);
-            // Skip dead entities
-            if (ct.get<dead>(id).value_or(false)) {
-                continue;
-            }
-            // Check entity type
-            const entitytype_t type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
-            if (type == ENTITY_NPC) {
-                t->set_cached_live_npc(id);
-            }
-            else if (type == ENTITY_PLAYER) {
-                t->set_cached_player_present(true);
-                t->set_cached_live_npc(id);
-            }
-            else if (type == ENTITY_ITEM) {
-                //t->set_cached_item_count(t->get_cached_item_count() + 1);
-                t->set_cached_item(id);
-            }
-        }
-        // Cache is now clean
-        t->set_dirty_entities(false);
-    }
+    //inline void recompute_entity_cache(shared_ptr<tile_t> t) {
+    // Only recompute if cache is dirty
+    //if (t == nullptr) {
+    //    return;
+    //}
+    //
+    //if (!t->get_dirty_entities()) {
+    //    return;
+    //}
+    // Reset counters
+    //t->set_cached_item_count(0);
+    //        t->set_cached_player_present(false);
+    //        t->set_cached_live_npc(ENTITYID_INVALID);
+    //        t->set_cached_item(ENTITYID_INVALID);
+    // Iterate through all entities on the tile
+    //        for (size_t i = 0; i < t->get_entity_count(); i++) {
+    //            const entityid id = t->get_entity_at(i);
+    // Skip dead entities
+    //            if (ct.get<dead>(id).value_or(false)) {
+    //                continue;
+    //            }
+    // Check entity type
+    //            const entitytype_t type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
+    //            if (type == ENTITY_NPC) {
+    //                t->set_cached_live_npc(id);
+    //            }
+    //            else if (type == ENTITY_PLAYER) {
+    //                t->set_cached_player_present(true);
+    //                t->set_cached_live_npc(id);
+    //            }
+    //            else if (type == ENTITY_ITEM) {
+    //                //t->set_cached_item_count(t->get_cached_item_count() + 1);
+    //                t->set_cached_item(id);
+    //            }
+    //        }
+    // Cache is now clean
+    //        t->set_dirty_entities(false);
+    //    }
 
 
 
 
-    inline void recompute_entity_cache_at(vec3 l) {
-        massert(l.x >= 0 && l.y >= 0 && l.z >= 0, "x, y, or z is out of bounds: %d, %d, %d", l.x, l.y, l.z);
-        massert((size_t)l.z < d.floors.size(), "z is out of bounds");
-        shared_ptr<dungeon_floor> df = d.floors[l.z];
-        shared_ptr<tile_t> t = df->tile_at(l);
-        recompute_entity_cache(t);
-    }
+    //inline void recompute_entity_cache_at(vec3 l) {
+    //massert(l.x >= 0 && l.y >= 0 && l.z >= 0, "x, y, or z is out of bounds: %d, %d, %d", l.x, l.y, l.z);
+    //massert((size_t)l.z < d.floors.size(), "z is out of bounds");
+    //shared_ptr<dungeon_floor> df = d.floors[l.z];
+    //shared_ptr<tile_t> t = df->tile_at(l);
+    //recompute_entity_cache(t);
+    //}
 
 
 
@@ -613,7 +614,7 @@ public:
 
 
     inline bool tile_has_player(shared_ptr<tile_t> t) {
-        recompute_entity_cache(t);
+        //recompute_entity_cache(t);
         return t->get_cached_player_present();
     }
 
@@ -1103,14 +1104,14 @@ public:
         massert((size_t)z < d.floors.size(), "floor is out of bounds");
         auto df = d.get_floor(z);
         auto t = df->tile_at((vec3){x, y, z});
-        for (int i = 0; (size_t)i < t->get_entity_count(); i++) {
-            const entityid id = t->tile_get_entity(i);
-            const entitytype_t type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
-            if (id != INVALID && type == ENTITY_BOX) {
-                return id;
-            }
-        }
-        return INVALID;
+        //for (int i = 0; (size_t)i < t->get_entity_count(); i++) {
+        //const entityid id = t->tile_get_entity(i);
+        //const entitytype_t type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
+        //if (id != INVALID && type == ENTITY_BOX) {
+        //    return id;
+        //}
+        //}
+        return t->get_cached_box();
     }
 
 
@@ -1122,13 +1123,25 @@ public:
         massert((size_t)z < d.floors.size(), "floor is out of bounds");
         shared_ptr<dungeon_floor> df = d.get_floor(z);
         shared_ptr<tile_t> t = df->tile_at(vec3{x, y, z});
-        for (size_t i = 0; i < t->get_entity_count(); i++) {
-            const entityid id = t->tile_get_entity(i);
-            const bool is_pullable = ct.get<pullable>(id).value_or(false);
-            if (id != ENTITYID_INVALID && is_pullable) {
-                return id;
+
+        //for (size_t i = 0; i < t->get_entity_count(); i++) {
+        //    const entityid id = t->tile_get_entity(i);
+        //    const bool is_pullable = ct.get<pullable>(id).value_or(false);
+        //    if (id != ENTITYID_INVALID && is_pullable) {
+        //        return id;
+        //    }
+        //}
+
+
+        entityid box_id = t->get_cached_box();
+        if (box_id != INVALID) {
+            const bool is_pullable = ct.get<pullable>(box_id).value_or(false);
+            if (is_pullable) {
+                return box_id;
             }
         }
+
+
         return ENTITYID_INVALID;
     }
 
@@ -1210,7 +1223,7 @@ public:
         if (!df->df_add_at(id, ENTITY_NPC, loc)) {
             return ENTITYID_INVALID;
         }
-        df->add_living_npc(id);
+        //df->add_living_npc(id);
         ct.set<location>(id, loc);
         ct.set<update>(id, true);
         return id;
@@ -1257,15 +1270,24 @@ public:
                 return true;
             }
             // also need to check for a door or other blockades
-            for (auto id : *t->get_entities()) {
-                const bool door_present = ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_DOOR;
-                if (door_present) {
-                    const bool door_is_open = ct.get<door_open>(id).value_or(false);
-                    if (!door_is_open) {
-                        return true;
-                    }
+            entityid door_id = t->get_cached_door();
+            if (door_id != INVALID) {
+                const bool door_is_open = ct.get<door_open>(door_id).value_or(false);
+                if (!door_is_open) {
+                    return true;
                 }
             }
+
+
+            //for (auto id : *t->get_entities()) {
+            //    const bool door_present = ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_DOOR;
+            //    if (door_present) {
+            //        const bool door_is_open = ct.get<door_open>(id).value_or(false);
+            //       if (!door_is_open) {
+            //           return true;
+            //       }
+            //   }
+            //}
         }
         return false;
     }
@@ -1367,16 +1389,42 @@ public:
     }
 
     inline void update_npcs_state() {
-        minfo2("update_npcs_state");
-        auto df_npcs = d.get_current_floor()->get_living_npcs();
-        for (entityid id : *df_npcs) {
-            unsigned char a = ct.get<txalpha>(id).value_or(255);
-            if (a < 255) {
-                a++;
+        minfo2("BEGIN update_npcs_state");
+
+        //minfo2("getting df...")%
+        auto df = d.get_current_floor();
+
+
+
+        //minfo2("getting df_npcs...");
+        //auto df_npcs = df->get_living_npcs();
+
+        minfo2("begin loop");
+
+        for (entityid id = 0; id < next_entityid; id++) {
+            auto type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
+            if (type == ENTITY_NPC) {
+                unsigned char a = ct.get<txalpha>(id).value_or(255);
+                if (a < 255) {
+                    a++;
+                }
+                ct.set<txalpha>(id, a);
+                ct.set<damaged>(id, false);
             }
-            ct.set<txalpha>(id, a);
-            ct.set<damaged>(id, false);
         }
+
+        //for (entityid id : *df_npcs) {
+        //    minfo2("id %d", id);
+        //    unsigned char a = ct.get<txalpha>(id).value_or(255);
+        //    if (a < 255) {
+        //        a++;
+        //    }
+        //    ct.set<txalpha>(id, a);
+        //    ct.set<damaged>(id, false);
+        //}
+
+        //minfo2("end loop");
+        //minfo2("END update_npcs_state");
     }
 
     //inline size_t count_live_npcs_on_floor(size_t floor) {
@@ -2128,13 +2176,33 @@ public:
         massert((size_t)z < d.floors.size(), "floor is out of bounds");
         shared_ptr<dungeon_floor> df = d.get_floor(z);
         shared_ptr<tile_t> t = df->tile_at(vec3{x, y, z});
-        for (int i = 0; (size_t)i < t->get_entity_count(); i++) {
-            const entityid id = t->tile_get_entity(i);
-            const bool is_solid = ct.get<solid>(id).value_or(false);
-            if (id != ENTITYID_INVALID && is_solid) {
-                return true;
-            }
+
+        //for (int i = 0; (size_t)i < t->get_entity_count(); i++) {
+        entityid id = t->get_cached_live_npc();
+        bool is_solid = ct.get<solid>(id).value_or(false);
+        if (id != ENTITYID_INVALID && is_solid) {
+            return true;
         }
+
+        id = t->get_cached_box();
+        is_solid = ct.get<solid>(id).value_or(false);
+        if (id != ENTITYID_INVALID && is_solid) {
+            return true;
+        }
+
+        id = t->get_cached_door();
+        is_solid = ct.get<solid>(id).value_or(false);
+        if (id != ENTITYID_INVALID && is_solid) {
+            return true;
+        }
+
+        id = t->get_cached_item();
+        is_solid = ct.get<solid>(id).value_or(false);
+        if (id != ENTITYID_INVALID && is_solid) {
+            return true;
+        }
+
+
         return false;
     }
 
@@ -2151,27 +2219,29 @@ public:
         massert((size_t)z < d.floors.size(), "floor is out of bounds");
         shared_ptr<dungeon_floor> df = d.get_floor(z);
         shared_ptr<tile_t> t = df->tile_at(vec3{x, y, z});
-        for (int i = 0; (size_t)i < t->get_entity_count(); i++) {
-            const entityid id = t->tile_get_entity(i);
-            const bool is_pushable = ct.get<pushable>(id).value_or(false);
-            if (id != ENTITYID_INVALID && is_pushable) {
-                return id;
-            }
+
+        //for (int i = 0; (size_t)i < t->get_entity_count(); i++) {
+        const entityid id = t->get_cached_box();
+        const bool is_pushable = ct.get<pushable>(id).value_or(false);
+        if (id != ENTITYID_INVALID && is_pushable) {
+            return id;
         }
+        //}
+
         return ENTITYID_INVALID;
     }
 
     inline entityid tile_has_door(vec3 v) {
         shared_ptr<dungeon_floor> df = d.get_current_floor();
         shared_ptr<tile_t> t = df->tile_at(v);
-        for (size_t i = 0; i < t->get_entity_count(); i++) {
-            const entityid id = t->get_entity_at(i);
-            const entitytype_t type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
-            if (type == ENTITY_DOOR) {
-                return id;
-            }
-        }
-        return ENTITYID_INVALID;
+        //for (size_t i = 0; i < t->get_entity_count(); i++) {
+        const entityid id = t->get_cached_door();
+        //const entitytype_t type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
+        //if (type == ENTITY_DOOR) {
+        return id;
+        //}
+        //}
+        //return ENTITYID_INVALID;
     }
 
     inline bool check_hearing(entityid id, vec3 loc) {
@@ -2267,7 +2337,7 @@ public:
         }
 
         // force cache update
-        recompute_entity_cache_at(loc);
+        //recompute_entity_cache_at(loc);
         // add the entity to the new tile
 
 
@@ -2280,7 +2350,7 @@ public:
 
 
         // force cache update
-        recompute_entity_cache_at(aloc);
+        //recompute_entity_cache_at(aloc);
         ct.set<location>(id, aloc);
         const float mx = v.x * DEFAULT_TILE_SIZE;
         const float my = v.y * DEFAULT_TILE_SIZE;
@@ -2433,7 +2503,7 @@ public:
         if (t == nullptr) {
             return INVALID;
         }
-        recompute_entity_cache(t); // Force update
+        //recompute_entity_cache(t); // Force update
         return t->get_cached_live_npc();
     }
 
@@ -2573,7 +2643,7 @@ public:
 
         // we need to remove tgt_id from the floor's living npcs and add it to dead npcs
         shared_ptr<dungeon_floor> df = d.get_current_floor();
-        df->remove_living_npc(tgt_id);
+        //df->remove_living_npc(tgt_id);
         df->add_dead_npc(tgt_id);
 
         // when an npc target is killed, the attacker gains xp
@@ -2764,7 +2834,7 @@ public:
     }
 
     inline entityid tile_get_item(shared_ptr<tile_t> t) {
-        recompute_entity_cache(t);
+        //recompute_entity_cache(t);
         return t->get_cached_item();
     }
 
@@ -2856,7 +2926,7 @@ public:
             return false;
         }
         // force cache update
-        recompute_entity_cache_at(loc);
+        //recompute_entity_cache_at(loc);
         // add the entity to the new tile
 
         auto type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
@@ -2865,7 +2935,7 @@ public:
             return false;
         }
         // force cache update
-        recompute_entity_cache_at(aloc);
+        //recompute_entity_cache_at(aloc);
         ct.set<location>(id, aloc);
         const float mx = v.x * DEFAULT_TILE_SIZE;
         const float my = v.y * DEFAULT_TILE_SIZE;
@@ -3010,18 +3080,30 @@ public:
         }
         shared_ptr<dungeon_floor> df = d.get_current_floor();
         shared_ptr<tile_t> t = df->tile_at(loc);
-        for (size_t i = 0; i < t->get_entity_count(); i++) {
-            const entityid myid = t->get_entity_at(i);
-            const entitytype_t type = ct.get<entitytype>(myid).value_or(ENTITY_NONE);
-            if (type != ENTITY_DOOR) {
-                continue;
-            }
-            optional<bool> maybe_is_open = ct.get<door_open>(myid);
-            massert(maybe_is_open.has_value(), "door %d has no `is_open` component", myid);
-            ct.set<door_open>(myid, !maybe_is_open.value());
+
+
+        entityid door_id = t->get_cached_door();
+        if (door_id != INVALID) {
+            optional<bool> maybe_is_open = ct.get<door_open>(door_id);
+            massert(maybe_is_open.has_value(), "door %d has no `is_open` component", door_id);
+            ct.set<door_open>(door_id, !maybe_is_open.value());
             PlaySound(sfx.at(SFX_CHEST_OPEN));
             return true;
         }
+
+
+        //for (size_t i = 0; i < t->get_entity_count(); i++) {
+        //const entityid myid = t->get_entity_at(i);
+        //const entitytype_t type = ct.get<entitytype>(myid).value_or(ENTITY_NONE);
+        //if (type != ENTITY_DOOR) {
+        //    continue;
+        //}
+        //optional<bool> maybe_is_open = ct.get<door_open>(myid);
+        //massert(maybe_is_open.has_value(), "door %d has no `is_open` component", myid);
+        //ct.set<door_open>(myid, !maybe_is_open.value());
+        //PlaySound(sfx.at(SFX_CHEST_OPEN));
+        //return true;
+        //}
         return false;
     }
 
@@ -3118,13 +3200,13 @@ public:
 
             if (tile_has_door(spell_loc)) {
                 // find the door id
-                entityid doorid = ENTITYID_INVALID;
-                for (auto id : *tile->get_entities()) {
-                    if (ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_DOOR) {
-                        doorid = id;
-                        break;
-                    }
-                }
+                entityid doorid = tile->get_cached_door();
+                //for (auto id : *tile->get_entities()) {
+                //if (ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_DOOR) {
+                //doorid = id;
+                //break;
+                //}
+                //}
                 // mark it 'destroyed'
                 // remove it from the tile
                 if (doorid != ENTITYID_INVALID) {
@@ -3395,6 +3477,9 @@ public:
 
         bzero(debugpanel.buffer, sizeof(debugpanel.buffer));
         // Format the string in one pass
+
+        minfo2("calling snprintf...");
+
         snprintf(
             debugpanel.buffer,
             sizeof(debugpanel.buffer),
@@ -3455,8 +3540,8 @@ public:
             message_count,
             df_w,
             df_h,
-            d.get_current_floor()->get_living_npcs()->size(),
-            d.get_current_floor()->get_dead_npcs()->size(),
+            0L,
+            0L,
             god_mode,
             player_dir);
 
@@ -3765,17 +3850,33 @@ public:
                 flag = GAMESTATE_FLAG_NPC_ANIM;
             }
 #else
-            auto df_npcs = d.get_current_floor()->get_living_npcs();
-            for (entityid id : *df_npcs) {
-                const bool result = handle_npc(id);
-                if (result) {
-                    msuccess2("npc %d handled successfully", entity_turn);
-                }
-                else {
-                    merror2("npc %d handle failed", entity_turn);
+            auto df = d.get_current_floor();
+            //auto df_npcs = df->get_living_npcs();
+
+            for (entityid id = 0; id < next_entityid; id++) {
+                auto type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
+                if (type == ENTITY_NPC) {
+                    const bool result = handle_npc(id);
+                    if (result) {
+                        msuccess2("npc %d handled successfully", entity_turn);
+                    }
+                    else {
+                        merror2("npc %d handle failed", entity_turn);
+                    }
                 }
             }
             flag = GAMESTATE_FLAG_NPC_ANIM;
+
+            //for (entityid id : *df_npcs) {
+            //const bool result = handle_npc(id);
+            //if (result) {
+            //    msuccess2("npc %d handled successfully", entity_turn);
+            //}
+            //else {
+            //    merror2("npc %d handle failed", entity_turn);
+            //}
+            //}
+            //flag = GAMESTATE_FLAG_NPC_ANIM;
 #endif
         }
     }
@@ -3836,6 +3937,7 @@ public:
         if (!update_player_state()) {
             merror3("update player state failed");
         }
+
         update_npcs_state();
         update_spells_state();
         handle_input(is);

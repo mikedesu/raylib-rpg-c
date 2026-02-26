@@ -20,8 +20,7 @@ using std::vector;
 
 
 
-class dungeon
-{
+class dungeon {
 public:
     vector<shared_ptr<dungeon_floor>> floors; // vector of shared pointers to dungeon_floor_t
     int current_floor;
@@ -30,8 +29,7 @@ public:
 
 
 
-    dungeon()
-    {
+    dungeon() {
         current_floor = 0;
         is_locked = false;
         is_initialized = false;
@@ -40,24 +38,21 @@ public:
 
 
 
-    ~dungeon()
-    {
+    ~dungeon() {
         floors.clear();
     }
 
 
 
 
-    const inline size_t get_floor_count()
-    {
+    const inline size_t get_floor_count() {
         return floors.size();
     }
 
 
 
 
-    inline shared_ptr<dungeon_floor> get_floor(const size_t index)
-    {
+    inline shared_ptr<dungeon_floor> get_floor(const size_t index) {
         //minfo2("get_floor: %ld", index);
         massert(index >= 0 && index < floors.size(), "index is OOB: index is %ld", index);
         return floors.at(index);
@@ -66,16 +61,14 @@ public:
 
 
 
-    inline shared_ptr<dungeon_floor> get_current_floor()
-    {
+    inline shared_ptr<dungeon_floor> get_current_floor() {
         return get_floor(current_floor);
     }
 
 
 
 
-    inline shared_ptr<dungeon_floor> create_floor(biome_t type, int width, int height)
-    {
+    inline shared_ptr<dungeon_floor> create_floor(biome_t type, int width, int height) {
         massert(width > 0, "width is 0");
         massert(height > 0, "height is 0");
         massert(!is_locked, "dungeon is locked");
@@ -87,8 +80,7 @@ public:
 
 
 
-    inline void add_floor(shared_ptr<dungeon_floor> df)
-    {
+    inline void add_floor(shared_ptr<dungeon_floor> df) {
         floors.push_back(df);
     }
 };
