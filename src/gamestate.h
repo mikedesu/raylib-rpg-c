@@ -389,10 +389,10 @@ public:
         }
         minfo2("setting rooms");
         for (size_t i = 0; i < rooms.size(); i++) {
-            if (!df->add_room(rooms[i])) {
-                merror("Failed to add room");
-                continue;
-            }
+            //if (!df->add_room(rooms[i])) {
+            //    merror("Failed to add room");
+            //    continue;
+            //}
             df->set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, rooms[i].get_area());
         }
         minfo2("sorting rooms");

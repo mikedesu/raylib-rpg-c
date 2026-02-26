@@ -37,49 +37,48 @@ private:
 
     //shared_ptr<vector<entityid>> living_npcs;
     //shared_ptr<vector<entityid>> dead_npcs;
-    shared_ptr<vector<room>> room_metadatas;
+    //shared_ptr<vector<room>> room_metadatas;
     shared_ptr<unordered_map<tile_id, shared_ptr<tile_t>>> tile_map; // Maps tile_id to tile_t pointer
 
 public:
-    bool room_id_exists(room_id id) {
-        for (auto room : *room_metadatas) {
-            if (room.get_id() == id) {
-                return true;
-            }
-        }
-        return false;
-    }
+    //bool room_id_exists(room_id id) {
+    //    for (auto room : *room_metadatas) {
+    //        if (room.get_id() == id) {
+    //            return true;
+    //        }
+    //    }
+    //    return false;
+    //}
 
-    bool room_area_collides(Rectangle a) {
-        for (auto room : *room_metadatas) {
-            const Rectangle r = room.get_area();
-            if (CheckCollisionRecs(a, r)) {
-                return true;
-            }
-        }
-        return false;
-    }
+    //bool room_area_collides(Rectangle a) {
+    //    for (auto room : *room_metadatas) {
+    //        const Rectangle r = room.get_area();
+    //        if (CheckCollisionRecs(a, r)) {
+    //            return true;
+    //        }
+    //    }
+    //    return false;
+    //}
 
-    bool add_room(room r) {
-        // need to check for existing rooms
-        if (room_id_exists(r.get_id())) {
-            return false;
-        }
-        else if (room_area_collides(r.get_area())) {
-            return false;
-        }
+    //bool add_room(room r) {
+    //    // need to check for existing rooms
+    //    if (room_id_exists(r.get_id())) {
+    //        return false;
+    //    }
+    //    else if (room_area_collides(r.get_area())) {
+    //        return false;
+    //    }
+    //    room_metadatas->push_back(r);
+    //    return true;
+    //}
 
-        room_metadatas->push_back(r);
-        return true;
-    }
+    //room get_room_metadata(size_t i) {
+    //    return room_metadatas->at(i);
+    //}
 
-    room get_room_metadata(size_t i) {
-        return room_metadatas->at(i);
-    }
-
-    shared_ptr<vector<room>> get_room_metadatas() {
-        return room_metadatas;
-    }
+    //shared_ptr<vector<room>> get_room_metadatas() {
+    //    return room_metadatas;
+    //}
 
     //shared_ptr<vector<entityid>> get_dead_npcs() {
     //    return dead_npcs;
