@@ -2291,6 +2291,10 @@ public:
         return dist <= hearing;
     }
 
+
+
+
+
     inline bool try_entity_move(entityid id, vec3 v) {
         massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
         minfo2("entity %d is trying to move: (%d,%d,%d)", id, v.x, v.y, v.z);
@@ -2298,17 +2302,23 @@ public:
         ct.set<update>(id, true);
         // entity location
         massert(ct.has<location>(id), "id %d has no location", id);
+        
         const vec3 loc = ct.get<location>(id).value_or((vec3){-1, -1, -1});
+        
         massert(!vec3_invalid(loc), "id %d location invalid", id);
         // entity's new location
         // we will have a special case for traversing floors so ignore v.z
         const vec3 aloc = {loc.x + v.x, loc.y + v.y, loc.z};
+        
         minfo2("entity %d is trying to move to (%d,%d,%d)", id, aloc.x, aloc.y, aloc.z);
+        
         shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
+        
         if (aloc.x < 0 || aloc.x >= df->get_width() || aloc.y < 0 || aloc.y >= df->get_height()) {
             merror2("destination is invalid: (%d, %d, %d)", aloc.x, aloc.y, aloc.z);
             return false;
         }
+
         shared_ptr<tile_t> tile = df->tile_at(aloc);
         if (!tile_is_walkable(tile->get_type())) {
             if (!(god_mode && id == hero_id)) {
@@ -2335,6 +2345,7 @@ public:
             merror2("live npcs present, cannot move");
             return false;
         }
+
         //else if (tile_has_live_npcs(tile_at_cur_floor(aloc))) {
         //    merror2("live npcs present, cannot move");
         //    return false;
@@ -2387,6 +2398,11 @@ public:
         msuccess2("npc %d moved to (%d,%d,%d)", id, aloc.x, aloc.y, aloc.z);
         return true;
     }
+
+
+
+
+
 
     inline bool handle_move_up(const inputstate& is, bool is_dead) {
         //if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W) || inputstate_is_pressed(is, KEY_KP_8)) {

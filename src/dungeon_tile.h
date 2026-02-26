@@ -273,8 +273,8 @@ public:
         //massert(entities, "tile or tile entities is NULL");
         massert(id != ENTITYID_INVALID, "tile_remove: id is invalid");
 
-        dirty_entities = true;
-        tile_reset_cache();
+        //dirty_entities = true;
+        //tile_reset_cache();
 
         if (id == cached_live_npc) {
             cached_live_npc = INVALID;

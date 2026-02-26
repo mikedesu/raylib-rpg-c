@@ -451,12 +451,16 @@ public:
         massert(id != ENTITYID_INVALID, "id is -1");
         massert(l.x >= 0 && l.x < width, "x is out of bounds");
         massert(l.y >= 0 && l.y < height, "y is out of bounds");
+        
         shared_ptr<tile_t> tile = tile_at(l);
+        
         const entityid r = tile->tile_remove(id);
+        
         if (r == ENTITYID_INVALID) {
             merror("df_remove_at: Failed to remove entity %d at (%d, %d)", id, l.x, l.y);
             return false;
         }
+
         if (r != id) {
             merror("df_remove_at: Removed entity %d but expected to remove %d at (%d, %d)", r, id, l.x, l.y);
             return false;
