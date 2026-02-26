@@ -352,9 +352,16 @@ public:
         return id;
     }
 
-    inline shared_ptr<tile_t> tile_at_cur_floor(vec3 loc) {
+
+
+
+    //inline shared_ptr<tile_t> tile_at_cur_floor(vec3 loc) {
+    inline tile_t& tile_at_cur_floor(vec3 loc) {
         return d.get_current_floor()->tile_at(loc);
     }
+
+
+
 
     //inline void create_and_add_df_0(biome_t type, int df_count, int w, int h, float parts) {
     inline void create_and_add_df_0(biome_t type, int df_count, float parts) {
@@ -417,11 +424,18 @@ public:
                     const float rw = rjx_e - rx_e;
                     Rectangle c0 = {rxf_e, riy, rw, 1};
                     df->set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, c0);
-                    shared_ptr<tile_t> first_tile = df->tile_at(vec3{rx_e, ry, -1});
-                    first_tile->set_can_have_door(true);
+                    
+                    //shared_ptr<tile_t> first_tile = df->tile_at(vec3{rx_e, ry, -1});
+                    tile_t& first_tile = df->tile_at(vec3{rx_e, ry, -1});
+
+                    //first_tile->set_can_have_door(true);
+                    first_tile.set_can_have_door(true);
                     const int rw_i = rw;
-                    shared_ptr<tile_t> last_tile = df->tile_at(vec3{rx_e + rw_i - 1, ry, -1});
-                    last_tile->set_can_have_door(true);
+
+                    //shared_ptr<tile_t> last_tile = df->tile_at(vec3{rx_e + rw_i - 1, ry, -1});
+                    tile_t& last_tile = df->tile_at(vec3{rx_e + rw_i - 1, ry, -1});
+                    //last_tile->set_can_have_door(true);
+                    last_tile.set_can_have_door(true);
                 }
                 if (y < parts - 1) {
                     const size_t index2 = (y + 1) * parts + x;
@@ -432,8 +446,10 @@ public:
                     const float rh = rjy_e - ry_e;
                     Rectangle c0 = {rix, ryf_e, 1, rh};
                     df->set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, c0);
-                    shared_ptr<tile_t> first_tile = df->tile_at(vec3{rx, ry_e, -1});
-                    first_tile->set_can_have_door(true);
+                    //shared_ptr<tile_t> first_tile = df->tile_at(vec3{rx, ry_e, -1});
+                    tile_t& first_tile = df->tile_at(vec3{rx, ry_e, -1});
+                    //first_tile->set_can_have_door(true);
+                    first_tile.set_can_have_door(true);
                 }
             }
         }
@@ -628,8 +644,10 @@ public:
 
     inline entityid create_door_at_with(const vec3 loc, with_fun doorInitFunction) {
         shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
-        shared_ptr<tile_t> tile = df->tile_at(loc);
-        if (!tile_is_walkable(tile->get_type())) {
+        //shared_ptr<tile_t> tile = df->tile_at(loc);
+        tile_t& tile = df->tile_at(loc);
+        //if (!tile_is_walkable(tile->get_type())) {
+        if (!tile_is_walkable(tile.get_type())) {
             return INVALID;
         }
         const entityid id = create_door_with(doorInitFunction);
@@ -659,8 +677,10 @@ public:
             for (int x = 0; x < df->get_width(); x++) {
                 for (int y = 0; y < df->get_height(); y++) {
                     const vec3 loc = {x, y, static_cast<int>(z)};
-                    shared_ptr<tile_t> tile = df->tile_at(loc);
-                    if (!tile->get_can_have_door()) {
+                    //shared_ptr<tile_t> tile = df->tile_at(loc);
+                    tile_t& tile = df->tile_at(loc);
+                    //if (!tile->get_can_have_door()) {
+                    if (!tile.get_can_have_door()) {
                         continue;
                     }
                     const entityid door_id = create_door_at_with(loc, [](CT& ct, const entityid id) {});
@@ -719,14 +739,18 @@ public:
             for (int x = 0; x < df->get_width(); x++) {
                 for (int y = 0; y < df->get_height(); y++) {
                     const vec3 loc = {x, y, z};
-                    shared_ptr<tile_t> t = df->tile_at(loc);
-                    if (t->get_type() == TILE_UPSTAIRS || t->get_type() == TILE_DOWNSTAIRS) {
+                    //shared_ptr<tile_t> t = df->tile_at(loc);
+                    tile_t& t = df->tile_at(loc);
+                    //if (t->get_type() == TILE_UPSTAIRS || t->get_type() == TILE_DOWNSTAIRS) {
+                    if (t.get_type() == TILE_UPSTAIRS || t.get_type() == TILE_DOWNSTAIRS) {
                         continue;
                     }
-                    if (t->get_can_have_door()) {
+                    //if (t->get_can_have_door()) {
+                    if (t.get_can_have_door()) {
                         continue;
                     }
-                    if (t->tile_is_wall()) {
+                    //if (t->tile_is_wall()) {
+                    if (t.tile_is_wall()) {
                         uniform_int_distribution<int> gen(0, 20);
                         const int flip = gen(mt);
                         if (flip == 0) {
@@ -893,8 +917,10 @@ public:
             return INVALID;
         }
         shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
-        shared_ptr<tile_t> tile = df->tile_at(loc);
-        if (!tile_is_walkable(tile->get_type())) {
+        //shared_ptr<tile_t> tile = df->tile_at(loc);
+        tile_t& tile = df->tile_at(loc);
+        //if (!tile_is_walkable(tile->get_type())) {
+        if (!tile_is_walkable(tile.get_type())) {
             merror2("cannot create entity on non-walkable tile");
             return INVALID;
         }
@@ -962,8 +988,10 @@ public:
 
     inline entityid create_potion_at_with(const vec3 loc, with_fun potionInitFunction) {
         shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
-        shared_ptr<tile_t> tile = df->tile_at(loc);
-        if (!tile_is_walkable(tile->get_type())) {
+        //shared_ptr<tile_t> tile = df->tile_at(loc);
+        tile_t& tile = df->tile_at(loc);
+        //if (!tile_is_walkable(tile->get_type())) {
+        if (!tile_is_walkable(tile.get_type())) {
             return INVALID;
         }
 
@@ -1108,7 +1136,7 @@ public:
         massert(z >= 0, "floor is out of bounds");
         massert((size_t)z < d.floors.size(), "floor is out of bounds");
         auto df = d.get_floor(z);
-        auto t = df->tile_at((vec3){x, y, z});
+        tile_t& t = df->tile_at((vec3){x, y, z});
         //for (int i = 0; (size_t)i < t->get_entity_count(); i++) {
         //const entityid id = t->tile_get_entity(i);
         //const entitytype_t type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
@@ -1116,7 +1144,8 @@ public:
         //    return id;
         //}
         //}
-        return t->get_cached_box();
+        //return t->get_cached_box();
+        return t.get_cached_box();
     }
 
 
@@ -1127,7 +1156,8 @@ public:
         massert(z >= 0, "floor is out of bounds");
         massert((size_t)z < d.floors.size(), "floor is out of bounds");
         shared_ptr<dungeon_floor> df = d.get_floor(z);
-        shared_ptr<tile_t> t = df->tile_at(vec3{x, y, z});
+        //shared_ptr<tile_t> t = df->tile_at(vec3{x, y, z});
+        tile_t& t = df->tile_at(vec3{x, y, z});
 
         //for (size_t i = 0; i < t->get_entity_count(); i++) {
         //    const entityid id = t->tile_get_entity(i);
@@ -1138,7 +1168,7 @@ public:
         //}
 
 
-        entityid box_id = t->get_cached_box();
+        entityid box_id = t.get_cached_box();
         if (box_id != INVALID) {
             const bool is_pullable = ct.get<pullable>(box_id).value_or(false);
             if (is_pullable) {
@@ -1156,8 +1186,8 @@ public:
     inline entityid create_npc_at_with(race_t rt, vec3 loc, with_fun npcInitFunction) {
         minfo2("create npc at with: (%d, %d, %d)", loc.x, loc.y, loc.z);
         auto df = d.get_floor(loc.z);
-        auto tile = df->tile_at(loc);
-        if (!tile_is_walkable(tile->get_type())) {
+        tile_t& tile = df->tile_at(loc);
+        if (!tile_is_walkable(tile.get_type())) {
             merror2("cannot create entity on non-walkable tile: tile.type: %s", tiletype2str(tile->get_type()).c_str());
             return INVALID;
         }
@@ -1217,8 +1247,8 @@ public:
             return ENTITYID_INVALID;
         }
         auto df = d.get_floor(loc.z);
-        auto t = df->tile_at(loc);
-        if (!tile_is_walkable(t->get_type())) {
+        tile_t& t = df->tile_at(loc);
+        if (!tile_is_walkable(t.get_type())) {
             return ENTITYID_INVALID;
         }
         //if (tile_has_live_npcs(t)) {
@@ -1261,24 +1291,32 @@ public:
         msg_history.push_back(s);
     }
 
-    inline void update_tile(shared_ptr<tile_t> tile) {
-        tile->set_explored(true);
-        tile->set_visible(true);
+
+
+
+    //inline void update_tile(shared_ptr<tile_t> tile) {
+    inline void update_tile(tile_t& tile) {
+        tile.set_explored(true);
+        tile.set_visible(true);
     }
+
+
+
 
     inline bool path_blocked(vec3 a, vec3 b) {
         vector<vec3> path = calculate_path_with_thickness(a, b);
         auto df = d.get_current_floor();
         for (auto loc : path) {
-            auto t = df->tile_at(loc);
-            if (tiletype_is_none(t->get_type())) {
+            tile_t& t = df->tile_at(loc);
+            if (tiletype_is_none(t.get_type())) {
                 return true;
             }
-            else if (tiletype_is_wall(t->get_type())) {
+            //else if (tiletype_is_wall(t->get_type())) {
+            else if (tiletype_is_wall(t.get_type())) {
                 return true;
             }
             // also need to check for a door or other blockades
-            entityid door_id = t->get_cached_door();
+            entityid door_id = t.get_cached_door();
             if (door_id != INVALID) {
                 const bool door_is_open = ct.get<door_open>(door_id).value_or(false);
                 if (!door_is_open) {
@@ -1341,7 +1379,7 @@ public:
                 if (blocked) {
                     continue;
                 }
-                auto t = df->tile_at(loc);
+                tile_t& t = df->tile_at(loc);
                 update_tile(t);
             }
         }
@@ -1592,9 +1630,9 @@ public:
         ct.set<entitytype>(id, ENTITY_PLAYER);
 
         auto df = d.get_current_floor();
-        auto tile = df->tile_at(loc);
-        tile->set_cached_player_present(true);
-        tile->set_cached_live_npc(id);
+        tile_t& tile = df->tile_at(loc);
+        tile.set_cached_player_present(true);
+        tile.set_cached_live_npc(id);
 
 
 
@@ -1626,8 +1664,10 @@ public:
 
     inline entityid create_box_at_with(vec3 loc) {
         shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
-        shared_ptr<tile_t> tile = df->tile_at(loc);
-        if (!tile_is_walkable(tile->get_type())) {
+        //shared_ptr<tile_t> tile = df->tile_at(loc);
+        tile_t& tile = df->tile_at(loc);
+        //if (!tile_is_walkable(tile->get_type())) {
+        if (!tile_is_walkable(tile.get_type())) {
             merror("cannot create entity on non-walkable tile");
             return ENTITYID_INVALID;
         }
@@ -1659,7 +1699,8 @@ public:
     inline entityid create_spell_at_with(vec3 loc) {
         auto df = d.get_floor(loc.z);
         auto tile = df->tile_at(loc);
-        if (!tile_is_walkable(tile->get_type())) {
+        //if (!tile_is_walkable(tile->get_type())) {
+        if (!tile_is_walkable(tile.get_type())) {
             return ENTITYID_INVALID;
         }
         const entityid id = create_spell_with();
@@ -2203,28 +2244,35 @@ public:
         massert(z >= 0, "floor is out of bounds");
         massert((size_t)z < d.floors.size(), "floor is out of bounds");
         shared_ptr<dungeon_floor> df = d.get_floor(z);
-        shared_ptr<tile_t> t = df->tile_at(vec3{x, y, z});
+        //shared_ptr<tile_t> t = df->tile_at(vec3{x, y, z});
+        tile_t& t = df->tile_at(vec3{x, y, z});
 
         //for (int i = 0; (size_t)i < t->get_entity_count(); i++) {
-        entityid id = t->get_cached_live_npc();
+        //entityid id = t->get_cached_live_npc();
+        entityid id = t.get_cached_live_npc();
         bool is_solid = ct.get<solid>(id).value_or(false);
         if (id != ENTITYID_INVALID && is_solid) {
             return true;
         }
 
-        id = t->get_cached_box();
+
+
+        id = t.get_cached_box();
         is_solid = ct.get<solid>(id).value_or(false);
         if (id != ENTITYID_INVALID && is_solid) {
             return true;
         }
 
-        id = t->get_cached_door();
+
+
+
+        id = t.get_cached_door();
         is_solid = ct.get<solid>(id).value_or(false);
         if (id != ENTITYID_INVALID && is_solid) {
             return true;
         }
 
-        id = t->get_cached_item();
+        id = t.get_cached_item();
         is_solid = ct.get<solid>(id).value_or(false);
         if (id != ENTITYID_INVALID && is_solid) {
             return true;
@@ -2246,10 +2294,12 @@ public:
         massert(z >= 0, "floor is out of bounds");
         massert((size_t)z < d.floors.size(), "floor is out of bounds");
         shared_ptr<dungeon_floor> df = d.get_floor(z);
-        shared_ptr<tile_t> t = df->tile_at(vec3{x, y, z});
+        //shared_ptr<tile_t> t = df->tile_at(vec3{x, y, z});
+        tile_t& t = df->tile_at(vec3{x, y, z});
 
         //for (int i = 0; (size_t)i < t->get_entity_count(); i++) {
-        const entityid id = t->get_cached_box();
+        //const entityid id = t->get_cached_box();
+        const entityid id = t.get_cached_box();
         const bool is_pushable = ct.get<pushable>(id).value_or(false);
         if (id != ENTITYID_INVALID && is_pushable) {
             return id;
@@ -2261,9 +2311,11 @@ public:
 
     inline entityid tile_has_door(vec3 v) {
         shared_ptr<dungeon_floor> df = d.get_current_floor();
-        shared_ptr<tile_t> t = df->tile_at(v);
+        //shared_ptr<tile_t> t = df->tile_at(v);
+        tile_t& t = df->tile_at(v);
         //for (size_t i = 0; i < t->get_entity_count(); i++) {
-        const entityid id = t->get_cached_door();
+        //const entityid id = t->get_cached_door();
+        const entityid id = t.get_cached_door();
         //const entitytype_t type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
         //if (type == ENTITY_DOOR) {
         return id;
@@ -2324,8 +2376,10 @@ public:
             return false;
         }
 
-        shared_ptr<tile_t> tile = df->tile_at(aloc);
-        if (!tile_is_walkable(tile->get_type())) {
+        //shared_ptr<tile_t> tile = df->tile_at(aloc);
+        tile_t& tile = df->tile_at(aloc);
+        //if (!tile_is_walkable(tile->get_type())) {
+        if (!tile_is_walkable(tile.get_type())) {
             if (!(god_mode && id == hero_id)) {
                 merror2("tile is not walkable");
                 return false;
@@ -2346,7 +2400,8 @@ public:
             merror2("solid present, cannot move");
             return false;
         }
-        else if (get_cached_live_npc(tile) != INVALID) {
+        //else if (get_cached_live_npc(tile) != INVALID) {
+        else if (tile.get_cached_live_npc() != INVALID) {
             merror2("live npcs present, cannot move");
             return false;
         }
@@ -2716,12 +2771,13 @@ public:
 
 
 
-    inline attack_result_t process_attack_entity(shared_ptr<tile_t> tile, entityid attacker_id, entityid target_id) {
+    //inline attack_result_t process_attack_entity(shared_ptr<tile_t> tile, entityid attacker_id, entityid target_id) {
+    inline attack_result_t process_attack_entity(tile_t& tile, entityid attacker_id, entityid target_id) {
         massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
 
-        if (tile == nullptr) {
-            return ATTACK_RESULT_MISS;
-        }
+        //if (tile == nullptr) {
+        //    return ATTACK_RESULT_MISS;
+        //}
 
         if (target_id == INVALID) {
             return ATTACK_RESULT_MISS;
@@ -2835,7 +2891,8 @@ public:
 
         const vec3 loc = ct.get<location>(id).value();
         shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
-        shared_ptr<tile_t> tile = df->tile_at(vec3{x, y, loc.z});
+        //shared_ptr<tile_t> tile = df->tile_at(vec3{x, y, loc.z});
+        tile_t& tile = df->tile_at(vec3{x, y, loc.z});
 
         // Calculate direction based on target position
         const int dx = x - loc.x;
@@ -2845,7 +2902,8 @@ public:
         ct.set<attacking>(id, true);
         ct.set<update>(id, true);
 
-        const entityid npc_id = get_cached_live_npc(tile);
+        //const entityid npc_id = get_cached_live_npc(tile);
+        const entityid npc_id = tile.get_cached_live_npc();
         const attack_result_t result = process_attack_entity(tile, id, npc_id);
 
         // did the hero hear this event?
@@ -2908,12 +2966,15 @@ public:
         vec3 aloc = {loc.x + v.x, loc.y + v.y, loc.z};
         vec3 fv = get_loc_from_dir(facing_d);
         vec3 bloc = {loc.x + fv.x, loc.y + fv.y, loc.z};
-        auto tile_dest = df->tile_at(aloc);
+        
+        tile_t& tile_dest = df->tile_at(aloc);
         if (aloc.x < 0 || aloc.x >= df->get_width() || aloc.y < 0 || aloc.y >= df->get_height()) {
             merror2("destination is invalid: (%d, %d, %d)", aloc.x, aloc.y, aloc.z);
             return false;
         }
-        if (!tile_is_walkable(tile_dest->get_type())) {
+
+        //if (!tile_is_walkable(tile_dest->get_type())) {
+        if (!tile_is_walkable(tile_dest.get_type())) {
             //if (!(god_mode && id == hero_id)) {
             merror2("tile is not walkable");
             return false;
@@ -2929,7 +2990,8 @@ public:
             merror2("solid present, cannot move");
             return false;
         }
-        else if (get_cached_live_npc(tile_dest)) {
+        //else if (get_cached_live_npc(tile_dest)) {
+        else if (tile_dest.get_cached_live_npc()) {
             merror2("live npcs present, cannot move");
             return false;
         }
@@ -2939,7 +3001,8 @@ public:
         //    merror2("live npcs present, cannot move");
         //    return false;
         //}
-        else if (tile_has_player(tile_at_cur_floor(aloc))) {
+        //else if (tile_has_player(tile_at_cur_floor(aloc))) {
+        else if (tile_at_cur_floor(aloc).get_cached_player_present()) {
             merror2("player present, cannot move");
             return false;
         }
@@ -3016,12 +3079,15 @@ public:
         }
         const vec3 loc = maybe_loc.value();
         shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
-        shared_ptr<tile_t> tile = df->tile_at(loc);
+        //shared_ptr<tile_t> tile = df->tile_at(loc);
+        tile_t& tile = df->tile_at(loc);
         bool item_picked_up = false;
         // lets try using our new cached_item via tile_get_item
-        const entityid item_id = tile_get_item(tile);
+        //const entityid item_id = tile_get_item(tile);
+        const entityid item_id = tile.get_cached_item();
         if (item_id != ENTITYID_INVALID && add_to_inventory(id, item_id)) {
-            tile->tile_remove(item_id);
+            //tile->tile_remove(item_id);
+            tile.tile_remove(item_id);
             PlaySound(sfx[SFX_CONFIRM_01]);
             item_picked_up = true;
             const string item_name = ct.get<name>(item_id).value_or("no-name-item");
@@ -3057,9 +3123,11 @@ public:
         // first, we prob want to get the tile at this location
         const int current_floor = d.current_floor;
         shared_ptr<dungeon_floor> df = d.floors[current_floor];
-        shared_ptr<tile_t> t = df->tile_at(loc);
+        //shared_ptr<tile_t> t = df->tile_at(loc);
+        tile_t& t = df->tile_at(loc);
         // check the tile type
-        if (t->get_type() == TILE_UPSTAIRS) {
+        //if (t->get_type() == TILE_UPSTAIRS) {
+        if (t.get_type() == TILE_UPSTAIRS) {
             // can't go up on the top floor
             // otherwise...
             if (current_floor == 0) {
@@ -3080,7 +3148,8 @@ public:
                 return true;
             }
         }
-        else if (t->get_type() == TILE_DOWNSTAIRS) {
+        //else if (t->get_type() == TILE_DOWNSTAIRS) {
+        else if (t.get_type() == TILE_DOWNSTAIRS) {
             // can't go down on the bottom floor
             // otherwise...
             if ((size_t)current_floor < d.floors.size() - 1) {
@@ -3123,10 +3192,12 @@ public:
             return false;
         }
         shared_ptr<dungeon_floor> df = d.get_current_floor();
-        shared_ptr<tile_t> t = df->tile_at(loc);
+        //shared_ptr<tile_t> t = df->tile_at(loc);
+        tile_t& t = df->tile_at(loc);
 
 
-        entityid door_id = t->get_cached_door();
+        //entityid door_id = t->get_cached_door();
+        entityid door_id = t.get_cached_door();
         if (door_id != INVALID) {
             optional<bool> maybe_is_open = ct.get<door_open>(door_id);
             massert(maybe_is_open.has_value(), "door %d has no `is_open` component", door_id);
@@ -3173,7 +3244,8 @@ public:
         const vec3 loc = maybe_loc.value();
         shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
         const vec3 spell_loc = {tgt_x, tgt_y, loc.z};
-        shared_ptr<tile_t> tile = df->tile_at(spell_loc);
+        //shared_ptr<tile_t> tile = df->tile_at(spell_loc);
+        tile_t& tile = df->tile_at(spell_loc);
         // Calculate direction based on target position
         bool ok = false;
         const int dx = tgt_x - loc.x;
@@ -3244,7 +3316,8 @@ public:
 
             if (tile_has_door(spell_loc)) {
                 // find the door id
-                entityid doorid = tile->get_cached_door();
+                //entityid doorid = tile->get_cached_door();
+                entityid doorid = tile.get_cached_door();
                 //for (auto id : *tile->get_entities()) {
                 //if (ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_DOOR) {
                 //doorid = id;
@@ -3694,8 +3767,9 @@ public:
                 }
 
                 // Tile check
-                shared_ptr<tile_t> tile = df->tile_at(neighbor);
-                if (!tile_is_walkable(tile->get_type()) || tile_has_pushable(neighbor.x, neighbor.y, neighbor.z) != ENTITYID_INVALID) {
+                //shared_ptr<tile_t> tile = df->tile_at(neighbor);
+                tile_t& tile = df->tile_at(neighbor);
+                if (!tile_is_walkable(tile.get_type()) || tile_has_pushable(neighbor.x, neighbor.y, neighbor.z) != ENTITYID_INVALID) {
                     continue;
                 }
 

@@ -54,22 +54,22 @@ static inline bool is_loc_path_blocked(gamestate& g, shared_ptr<dungeon_floor> d
             continue;
         }
 
-        auto v0_tile = df->tile_at(v0);
-        auto v0_tiletype = v0_tile->get_type();
+        tile_t& v0_tile = df->tile_at(v0);
+        auto v0_tiletype = v0_tile.get_type();
 
         if (tiletype_is_none(v0_tiletype) || tiletype_is_wall(v0_tiletype)) {
             blocked = true;
             break;
         }
 
-        if (v0_tile->entity_count() == 0) {
+        if (v0_tile.entity_count() == 0) {
             continue;
         }
 
 
 
         // check if tile has a DOOR
-        entityid door_id = v0_tile->get_cached_door();
+        entityid door_id = v0_tile.get_cached_door();
         if (door_id != INVALID) {
             auto is_open = g.ct.get<door_open>(door_id).value_or(false);
             if (!is_open) {
@@ -78,13 +78,13 @@ static inline bool is_loc_path_blocked(gamestate& g, shared_ptr<dungeon_floor> d
             }
         }
 
-        entityid box_id = v0_tile->get_cached_box();
+        entityid box_id = v0_tile.get_cached_box();
         if (box_id != INVALID) {
             blocked = true;
             break;
         }
 
-        entityid npc_id = v0_tile->get_cached_live_npc();
+        entityid npc_id = v0_tile.get_cached_live_npc();
         if (npc_id != INVALID) {
             massert(g.ct.has<dead>(npc_id), "id %d doesn't have a dead component", npc_id);
             const bool is_dead = g.ct.get<dead>(npc_id).value();
@@ -175,16 +175,16 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, int x, int y, int z) {
 
     massert(!vec3_invalid(loc), "loc is invalid");
 
-    auto tile = df->tile_at(vec3{x, y, z});
+    tile_t& tile = df->tile_at(vec3{x, y, z});
 
-    massert(tile, "tile is NULL");
+    //massert(tile, "tile is NULL");
 
-    if (tile->get_type() == TILE_NONE || !tile->get_visible() || !tile->get_explored()) {
+    if (tile.get_type() == TILE_NONE || !tile.get_visible() || !tile.get_explored()) {
         return true;
     }
 
     // Get tile texture
-    const int txkey = get_txkey_for_tiletype(tile->get_type());
+    const int txkey = get_txkey_for_tiletype(tile.get_type());
     massert(txkey >= 0, "txkey is invalid");
 
     Texture2D* texture = &txinfo[txkey].texture;
@@ -243,8 +243,8 @@ draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type_0, int vision_dist
         for (int x = 0; x < df_w; x++) {
             //const int x = i - (y * df_w);
             const vec3 loc = {x, y, g.d.current_floor};
-            auto tile = df->tile_at(loc);
-            auto tiletype = tile->get_type();
+            tile_t& tile = df->tile_at(loc);
+            auto tiletype = tile.get_type();
             if (tiletype_is_none(tiletype) || tiletype_is_wall(tiletype)) {
                 continue;
             }
@@ -268,7 +268,7 @@ draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type_0, int vision_dist
             // manage individual integer values for the ids,
             // we will have to call a new method...
             //if (tile->get_entities()->size() == 0) {
-            if (tile->entity_count() == 0) {
+            if (tile.entity_count() == 0) {
                 continue;
                 //break;
             }
@@ -298,30 +298,30 @@ draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type_0, int vision_dist
 
             // now, since we have these 'cached' values on the tile...
 
-            entityid npc_id = tile->get_cached_live_npc();
+            entityid npc_id = tile.get_cached_live_npc();
             if (type_0 == ENTITY_NPC && npc_id != INVALID && extra_check(g, npc_id)) {
                 draw_sprite_and_shadow(g, npc_id);
             }
             
 
 
-            bool player_present = tile->get_cached_player_present();
+            bool player_present = tile.get_cached_player_present();
             if (type_0 == ENTITY_PLAYER && player_present && extra_check(g, g.hero_id)) {
                 draw_sprite_and_shadow(g, g.hero_id);
             }
 
 
-            entityid box_id = tile->get_cached_box();
+            entityid box_id = tile.get_cached_box();
             if (type_0 == ENTITY_BOX && box_id != INVALID && extra_check(g, box_id)) {
                 draw_sprite_and_shadow(g, box_id);
             }
 
-            entityid item_id = tile->get_cached_item();
+            entityid item_id = tile.get_cached_item();
             if (type_0 == ENTITY_ITEM && item_id != INVALID && extra_check(g, item_id)) {
                 draw_sprite_and_shadow(g, item_id);
             }
 
-            entityid door_id = tile->get_cached_door();
+            entityid door_id = tile.get_cached_door();
             if (type_0 == ENTITY_DOOR && door_id != INVALID && extra_check(g, door_id)) {
                 draw_sprite_and_shadow(g, door_id);
             }

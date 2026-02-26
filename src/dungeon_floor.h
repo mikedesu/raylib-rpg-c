@@ -33,12 +33,12 @@ private:
     vec3 downstairs_loc;
     vec3 upstairs_loc;
 
-    vector<tile_id> tiles;
+    //vector<tile_id> tiles;
 
     //shared_ptr<vector<entityid>> living_npcs;
     //shared_ptr<vector<entityid>> dead_npcs;
     //shared_ptr<vector<room>> room_metadatas;
-    shared_ptr<unordered_map<tile_id, shared_ptr<tile_t>>> tile_map; // Maps tile_id to tile_t pointer
+    //shared_ptr<unordered_map<tile_id, shared_ptr<tile_t>>> tile_map; // Maps tile_id to tile_t pointer
 
     tile_t grid[64][64];
 
@@ -146,52 +146,56 @@ public:
         return floor;
     }
 
-    inline shared_ptr<tile_t> tile_at(vec3 loc) {
+    //inline shared_ptr<tile_t> tile_at(vec3 loc) {
+    inline tile_t& tile_at(vec3 loc) {
         // given that tiles is a 2D vector of shared pointers to tile_t
         // we can access the tile using the x and y coordinates
         // and calculate the index
-        const size_t index = loc.y * width + loc.x;
+        //const size_t index = loc.y * width + loc.x;
         minfo3("tile_at: (%d, %d, %d)", loc.x, loc.y, loc.z);
 
         //massert(index < tiles.size(), "index is out-of-bounds: %d, %d", loc.x, loc.y);
+        //if (index >= tiles.size()) {
+        //    merror("index is out-of-bounds: %d, %d", loc.x, loc.y);
+        //    return nullptr;
+        //}
 
-
-        if (index >= tiles.size()) {
-            merror("index is out-of-bounds: %d, %d", loc.x, loc.y);
-            return nullptr;
-        }
-
-        const tile_id id = tiles[index];
+        //const tile_id id = tiles[index];
         // Check if the tile_id exists in the map
-        auto it = tile_map->find(id);
-        return it->second;
+        //auto it = tile_map->find(id);
+        //return it->second;
+    
+        return grid[loc.y][loc.x];
     }
 
     inline void df_set_can_have_door(const vec3 loc) {
         //minfo("set can have door: %d, %d, %d", loc.x, loc.y, loc.z);
-        shared_ptr<tile_t> tile = tile_at(loc);
-        tile->set_can_have_door(true);
+        //shared_ptr<tile_t> tile = tile_at(loc);
+        tile_t& tile = tile_at(loc);
+
+
+        tile.set_can_have_door(true);
     }
 
     inline bool df_is_good_door_loc(vec3 loc) {
         auto tile = tile_at(loc);
         if (loc.x >= 1 && loc.y >= 1 && loc.x < width - 1 && loc.y < height - 1) {
-            auto t0 = tile_at((vec3){loc.x - 1, loc.y - 1, loc.z});
-            auto t1 = tile_at((vec3){loc.x - 1, loc.y, loc.z});
-            auto t2 = tile_at((vec3){loc.x - 1, loc.y + 1, loc.z});
-            auto t3 = tile_at((vec3){loc.x, loc.y - 1, loc.z});
-            auto t4 = tile_at((vec3){loc.x, loc.y + 1, loc.z});
-            auto t5 = tile_at((vec3){loc.x + 1, loc.y - 1, loc.z});
-            auto t6 = tile_at((vec3){loc.x + 1, loc.y, loc.z});
-            auto t7 = tile_at((vec3){loc.x + 1, loc.y + 1, loc.z});
-            auto tw0 = t0->tile_is_wall();
-            auto tw1 = t1->tile_is_wall();
-            auto tw2 = t2->tile_is_wall();
-            auto tw3 = t3->tile_is_wall();
-            auto tw4 = t4->tile_is_wall();
-            auto tw5 = t5->tile_is_wall();
-            auto tw6 = t6->tile_is_wall();
-            auto tw7 = t7->tile_is_wall();
+            tile_t& t0 = tile_at((vec3){loc.x - 1, loc.y - 1, loc.z});
+            tile_t& t1 = tile_at((vec3){loc.x - 1, loc.y, loc.z});
+            tile_t& t2 = tile_at((vec3){loc.x - 1, loc.y + 1, loc.z});
+            tile_t& t3 = tile_at((vec3){loc.x, loc.y - 1, loc.z});
+            tile_t& t4 = tile_at((vec3){loc.x, loc.y + 1, loc.z});
+            tile_t& t5 = tile_at((vec3){loc.x + 1, loc.y - 1, loc.z});
+            tile_t& t6 = tile_at((vec3){loc.x + 1, loc.y, loc.z});
+            tile_t& t7 = tile_at((vec3){loc.x + 1, loc.y + 1, loc.z});
+            auto tw0 = t0.tile_is_wall();
+            auto tw1 = t1.tile_is_wall();
+            auto tw2 = t2.tile_is_wall();
+            auto tw3 = t3.tile_is_wall();
+            auto tw4 = t4.tile_is_wall();
+            auto tw5 = t5.tile_is_wall();
+            auto tw6 = t6.tile_is_wall();
+            auto tw7 = t7.tile_is_wall();
             if (tw3 && tw4 && !(tw0 || tw1 || tw2 || tw5 || tw6 || tw7)) {
                 return true;
             }
@@ -220,12 +224,12 @@ public:
              247
              */
 
-            auto top_row_none = t0->get_type() == TILE_NONE && t3->get_type() == TILE_NONE && t5->get_type() == TILE_NONE;
+            auto top_row_none = t0.get_type() == TILE_NONE && t3.get_type() == TILE_NONE && t5.get_type() == TILE_NONE;
 
-            auto bottom_row_none = t2->get_type() == TILE_NONE && t4->get_type() == TILE_NONE && t7->get_type() == TILE_NONE;
+            auto bottom_row_none = t2.get_type() == TILE_NONE && t4.get_type() == TILE_NONE && t7.get_type() == TILE_NONE;
 
-            auto left_not_none = t1->get_type() != TILE_NONE;
-            auto right_not_none = t6->get_type() != TILE_NONE;
+            auto left_not_none = t1.get_type() != TILE_NONE;
+            auto right_not_none = t6.get_type() != TILE_NONE;
 
             auto case1 = top_row_none && bottom_row_none && left_not_none && right_not_none;
 
@@ -237,8 +241,9 @@ public:
     }
 
     inline void df_set_tile(const tiletype_t type, const int x, const int y) {
-        shared_ptr<tile_t> current = tile_at((vec3){x, y, -1});
-        current->set_type(type);
+        //shared_ptr<tile_t> current = tile_at((vec3){x, y, -1});
+        tile_t&  current = tile_at((vec3){x, y, -1});
+        current.set_type(type);
         //current.tile_init(type);
     }
 
@@ -287,15 +292,29 @@ public:
         height = 64;
         biome = t;
         // alloc the tile map
-        tile_map = make_shared<unordered_map<tile_id, shared_ptr<tile_t>>>();
-        massert(tile_map, "failed to create tile map");
+        //tile_map = make_shared<unordered_map<tile_id, shared_ptr<tile_t>>>();
+        //massert(tile_map, "failed to create tile map");
         // create all the tiles and add to the tile vector and tile map
-        for (tile_id i = 0; i < width * height; i++) {
-            minfo2("Begin loop %d", i);
-            tiles.push_back(i);
-            shared_ptr<tile_t> tile = make_shared<tile_t>(TILE_NONE, i);
-            tile_map->insert({i, tile});
+        //for (tile_id i = 0; i < width * height; i++) {
+            //minfo2("Begin loop %d", i);
+            //tiles.push_back(i);
+            //shared_ptr<tile_t> tile = make_shared<tile_t>(TILE_NONE, i);
+            //tile_map->insert({i, tile});
+        //}
+
+
+        for (int i = 0; i < 64; i++) {
+            for (int j = 0; j < 64; j++) {
+                //grid[i][j] = tile_t(TILE_NONE, i);
+                grid[i][j].set_type(TILE_NONE);
+                grid[i][j].set_id(i*64+j);
+            }
         }
+
+
+
+
+
         //df_set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_00, (Rectangle){x + w2 / 2.0f, y + 6, 1, 2});
         //df_set_tile(TILE_UPSTAIRS, loc_u.x, loc_u.y);
         //df_set_tile(TILE_DOWNSTAIRS, loc_d.x, loc_d.y);
@@ -327,9 +346,11 @@ public:
         int count = 0;
         for (int y0 = r.y; y0 < height; y0++) {
             for (int x0 = r.x; x0 < width; x0++) {
-                shared_ptr<tile_t> tile = tile_at((vec3){x0, y0, -1});
+                //shared_ptr<tile_t> tile = tile_at((vec3){x0, y0, -1});
+                tile_t& tile = tile_at(vec3{x0, y0, -1});
                 // check if the tile is possible downstairs
-                if (tile_is_possible_downstairs(tile->get_type())) {
+                //if (tile_is_possible_downstairs(tile->get_type())) {
+                if (tile_is_possible_downstairs(tile.get_type())) {
                     count++;
                 }
             }
@@ -355,8 +376,9 @@ public:
         int count = 0;
         for (int y0 = r.y; y0 < height; y0++) {
             for (int x0 = r.x; x0 < width; x0++) {
-                shared_ptr<tile_t> tile = tile_at((vec3){x0, y0, -1});
-                if (tile_is_possible_upstairs(tile->get_type())) {
+                //shared_ptr<tile_t> tile = tile_at((vec3){x0, y0, -1});
+                tile_t& tile = tile_at(vec3{x0, y0, -1});
+                if (tile_is_possible_upstairs(tile.get_type())) {
                     count++;
                 }
             }
@@ -375,10 +397,12 @@ public:
         // now we can loop thru the dungeon floor again and fill the array with the locations
         for (int y0 = r.y; y0 < height; y0++) {
             for (int x0 = r.x; x0 < width; x0++) {
-                shared_ptr<tile_t> tile = tile_at((vec3){x0, y0, -1});
+                //shared_ptr<tile_t> tile = tile_at((vec3){x0, y0, -1});
+                tile_t& tile = tile_at(vec3{x0, y0, -1});
                 // there wont be any entities yet so do not check for them
-                if (tile_is_possible_upstairs(tile->get_type())) {
-                    locations->push_back((vec3){x0, y0, 0});
+                //if (tile_is_possible_upstairs(tile->get_type())) {
+                if (tile_is_possible_upstairs(tile.get_type())) {
+                    locations->push_back(vec3{x0, y0, 0});
                 }
             }
         }
@@ -400,10 +424,12 @@ public:
         // now we can loop thru the dungeon floor again and fill the array with the locations
         for (int y0 = r.y; y0 < height; y0++) {
             for (int x0 = r.x; x0 < width; x0++) {
-                shared_ptr<tile_t> tile = tile_at((vec3){x0, y0, -1});
+                //shared_ptr<tile_t> tile = tile_at((vec3){x0, y0, -1});
+                tile_t& tile = tile_at(vec3{x0, y0, -1});
                 // there wont be any entities yet so do not check for them
-                if (tile_is_possible_downstairs(tile->get_type())) {
-                    locations->push_back((vec3){x0, y0, 0});
+                //if (tile_is_possible_downstairs(tile->get_type())) {
+                if (tile_is_possible_downstairs(tile.get_type())) {
+                    locations->push_back(vec3{x0, y0, 0});
                 }
             }
         }
@@ -457,8 +483,8 @@ public:
 
     inline void df_free() {
         //minfo("df_free");
-        tiles.clear();
-        tile_map->clear();
+        //tiles.clear();
+        //tile_map->clear();
     }
 
 
@@ -479,8 +505,10 @@ public:
         massert(loc.y >= 0 && loc.y < height, "y is out of bounds");
 
         //shared_ptr<tile_t> tile = df_tile_at(vec3{x, y, -1});
-        shared_ptr<tile_t> tile = tile_at(loc);
-        const entityid result = tile->tile_add(id, type);
+        //shared_ptr<tile_t> tile = tile_at(loc);
+        tile_t& tile = tile_at(loc);
+        //const entityid result = tile->tile_add(id, type);
+        const entityid result = tile.tile_add(id, type);
         if (result == ENTITYID_INVALID) {
             minfo("tile_add returned %d", result);
         }
@@ -496,9 +524,11 @@ public:
         massert(l.x >= 0 && l.x < width, "x is out of bounds");
         massert(l.y >= 0 && l.y < height, "y is out of bounds");
         
-        shared_ptr<tile_t> tile = tile_at(l);
+        //shared_ptr<tile_t> tile = tile_at(l);
+        tile_t& tile = tile_at(l);
         
-        const entityid r = tile->tile_remove(id);
+        //const entityid r = tile->tile_remove(id);
+        const entityid r = tile.tile_remove(id);
         
         if (r == ENTITYID_INVALID) {
             merror("df_remove_at: Failed to remove entity %d at (%d, %d)", id, l.x, l.y);
@@ -530,14 +560,14 @@ public:
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 const vec3 loc = {x, y, floor};
-                auto tile = tile_at(loc);
-                const bool type_invalid = tile->get_type() == TILE_NONE || tile->get_type() == TILE_STONE_WALL_00 || tile->get_type() == TILE_STONE_WALL_01 ||
-                                          tile->get_type() == TILE_UPSTAIRS || tile->get_type() == TILE_DOWNSTAIRS;
+                tile_t& tile = tile_at(loc);
+                const bool type_invalid = tile.get_type() == TILE_NONE || tile.get_type() == TILE_STONE_WALL_00 || tile.get_type() == TILE_STONE_WALL_01 ||
+                                          tile.get_type() == TILE_UPSTAIRS || tile.get_type() == TILE_DOWNSTAIRS;
                 if (type_invalid) {
                     //merror("loc at (%d, %d, %d) type invalid. type is: %d", x, y, floor, tile.type);
                     continue;
                 }
-                if (tile->entity_count() > 0) {
+                if (tile.entity_count() > 0) {
                     //merror("loc at (%d, %d, %d) type invalid. tile has %ld entities", x, y, floor, tile.entities->size());
                     continue;
                 }
@@ -560,8 +590,8 @@ public:
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 vec3 loc = {x, y, floor};
-                auto tile = tile_at(loc);
-                if (tile->get_type() != type) {
+                tile_t& tile = tile_at(loc);
+                if (tile.get_type() != type) {
                     continue;
                 }
                 //if (tile.type == TILE_NONE || tile.type == TILE_STONE_WALL_00 || tile.type == TILE_STONE_WALL_01 || tile.type == TILE_UPSTAIRS ||
