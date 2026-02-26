@@ -36,7 +36,7 @@ private:
     vector<tile_id> tiles;
 
     //shared_ptr<vector<entityid>> living_npcs;
-    shared_ptr<vector<entityid>> dead_npcs;
+    //shared_ptr<vector<entityid>> dead_npcs;
     shared_ptr<vector<room>> room_metadatas;
     shared_ptr<unordered_map<tile_id, shared_ptr<tile_t>>> tile_map; // Maps tile_id to tile_t pointer
 
@@ -81,29 +81,28 @@ public:
         return room_metadatas;
     }
 
-    shared_ptr<vector<entityid>> get_dead_npcs() {
-        return dead_npcs;
-    }
+    //shared_ptr<vector<entityid>> get_dead_npcs() {
+    //    return dead_npcs;
+    //}
 
     //shared_ptr<vector<entityid>> get_living_npcs() {
     //return living_npcs;
     //}
 
-    void add_dead_npc(entityid id) {
-        massert(id != ENTITYID_INVALID, "id is invalid");
-        dead_npcs->push_back(id);
-    }
+    //void add_dead_npc(entityid id) {
+    //    massert(id != ENTITYID_INVALID, "id is invalid");
+    //    dead_npcs->push_back(id);
+    //}
 
-    bool remove_dead_npc(entityid id) {
-        massert(id != ENTITYID_INVALID, "id is invalid");
-
-        auto it = find(dead_npcs->cbegin(), dead_npcs->cend(), id);
-        if (it == dead_npcs->cend()) {
-            return false;
-        }
-        dead_npcs->erase(it);
-        return true;
-    }
+    //bool remove_dead_npc(entityid id) {
+    //    massert(id != ENTITYID_INVALID, "id is invalid");
+    //    auto it = find(dead_npcs->cbegin(), dead_npcs->cend(), id);
+    //    if (it == dead_npcs->cend()) {
+    //        return false;
+    //    }
+    //    dead_npcs->erase(it);
+    //    return true;
+    //}
 
     //void add_living_npc(entityid id) {
     //massert(id != ENTITYID_INVALID, "id is invalid");

@@ -2681,9 +2681,9 @@ public:
         ct.set<pullable>(tgt_id, true);
 
         // we need to remove tgt_id from the floor's living npcs and add it to dead npcs
-        shared_ptr<dungeon_floor> df = d.get_current_floor();
+        //shared_ptr<dungeon_floor> df = d.get_current_floor();
         //df->remove_living_npc(tgt_id);
-        df->add_dead_npc(tgt_id);
+        //df->add_dead_npc(tgt_id);
 
         // when an npc target is killed, the attacker gains xp
         // when an npc target is killed, it drops its inventory
