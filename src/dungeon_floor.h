@@ -15,8 +15,8 @@
 #include <unordered_map>
 #include <vector>
 
-//#define DEFAULT_DUNGEON_FLOOR_WIDTH (16)
-//#define DEFAULT_DUNGEON_FLOOR_HEIGHT (12)
+#define DUNGEON_FLOOR_WIDTH 256
+#define DUNGEON_FLOOR_HEIGHT 256
 
 using std::function;
 using std::make_shared;
@@ -40,7 +40,7 @@ private:
     //shared_ptr<vector<room>> room_metadatas;
     //shared_ptr<unordered_map<tile_id, shared_ptr<tile_t>>> tile_map; // Maps tile_id to tile_t pointer
 
-    tile_t grid[64][64];
+    tile_t grid[DUNGEON_FLOOR_HEIGHT][DUNGEON_FLOOR_WIDTH];
 
 
 public:
@@ -281,15 +281,15 @@ public:
 
     //inline void init(const int f, const biome_t t, const int w, const int h) {
     inline void init(const int f, const biome_t t) {
-        minfo2("df init: f=%d, t=%d, w=%d, h=%d", f, t, w, h);
+        //minfo2("df init: f=%d, t=%d, w=%d, h=%d", f, t, w, h);
         //massert(w > 0, "width must be greater than zero");
         //massert(h > 0, "height must be greater than zero");
         massert(f >= 0, "floor must be greater than or equal to zero");
         // creating a new dungeon floor
         // init floor vars
         floor = f;
-        width = 64;
-        height = 64;
+        width = DUNGEON_FLOOR_WIDTH;
+        height = DUNGEON_FLOOR_HEIGHT;
         biome = t;
         // alloc the tile map
         //tile_map = make_shared<unordered_map<tile_id, shared_ptr<tile_t>>>();
@@ -303,9 +303,8 @@ public:
         //}
 
 
-        for (int i = 0; i < 64; i++) {
-            for (int j = 0; j < 64; j++) {
-                //grid[i][j] = tile_t(TILE_NONE, i);
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
                 grid[i][j].set_type(TILE_NONE);
                 grid[i][j].set_id(i*64+j);
             }
@@ -523,13 +522,10 @@ public:
         massert(id != ENTITYID_INVALID, "id is -1");
         massert(l.x >= 0 && l.x < width, "x is out of bounds");
         massert(l.y >= 0 && l.y < height, "y is out of bounds");
-        
         //shared_ptr<tile_t> tile = tile_at(l);
         tile_t& tile = tile_at(l);
-        
         //const entityid r = tile->tile_remove(id);
         const entityid r = tile.tile_remove(id);
-        
         if (r == ENTITYID_INVALID) {
             merror("df_remove_at: Failed to remove entity %d at (%d, %d)", id, l.x, l.y);
             return false;

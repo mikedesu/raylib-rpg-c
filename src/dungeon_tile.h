@@ -25,20 +25,18 @@
 class tile_t {
 private:
     bool can_have_door;
-    tiletype_t type;
-    tile_id id;
     bool visible;
     bool explored;
     bool cached_player_present;
     bool dirty_entities;
     //int cached_live_npcs;
     //int cached_item_count;
-
+    tiletype_t type;
+    tile_id id;
     entityid cached_live_npc;
     entityid cached_item;
     entityid cached_box;
     entityid cached_door;
-
     //shared_ptr<vector<entityid>> entities;
 
 

@@ -34,8 +34,10 @@ static inline void draw_title_screen_to_texture(gamestate& g, bool show_menu) {
     EndTextureMode();
 }
 
-static inline void libdraw_drawframe_2d_to_texture(gamestate& g) {
+static inline void libdraw_drawframe_2d_to_texture(gamestate& g, int vision_dist, int light_rad) {
     BeginTextureMode(main_game_target_texture);
-    libdraw_drawframe_2d(g);
+
+    libdraw_drawframe_2d(g, vision_dist, light_rad);
+
     EndTextureMode();
 }

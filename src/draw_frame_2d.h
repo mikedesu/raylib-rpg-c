@@ -15,15 +15,22 @@
 #include "gamestate.h"
 
 
-static inline void libdraw_drawframe_2d(gamestate& g) {
+static inline void libdraw_drawframe_2d(gamestate& g, int vision_dist, int light_rad) {
     //BeginShaderMode(shader_color_noise);
     //float time = (float)GetTime(); // Current time in seconds
     //SetShaderValue(shader_color_noise, GetShaderLocation(shader_color_noise, "time"), &time, SHADER_UNIFORM_FLOAT);
     //EndShaderMode();
+    
     camera_lock_on(g);
+    
     BeginMode2D(g.cam2d);
     ClearBackground(BLACK);
-    draw_dungeon_floor(g);
+    
+    //const int vision_dist = g.ct.get<vision_distance>(g.hero_id).value_or(0);
+    //const int light_rad = g.ct.get<light_radius>(g.hero_id).value_or(0);
+
+    draw_dungeon_floor(g, vision_dist, light_rad);
+    
     EndMode2D();
     draw_hud(g);
     //draw_look_panel(g);

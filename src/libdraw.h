@@ -53,7 +53,9 @@ static inline void drawframe(gamestate& g) {
             draw_char_creation_to_texture(g);
         } break;
         case SCENE_GAMEPLAY: {
-            libdraw_drawframe_2d_to_texture(g);
+            const int vision_dist = g.ct.get<vision_distance>(g.hero_id).value_or(0);
+            const int light_rad = g.ct.get<light_radius>(g.hero_id).value_or(0);
+            libdraw_drawframe_2d_to_texture(g, vision_dist, light_rad);
         } break;
         default: break;
         }

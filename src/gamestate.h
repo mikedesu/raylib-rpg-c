@@ -465,12 +465,13 @@ public:
         d.add_floor(df);
     }
 
-    inline void init_dungeon(biome_t type, int df_count, int w, int h, float parts) {
+    //inline void init_dungeon(biome_t type, int df_count, int w, int h, float parts) {
+    inline void init_dungeon(biome_t type, int df_count, float parts) {
         //constexpr float min_room_w = 2;
         minfo2("init_dungeon");
         massert(df_count > 0, "df_count is <= 0");
-        massert(w > 0, "w == 0");
-        massert(h > 0, "h == 0");
+        //massert(w > 0, "w == 0");
+        //massert(h > 0, "h == 0");
         massert(df_count > 0, "df_count == 0");
         massert(type > BIOME_NONE, "biome is invalid");
         massert(type < BIOME_COUNT, "biome is invalid 2");
@@ -1375,8 +1376,8 @@ public:
                 }
                 // we need to see if there is anything blocking us between the player and this hero_location
                 const vec3 loc = {x, y, hero_loc.z};
-                const bool blocked = path_blocked(hero_loc, loc);
-                if (blocked) {
+                //const bool blocked = ;
+                if (path_blocked(hero_loc, loc)) {
                     continue;
                 }
                 tile_t& t = df->tile_at(loc);
@@ -1495,15 +1496,17 @@ public:
         // 16x16 = 4 8x8 areas
         // 32x32 = 4 16x16 areas = 8 8x8 areas
 
-        const int w = 64; // 4x4 4x4 areas
-        const int h = 64;
+        //const int w = 128; // 4x4 4x4 areas
+        //const int h = 128;
         constexpr float parts = 1.0;
 
         //const int w = 32; // 4x4 4x4 areas
         //const int h = 32;
         //constexpr float parts = 4.0;
 
-        init_dungeon(BIOME_STONE, 1, w, h, parts);
+        //init_dungeon(BIOME_STONE, 1, w, h, parts);
+        init_dungeon(BIOME_STONE, 1, parts);
+
         massert(d.floors.size() > 0, "dungeon.floors.size is 0");
         place_doors();
         //place_props();
