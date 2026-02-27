@@ -218,7 +218,7 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, int x, int y, int z, in
     //const bool blocking = is_loc_path_blocked(g, df, loc, hero_loc);
 
     // Apply fade if blocked
-    
+
     //const unsigned char a = blocking ? 31 : distance > light_dist ? 102 : 255;
     const unsigned char a = distance > light_dist ? 102 : 255;
 
@@ -246,7 +246,7 @@ draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type_0, int vision_dist
     //const int light_rad = g.ct.get<light_radius>(g.hero_id).value_or(0);
 
     //for (int i = 0; i < num_tiles; i++) {
-    
+
 
 
 
@@ -267,7 +267,7 @@ draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type_0, int vision_dist
     // we have a similar double-loop in the gamestate.tick() method,
     // around "update player tiles explored" (which is currently disabled since
     // all created tiles are temporarily marked as 'explored')
-    
+
     const int min_x = std::max(0, hero_loc.x - light_rad);
     const int max_x = std::min(df->get_width() - 1, hero_loc.x + light_rad);
     const int min_y = std::max(0, hero_loc.y - light_rad);
@@ -275,14 +275,13 @@ draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type_0, int vision_dist
 
     for (int y = min_y; y <= max_y; y++) {
         for (int x = min_x; x <= max_x; x++) {
-
             if (abs(x - hero_loc.x) + abs(y - hero_loc.y) > light_rad) {
                 continue;
             }
 
-    //for (int y = 0; y < df_h; y++) {
-        //const int y = i / df_w;
-        //for (int x = 0; x < df_w; x++) {
+            //for (int y = 0; y < df_h; y++) {
+            //const int y = i / df_w;
+            //for (int x = 0; x < df_w; x++) {
             //const int x = i - (y * df_w);
             const vec3 loc = {x, y, g.d.current_floor};
             tile_t& tile = df->tile_at(loc);
@@ -295,7 +294,7 @@ draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type_0, int vision_dist
             //const int dist_to_check = std::max(vision_dist, light_rad);
             //if (is_loc_too_far_to_draw(g, loc, hero_loc, vision_dist, light_rad)) {
             //if (is_loc_too_far_to_draw(g, loc, hero_loc, dist_to_check)) {
-                //continue;
+            //continue;
             //}
 
             // bugfix for tall walls so entities do not draw on top: check to see if the tile directly beneath this tile is a wall
@@ -383,8 +382,7 @@ static inline bool draw_dungeon_floor(gamestate& g, int vision_dist, int light_r
 
     // render tiles
     for (int y = 0; y < df->get_height(); y++) {
-        for (int x = 0; x < df->get_width(); x ++) {
-            
+        for (int x = 0; x < df->get_width(); x++) {
             const vec3 loc = {x, y, z};
             const int distance = manhattan_distance(loc, hero_loc);
 
@@ -394,13 +392,13 @@ static inline bool draw_dungeon_floor(gamestate& g, int vision_dist, int light_r
 
     auto mydefault = [](gamestate& g, entityid id) { return true; };
 
-    //auto alive_check = [](gamestate& g, entityid id) {
-    //    auto maybe_dead = g.ct.get<dead>(id);
-    //    if (maybe_dead.has_value()) {
-    //        return !maybe_dead.value();
-    //    }
-    //    return false;
-    //};
+    auto alive_check = [](gamestate& g, entityid id) {
+        auto maybe_dead = g.ct.get<dead>(id);
+        if (maybe_dead.has_value()) {
+            return !maybe_dead.value();
+        }
+        return false;
+    };
 
     //auto dead_check = [](gamestate& g, entityid id) {
     //    auto maybe_dead = g.ct.get<dead>(id);
@@ -419,14 +417,8 @@ static inline bool draw_dungeon_floor(gamestate& g, int vision_dist, int light_r
     //draw_dungeon_floor_entitytype(g, ENTITY_NPC, vision_dist, light_rad, dead_check);
     //draw_dungeon_floor_entitytype(g, ENTITY_BOX, vision_dist, light_rad, mydefault);
     //draw_dungeon_floor_entitytype(g, ENTITY_ITEM, vision_dist, light_rad, mydefault);
-    //draw_dungeon_floor_entitytype(g, ENTITY_NPC, vision_dist, light_rad, alive_check);
+    draw_dungeon_floor_entitytype(g, ENTITY_NPC, vision_dist, light_rad, alive_check);
     draw_dungeon_floor_entitytype(g, ENTITY_PLAYER, vision_dist, light_rad, mydefault);
 
     return true;
 }
-
-
-
-
-
-

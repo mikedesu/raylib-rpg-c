@@ -424,7 +424,7 @@ public:
                     const float rw = rjx_e - rx_e;
                     Rectangle c0 = {rxf_e, riy, rw, 1};
                     df->set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, c0);
-                    
+
                     //shared_ptr<tile_t> first_tile = df->tile_at(vec3{rx_e, ry, -1});
                     tile_t& first_tile = df->tile_at(vec3{rx_e, ry, -1});
 
@@ -465,13 +465,9 @@ public:
         d.add_floor(df);
     }
 
-    //inline void init_dungeon(biome_t type, int df_count, int w, int h, float parts) {
     inline void init_dungeon(biome_t type, int df_count, float parts) {
-        //constexpr float min_room_w = 2;
         minfo2("init_dungeon");
         massert(df_count > 0, "df_count is <= 0");
-        //massert(w > 0, "w == 0");
-        //massert(h > 0, "h == 0");
         massert(df_count > 0, "df_count == 0");
         massert(type > BIOME_NONE, "biome is invalid");
         massert(type < BIOME_COUNT, "biome is invalid 2");
@@ -480,7 +476,7 @@ public:
             return;
         }
         for (int i = 0; i < df_count; i++) {
-            create_and_add_df_0(type, df_count,parts);
+            create_and_add_df_0(type, df_count, parts);
             //create_and_add_df_0(type, df_count, w, h, parts);
             //create_and_add_df_1(type, df_count, w, h, parts);
 
@@ -565,6 +561,9 @@ public:
         minfo2("END floor creation loop");
         d.is_initialized = true;
     }
+
+
+
 
     inline entityid create_door_with(with_fun doorInitFunction) {
         const entityid id = add_entity();
@@ -1110,10 +1109,10 @@ public:
 
 
 
-        //ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_RANDOM_MOVE);
+        ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_RANDOM_MOVE);
         //ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_MOVE_TO_TARGET);
         //ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_ATTACK_TARGET_IF_ADJACENT);
-        ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_RANDOM_MOVE_AND_ATTACK_TARGET_IF_ADJACENT);
+        //ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_RANDOM_MOVE_AND_ATTACK_TARGET_IF_ADJACENT);
 
 
 
@@ -1215,10 +1214,10 @@ public:
             merror("failed to add npc %d to %d, %d", id, loc.x, loc.y);
             return INVALID;
         }
-        
+
         minfo2("setting location for %d", id);
         ct.set<location>(id, loc);
-        
+
         msuccess2("created npc %d", id);
         return id;
     }
@@ -1514,10 +1513,10 @@ public:
         auto df = d.get_current_floor();
         //auto rl0 = df->df_get_random_loc();
         //create_weapon_at_with(ct, df->get_random_loc(), dagger_init());
-        
+
         //create_weapon_at_with(ct, df->get_random_loc(), axe_init());
         //create_shield_at_with(ct, df->get_random_loc(), shield_init());
-        
+
         //create_shield_at_with(ct, df->get_random_loc(), shield_init());
         //create_shield_at_with(ct, df->get_random_loc(), shield_init());
 
@@ -1527,7 +1526,7 @@ public:
             create_box_at_with(df->get_random_loc());
         }
 
-        constexpr int monster_count = 0;
+        constexpr int monster_count = 2000;
         for (int j = 0; j < monster_count; j++) {
             const vec3 random_loc = d.get_floor(0)->get_random_loc();
             create_orc_at_with(random_loc, [this](CT& ct, const entityid id) {
@@ -2354,7 +2353,6 @@ public:
 
 
 
-
     inline bool try_entity_move(entityid id, vec3 v) {
         massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
         minfo2("entity %d is trying to move: (%d,%d,%d)", id, v.x, v.y, v.z);
@@ -2362,18 +2360,18 @@ public:
         ct.set<update>(id, true);
         // entity location
         massert(ct.has<location>(id), "id %d has no location", id);
-        
+
         const vec3 loc = ct.get<location>(id).value_or((vec3){-1, -1, -1});
-        
+
         massert(!vec3_invalid(loc), "id %d location invalid", id);
         // entity's new location
         // we will have a special case for traversing floors so ignore v.z
         const vec3 aloc = {loc.x + v.x, loc.y + v.y, loc.z};
-        
+
         minfo2("entity %d is trying to move to (%d,%d,%d)", id, aloc.x, aloc.y, aloc.z);
-        
+
         shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
-        
+
         if (aloc.x < 0 || aloc.x >= df->get_width() || aloc.y < 0 || aloc.y >= df->get_height()) {
             merror2("destination is invalid: (%d, %d, %d)", aloc.x, aloc.y, aloc.z);
             return false;
@@ -2461,8 +2459,6 @@ public:
         msuccess2("npc %d moved to (%d,%d,%d)", id, aloc.x, aloc.y, aloc.z);
         return true;
     }
-
-
 
 
 
@@ -2969,7 +2965,7 @@ public:
         vec3 aloc = {loc.x + v.x, loc.y + v.y, loc.z};
         vec3 fv = get_loc_from_dir(facing_d);
         vec3 bloc = {loc.x + fv.x, loc.y + fv.y, loc.z};
-        
+
         tile_t& tile_dest = df->tile_at(aloc);
         if (aloc.x < 0 || aloc.x >= df->get_width() || aloc.y < 0 || aloc.y >= df->get_height()) {
             merror2("destination is invalid: (%d, %d, %d)", aloc.x, aloc.y, aloc.z);

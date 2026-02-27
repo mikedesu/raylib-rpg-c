@@ -15,8 +15,12 @@
 #include <unordered_map>
 #include <vector>
 
-#define DUNGEON_FLOOR_WIDTH 256
-#define DUNGEON_FLOOR_HEIGHT 256
+//#define DUNGEON_FLOOR_WIDTH 8
+//#define DUNGEON_FLOOR_HEIGHT 8
+#define DUNGEON_FLOOR_WIDTH 128
+#define DUNGEON_FLOOR_HEIGHT 128
+//#define DUNGEON_FLOOR_WIDTH 256 // max 256 (so-far)
+//#define DUNGEON_FLOOR_HEIGHT 256 // max 256 (so-far)
 
 using std::function;
 using std::make_shared;
@@ -164,7 +168,7 @@ public:
         // Check if the tile_id exists in the map
         //auto it = tile_map->find(id);
         //return it->second;
-    
+
         return grid[loc.y][loc.x];
     }
 
@@ -242,7 +246,7 @@ public:
 
     inline void df_set_tile(const tiletype_t type, const int x, const int y) {
         //shared_ptr<tile_t> current = tile_at((vec3){x, y, -1});
-        tile_t&  current = tile_at((vec3){x, y, -1});
+        tile_t& current = tile_at((vec3){x, y, -1});
         current.set_type(type);
         //current.tile_init(type);
     }
@@ -278,7 +282,6 @@ public:
 
 
 
-
     //inline void init(const int f, const biome_t t, const int w, const int h) {
     inline void init(const int f, const biome_t t) {
         //minfo2("df init: f=%d, t=%d, w=%d, h=%d", f, t, w, h);
@@ -296,20 +299,19 @@ public:
         //massert(tile_map, "failed to create tile map");
         // create all the tiles and add to the tile vector and tile map
         //for (tile_id i = 0; i < width * height; i++) {
-            //minfo2("Begin loop %d", i);
-            //tiles.push_back(i);
-            //shared_ptr<tile_t> tile = make_shared<tile_t>(TILE_NONE, i);
-            //tile_map->insert({i, tile});
+        //minfo2("Begin loop %d", i);
+        //tiles.push_back(i);
+        //shared_ptr<tile_t> tile = make_shared<tile_t>(TILE_NONE, i);
+        //tile_map->insert({i, tile});
         //}
 
 
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 grid[i][j].set_type(TILE_NONE);
-                grid[i][j].set_id(i*64+j);
+                grid[i][j].set_id(i * 64 + j);
             }
         }
-
 
 
 
@@ -323,12 +325,9 @@ public:
 
 
 
-
     inline void df_xform(function<void()> mLambda) {
         mLambda();
     }
-
-
 
 
 
@@ -360,8 +359,6 @@ public:
 
 
 
-
-
     inline int df_get_possible_upstairs_count_in_area(const Rectangle r) {
         massert(r.x >= 0, "x is less than zero");
         massert(r.x < width, "x is out of bounds");
@@ -388,8 +385,6 @@ public:
 
 
 
-
-
     inline shared_ptr<vector<vec3>> df_get_possible_upstairs_locs_in_area(const Rectangle r) {
         auto locations = make_shared<vector<vec3>>();
         massert(locations, "failed to make_shared locations");
@@ -407,8 +402,6 @@ public:
         }
         return locations;
     }
-
-
 
 
 
@@ -438,8 +431,6 @@ public:
 
 
 
-
-
     inline int df_get_possible_upstairs_count() {
         return df_get_possible_upstairs_count_in_area((Rectangle){0, 0, (float)width, (float)height});
     }
@@ -447,13 +438,9 @@ public:
 
 
 
-
-
     inline int df_get_possible_downstairs_count() {
         return df_get_possible_downstairs_count_in_area((Rectangle){0, 0, (float)width, (float)height});
     }
-
-
 
 
 
@@ -467,8 +454,6 @@ public:
 
 
 
-
-
     inline shared_ptr<vector<vec3>> df_get_possible_downstairs_locs() {
         auto locs = df_get_possible_downstairs_locs_in_area((Rectangle){0, 0, (float)width, (float)height});
         massert(locs, "failed to get possible downstairs locations");
@@ -478,15 +463,11 @@ public:
 
 
 
-
-
     inline void df_free() {
         //minfo("df_free");
         //tiles.clear();
         //tile_map->clear();
     }
-
-
 
 
 
@@ -541,12 +522,10 @@ public:
 
 
 
-
     inline void df_set_all_tiles(const tiletype_t type) {
         //minfo("df_set_all_tiles: Setting all tiles to type %d", type);
         set_area(type, type, (Rectangle){0, 0, (float)width, (float)height});
     }
-
 
 
 
@@ -576,7 +555,6 @@ public:
         }
         return tmp[GetRandomValue(0, tmp.size() - 1)];
     }
-
 
 
 
