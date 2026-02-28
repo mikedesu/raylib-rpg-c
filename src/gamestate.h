@@ -1741,7 +1741,7 @@ public:
             }
             shared_ptr<dungeon_floor> df = d.floors[0];
             const vec3 start_loc = df->get_random_loc();
-            massert(!vec3_invalid(start_loc), "start_loc is (-1,-1,-1)");
+            massert(!vec3_invalid(start_loc), "start_loc is (-1,-1,-1) - no valid start location exists");
             entity_turn = create_player_at_with(start_loc, "darkmage", [this, maxhp_roll](CT& ct, const entityid id) {
                 // set stats from char_creation
                 ct.set<strength>(id, chara_creation.strength);
