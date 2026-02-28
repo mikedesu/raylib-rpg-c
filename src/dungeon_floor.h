@@ -15,10 +15,10 @@
 #include <unordered_map>
 #include <vector>
 
-//#define DUNGEON_FLOOR_WIDTH 8
-//#define DUNGEON_FLOOR_HEIGHT 8
-#define DUNGEON_FLOOR_WIDTH 128
-#define DUNGEON_FLOOR_HEIGHT 128
+#define DUNGEON_FLOOR_WIDTH 8
+#define DUNGEON_FLOOR_HEIGHT 8
+//#define DUNGEON_FLOOR_WIDTH 128
+//#define DUNGEON_FLOOR_HEIGHT 128
 //#define DUNGEON_FLOOR_WIDTH 256 // max 256 (so-far)
 //#define DUNGEON_FLOOR_HEIGHT 256 // max 256 (so-far)
 
@@ -539,11 +539,9 @@ public:
                 const bool type_invalid = tile.get_type() == TILE_NONE || tile.get_type() == TILE_STONE_WALL_00 || tile.get_type() == TILE_STONE_WALL_01 ||
                                           tile.get_type() == TILE_UPSTAIRS || tile.get_type() == TILE_DOWNSTAIRS;
                 if (type_invalid) {
-                    //merror("loc at (%d, %d, %d) type invalid. type is: %d", x, y, floor, tile.type);
                     continue;
                 }
                 if (tile.entity_count() > 0) {
-                    //merror("loc at (%d, %d, %d) type invalid. tile has %ld entities", x, y, floor, tile.entities->size());
                     continue;
                 }
                 tmp.push_back(loc);
@@ -551,8 +549,11 @@ public:
         }
         if (tmp.size() == 0) {
             merror2("no locations are suitable. returning (-1, -1, -1)");
-            return (vec3){-1, -1, -1};
+            return vec3{-1, -1, -1};
         }
+
+
+
         return tmp[GetRandomValue(0, tmp.size() - 1)];
     }
 
