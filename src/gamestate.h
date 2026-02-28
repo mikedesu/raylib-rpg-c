@@ -1207,6 +1207,12 @@ public:
         //if (tile_has_live_npcs(t)) {
         //    return ENTITYID_INVALID;
         //}
+
+        if (t.get_cached_live_npc() != INVALID) {
+            return INVALID;
+        }
+
+
         const entityid id = create_orc_with(monsterInitFunction);
         if (id == ENTITYID_INVALID) {
             return ENTITYID_INVALID;
@@ -1214,7 +1220,6 @@ public:
         if (!df->df_add_at(id, ENTITY_NPC, loc)) {
             return ENTITYID_INVALID;
         }
-        //df->add_living_npc(id);
         ct.set<location>(id, loc);
         ct.set<update>(id, true);
         return id;
@@ -1269,7 +1274,6 @@ public:
             if (tiletype_is_none(t.get_type())) {
                 return true;
             }
-            //else if (tiletype_is_wall(t->get_type())) {
             else if (tiletype_is_wall(t.get_type())) {
                 return true;
             }
@@ -1281,15 +1285,6 @@ public:
                     return true;
                 }
             }
-            //for (auto id : *t->get_entities()) {
-            //    const bool door_present = ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_DOOR;
-            //    if (door_present) {
-            //        const bool door_is_open = ct.get<door_open>(id).value_or(false);
-            //       if (!door_is_open) {
-            //           return true;
-            //       }
-            //   }
-            //}
         }
         return false;
     }
@@ -1326,7 +1321,6 @@ public:
                 }
                 // we need to see if there is anything blocking us between the player and this hero_location
                 const vec3 loc = {x, y, hero_loc.z};
-                //const bool blocked = ;
                 if (path_blocked(hero_loc, loc)) {
                     continue;
                 }
@@ -1408,6 +1402,8 @@ public:
     }
 
 
+
+
     inline void logic_init() {
         minfo("gamestate.logic_init");
         srand(time(NULL));
@@ -1439,15 +1435,16 @@ public:
         for (int i = 0; i < num_boxes; i++) {
             create_box_at_with(df->get_random_loc());
         }
-        constexpr int monster_count = 2000;
+        constexpr int monster_count = 10;
         for (int j = 0; j < monster_count; j++) {
             const vec3 random_loc = d.get_floor(0)->get_random_loc();
-            create_orc_at_with(random_loc, [this](CT& ct, const entityid id) {
+
+            const entityid id = create_orc_at_with(random_loc, [this](CT& ct, const entityid id) {
                 const entityid wpn_id = create_weapon_with([](CT& ct, const entityid id) {
                     ct.set<name>(id, "Dagger");
                     ct.set<description>(id, "Stabby stabby.");
                     ct.set<weapontype>(id, WEAPON_DAGGER);
-                    ct.set<damage>(id, (vec3){1, 4, 0});
+                    ct.set<damage>(id, vec3{1, 4, 0});
                     ct.set<durability>(id, 100);
                     ct.set<max_durability>(id, 100);
                     ct.set<rarity>(id, RARITY_COMMON);
@@ -1456,12 +1453,14 @@ public:
                     ct.set<name>(id, "small healing potion");
                     ct.set<description>(id, "a small healing potion");
                     ct.set<potiontype>(id, POTION_HP_SMALL);
-                    ct.set<healing>(id, (vec3){1, 6, 0});
+                    ct.set<healing>(id, vec3{1, 6, 0});
                 });
                 add_to_inventory(id, wpn_id);
                 add_to_inventory(id, potion_id);
                 ct.set<equipped_weapon>(id, wpn_id);
             });
+
+            minfo("Created orc id %d", id);
         }
         msuccess("end creating monsters...");
         add_message("Welcome to the game! Press enter to cycle messages.");
