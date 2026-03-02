@@ -74,6 +74,12 @@ using std::chrono::nanoseconds;
 using std::chrono::system_clock;
 using std::chrono::time_point;
 
+
+
+extern float music_volume;
+extern float master_volume;
+
+
 class gamestate {
 public:
     controlmode_t controlmode;
@@ -3681,6 +3687,7 @@ public:
             "dead npcs on floor: %lu\n"
             "god_mode: %d\n"
             "player direction: %d\n"
+            "master volume: %0.1f\n"
             "\n",
             framecount,
             frame_updates,
@@ -3715,7 +3722,8 @@ public:
             0L,
             0L,
             god_mode,
-            player_dir);
+            player_dir,
+            master_volume);
 
         msuccess2("successfully updated debug panel buffer");
     }

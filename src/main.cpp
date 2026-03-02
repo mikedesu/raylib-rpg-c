@@ -1,6 +1,7 @@
 #include "gamestate.h"
 #include "inputstate.h"
 #include "libdraw.h"
+#include "libgame_defines.h"
 #ifdef WEB
 #include <emscripten/emscripten.h>
 #endif
@@ -20,7 +21,10 @@ Rectangle target_src = {0, 0, DEFAULT_TARGET_WIDTH, DEFAULT_TARGET_HEIGHT};
 Rectangle target_dest = {0, 0, DEFAULT_TARGET_WIDTH, DEFAULT_TARGET_HEIGHT};
 Rectangle win_dest = {0, 0, DEFAULT_WIN_WIDTH, DEFAULT_WIN_HEIGHT};
 Music music;
+
 float music_volume = DEFAULT_MUSIC_VOLUME;
+float master_volume = DEFAULT_MASTER_VOLUME;
+
 int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 
 static inline void gameloop() {
