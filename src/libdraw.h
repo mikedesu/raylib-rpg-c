@@ -82,6 +82,7 @@ static inline void drawframe(gamestate& g) {
     win_dest.width = GetScreenWidth();
     win_dest.height = GetScreenHeight();
     DrawTexturePro(target.texture, target_src, win_dest, (Vector2){0, 0}, 0.0f, WHITE);
+    DrawFPS(10, 10);
     EndDrawing();
     msuccess3("end drawing");
 #ifdef DEBUG
