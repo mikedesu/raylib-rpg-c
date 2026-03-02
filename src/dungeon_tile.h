@@ -34,6 +34,7 @@ private:
     tiletype_t type;
     tile_id id;
     entityid cached_live_npc;
+    entityid cached_dead_npc;
     entityid cached_item;
     entityid cached_box;
     entityid cached_door;
@@ -45,6 +46,7 @@ public:
     inline size_t entity_count() {
         size_t count = 0;
         count += cached_live_npc != INVALID ? 1 : 0;
+        count += cached_dead_npc != INVALID ? 1 : 0;
         count += cached_item != INVALID ? 1 : 0;
         count += cached_box != INVALID ? 1 : 0;
         count += cached_door != INVALID ? 1 : 0;
@@ -104,6 +106,15 @@ public:
     }
 
 
+
+    void set_cached_dead_npc(entityid id) {
+        cached_dead_npc = id;
+    }
+
+
+    entityid get_cached_dead_npc() {
+        return cached_dead_npc;
+    }
 
 
     void set_dirty_entities(bool b) {
@@ -214,6 +225,7 @@ public:
     inline void tile_reset_cache() {
         cached_player_present = false;
         cached_live_npc = ENTITYID_INVALID;
+        cached_dead_npc = ENTITYID_INVALID;
         cached_item = ENTITYID_INVALID;
         cached_box = ENTITYID_INVALID;
         cached_door = ENTITYID_INVALID;
@@ -251,6 +263,7 @@ public:
             cached_live_npc = id;
         }
         else if (type == ENTITY_NPC) {
+            // This handles both live and dead NPCs based on their state elsewhere
             cached_live_npc = id;
         }
         else if (type == ENTITY_ITEM) {
