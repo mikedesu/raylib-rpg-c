@@ -33,7 +33,9 @@ extern int ANIM_SPEED;
 
 static inline void drawframe(gamestate& g) {
     minfo3("drawframe");
-    //const double start_time = GetTime();
+#ifdef DEBUG
+    const double start_time = GetTime();
+#endif
     libdraw_update_sprites_pre(g);
 
     minfo3("begin drawing");

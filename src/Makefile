@@ -6,7 +6,7 @@ CXX = g++
 OBJ = -c
 
 
-WFLAGS = -Wall -Werror -std=c++23
+WFLAGS = -Wall -Werror -std=c++17
 
 
 SHARED = -shared

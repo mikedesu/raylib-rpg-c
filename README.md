@@ -8,6 +8,8 @@ The most recent release can be played online at [https://evildojo.itch.io/projec
 
 *with art assets by Krishna Palacio* [https://www.minifantasy.net](https://www.minifantasy.net)
 
+*sound effects by Leoh Paz* [https://leohpaz.itch.io/](https://leohpaz.itch.io/)
+
 -----
 
 ## Building 
@@ -15,8 +17,8 @@ The most recent release can be played online at [https://evildojo.itch.io/projec
 ### Requirements
 
 - **Raylib** (development libraries)
-- **GCC** or **Clang** (C++17 compatible)
-- **Emscripten** (for WebAssembly builds)
+- **g++** or **clang++** (C++17 compatible)
+- **emcc** (for WebAssembly builds)
 - **Make**
 
 ### Build Instructions
@@ -29,17 +31,17 @@ cd src
 
 #### Standard Build
 ```bash
-make
+make clean && make
 ```
 
 #### Debug Build
 ```bash
-CFLAGS="-DDEBUG=1" make
+make clean && CXXFLAGS="-DDEBUG_ASSERT=1 -DNPCS_ALL_AT_ONCE -DDEBUG=1 -DMASTER_VOLUME=0.25f" make game
 ```
 
 #### WebAssembly Build
 ```bash
-make index.html
+make clean && CXXFLAGS="-DDEBUG_ASSERT=1 -DNPCS_ALL_AT_ONCE -DDEBUG=1 -DMASTER_VOLUME=0.25f" make index.html
 ```
 
 -----
@@ -58,8 +60,8 @@ emrun index.html
 
 ### Running Tests
 ```bash
-make test
-./test
+make tests
+./tests
 ```
 
 -----

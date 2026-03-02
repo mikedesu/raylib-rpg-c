@@ -1467,7 +1467,7 @@ public:
                 ct.set<equipped_weapon>(id, wpn_id);
             });
 
-            minfo("Created orc id %d", id);
+            //minfo("Created orc id %d", id);
         }
         msuccess("end creating monsters...");
         add_message("Welcome to the game! Press enter to cycle messages.");
