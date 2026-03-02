@@ -1445,7 +1445,8 @@ public:
         for (int j = 0; j < monster_count; j++) {
             const vec3 random_loc = d.get_floor(0)->get_random_loc();
 
-            const entityid id = create_orc_at_with(random_loc, [this](CT& ct, const entityid id) {
+            //const entityid id = create_orc_at_with(random_loc, [this](CT& ct, const entityid id) {
+            create_orc_at_with(random_loc, [this](CT& ct, const entityid id) {
                 const entityid wpn_id = create_weapon_with([](CT& ct, const entityid id) {
                     ct.set<name>(id, "Dagger");
                     ct.set<description>(id, "Stabby stabby.");

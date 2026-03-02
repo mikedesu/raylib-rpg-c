@@ -175,9 +175,9 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, int x, int y, int z, in
     massert(x >= 0 && x < df->get_width(), "x is oob");
     massert(y >= 0 && y < df->get_height(), "y is oob");
 
-    const vec3 loc = {x, y, z};
+    //const vec3 loc = {x, y, z};
 
-    massert(!vec3_invalid(loc), "loc is invalid");
+    massert(!vec3_invalid(vec3{x, y, z}), "loc is invalid");
 
     tile_t& tile = df->tile_at(vec3{x, y, z});
 
