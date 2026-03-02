@@ -45,9 +45,9 @@ static inline void handle_music_stream(gamestate& g) {
         //        SetMusicVolume(music, music_volume); // Set initial music volume
         //#endif
 
-#ifdef MUSIC_VOLUME
-        music_volume = MUSIC_VOLUME;
-#endif
+//#ifdef MUSIC_VOLUME
+//        music_volume = MUSIC_VOLUME;
+//#endif
 
 
 // if MUSIC_OFF is defined
@@ -65,7 +65,13 @@ static inline void handle_music_stream(gamestate& g) {
 static inline void libdraw_load_music(gamestate& g) {
     minfo2("BEGIN load_music");
     load_random_music(g);
+
+#ifndef MASTER_VOLUME_OFF
     SetMasterVolume(DEFAULT_MASTER_VOLUME);
+#else
+    SetMasterVolume(0.0f);
+#endif
+
 #ifdef MUSIC_OFF
     SetMusicVolume(music, 0.0f); // Set initial music volume
 #else
