@@ -1,6 +1,6 @@
 
 
-CXX = g++
+CXX = clang++
 
 
 OBJ = -c
