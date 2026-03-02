@@ -334,6 +334,15 @@ draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type_0, int vision_dist
             //}
             //}
             // now, since we have these 'cached' values on the tile...
+
+
+            entityid dead_npc_id = tile.get_cached_dead_npc();
+            if (type_0 == ENTITY_NPC && dead_npc_id != INVALID && extra_check(g, dead_npc_id)) {
+                draw_sprite_and_shadow(g, dead_npc_id);
+            }
+
+
+
             entityid npc_id = tile.get_cached_live_npc();
             if (type_0 == ENTITY_NPC && npc_id != INVALID && extra_check(g, npc_id)) {
                 draw_sprite_and_shadow(g, npc_id);
@@ -400,13 +409,13 @@ static inline bool draw_dungeon_floor(gamestate& g, int vision_dist, int light_r
         return false;
     };
 
-    //auto dead_check = [](gamestate& g, entityid id) {
-    //    auto maybe_dead = g.ct.get<dead>(id);
-    //    if (maybe_dead.has_value()) {
-    //        return maybe_dead.value();
-    //    }
-    //    return false;
-    //};
+    auto dead_check = [](gamestate& g, entityid id) {
+        auto maybe_dead = g.ct.get<dead>(id);
+        if (maybe_dead.has_value()) {
+            return maybe_dead.value();
+        }
+        return false;
+    };
 
     //draw_dungeon_floor_entitytype(g, ENTITY_DOOR, vision_dist, light_rad, mydefault);
     //draw_dungeon_floor_entitytype(g, ENTITY_PROP, vision_dist, light_rad, mydefault);
@@ -414,7 +423,7 @@ static inline bool draw_dungeon_floor(gamestate& g, int vision_dist, int light_r
     libdraw_draw_player_target_box(g);
 
     //draw_dungeon_floor_entitytype(g, ENTITY_SPELL, vision_dist, light_rad, mydefault);
-    //draw_dungeon_floor_entitytype(g, ENTITY_NPC, vision_dist, light_rad, dead_check);
+    draw_dungeon_floor_entitytype(g, ENTITY_NPC, vision_dist, light_rad, dead_check);
     //draw_dungeon_floor_entitytype(g, ENTITY_BOX, vision_dist, light_rad, mydefault);
     //draw_dungeon_floor_entitytype(g, ENTITY_ITEM, vision_dist, light_rad, mydefault);
     draw_dungeon_floor_entitytype(g, ENTITY_NPC, vision_dist, light_rad, alive_check);

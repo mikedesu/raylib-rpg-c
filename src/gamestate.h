@@ -1441,7 +1441,7 @@ public:
         for (int i = 0; i < num_boxes; i++) {
             create_box_at_with(df->get_random_loc());
         }
-        constexpr int monster_count = 1;
+        constexpr int monster_count = 9;
         for (int j = 0; j < monster_count; j++) {
             const vec3 random_loc = d.get_floor(0)->get_random_loc();
 
