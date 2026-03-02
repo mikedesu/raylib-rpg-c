@@ -291,6 +291,10 @@ public:
             cached_live_npc = INVALID;
             return id;
         }
+        else if (id == cached_dead_npc) {
+            cached_dead_npc = INVALID;
+            return id;
+        }
         else if (id == cached_box) {
             cached_box = INVALID;
             return id;
