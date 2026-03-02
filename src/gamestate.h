@@ -2765,7 +2765,7 @@ public:
 
 
 
-    inline void process_attack_results(entityid atk_id, entityid tgt_id, bool atk_successful) {
+    inline void process_attack_results(tile_t& tile, entityid atk_id, entityid tgt_id, bool atk_successful) {
         massert(atk_id != ENTITYID_INVALID, "attacker entity id is invalid");
         massert(tgt_id != ENTITYID_INVALID, "target entity id is invalid");
 
@@ -2808,9 +2808,12 @@ public:
         }
 
         ct.set<dead>(tgt_id, true);
-
         // testing marking corpses as pullable objects
         ct.set<pullable>(tgt_id, true);
+
+        // set the cached dead npc on the tile
+        tile.set_cached_dead_npc(tgt_id);
+
 
         // we need to remove tgt_id from the floor's living npcs and add it to dead npcs
         //shared_ptr<dungeon_floor> df = d.get_current_floor();
@@ -2845,42 +2848,53 @@ public:
 
     inline attack_result_t process_attack_entity(tile_t& tile, entityid attacker_id, entityid target_id) {
         massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
+
         if (target_id == INVALID) {
             return ATTACK_RESULT_MISS;
         }
+
         const entitytype_t type = ct.get<entitytype>(target_id).value_or(ENTITY_NONE);
+
         if (type != ENTITY_PLAYER && type != ENTITY_NPC) {
             return ATTACK_RESULT_MISS;
         }
+
         if (ct.get<dead>(target_id).value_or(true)) {
             return ATTACK_RESULT_MISS;
         }
+
         // they have a shield
         // still need to do attack successful check
         const bool attack_successful = compute_attack_roll(attacker_id, target_id);
+
         // attack unsuccessful
         if (!attack_successful) {
-            process_attack_results(attacker_id, target_id, false);
+            process_attack_results(tile, attacker_id, target_id, false);
             return ATTACK_RESULT_MISS;
         }
+
         // check for shield
         const entityid shield_id = ct.get<equipped_shield>(target_id).value_or(ENTITYID_INVALID);
+
         // if no shield
         if (shield_id == ENTITYID_INVALID) {
-            process_attack_results(attacker_id, target_id, true);
+            process_attack_results(tile, attacker_id, target_id, true);
             return ATTACK_RESULT_HIT;
         }
+
         // if has shield
         // compute chance to block
         uniform_int_distribution<int> gen(1, MAX_BLOCK_CHANCE);
         const int roll = gen(mt);
         const int chance = ct.get<block_chance>(shield_id).value_or(MAX_BLOCK_CHANCE);
         const int low_roll = MAX_BLOCK_CHANCE - chance;
+
         if (roll <= low_roll) {
             // failed to block
-            process_attack_results(attacker_id, target_id, true);
+            process_attack_results(tile, attacker_id, target_id, true);
             return ATTACK_RESULT_HIT;
         }
+
         // decrement shield durability
         handle_shield_durability_loss(target_id, attacker_id);
         handle_shield_block_sfx(target_id);
@@ -2945,7 +2959,6 @@ public:
         massert(ct.has<location>(id), "entity %d has no location", id);
         const vec3 loc = ct.get<location>(id).value();
         shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
-        //shared_ptr<tile_t> tile = df->tile_at(vec3{x, y, loc.z});
         tile_t& tile = df->tile_at(vec3{x, y, loc.z});
         // Calculate direction based on target position
         const int dx = x - loc.x;
@@ -2953,7 +2966,7 @@ public:
         ct.set<direction>(id, get_dir_from_xy(dx, dy));
         ct.set<attacking>(id, true);
         ct.set<update>(id, true);
-        //const entityid npc_id = get_cached_live_npc(tile);
+
         const entityid npc_id = tile.get_cached_live_npc();
         const attack_result_t result = process_attack_entity(tile, id, npc_id);
         // did the hero hear this event?

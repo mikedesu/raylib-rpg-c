@@ -256,7 +256,17 @@ public:
         // Check if the entity already exists
         //minfo("tile_add: %d", id);
 
-        tile_reset_cache();
+        //tile_reset_cache();
+
+        cached_player_present = false;
+        cached_live_npc = ENTITYID_INVALID;
+        //cached_dead_npc = ENTITYID_INVALID;
+        cached_item = ENTITYID_INVALID;
+        cached_box = ENTITYID_INVALID;
+        cached_door = ENTITYID_INVALID;
+
+
+
 
         if (type == ENTITY_PLAYER) {
             cached_player_present = true;

@@ -33,7 +33,7 @@ static inline void libdraw_drawframe_2d(gamestate& g, int vision_dist, int light
 
     EndMode2D();
     draw_hud(g);
-    //draw_look_panel(g);
+    draw_look_panel(g);
     draw_message_history(g);
     draw_message_box(g);
 
