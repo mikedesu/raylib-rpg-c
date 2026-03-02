@@ -2812,7 +2812,8 @@ public:
         ct.set<pullable>(tgt_id, true);
 
         // set the cached dead npc on the tile
-        tile.set_cached_dead_npc(tgt_id);
+        //tile.set_cached_dead_npc(tgt_id);
+        tile.add_dead_npc(tgt_id);
 
 
         // we need to remove tgt_id from the floor's living npcs and add it to dead npcs

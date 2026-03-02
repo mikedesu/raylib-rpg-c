@@ -22,6 +22,8 @@
 //using std::vector;
 
 
+#define MAX_DEAD_NPCS_PER_TILE 8
+
 class tile_t {
 private:
     bool can_have_door;
@@ -34,19 +36,27 @@ private:
     tiletype_t type;
     tile_id id;
     entityid cached_live_npc;
-    entityid cached_dead_npc;
     entityid cached_item;
     entityid cached_box;
     entityid cached_door;
+    entityid cached_dead_npc;
     //shared_ptr<vector<entityid>> entities;
 
+    entityid dead_npcs[MAX_DEAD_NPCS_PER_TILE];
+    int dead_npcs_count;
 
 
 public:
     inline size_t entity_count() {
         size_t count = 0;
+
         count += cached_live_npc != INVALID ? 1 : 0;
-        count += cached_dead_npc != INVALID ? 1 : 0;
+
+        //count += cached_dead_npc != INVALID ? 1 : 0;
+        for (int i = 0; i < dead_npcs_count; i++) {
+            count += dead_npcs[i] != INVALID ? 1 : 0;
+        }
+
         count += cached_item != INVALID ? 1 : 0;
         count += cached_box != INVALID ? 1 : 0;
         count += cached_door != INVALID ? 1 : 0;
@@ -247,6 +257,27 @@ public:
         dirty_entities = true;
 
         tile_reset_cache();
+
+        for (int i = 0; i < MAX_DEAD_NPCS_PER_TILE; i++) {
+            dead_npcs[i] = INVALID;
+        }
+        dead_npcs_count = 0;
+    }
+
+
+
+
+    inline bool add_dead_npc(entityid id) {
+        if (dead_npcs_count >= MAX_DEAD_NPCS_PER_TILE) {
+            // returning false for now
+            // in future might want to rotate old dead bodies out
+            return false;
+        }
+
+        cached_dead_npc = id;
+        dead_npcs[dead_npcs_count++] = id;
+
+        return true;
     }
 
 
