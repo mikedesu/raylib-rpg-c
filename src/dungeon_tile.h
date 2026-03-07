@@ -1,13 +1,13 @@
 #pragma once
 
 #include "ComponentTraits.h"
+#include "dead_npc_cache.h"
 #include "dungeon_tile_type.h"
 #include "entityid.h"
 #include "entitytype.h"
 #include "massert.h"
 #include "mprint.h"
 #include "tile_id.h"
-#include "dead_npc_cache.h"
 
 class tile_t {
 private:
@@ -17,7 +17,7 @@ private:
     bool cached_player_present;
     bool dirty_entities;
     tiletype_t type;
-    tile_id id;
+    //tile_id id;
     entityid cached_live_npc;
     entityid cached_item;
     entityid cached_box;
@@ -167,7 +167,6 @@ public:
         dirty_entities = true;
         tile_reset_cache();
     }
-
 
     inline entityid tile_add(entityid id, entitytype_t type) {
         cached_player_present = false;
