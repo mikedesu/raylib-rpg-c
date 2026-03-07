@@ -171,7 +171,6 @@ public:
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 grid[i][j].set_type(TILE_NONE);
-                grid[i][j].set_id(i * 64 + j);
             }
         }
         msuccess2("Created dungeon floor %d with dimensions %dx%d", floor, width, height);
@@ -331,11 +330,8 @@ public:
                 if (type_invalid) {
                     continue;
                 }
-                if (tile.get_cached_live_npc() != INVALID || 
-                    tile.get_dead_npc_count() > 0 ||
-                    tile.get_cached_item() != INVALID ||
-                    tile.get_cached_box() != INVALID || 
-                    tile.get_cached_door() != INVALID) {
+                if (tile.get_cached_live_npc() != INVALID || tile.get_dead_npc_count() > 0 || tile.get_cached_item() != INVALID ||
+                    tile.get_cached_box() != INVALID || tile.get_cached_door() != INVALID) {
                     continue;
                 }
                 tmp.push_back(loc);

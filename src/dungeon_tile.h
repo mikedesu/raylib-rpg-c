@@ -17,7 +17,6 @@ private:
     bool cached_player_present;
     bool dirty_entities;
     tiletype_t type;
-    //tile_id id;
     entityid cached_live_npc;
     entityid cached_item;
     entityid cached_box;
@@ -71,13 +70,6 @@ public:
         dirty_entities = true;
     }
 
-    entityid get_cached_dead_npc() {
-        if (dead_npcs.get_count() > 0) {
-            return dead_npcs.contains(id);
-        }
-        return INVALID;
-    }
-
     size_t get_dead_npc_count() {
         return dead_npcs.get_count();
     }
@@ -112,14 +104,6 @@ public:
 
     bool get_visible() {
         return visible;
-    }
-
-    tile_id get_id() {
-        return id;
-    }
-
-    void set_id(const tile_id tid) {
-        id = tid;
     }
 
     tiletype_t get_type() {
@@ -221,9 +205,8 @@ public:
         tile_init(type);
     }
 
-    tile_t(tiletype_t t, tile_id tid)
-        : type(t)
-        , id(tid) {
+    tile_t(tiletype_t t)
+        : type(t) {
         minfo2("BEGIN tile_t(%d, %d)", tid, t);
         tile_init(t);
         minfo2("END tile_t(%d, %d)", tid, t);
@@ -237,5 +220,9 @@ public:
 
     ~tile_t() {
         minfo2("destroying tile id %d", id);
+    }
+
+    entityid get_cached_dead_npc() {
+        return dead_npcs.top();
     }
 };

@@ -25,7 +25,6 @@ static inline void draw_look_panel(gamestate& g) {
 
     const char* dummy_text = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
-
     //float some_offset_x = 10;
 
     const int font_size = DEFAULT_LOOK_PANEL_FONT_SIZE;
@@ -33,7 +32,6 @@ static inline void draw_look_panel(gamestate& g) {
     const Color bgcolor = {0, 0, 255, 128};
     const int pad_w = 10;
     const int pad_h = 10;
-
 
     const int m = MeasureText(dummy_text, font_size);
 
@@ -56,7 +54,6 @@ static inline void draw_look_panel(gamestate& g) {
     //    DrawText(texts[i], r.x + pad_w, r.y + pad_h + off_y, font_size, WHITE);
     //    off_y += font_size + 5;
     //}
-
 
     DrawText("Look Panel", r.x + pad_w, r.y + pad_h + (font_size + 5) * 0, font_size, WHITE);
     DrawText(TextFormat("There are %d things here", entity_count), r.x + pad_w, r.y + pad_h + (font_size + 5) * 1, font_size, WHITE);
