@@ -3,15 +3,19 @@
 #include "entityid.h"
 #include <cstddef>
 
+#ifndef DEAD_NPC_CACHE_SIZE
+#define DEAD_NPC_CACHE_SIZE 8
+#endif
+
 class dead_npc_cache {
 private:
     size_t count;
-    entityid ids[8];
+    entityid ids[DEAD_NPC_CACHE_SIZE];
 
 public:
     dead_npc_cache() {
         count = 0;
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < DEAD_NPC_CACHE_SIZE; i++) {
             ids[i] = INVALID;
         }
     }
@@ -24,15 +28,15 @@ public:
     }
 
     void add_id(entityid id) {
-        if (count < 8) {
+        if (count < DEAD_NPC_CACHE_SIZE) {
             ids[count++] = id;
         }
         else {
             // Shift all elements left
-            for (size_t i = 1; i < 8; i++) {
+            for (size_t i = 1; i < DEAD_NPC_CACHE_SIZE; i++) {
                 ids[i - 1] = ids[i];
             }
-            ids[7] = id; // Add new id at end
+            ids[DEAD_NPC_CACHE_SIZE - 1] = id; // Add new id at end
         }
     }
 
