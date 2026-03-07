@@ -7,6 +7,7 @@
 #include "massert.h"
 #include "mprint.h"
 #include "tile_id.h"
+#include "dead_npc_cache.h"
 
 class tile_t {
 private:
@@ -21,7 +22,7 @@ private:
     entityid cached_item;
     entityid cached_box;
     entityid cached_door;
-    entityid cached_dead_npc;
+    dead_npc_cache dead_npcs;
 
 public:
     inline size_t entity_count() {
@@ -66,11 +67,19 @@ public:
     }
 
     void set_cached_dead_npc(entityid id) {
-        cached_dead_npc = id;
+        dead_npcs.add_id(id);
+        dirty_entities = true;
     }
 
     entityid get_cached_dead_npc() {
-        return cached_dead_npc;
+        if (dead_npcs.get_count() > 0) {
+            return dead_npcs.contains(id);
+        }
+        return INVALID;
+    }
+
+    size_t get_dead_npc_count() {
+        return dead_npcs.get_count();
     }
 
     void set_dirty_entities(bool b) {
@@ -189,8 +198,7 @@ public:
             cached_live_npc = INVALID;
             return id;
         }
-        else if (id == cached_dead_npc) {
-            cached_dead_npc = INVALID;
+        else if (dead_npcs.remove_id(id)) {
             return id;
         }
         else if (id == cached_box) {
