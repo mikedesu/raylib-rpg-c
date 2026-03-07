@@ -61,4 +61,21 @@ public:
         }
         return false;
     }
+
+    entityid top() {
+        if (count == 0) {
+            return INVALID;
+        }
+        return ids[count - 1];
+    }
+
+    entityid pop() {
+        if (count == 0) {
+            return INVALID;
+        }
+        entityid id = ids[count - 1];
+        ids[count - 1] = INVALID;
+        count--;
+        return id;
+    }
 };
