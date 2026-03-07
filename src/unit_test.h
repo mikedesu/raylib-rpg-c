@@ -74,4 +74,42 @@ public:
         TS_ASSERT(!cache.remove_id(999));
         TS_ASSERT_EQUALS(cache.get_count(), 2);
     }
+
+    void testDeadNpcCacheTop() {
+        dead_npc_cache cache;
+
+        // Test empty cache
+        TS_ASSERT_EQUALS(cache.top(), INVALID);
+
+        // Test with single item
+        cache.add_id(10);
+        TS_ASSERT_EQUALS(cache.top(), 10);
+
+        // Test with multiple items (should return most recently added)
+        cache.add_id(20);
+        TS_ASSERT_EQUALS(cache.top(), 20);
+    }
+
+    void testDeadNpcCachePop() {
+        dead_npc_cache cache;
+        cache.add_id(10);
+        cache.add_id(20);
+        cache.add_id(30);
+
+        // Test pop returns items in reverse order of addition
+        TS_ASSERT_EQUALS(cache.pop(), 30);
+        TS_ASSERT_EQUALS(cache.get_count(), 2);
+        TS_ASSERT_EQUALS(cache.contains(30), -1);
+
+        TS_ASSERT_EQUALS(cache.pop(), 20);
+        TS_ASSERT_EQUALS(cache.get_count(), 1);
+        TS_ASSERT_EQUALS(cache.contains(20), -1);
+
+        TS_ASSERT_EQUALS(cache.pop(), 10);
+        TS_ASSERT_EQUALS(cache.get_count(), 0);
+        TS_ASSERT_EQUALS(cache.contains(10), -1);
+
+        // Test popping empty cache
+        TS_ASSERT_EQUALS(cache.pop(), INVALID);
+    }
 };
