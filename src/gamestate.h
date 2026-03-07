@@ -975,7 +975,8 @@ public:
 
         ct.set<hunger_points>(id, hunger_points_t{100, 100});
 
-        ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_RANDOM_MOVE);
+        ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_NONE);
+        //ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_RANDOM_MOVE);
         //ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_MOVE_TO_TARGET);
         //ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_ATTACK_TARGET_IF_ADJACENT);
         //ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_RANDOM_MOVE_AND_ATTACK_TARGET_IF_ADJACENT);
@@ -1094,14 +1095,9 @@ public:
         if (!tile_is_walkable(t.get_type())) {
             return ENTITYID_INVALID;
         }
-        //if (tile_has_live_npcs(t)) {
-        //    return ENTITYID_INVALID;
-        //}
-
         if (t.get_cached_live_npc() != INVALID) {
             return INVALID;
         }
-
         const entityid id = create_orc_with(monsterInitFunction);
         if (id == ENTITYID_INVALID) {
             return ENTITYID_INVALID;
@@ -1297,10 +1293,9 @@ public:
         for (int i = 0; i < num_boxes; i++) {
             create_box_at_with(df->get_random_loc());
         }
-        constexpr int monster_count = 9;
+        constexpr int monster_count = 1;
         for (int j = 0; j < monster_count; j++) {
             const vec3 random_loc = d.get_floor(0)->get_random_loc();
-
             //const entityid id = create_orc_at_with(random_loc, [this](CT& ct, const entityid id) {
             create_orc_at_with(random_loc, [this](CT& ct, const entityid id) {
                 const entityid wpn_id = create_weapon_with([](CT& ct, const entityid id) {
@@ -3529,7 +3524,10 @@ public:
         //if (d_action == ENTITY_DEFAULT_ACTION_NONE) {
         //}
         //else if (d_action == ENTITY_DEFAULT_ACTION_RANDOM_MOVE) {
-        if (d_action == ENTITY_DEFAULT_ACTION_RANDOM_MOVE) {
+        if (d_action == ENTITY_DEFAULT_ACTION_NONE) {
+            return true;
+        }
+        else if (d_action == ENTITY_DEFAULT_ACTION_RANDOM_MOVE) {
             // handle random move
             //uniform_int_distribution<int> dist(-1, 1);
             //if (try_entity_move(id, vec3{dist(mt), dist(mt), 0})) {
