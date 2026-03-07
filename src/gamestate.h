@@ -975,8 +975,8 @@ public:
 
         ct.set<hunger_points>(id, hunger_points_t{100, 100});
 
-        ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_NONE);
-        //ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_RANDOM_MOVE);
+        //ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_NONE);
+        ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_RANDOM_MOVE);
         //ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_MOVE_TO_TARGET);
         //ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_ATTACK_TARGET_IF_ADJACENT);
         //ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_RANDOM_MOVE_AND_ATTACK_TARGET_IF_ADJACENT);
@@ -1036,7 +1036,7 @@ public:
         auto df = d.get_floor(loc.z);
         tile_t& tile = df->tile_at(loc);
         if (!tile_is_walkable(tile.get_type())) {
-            merror2("cannot create entity on non-walkable tile: tile.type: %s", tiletype2str(tile->get_type()).c_str());
+            merror2("cannot create entity on non-walkable tile: tile.type: %s", tiletype2str(tile.get_type()).c_str());
             return INVALID;
         }
         //if (tile_has_live_npcs(tile)) {
@@ -1293,8 +1293,9 @@ public:
         for (int i = 0; i < num_boxes; i++) {
             create_box_at_with(df->get_random_loc());
         }
-        constexpr int monster_count = 9;
+        constexpr int monster_count = 2000;
         for (int j = 0; j < monster_count; j++) {
+            //minfo("Placing monster %d...", j);
             const vec3 random_loc = d.get_floor(0)->get_random_loc();
             //const entityid id = create_orc_at_with(random_loc, [this](CT& ct, const entityid id) {
             create_orc_at_with(random_loc, [this](CT& ct, const entityid id) {
@@ -1389,8 +1390,8 @@ public:
         massert(id != ENTITYID_INVALID, "id is invalid");
         constexpr int hp_ = 10;
         constexpr int maxhp_ = 10;
-        constexpr int vis_dist = 5;
-        constexpr int light_rad = 5;
+        constexpr int vis_dist = 20;
+        constexpr int light_rad = 20;
         constexpr int hear_dist = 3;
         //constexpr entitytype_t type = ENTITY_PLAYER;
         set_hero_id(id);
@@ -2679,27 +2680,27 @@ public:
         vec3 bloc = {loc.x + fv.x, loc.y + fv.y, loc.z};
         tile_t& tile_dest = df->tile_at(aloc);
         if (aloc.x < 0 || aloc.x >= df->get_width() || aloc.y < 0 || aloc.y >= df->get_height()) {
-            merror2("destination is invalid: (%d, %d, %d)", aloc.x, aloc.y, aloc.z);
+            merror("destination is invalid: (%d, %d, %d)", aloc.x, aloc.y, aloc.z);
             return false;
         }
         if (!tile_is_walkable(tile_dest.get_type())) {
             //if (!(god_mode && id == hero_id)) {
-            merror2("tile is not walkable");
+            merror("tile is not walkable");
             return false;
         }
         const entityid box_id = tile_has_box(aloc.x, aloc.y, aloc.z);
         if (box_id != ENTITYID_INVALID) {
-            merror2("box present, can't push and pull simultaneously");
+            merror("box present, can't push and pull simultaneously");
             return false;
         }
         const bool has_solid = tile_has_solid(aloc.x, aloc.y, aloc.z);
         if (has_solid) {
-            merror2("solid present, cannot move");
+            merror("solid present, cannot move");
             return false;
         }
         //else if (get_cached_live_npc(tile_dest)) {
         else if (tile_dest.get_cached_live_npc()) {
-            merror2("live npcs present, cannot move");
+            merror("live npcs present, cannot move");
             return false;
         }
         //else if (tile_has_live_npcs(tile_at_cur_floor(aloc))) {
@@ -2708,14 +2709,14 @@ public:
         //}
         //else if (tile_has_player(tile_at_cur_floor(aloc))) {
         else if (tile_at_cur_floor(aloc).get_cached_player_present()) {
-            merror2("player present, cannot move");
+            merror("player present, cannot move");
             return false;
         }
         const entityid door_id = tile_has_door(aloc);
         if (door_id != ENTITYID_INVALID) {
             massert(ct.has<door_open>(door_id), "door_id %d doesnt have a door_open component", door_id);
             if (!ct.get<door_open>(door_id).value_or(false)) {
-                merror2("door is closed");
+                merror("door is closed");
                 return false;
             }
         }
@@ -2727,7 +2728,7 @@ public:
 
         // remove the entity from the current tile
         if (!df->df_remove_at(id, loc)) {
-            merror2("Failed to remove %d from (%d, %d)", id, loc.x, loc.y);
+            merror("Failed to remove %d from (%d, %d)", id, loc.x, loc.y);
             return false;
         }
         // force cache update
@@ -2735,7 +2736,7 @@ public:
         // add the entity to the new tile
         auto type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
         if (df->df_add_at(id, type, aloc) == ENTITYID_INVALID) {
-            merror2("Failed to add %d to (%d, %d)", id, aloc.x, aloc.y);
+            merror("Failed to add %d to (%d, %d)", id, aloc.x, aloc.y);
             return false;
         }
         // force cache update
@@ -2752,7 +2753,7 @@ public:
         }
         ct.set<steps_taken>(id, ct.get<steps_taken>(id).value_or(0) + 1);
 
-        msuccess2("npc %d moved to (%d,%d,%d)", id, aloc.x, aloc.y, aloc.z);
+        msuccess("npc %d moved to (%d,%d,%d)", id, aloc.x, aloc.y, aloc.z);
 
         // check to see if pullable
         // for now i will be lazy

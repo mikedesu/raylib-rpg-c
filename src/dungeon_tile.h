@@ -210,9 +210,9 @@ public:
 
     tile_t(tiletype_t t)
         : type(t) {
-        minfo2("BEGIN tile_t(%d, %d)", tid, t);
+        //minfo2("BEGIN tile_t(%d, %d)", tid, t);
         tile_init(t);
-        minfo2("END tile_t(%d, %d)", tid, t);
+        //minfo2("END tile_t(%d, %d)", tid, t);
     }
 
     tile_t() {
@@ -222,7 +222,7 @@ public:
     }
 
     ~tile_t() {
-        minfo2("destroying tile id %d", id);
+        minfo2("destroying tile");
     }
 
     entityid get_cached_dead_npc() {
