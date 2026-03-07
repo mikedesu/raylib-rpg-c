@@ -1,7 +1,6 @@
 #pragma once
 
 #include "biome.h"
-//#include "dungeon.h"
 #include "dungeon_tile.h"
 #include "dungeon_tile_type.h"
 #include "entityid.h"
@@ -17,11 +16,8 @@
 
 #define DUNGEON_FLOOR_WIDTH 8
 #define DUNGEON_FLOOR_HEIGHT 8
-
 //#define DUNGEON_FLOOR_WIDTH 128
 //#define DUNGEON_FLOOR_HEIGHT 128
-//#define DUNGEON_FLOOR_WIDTH 32 // max 256 (so-far)
-//#define DUNGEON_FLOOR_HEIGHT 32 // max 256 (so-far)
 //#define DUNGEON_FLOOR_WIDTH 256 // max 256 (so-far)
 //#define DUNGEON_FLOOR_HEIGHT 256 // max 256 (so-far)
 
@@ -41,7 +37,6 @@ private:
     vec3 upstairs_loc;
 
     tile_t grid[DUNGEON_FLOOR_HEIGHT][DUNGEON_FLOOR_WIDTH];
-
 
 public:
     const vec3 get_upstairs_loc() {
@@ -165,8 +160,6 @@ public:
         }
     }
 
-
-
     inline void init(const int f, const biome_t t) {
         massert(f >= 0, "floor must be greater than or equal to zero");
         // creating a new dungeon floor
@@ -184,15 +177,9 @@ public:
         msuccess2("Created dungeon floor %d with dimensions %dx%d", floor, width, height);
     }
 
-
-
-
     inline void df_xform(function<void()> mLambda) {
         mLambda();
     }
-
-
-
 
     inline int df_get_possible_downstairs_count_in_area(const Rectangle r) {
         massert(r.x >= 0, "x is less than zero");
@@ -216,9 +203,6 @@ public:
         return count;
     }
 
-
-
-
     inline int df_get_possible_upstairs_count_in_area(const Rectangle r) {
         massert(r.x >= 0, "x is less than zero");
         massert(r.x < width, "x is out of bounds");
@@ -240,9 +224,6 @@ public:
         return count;
     }
 
-
-
-
     inline shared_ptr<vector<vec3>> df_get_possible_upstairs_locs_in_area(const Rectangle r) {
         auto locations = make_shared<vector<vec3>>();
         massert(locations, "failed to make_shared locations");
@@ -258,9 +239,6 @@ public:
         }
         return locations;
     }
-
-
-
 
     inline shared_ptr<vector<vec3>> df_get_possible_downstairs_locs_in_area(const Rectangle r) {
         massert(r.x >= 0, "x is less than zero");
@@ -282,22 +260,13 @@ public:
         return locations;
     }
 
-
-
-
     inline int df_get_possible_upstairs_count() {
         return df_get_possible_upstairs_count_in_area((Rectangle){0, 0, (float)width, (float)height});
     }
 
-
-
-
     inline int df_get_possible_downstairs_count() {
         return df_get_possible_downstairs_count_in_area((Rectangle){0, 0, (float)width, (float)height});
     }
-
-
-
 
     inline shared_ptr<vector<vec3>> df_get_possible_upstairs_locs() {
         auto locs = df_get_possible_upstairs_locs_in_area((Rectangle){0, 0, (float)width, (float)height});
@@ -305,23 +274,14 @@ public:
         return locs;
     }
 
-
-
-
     inline shared_ptr<vector<vec3>> df_get_possible_downstairs_locs() {
         auto locs = df_get_possible_downstairs_locs_in_area((Rectangle){0, 0, (float)width, (float)height});
         massert(locs, "failed to get possible downstairs locations");
         return locs;
     }
 
-
-
-
     inline void df_free() {
     }
-
-
-
 
     inline entityid df_add_at(entityid id, entitytype_t type, vec3 loc) {
         if (id == ENTITYID_INVALID) {
@@ -338,9 +298,6 @@ public:
         }
         return result;
     }
-
-
-
 
     inline bool df_remove_at(entityid id, vec3 l) {
         massert(id != ENTITYID_INVALID, "id is -1");
@@ -359,15 +316,9 @@ public:
         return true;
     }
 
-
-
-
     inline void df_set_all_tiles(const tiletype_t type) {
         set_area(type, type, (Rectangle){0, 0, (float)width, (float)height});
     }
-
-
-
 
     const inline vec3 get_random_loc() {
         vector<vec3> tmp;
@@ -393,9 +344,6 @@ public:
         return tmp[GetRandomValue(0, tmp.size() - 1)];
     }
 
-
-
-
     const inline vec3 df_get_random_loc_of_type(const tiletype_t type) {
         vector<vec3> tmp;
         for (int x = 0; x < width; x++) {
@@ -415,12 +363,10 @@ public:
         return loc;
     }
 
-
     dungeon_floor() {
         upstairs_loc = {-1, -1, -1};
         downstairs_loc = {-1, -1, -1};
     }
-
 
     ~dungeon_floor() {
         minfo2("dungeon floor destroyed");
