@@ -10,15 +10,11 @@
 #include "libgame_defines.h"
 #include "textureinfo.h"
 
-
 extern textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
 constexpr static inline int manhattan_distance(vec3 a, vec3 b) {
     return abs(a.x - b.x) + abs(a.y - b.y);
 }
-
-
-
 
 //static inline bool is_loc_too_far_to_draw(gamestate& g, vec3 loc, vec3 hero_loc) {
 //static inline bool is_loc_too_far_to_draw(gamestate& g, vec3 loc, vec3 hero_loc, int vision_dist, int light_rad) {
@@ -40,9 +36,6 @@ static inline bool is_loc_too_far_to_draw(gamestate& g, vec3 loc, vec3 hero_loc,
     // we might want to enforce a drawing order with the introduction of doors...
     return dist > dist_to_check;
 }
-
-
-
 
 static inline bool is_loc_path_blocked(gamestate& g, shared_ptr<dungeon_floor> df, vec3 loc, vec3 hero_loc) {
     vector<vec3> path = calculate_path_with_thickness(loc, hero_loc);
@@ -69,8 +62,6 @@ static inline bool is_loc_path_blocked(gamestate& g, shared_ptr<dungeon_floor> d
         if (v0_tile.entity_count() == 0) {
             continue;
         }
-
-
 
         // check if tile has a DOOR
         entityid door_id = v0_tile.get_cached_door();
@@ -130,13 +121,8 @@ static inline bool is_loc_path_blocked(gamestate& g, shared_ptr<dungeon_floor> d
         //}
     }
 
-
-
     return blocked;
 }
-
-
-
 
 static inline bool draw_dungeon_floor_tile(gamestate& g, int x, int y, int z, int light_dist, vec3 hero_loc, int distance) {
     //minfo3("BEGIN draw dungeon floor tile");
@@ -167,8 +153,6 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, int x, int y, int z, in
     //}
     //}
 
-
-
     auto df = g.d.get_floor(z);
 
     massert(df, "dungeon_floor is NULL");
@@ -180,9 +164,6 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, int x, int y, int z, in
     massert(!vec3_invalid(vec3{x, y, z}), "loc is invalid");
 
     tile_t& tile = df->tile_at(vec3{x, y, z});
-
-
-
 
     //massert(tile, "tile is NULL");
 
@@ -207,11 +188,8 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, int x, int y, int z, in
     //}
     //const vec3 hero_loc = maybe_hero_loc.value();
 
-
-
     // Calculate Manhattan distance from hero to this tile (diamond pattern)
     //const int distance = manhattan_distance(loc, hero_loc);
-
 
     // Draw tile with fade ALSO if path between tile and hero is blocked
     // Check for blocking walls/doors in path
@@ -230,9 +208,6 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, int x, int y, int z, in
     return true;
 }
 
-
-
-
 static inline void
 draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type_0, int vision_dist, int light_rad, function<bool(gamestate&, entityid)> extra_check) {
     auto df = g.d.get_current_floor();
@@ -246,9 +221,6 @@ draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type_0, int vision_dist
     //const int light_rad = g.ct.get<light_radius>(g.hero_id).value_or(0);
 
     //for (int i = 0; i < num_tiles; i++) {
-
-
-
 
     // instead of looping over the WHOLE df...
     // you know what we should rly be doing?
@@ -289,7 +261,6 @@ draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type_0, int vision_dist
             if (tiletype_is_none(tiletype) || tiletype_is_wall(tiletype)) {
                 continue;
             }
-
 
             //const int dist_to_check = std::max(vision_dist, light_rad);
             //if (is_loc_too_far_to_draw(g, loc, hero_loc, vision_dist, light_rad)) {
@@ -335,13 +306,10 @@ draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type_0, int vision_dist
             //}
             // now, since we have these 'cached' values on the tile...
 
-
             entityid dead_npc_id = tile.get_cached_dead_npc();
             if (type_0 == ENTITY_NPC && dead_npc_id != INVALID && extra_check(g, dead_npc_id)) {
                 draw_sprite_and_shadow(g, dead_npc_id);
             }
-
-
 
             entityid npc_id = tile.get_cached_live_npc();
             if (type_0 == ENTITY_NPC && npc_id != INVALID && extra_check(g, npc_id)) {
@@ -371,16 +339,12 @@ draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type_0, int vision_dist
     }
 }
 
-
-
-
 static inline bool draw_dungeon_floor(gamestate& g, int vision_dist, int light_rad) {
     shared_ptr<dungeon_floor> df = g.d.get_current_floor();
     const int z = g.d.current_floor;
 
     //const int vision_dist = g.ct.get<vision_distance>(g.hero_id).value_or(0);
     //const int light_dist = g.ct.get<light_radius>(g.hero_id).value_or(0);
-
 
     auto maybe_hero_loc = g.ct.get<location>(g.hero_id);
     if (!maybe_hero_loc.has_value()) {
