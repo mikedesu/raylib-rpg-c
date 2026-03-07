@@ -43,9 +43,14 @@ WEB_OPTIONS = -DPLATFORM_WEB -DWEB -DSPAWN_MONSTERS -DNPCS_ALL_AT_ONCE -DSTART_M
 all: game index.html tests
 
 # Desktop build
-game: main.cpp 
+game: main.o
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $(CFLAGS) $^ -L. $(RAYLIB_LIBS)   -o $@ 
 	./log_build_stats.sh
+
+
+main.o: main.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $(CFLAGS) main.cpp -c  
+
 
 # Web build
 index.html: main.cpp
@@ -60,6 +65,6 @@ tests.cpp: unit_test.h
 
 
 clean:
-	rm -rfv game *.gch time.txt index.html index.js index.wasm index.data test tests.cpp tests
+	rm -rfv game *.o *.gch time.txt index.html index.js index.wasm index.data test tests.cpp tests
 
 
