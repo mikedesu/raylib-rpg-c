@@ -2,8 +2,8 @@
 
 #ifndef GAME_INFO_DEFINES
 #define GAME_INFO_DEFINES
-#define GAME_VERSION "v0.0.6.15"
-#define GAME_VERSION_DATE "March 6, 2026"
+#define GAME_VERSION "v0.0.6.16"
+#define GAME_VERSION_DATE "March 7, 2026"
 #define WINDOW_TITLE "@evildojo666 presents: project.rpg"
 #endif
 
@@ -17,7 +17,7 @@
 
 // Alternative window sizes if needed (commented out)
 // #define DEFAULT_WIN_WIDTH 360
-// #define DEFAULT_WIN_HEIGHT 640  
+// #define DEFAULT_WIN_HEIGHT 640
 // #define DEFAULT_TARGET_WIDTH 360
 // #define DEFAULT_TARGET_HEIGHT 640
 
@@ -30,7 +30,7 @@
 #ifndef UI_DEFINES
 #define UI_DEFINES
 #define DEFAULT_MSG_HISTORY_FONT_SIZE 20
-#define DEFAULT_MSG_WINDOW_FONT_SIZE 20  
+#define DEFAULT_MSG_WINDOW_FONT_SIZE 20
 #define DEFAULT_LOOK_PANEL_FONT_SIZE 20
 #define DEFAULT_HUD_FONT_SIZE 20
 #define DEFAULT_HUD_BUFFER_LINE_SIZE 1024
@@ -44,13 +44,13 @@
 #define DEFAULT_OFFSET -12
 #define DEFAULT_TARGET_FPS 60
 #define DEFAULT_LOCK 30
-#define DEFAULT_TILE_SIZE 8  
+#define DEFAULT_TILE_SIZE 8
 #define DEFAULT_ZOOM_INCR 1.0f
 #define DEFAULT_ZOOM_LEVEL 4.0f
 #define FRAMEINTERVAL 10
 #endif
 
-#ifndef GAMEPLAY_DEFINES  
+#ifndef GAMEPLAY_DEFINES
 #define GAMEPLAY_DEFINES
 #define DEFAULT_DUNGEONFLOOR_WIDTH 8
 #define DEFAULT_DUNGEONFLOOR_HEIGHT 8
@@ -70,7 +70,6 @@
 #define TITLESCENE 1
 #define GAMEPLAYSCENE 2
 #endif
-
 
 #define DEFAULT_PAD 20
 
