@@ -151,6 +151,11 @@ public:
         cached_door = ENTITYID_INVALID;
     }
 
+    inline bool add_dead_npc(entityid id) {
+        set_cached_dead_npc(id);
+        return true;
+    }
+
     inline void tile_init(tiletype_t t) {
         minfo2("tile_init(%d)", t);
         type = t;
