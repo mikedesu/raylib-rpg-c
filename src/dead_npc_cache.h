@@ -28,10 +28,11 @@ public:
             ids[count++] = id;
         }
         else {
-            ids[0] = INVALID;
+            // Shift all elements left
             for (size_t i = 1; i < 8; i++) {
                 ids[i - 1] = ids[i];
             }
+            ids[7] = id; // Add new id at end
         }
     }
 
@@ -47,10 +48,11 @@ public:
     bool remove_id(entityid id) {
         int i = contains(id);
         if (i != -1) {
-            ids[i] = INVALID;
-            for (i = i + 1; i < count; i++) {
-                ids[i - 1] = ids[i];
+            count--;
+            for (; i < count; i++) {
+                ids[i] = ids[i + 1];
             }
+            ids[count] = INVALID;
             return true;
         }
         return false;
