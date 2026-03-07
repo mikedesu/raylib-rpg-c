@@ -30,6 +30,9 @@ public:
         count += cached_item != INVALID ? 1 : 0;
         count += cached_box != INVALID ? 1 : 0;
         count += cached_door != INVALID ? 1 : 0;
+
+        count += dead_npcs.get_count();
+
         return count;
     }
 

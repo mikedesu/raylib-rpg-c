@@ -280,6 +280,7 @@ draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type_0, int vision_dist
             // manage individual integer values for the ids,
             // we will have to call a new method...
             //if (tile->get_entities()->size() == 0) {
+
             if (tile.entity_count() == 0) {
                 continue;
                 //break;
