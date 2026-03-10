@@ -345,558 +345,61 @@ public:
         return d.get_current_floor()->tile_at(loc);
     }
 
-    void create_and_add_df_0(biome_t type, int w, int h, int df_count, float parts) {
-        auto df = d.create_floor(type, w, h);
-        float dw = df->get_width();
-        float dh = df->get_height();
-        vector<room> rooms;
-        room r(0, TextFormat("room-%d", 0), TextFormat("room-%d description", 0), Rectangle{0, 0, dw, dh});
-        df->set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, r.get_area());
-        d.add_floor(df);
-    }
+    void create_and_add_df_0(biome_t type, int w, int h, int df_count, float parts);
 
-    void create_and_add_df_1(biome_t type, int w, int h, int df_count, float parts) {
-        float min_room_w = 2;
-        auto df = d.create_floor(type, w, h);
-        float dw = df->get_width();
-        float dh = df->get_height();
-        vector<room> rooms;
-        vector<room> doorways;
-        minfo2("creating rooms");
-        for (int i = 0; i < parts; i++) {
-            for (int j = 0; j < parts; j++) {
-                Rectangle q = {(dw / parts) * j, (dh / parts) * i, dw / parts, dh / parts};
-                float max_room_w = q.width / 2.0;
-                uniform_int_distribution<int> pgx(q.x, q.x + q.width / 2.0 - 1);
-                uniform_int_distribution<int> pgy(q.y, q.y + q.height / 2.0 - 1);
-                uniform_int_distribution<int> sg(min_room_w, max_room_w);
-                Rectangle ra1 = {static_cast<float>(pgx(mt)), static_cast<float>(pgy(mt)), static_cast<float>(sg(mt)), static_cast<float>(sg(mt))};
-                room_id rid = i * parts + j;
-                room r(rid, TextFormat("room-%d", rid), TextFormat("room-%d description", rid), ra1);
-                rooms.push_back(r);
-            }
-        }
-        minfo2("setting rooms");
-        for (size_t i = 0; i < rooms.size(); i++) {
-            df->set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, rooms[i].get_area());
-        }
-        minfo2("sorting rooms");
-        std::sort(rooms.begin(), rooms.end(), [](room& a, room& b) { return a.get_x() < b.get_x() && a.get_y() < b.get_y(); });
-        for (size_t y = 0; y < parts; y++) {
-            for (size_t x = 0; x < parts; x++) {
-                size_t index = y * parts + x;
-                room& r = rooms[index];
-                int rx = r.get_x() + r.get_w() / 2;
-                int ry = r.get_y() + r.get_h() / 2;
-                float rix = rx;
-                float riy = ry;
-                if (x < parts - 1) {
-                    room& r2 = rooms[index + 1];
-                    int rx_e = r.get_x() + r.get_w();
-                    float rxf_e = r.get_x() + r.get_w();
-                    int rjx_e = r2.get_x();
-                    float rw = rjx_e - rx_e;
-                    Rectangle c0 = {rxf_e, riy, rw, 1};
-                    df->set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, c0);
-                    tile_t& first_tile = df->tile_at(vec3{rx_e, ry, -1});
-                    first_tile.set_can_have_door(true);
-                    int rw_i = rw;
-                    tile_t& last_tile = df->tile_at(vec3{rx_e + rw_i - 1, ry, -1});
-                    last_tile.set_can_have_door(true);
-                }
-                if (y < parts - 1) {
-                    size_t index2 = (y + 1) * parts + x;
-                    room& r2 = rooms[index2];
-                    int ry_e = r.get_y() + r.get_h();
-                    float ryf_e = r.get_y() + r.get_h();
-                    int rjy_e = r2.get_y();
-                    float rh = rjy_e - ry_e;
-                    Rectangle c0 = {rix, ryf_e, 1, rh};
-                    df->set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, c0);
-                    tile_t& first_tile = df->tile_at(vec3{rx, ry_e, -1});
-                    first_tile.set_can_have_door(true);
-                }
-            }
-        }
-        for (int y = 1; y < dh - 1; y++) {
-            for (int x = 1; x < dw - 1; x++) {
-                vec3 loc = {x, y, -1};
-                if (df->tile_is_good_for_upgrade(loc)) {
-                    df->set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_10, Rectangle{static_cast<float>(loc.x), static_cast<float>(loc.y), 1, 1});
-                }
-            }
-        }
+    void create_and_add_df_1(biome_t type, int w, int h, int df_count, float parts);
 
-        d.add_floor(df);
-    }
+    void init_dungeon(biome_t type, int df_count, float parts, int width = DEFAULT_DUNGEON_FLOOR_WIDTH, int height = DEFAULT_DUNGEON_FLOOR_HEIGHT);
 
-    void init_dungeon(biome_t type, int df_count, float parts, int width = DEFAULT_DUNGEON_FLOOR_WIDTH, int height = DEFAULT_DUNGEON_FLOOR_HEIGHT) {
-        minfo2("init_dungeon");
-        massert(df_count > 0, "df_count is <= 0");
-        massert(df_count > 0, "df_count == 0");
-        massert(type > BIOME_NONE, "biome is invalid");
-        massert(type < BIOME_COUNT, "biome is invalid 2");
-        massert(width > 0, "width must be greater than zero");
-        massert(height > 0, "height must be greater than zero");
-        if (d.is_initialized) {
-            merror("dungeon is already initialized");
-            return;
-        }
-        for (int i = 0; i < df_count; i++) {
-            create_and_add_df_0(type, width, height, df_count, parts);
-        }
-        minfo2("END floor creation loop");
-        d.is_initialized = true;
-    }
-
-    entityid create_door_with(with_fun doorInitFunction) {
-        entityid id = add_entity();
-        ct.set<entitytype>(id, ENTITY_DOOR);
-        doorInitFunction(ct, id);
-        return id;
-    }
+    entityid create_door_with(with_fun doorInitFunction);
 
     bool tile_has_player(shared_ptr<tile_t> t) {
         return t->get_cached_player_present();
     }
 
-    entityid create_door_at_with(vec3 loc, with_fun doorInitFunction) {
-        shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
-        tile_t& tile = df->tile_at(loc);
-        if (!tile_is_walkable(tile.get_type())) {
-            return INVALID;
-        }
-        entityid id = create_door_with(doorInitFunction);
-        if (id == INVALID) {
-            return INVALID;
-        }
-        if (!df->df_add_at(id, ENTITY_DOOR, loc)) {
-            return INVALID;
-        }
-        ct.set<location>(id, loc);
-        ct.set<door_open>(id, false);
-        ct.set<update>(id, true);
-        return id;
-    }
+    entityid create_door_at_with(vec3 loc, with_fun doorInitFunction);
 
-    size_t place_doors() {
-        minfo2("gamestate.place_doors");
-        size_t placed_doors = 0;
-        for (size_t z = 0; z < d.floors.size(); z++) {
-            shared_ptr<dungeon_floor> df = d.get_floor(z);
-            for (int x = 0; x < df->get_width(); x++) {
-                for (int y = 0; y < df->get_height(); y++) {
-                    vec3 loc = {x, y, static_cast<int>(z)};
-                    tile_t& tile = df->tile_at(loc);
-                    if (!tile.get_can_have_door()) {
-                        continue;
-                    }
-                    entityid door_id = create_door_at_with(loc, [](CT& ct, const entityid id) {});
-                    if (door_id == ENTITYID_INVALID) {
-                        continue;
-                    }
-                    placed_doors++;
-                }
-            }
-        }
-        msuccess("placed %ld doors", placed_doors);
-        return placed_doors;
-    }
+    size_t place_doors();
 
-    entityid create_prop_with(proptype_t type, with_fun initFun) {
-        entityid id = add_entity();
-        ct.set<entitytype>(id, ENTITY_PROP);
-        ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
-        ct.set<update>(id, true);
-        ct.set<proptype>(id, type);
-        initFun(ct, id);
-        return id;
-    }
+    entityid create_prop_with(proptype_t type, with_fun initFun);
 
-    entityid create_prop_at_with(proptype_t type, vec3 loc, with_fun initFun) {
-        shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
-        entityid id = create_prop_with(type, initFun);
-        if (id == ENTITYID_INVALID) {
-            return ENTITYID_INVALID;
-        }
-        entityid result = df->df_add_at(id, ENTITY_PROP, loc);
-        if (result == ENTITYID_INVALID) {
-            return ENTITYID_INVALID;
-        }
-        ct.set<location>(id, loc);
-        return id;
-    }
+    entityid create_prop_at_with(proptype_t type, vec3 loc, with_fun initFun);
 
-    int place_props() {
-        //auto mydefault = [](gamestate& g, entityid id) {};
-        //auto set_solid = [](gamestate& g, entityid id) { g.ct.set<solid>(id, true); };
-        //auto set_solid_and_pushable = [](gamestate& g, entityid id) {
-        //    g.ct.set<solid>(id, true);
-        //    g.ct.set<pushable>(id, true);
-        //};
-        auto defaultInit = [](CT& ct, const entityid id) {};
-        int placed_props = 0;
-        for (int z = 0; z < (int)d.floors.size(); z++) {
-            shared_ptr<dungeon_floor> df = d.get_floor(z);
-            for (int x = 0; x < df->get_width(); x++) {
-                for (int y = 0; y < df->get_height(); y++) {
-                    vec3 loc = {x, y, z};
-                    tile_t& t = df->tile_at(loc);
-                    if (t.get_type() == TILE_UPSTAIRS || t.get_type() == TILE_DOWNSTAIRS) {
-                        continue;
-                    }
-                    if (t.get_can_have_door()) {
-                        continue;
-                    }
-                    if (t.tile_is_wall()) {
-                        uniform_int_distribution<int> gen(0, 20);
-                        int flip = gen(mt);
-                        if (flip == 0) {
-                            uniform_int_distribution<int> gen2(1, 3);
-                            int r = gen2(mt);
-                            switch (r) {
-                            case 1: {
-                                entityid id = create_prop_at_with(PROP_DUNGEON_BANNER_00, loc, defaultInit);
-                                if (id != ENTITYID_INVALID) {
-                                    placed_props++;
-                                }
-                            } break;
-                            case 2: {
-                                entityid id = create_prop_at_with(PROP_DUNGEON_BANNER_01, loc, defaultInit);
-                                if (id != ENTITYID_INVALID) {
-                                    placed_props++;
-                                }
-                            } break;
-                            case 3: {
-                                entityid id = create_prop_at_with(PROP_DUNGEON_BANNER_02, loc, defaultInit);
-                                if (id != ENTITYID_INVALID) {
-                                    placed_props++;
-                                }
-                            } break;
-                            default: break;
-                            }
-                        }
-                    }
-                    else {
-                        uniform_int_distribution<int> gen(0, 20);
-                        int flip = gen(mt);
-                        if (flip == 0) {
-                            entityid id = create_prop_at_with(PROP_DUNGEON_WOODEN_TABLE_00, loc, defaultInit);
-                            ct.set<solid>(id, true);
-                            if (id != INVALID) {
-                                placed_props++;
-                            }
-                        }
-                        else if (flip == 1) {
-                            entityid id = create_prop_at_with(PROP_DUNGEON_WOODEN_TABLE_01, loc, defaultInit);
-                            if (id != INVALID) {
-                                placed_props++;
-                                ct.set<solid>(id, true);
-                            }
-                        }
-                        else if (flip == 2) {
-                            entityid id = create_prop_at_with(PROP_DUNGEON_WOODEN_CHAIR_00, loc, defaultInit);
-                            if (id != INVALID) {
-                                placed_props++;
-                            }
-                        }
-                        else if (flip == 3) {
-                            entityid id = create_prop_at_with(PROP_DUNGEON_STATUE_00, loc, defaultInit);
-                            if (id != INVALID) {
-                                placed_props++;
-                                ct.set<solid>(id, true);
-                                ct.set<pushable>(id, true);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return placed_props;
-    }
+    int place_props();
 
-    entityid create_weapon_with(with_fun weaponInitFunction) {
-        entityid id = add_entity();
-        ct.set<entitytype>(id, ENTITY_ITEM);
-        ct.set<itemtype>(id, ITEM_WEAPON);
-        ct.set<spritemove>(id, Rectangle{0, 0, 0, 0});
-        ct.set<update>(id, true);
-        weaponInitFunction(ct, id);
-        return id;
-    }
+    entityid create_weapon_with(with_fun weaponInitFunction);
 
-    with_fun dagger_init() {
-        return [](CT& ct, const entityid id) {
-            ct.set<name>(id, "dagger");
-            ct.set<description>(id, "Stabby stabby.");
-            ct.set<weapontype>(id, WEAPON_DAGGER);
-            ct.set<damage>(id, (vec3){1, 4, 0});
-            ct.set<durability>(id, 100);
-            ct.set<max_durability>(id, 100);
-            ct.set<rarity>(id, RARITY_COMMON);
-        };
-    }
+    with_fun dagger_init();
 
-    with_fun axe_init() {
-        return [](CT& ct, const entityid id) {
-            ct.set<name>(id, "axe");
-            ct.set<description>(id, "Choppy choppy");
-            ct.set<weapontype>(id, WEAPON_AXE);
-            ct.set<damage>(id, (vec3){1, 8, 0});
-            ct.set<durability>(id, 100);
-            ct.set<max_durability>(id, 100);
-            ct.set<rarity>(id, RARITY_COMMON);
-        };
-    }
+    with_fun axe_init();
 
-    with_fun sword_init() {
-        return [](CT& ct, const entityid id) {
-            ct.set<name>(id, "short sword");
-            ct.set<description>(id, "your basic soldier's short sword");
-            ct.set<weapontype>(id, WEAPON_SHORT_SWORD);
-            ct.set<damage>(id, vec3{1, 6, 0});
-            ct.set<durability>(id, 100);
-            ct.set<max_durability>(id, 100);
-            ct.set<rarity>(id, RARITY_COMMON);
-        };
-    }
+    with_fun sword_init();
 
-    with_fun shield_init() {
-        return [](CT& ct, const entityid id) {
-            ct.set<name>(id, "kite shield");
-            ct.set<description>(id, "Standard knight's shield");
-            ct.set<shieldtype>(id, SHIELD_KITE);
-            ct.set<block_chance>(id, 90);
-            ct.set<rarity>(id, RARITY_COMMON);
-            ct.set<durability>(id, 100);
-            ct.set<max_durability>(id, 100);
-        };
-    }
+    with_fun shield_init();
 
-    with_fun potion_init(potiontype_t pt) {
-        return [pt](CT& ct, const entityid id) {
-            ct.set<potiontype>(id, pt);
-            if (pt == POTION_HP_SMALL) {
-                ct.set<name>(id, "small healing potion");
-                ct.set<description>(id, "a small healing potion");
-                ct.set<healing>(id, (vec3){1, 6, 0});
-            }
-        };
-    }
+    with_fun potion_init(potiontype_t pt);
 
-    with_fun player_init(int maxhp_roll) {
-        return [this, maxhp_roll](CT& ct, const entityid id) {
-            ct.set<strength>(id, chara_creation.strength);
-            ct.set<dexterity>(id, chara_creation.dexterity);
-            ct.set<constitution>(id, chara_creation.constitution);
-            ct.set<intelligence>(id, chara_creation.intelligence);
-            ct.set<wisdom>(id, chara_creation.wisdom);
-            ct.set<charisma>(id, chara_creation.charisma);
-            ct.set<hd>(id, (vec3){1, chara_creation.hitdie, 0});
-            ct.set<hp>(id, maxhp_roll);
-            ct.set<maxhp>(id, maxhp_roll);
-        };
-    }
+    with_fun player_init(int maxhp_roll);
 
-    entityid create_weapon_at_with(ComponentTable& ct, vec3 loc, with_fun weaponInitFunction) {
-        minfo2("create weapon at with: %d %d %d", loc.x, loc.y, loc.z);
-        if (d.floors.size() == 0) {
-            merror2("dungeon floors size is 0");
-            return INVALID;
-        }
-        if (!d.is_initialized) {
-            merror2("dungeon is_initialized flag not set");
-            return INVALID;
-        }
-        if (vec3_invalid(loc)) {
-            merror2("loc is invalid");
-            return INVALID;
-        }
-        shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
-        tile_t& tile = df->tile_at(loc);
-        if (!tile_is_walkable(tile.get_type())) {
-            merror2("cannot create entity on non-walkable tile");
-            return INVALID;
-        }
-        //if (tile_has_live_npcs(tile)) {
-        //    merror2("cannot create entity on tile with live NPCs");
-        //    return INVALID;
-        //}
-        entityid id = create_weapon_with(weaponInitFunction);
-        if (id == ENTITYID_INVALID) {
-            minfo2("failed to create weapon");
-            return INVALID;
-        }
-        if (df->df_add_at(id, ENTITY_ITEM, loc) == ENTITYID_INVALID) {
-            minfo2("failed to add weapon to df");
-            return INVALID;
-        }
-        ct.set<location>(id, loc);
-        return id;
-    }
+    entityid create_weapon_at_with(ComponentTable& ct, vec3 loc, with_fun weaponInitFunction);
 
-    entityid create_weapon_at_random_loc_with(CT& ct, with_fun weaponInitFunction) {
-        vec3 loc = d.floors[d.current_floor]->get_random_loc();
-        if (vec3_invalid(loc)) {
-            merror("loc is invalid");
-            return INVALID;
-        }
-        return create_weapon_at_with(ct, loc, dagger_init());
-    }
+    entityid create_weapon_at_random_loc_with(CT& ct, with_fun weaponInitFunction);
 
-    entityid create_shield_with(ComponentTable& ct, with_fun shieldInitFunction) {
-        entityid id = add_entity();
-        ct.set<entitytype>(id, ENTITY_ITEM);
-        ct.set<itemtype>(id, ITEM_SHIELD);
-        ct.set<durability>(id, 100);
-        ct.set<max_durability>(id, 100);
-        ct.set<rarity>(id, RARITY_COMMON);
-        ct.set<update>(id, false);
-        shieldInitFunction(ct, id);
-        return id;
-    }
+    entityid create_shield_with(ComponentTable& ct, with_fun shieldInitFunction);
 
-    entityid create_shield_at_with(ComponentTable& ct, vec3 loc, with_fun shieldInitFunction) {
-        if (d.floors.size() == 0) {
-            return INVALID;
-        }
-        entityid id = create_shield_with(ct, shieldInitFunction);
-        shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
-        if (!df->df_add_at(id, ENTITY_ITEM, loc)) {
-            return INVALID;
-        }
-        ct.set<location>(id, loc);
-        return id;
-    }
+    entityid create_shield_at_with(ComponentTable& ct, vec3 loc, with_fun shieldInitFunction);
 
-    entityid create_potion_with(with_fun potionInitFunction) {
-        entityid id = add_entity();
-        ct.set<entitytype>(id, ENTITY_ITEM);
-        ct.set<itemtype>(id, ITEM_POTION);
-        ct.set<update>(id, true);
-        potionInitFunction(ct, id);
-        return id;
-    }
+    entityid create_potion_with(with_fun potionInitFunction);
 
-    entityid create_potion_at_with(vec3 loc, with_fun potionInitFunction) {
-        shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
-        tile_t& tile = df->tile_at(loc);
-        if (!tile_is_walkable(tile.get_type())) {
-            return INVALID;
-        }
-        //if (tile_has_live_npcs(tile)) {
-        //    return INVALID;
-        //}
-        entityid id = create_potion_with(potionInitFunction);
-        if (id == INVALID) {
-            return INVALID;
-        }
-        if (!df->df_add_at(id, ENTITY_ITEM, loc)) {
-            return INVALID;
-        }
-        ct.set<location>(id, loc);
-        ct.set<update>(id, true);
-        return id;
-    }
+    entityid create_potion_at_with(vec3 loc, with_fun potionInitFunction);
 
-    race_t random_monster_type() {
-        vector<race_t> monster_races = {RACE_GOBLIN, RACE_ORC, RACE_BAT, RACE_WOLF, RACE_WARG, RACE_ZOMBIE, RACE_SKELETON, RACE_RAT, RACE_GREEN_SLIME};
-        uniform_int_distribution<int> gen(0, monster_races.size() - 1);
-        int random_index = gen(mt);
-        return monster_races[random_index];
-    }
+    race_t random_monster_type();
 
-    void set_npc_starting_stats(entityid id) {
-        race_t rt = ct.get<race>(id).value_or(RACE_NONE);
-        if (rt == RACE_NONE) {
-            return;
-        }
-        // stats racial modifiers for stats
-        int str_m = get_racial_modifiers(rt, 0);
-        int dex_m = get_racial_modifiers(rt, 1);
-        int int_m = get_racial_modifiers(rt, 2);
-        int wis_m = get_racial_modifiers(rt, 3);
-        int con_m = get_racial_modifiers(rt, 4);
-        int cha_m = get_racial_modifiers(rt, 5);
-        // default to 3-18 for stats
-        uniform_int_distribution<int> gen(3, 18);
-        int strength_ = gen(mt) + str_m;
-        int dexterity_ = gen(mt) + dex_m;
-        int intelligence_ = gen(mt) + int_m;
-        int wisdom_ = gen(mt) + wis_m;
-        int constitution_ = gen(mt) + con_m;
-        int charisma_ = gen(mt) + cha_m;
-        ct.set<strength>(id, strength_);
-        ct.set<dexterity>(id, dexterity_);
-        ct.set<intelligence>(id, intelligence_);
-        ct.set<wisdom>(id, wisdom_);
-        ct.set<constitution>(id, constitution_);
-        ct.set<charisma>(id, charisma_);
-        // set default hp/maxhp for now
-        // later, we will decide this by race templating
-        vec3 hitdie = {1, 8, 0};
-        switch (rt) {
-        case RACE_HUMAN: hitdie.y = 8; break;
-        case RACE_ELF: hitdie.y = 6; break;
-        case RACE_DWARF: hitdie.y = 10; break;
-        case RACE_HALFLING: hitdie.y = 6; break;
-        case RACE_GOBLIN: hitdie.y = 6; break;
-        case RACE_ORC: hitdie.y = 8; break;
-        case RACE_BAT: hitdie.y = 3; break;
-        case RACE_GREEN_SLIME: hitdie.y = 4; break;
-        case RACE_WOLF: hitdie.y = 6; break;
-        case RACE_WARG: hitdie.y = 12; break;
-        case RACE_RAT: hitdie.y = 4; break;
-        case RACE_SKELETON: hitdie.y = 8; break;
-        case RACE_ZOMBIE: hitdie.y = 8; break;
-        default: break;
-        }
-        uniform_int_distribution<int> gen2(1, hitdie.y);
-        int my_maxhp = std::max(1, gen2(mt) + get_stat_bonus(constitution_));
-        int my_hp = my_maxhp;
-        ct.set<maxhp>(id, my_maxhp);
-        ct.set<hp>(id, my_hp);
-        ct.set<base_ac>(id, 10);
-        ct.set<hd>(id, hitdie);
-    }
+    void set_npc_starting_stats(entityid id);
 
-    void set_npc_defaults(entityid id) {
-        ct.set<entitytype>(id, ENTITY_NPC);
-        ct.set<spritemove>(id, Rectangle{0, 0, 0, 0});
-        ct.set<dead>(id, false);
-        ct.set<update>(id, true);
-        ct.set<direction>(id, DIR_DOWN_RIGHT);
-        ct.set<attacking>(id, false);
-        ct.set<blocking>(id, false);
-        ct.set<block_success>(id, false);
-        ct.set<damaged>(id, false);
-        //ct.set<txalpha>(id, 255);
-        ct.set<inventory>(id, make_shared<vector<entityid>>());
-        ct.set<equipped_weapon>(id, ENTITYID_INVALID);
-        ct.set<aggro>(id, false);
-        ct.set<vision_distance>(id, 3);
-        ct.set<hearing_distance>(id, 3);
-        // here we have some hard decisions to make about how to template-out NPC creation
-        // all NPCs begin at level 1. level-up mechanisms will be determined elsewhere
-        ct.set<level>(id, 1);
-        ct.set<xp>(id, 0);
-        ct.set<hunger_points>(id, hunger_points_t{100, 100});
-        ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_NONE);
-        //ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_RANDOM_MOVE);
-        //ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_MOVE_TO_TARGET);
-        //ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_ATTACK_TARGET_IF_ADJACENT);
-        //ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_RANDOM_MOVE_AND_ATTACK_TARGET_IF_ADJACENT);
-        ct.set<target_path>(id, make_shared<vector<vec3>>());
-    }
+    void set_npc_defaults(entityid id);
 
-    entityid create_npc_with(race_t rt, with_fun npcInitFunction) {
-        entityid id = add_entity();
-        set_npc_defaults(id);
-        ct.set<race>(id, rt);
-        set_npc_starting_stats(id);
-        npcInitFunction(ct, id);
-        return id;
-    }
+    entityid create_npc_with(race_t rt, with_fun npcInitFunction);
 
     entityid tile_has_box(int x, int y, int z) {
         massert(z >= 0, "floor is out of bounds");
@@ -922,84 +425,13 @@ public:
         return ENTITYID_INVALID;
     }
 
-    entityid create_npc_at_with(race_t rt, vec3 loc, with_fun npcInitFunction) {
-        minfo2("create npc at with: (%d, %d, %d)", loc.x, loc.y, loc.z);
-        auto df = d.get_floor(loc.z);
-        tile_t& tile = df->tile_at(loc);
-        if (!tile_is_walkable(tile.get_type())) {
-            merror2("cannot create entity on non-walkable tile: tile.type: %s", tiletype2str(tile.get_type()).c_str());
-            return INVALID;
-        }
-        //if (tile_has_live_npcs(tile)) {
-        //    merror2("cannot create entity on tile with live NPCs");
-        //    return INVALID;
-        //}
-        if (tile_has_box(loc.x, loc.y, loc.z) != ENTITYID_INVALID) {
-            merror2("cannot create entity on tile with box");
-            return INVALID;
-        }
-        if (tile_has_pushable(loc.x, loc.y, loc.z) != ENTITYID_INVALID) {
-            merror2("cannot create entity on tile with pushable");
-            return INVALID;
-        }
-        entityid id = create_npc_with(rt, npcInitFunction);
-        if (id == INVALID) {
-            merror("failed to create npc");
-            return INVALID;
-        }
-        if (df->df_add_at(id, ENTITY_NPC, loc) == INVALID) {
-            merror("failed to add npc %d to %d, %d", id, loc.x, loc.y);
-            return INVALID;
-        }
-        minfo2("setting location for %d", id);
-        ct.set<location>(id, loc);
-        msuccess2("created npc %d", id);
-        return id;
-    }
+    entityid create_npc_at_with(race_t rt, vec3 loc, with_fun npcInitFunction);
 
-    bool add_to_inventory(entityid actor_id, entityid item_id) {
-        minfo2("adding %d to %d's inventory", actor_id, item_id);
-        auto maybe_inventory = ct.get<inventory>(actor_id);
-        if (!maybe_inventory.has_value()) {
-            merror2("%d has no inventory component", actor_id);
-            return false;
-        }
-        auto inventory = maybe_inventory.value();
-        inventory->push_back(item_id);
-        msuccess2("added %d to %d's inventory", actor_id, item_id);
-        return true;
-    }
+    bool add_to_inventory(entityid actor_id, entityid item_id);
 
-    entityid create_orc_with(with_fun monsterInitFunction) {
-        constexpr race_t r = RACE_ORC;
-        entityid id = create_npc_with(r, monsterInitFunction);
-        ct.set<name>(id, get_random_orc_name());
-        return id;
-    }
+    entityid create_orc_with(with_fun monsterInitFunction);
 
-    entityid create_orc_at_with(vec3 loc, with_fun monsterInitFunction) {
-        if (vec3_invalid(loc)) {
-            return ENTITYID_INVALID;
-        }
-        auto df = d.get_floor(loc.z);
-        tile_t& t = df->tile_at(loc);
-        if (!tile_is_walkable(t.get_type())) {
-            return ENTITYID_INVALID;
-        }
-        if (t.get_cached_live_npc() != INVALID) {
-            return INVALID;
-        }
-        entityid id = create_orc_with(monsterInitFunction);
-        if (id == ENTITYID_INVALID) {
-            return ENTITYID_INVALID;
-        }
-        if (!df->df_add_at(id, ENTITY_NPC, loc)) {
-            return ENTITYID_INVALID;
-        }
-        ct.set<location>(id, loc);
-        ct.set<update>(id, true);
-        return id;
-    }
+    entityid create_orc_at_with(vec3 loc, with_fun monsterInitFunction);
 
     bool add_message(const char* fmt, ...) {
         massert(fmt, "format string is NULL");
@@ -1266,95 +698,15 @@ public:
         frame_dirty = true;
     }
 
-    entityid create_player_at_with(vec3 loc, string n, with_fun playerInitFunction) {
-        minfo2("create player with: loc=(%d, %d, %d), n=%s", loc.x, loc.y, loc.z, n.c_str());
-        massert(n != "", "name is empty string");
-        race_t rt = chara_creation.race;
-        entityid id = create_npc_at_with(rt, loc, [](CT& ct, const entityid id) {});
-        massert(id != ENTITYID_INVALID, "id is invalid");
-        constexpr int hp_ = 10;
-        constexpr int maxhp_ = 10;
-        constexpr int vis_dist = 20;
-        constexpr int light_rad = 20;
-        constexpr int hear_dist = 3;
-        //constexpr entitytype_t type = ENTITY_PLAYER;
-        set_hero_id(id);
-        ct.set<entitytype>(id, ENTITY_PLAYER);
+    entityid create_player_at_with(vec3 loc, string n, with_fun playerInitFunction);
 
-        auto df = d.get_current_floor();
-        tile_t& tile = df->tile_at(loc);
-        tile.set_cached_player_present(true);
-        tile.set_cached_live_npc(id);
+    entityid create_box_with();
 
-        //ct.set<txalpha>(id, 0);
-        ct.set<hp>(id, hp_);
-        ct.set<maxhp>(id, maxhp_);
-        ct.set<vision_distance>(id, vis_dist);
-        ct.set<light_radius>(id, light_rad);
-        ct.set<hearing_distance>(id, hear_dist);
-        ct.set<name>(id, n);
-        ct.set<dead>(id, false); // Hero should never start dead
-        playerInitFunction(ct, id);
-        return id;
-    }
+    entityid create_box_at_with(vec3 loc);
 
-    entityid create_box_with() {
-        entityid id = add_entity();
-        ct.set<entitytype>(id, ENTITY_BOX);
-        ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
-        ct.set<update>(id, true);
-        ct.set<pushable>(id, true);
-        ct.set<pullable>(id, true);
-        //boxInitFunction(g, id);
-        return id;
-    }
+    entityid create_spell_with();
 
-    entityid create_box_at_with(vec3 loc) {
-        shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
-        tile_t& tile = df->tile_at(loc);
-        if (!tile_is_walkable(tile.get_type())) {
-            merror("cannot create entity on non-walkable tile");
-            return ENTITYID_INVALID;
-        }
-        //if (tile_has_live_npcs(tile)) {
-        //    merror("cannot create entity on tile with live NPCs");
-        //    return ENTITYID_INVALID;
-        //}
-        if (tile_has_box(loc.x, loc.y, loc.z) != ENTITYID_INVALID) {
-            merror("cannot create entity on tile with box");
-            return ENTITYID_INVALID;
-        }
-        entityid id = create_box_with();
-        if (df->df_add_at(id, ENTITY_BOX, loc) == ENTITYID_INVALID) {
-            merror("failed df_add_at: %d, %d, %d", id, loc.x, loc.y);
-            return ENTITYID_INVALID;
-        }
-        ct.set<location>(id, loc);
-        return id;
-    }
-
-    entityid create_spell_with() {
-        entityid id = add_entity();
-        ct.set<entitytype>(id, ENTITY_SPELL);
-        ct.set<spelltype>(id, SPELLTYPE_FIRE);
-        ct.set<spellstate>(id, SPELLSTATE_NONE);
-        return id;
-    }
-
-    entityid create_spell_at_with(vec3 loc) {
-        auto df = d.get_floor(loc.z);
-        auto tile = df->tile_at(loc);
-        if (!tile_is_walkable(tile.get_type())) {
-            return ENTITYID_INVALID;
-        }
-        entityid id = create_spell_with();
-        if (df->df_add_at(id, ENTITY_SPELL, loc) == ENTITYID_INVALID) {
-            return ENTITYID_INVALID;
-        }
-        ct.set<location>(id, loc);
-        ct.set<update>(id, true);
-        return id;
-    }
+    entityid create_spell_at_with(vec3 loc);
 
     void make_all_npcs_target_player() {
         massert(hero_id != ENTITYID_INVALID, "hero_id is invalid");
@@ -3629,3 +2981,6 @@ public:
         minfo2("end tick");
     }
 };
+
+#include "gamestate_world_impl.h"
+#include "gamestate_entity_factory_impl.h"
