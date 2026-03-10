@@ -355,9 +355,9 @@ public:
         d.add_floor(df);
     }
 
-    void create_and_add_df_1(biome_t type, int df_count, float parts) {
+    void create_and_add_df_1(biome_t type, int w, int h, int df_count, float parts) {
         float min_room_w = 2;
-        auto df = d.create_floor(type);
+        auto df = d.create_floor(type, w, h);
         float dw = df->get_width();
         float dh = df->get_height();
         vector<room> rooms;
@@ -430,18 +430,20 @@ public:
         d.add_floor(df);
     }
 
-    void init_dungeon(biome_t type, int df_count, float parts) {
+    void init_dungeon(biome_t type, int df_count, float parts, int width = DEFAULT_DUNGEON_FLOOR_WIDTH, int height = DEFAULT_DUNGEON_FLOOR_HEIGHT) {
         minfo2("init_dungeon");
         massert(df_count > 0, "df_count is <= 0");
         massert(df_count > 0, "df_count == 0");
         massert(type > BIOME_NONE, "biome is invalid");
         massert(type < BIOME_COUNT, "biome is invalid 2");
+        massert(width > 0, "width must be greater than zero");
+        massert(height > 0, "height must be greater than zero");
         if (d.is_initialized) {
             merror("dungeon is already initialized");
             return;
         }
         for (int i = 0; i < df_count; i++) {
-            create_and_add_df_0(type, 16, 16, df_count, parts);
+            create_and_add_df_0(type, width, height, df_count, parts);
         }
         minfo2("END floor creation loop");
         d.is_initialized = true;
@@ -1156,7 +1158,9 @@ public:
         srand(time(NULL));
         SetRandomSeed(time(NULL));
         constexpr float parts = 1.0;
-        init_dungeon(BIOME_STONE, 1, parts);
+
+        init_dungeon(BIOME_STONE, 1, parts, 16, 16);
+
         massert(d.floors.size() > 0, "dungeon.floors.size is 0");
         place_doors();
         //place_props();
