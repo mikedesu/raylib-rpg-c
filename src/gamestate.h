@@ -344,13 +344,14 @@ public:
         return id;
     }
 
-    inline tile_t& tile_at_cur_floor(vec3 loc) {
+    tile_t& tile_at_cur_floor(vec3 loc) {
         return d.get_current_floor()->tile_at(loc);
     }
 
-    inline void create_and_add_df_0(biome_t type, int df_count, float parts) {
-        //auto df = d.create_floor(type, w, h);
-        auto df = d.create_floor(type);
+    void create_and_add_df_0(biome_t type, int df_count, float parts) {
+        auto df = d.create_floor(type, 16, 16);
+        //auto df = d.create_floor(type);
+
         const float dw = df->get_width();
         const float dh = df->get_height();
         vector<room> rooms;
@@ -359,7 +360,7 @@ public:
         d.add_floor(df);
     }
 
-    inline void create_and_add_df_1(biome_t type, int df_count, float parts) {
+    void create_and_add_df_1(biome_t type, int df_count, float parts) {
         constexpr float min_room_w = 2;
         auto df = d.create_floor(type);
         const float dw = df->get_width();
@@ -1267,7 +1268,9 @@ public:
         //const int h = 32;
         //constexpr float parts = 4.0;
         //init_dungeon(BIOME_STONE, 1, w, h, parts);
+
         init_dungeon(BIOME_STONE, 1, parts);
+
         massert(d.floors.size() > 0, "dungeon.floors.size is 0");
         place_doors();
         //place_props();
