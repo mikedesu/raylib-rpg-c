@@ -10,6 +10,7 @@ This file is the handoff note for the `gamestate.h` cleanup work.
 - Extracted scene/bootstrap handlers out of `gamestate.h` into `gamestate_scene_impl.h`.
 - Extracted player input and menu handling out of `gamestate.h` into `gamestate_input_impl.h`.
 - Extracted NPC AI, combat resolution, and pathfinding out of `gamestate.h` into `gamestate_npc_combat_impl.h`.
+- Extracted world interaction helpers out of `gamestate.h` into `gamestate_world_interaction_impl.h`.
 
 ## Current State
 
@@ -25,6 +26,7 @@ This file is the handoff note for the `gamestate.h` cleanup work.
 - `gamestate_scene_impl.h`
 - `gamestate_input_impl.h`
 - `gamestate_npc_combat_impl.h`
+- `gamestate_world_interaction_impl.h`
 
 ## Verified
 
@@ -41,19 +43,12 @@ make clean && CXXFLAGS="-DDEBUG_ASSERT=1 -DNPCS_ALL_AT_ONCE -DDEBUG=1 -DMASTER_V
 
 These are the best remaining cleanup seams for the next session:
 
-1. World interaction helpers
-   - pull/push interaction
-   - pickup/drop flow
-   - stairs traversal
-   - door interaction
-   - spell interaction
-
-2. Inventory management helpers
+1. Inventory management helpers
    - equip/unequip
    - item use
    - inventory mutations and related utility functions
 
-3. Debug and diagnostics
+2. Debug and diagnostics
    - `update_debug_panel_buffer`
    - possibly related profiling/debug helpers
 
@@ -73,4 +68,4 @@ These are the best remaining cleanup seams for the next session:
 
 Continue with:
 
-`Refactor the remaining world interaction helpers out of gamestate.h, using PLAN.md as the handoff note.`
+`Refactor the remaining inventory management helpers out of gamestate.h, using PLAN.md as the handoff note.`

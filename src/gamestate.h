@@ -409,21 +409,7 @@ public:
         return t.get_cached_box();
     }
 
-    entityid tile_has_pullable(int x, int y, int z) {
-        minfo("tile_has_pullable(%d, %d, %d)", x, y, z);
-        massert(z >= 0, "floor is out of bounds");
-        massert((size_t)z < d.floors.size(), "floor is out of bounds");
-        shared_ptr<dungeon_floor> df = d.get_floor(z);
-        tile_t& t = df->tile_at(vec3{x, y, z});
-        entityid box_id = t.get_cached_box();
-        if (box_id != INVALID) {
-            bool is_pullable = ct.get<pullable>(box_id).value_or(false);
-            if (is_pullable) {
-                return box_id;
-            }
-        }
-        return ENTITYID_INVALID;
-    }
+    entityid tile_has_pullable(int x, int y, int z);
 
     entityid create_npc_at_with(race_t rt, vec3 loc, with_fun npcInitFunction);
 
@@ -518,42 +504,9 @@ public:
         return success;
     }
 
-    bool drop_from_inventory(entityid actor_id, entityid item_id) {
-        if (remove_from_inventory(actor_id, item_id)) {
-            auto maybe_loc = ct.get<location>(actor_id);
-            if (!maybe_loc.has_value()) {
-                merror("actor id %d has no location -- cannot drop item", actor_id);
-                return false;
-            }
-            vec3 loc = maybe_loc.value();
-            auto df = d.get_current_floor();
-            entityid retval = df->df_add_at(item_id, ENTITY_ITEM, loc);
-            if (retval == ENTITYID_INVALID) {
-                merror("Failed to add to tile");
-                return false;
-            }
-            // update the item_id's location
-            ct.set<location>(item_id, loc);
-            msuccess("Drop item successful");
-            return true;
-        }
-        merror("Remove from inventory failed for some reason");
-        return false;
-    }
+    bool drop_from_inventory(entityid actor_id, entityid item_id);
 
-    bool drop_all_from_inventory(entityid actor_id) {
-        auto maybe_inventory = ct.get<inventory>(actor_id);
-        if (!maybe_inventory.has_value()) {
-            merror("no inventory");
-            return false;
-        }
-        auto inventory = maybe_inventory.value();
-        while (inventory->size() > 0) {
-            auto id = inventory->back();
-            drop_from_inventory(actor_id, id);
-        }
-        return true;
-    }
+    bool drop_all_from_inventory(entityid actor_id);
 
     void handle_hero_inventory_equip_weapon(entityid item_id) {
         // Check if this is the currently equipped weapon
@@ -617,38 +570,7 @@ public:
         }
     }
 
-    bool drop_item_from_hero_inventory() {
-        if (!ct.has<inventory>(hero_id)) {
-            return false;
-        }
-        size_t index = inventory_cursor.y * 7 + inventory_cursor.x;
-        auto maybe_inventory = ct.get<inventory>(hero_id);
-        if (!maybe_inventory.has_value()) {
-            return false;
-        }
-        auto inventory = maybe_inventory.value();
-        if (index < 0 || index >= inventory->size()) {
-            return false;
-        }
-        entityid item_id = inventory->at(index);
-        inventory->erase(inventory->begin() + index);
-        if (item_id == ct.get<equipped_weapon>(hero_id).value_or(ENTITYID_INVALID)) {
-            ct.set<equipped_weapon>(hero_id, ENTITYID_INVALID);
-        }
-        // add it to the tile at the player's current location
-        // get the player's location
-        vec3 loc = ct.get<location>(hero_id).value();
-        // get the tile at the player's location
-        auto df = d.get_current_floor();
-        if (!df->df_add_at(item_id, ENTITY_ITEM, loc)) {
-            merror("Failed to add to %d, %d, %d", loc.x, loc.y, loc.z);
-            return false;
-        }
-        // update the entity's location
-        ct.set<location>(item_id, loc);
-        // add to tile
-        return true;
-    }
+    bool drop_item_from_hero_inventory();
 
     bool is_in_inventory(entityid actor_id, entityid item_id) {
         auto maybe_inventory = ct.get<inventory>(actor_id);
@@ -734,346 +656,35 @@ public:
 
     bool handle_display_inventory(inputstate& is);
 
-    bool tile_has_solid(int x, int y, int z) {
-        massert(z >= 0, "floor is out of bounds");
-        massert((size_t)z < d.floors.size(), "floor is out of bounds");
-        shared_ptr<dungeon_floor> df = d.get_floor(z);
-        //shared_ptr<tile_t> t = df->tile_at(vec3{x, y, z});
-        tile_t& t = df->tile_at(vec3{x, y, z});
+    bool tile_has_solid(int x, int y, int z);
 
-        //for (int i = 0; (size_t)i < t->get_entity_count(); i++) {
-        //entityid id = t->get_cached_live_npc();
-        entityid id = t.get_cached_live_npc();
-        bool is_solid = ct.get<solid>(id).value_or(false);
-        if (id != ENTITYID_INVALID && is_solid) {
-            return true;
-        }
+    bool handle_box_push(entityid id, vec3 v);
 
-        id = t.get_cached_box();
-        is_solid = ct.get<solid>(id).value_or(false);
-        if (id != ENTITYID_INVALID && is_solid) {
-            return true;
-        }
+    entityid tile_has_pushable(int x, int y, int z);
 
-        id = t.get_cached_door();
-        is_solid = ct.get<solid>(id).value_or(false);
-        if (id != ENTITYID_INVALID && is_solid) {
-            return true;
-        }
+    entityid tile_has_door(vec3 v);
 
-        id = t.get_cached_item();
-        is_solid = ct.get<solid>(id).value_or(false);
-        if (id != ENTITYID_INVALID && is_solid) {
-            return true;
-        }
+    bool check_hearing(entityid id, vec3 loc);
 
-        return false;
-    }
+    bool try_entity_move(entityid id, vec3 v);
 
-    bool handle_box_push(entityid id, vec3 v) {
-        bool can_push = ct.get<pushable>(id).value_or(false);
-        if (!can_push) {
-            return false;
-        }
-        return try_entity_move(id, v);
-    }
+    bool handle_move_up(inputstate& is, bool is_dead);
 
-    entityid tile_has_pushable(int x, int y, int z) {
-        massert(z >= 0, "floor is out of bounds");
-        massert((size_t)z < d.floors.size(), "floor is out of bounds");
-        shared_ptr<dungeon_floor> df = d.get_floor(z);
-        //shared_ptr<tile_t> t = df->tile_at(vec3{x, y, z});
-        tile_t& t = df->tile_at(vec3{x, y, z});
+    bool handle_move_down(inputstate& is, bool is_dead);
 
-        //for (int i = 0; (size_t)i < t->get_entity_count(); i++) {
-        //const entityid id = t->get_cached_box();
-        entityid id = t.get_cached_box();
-        bool is_pushable = ct.get<pushable>(id).value_or(false);
-        if (id != ENTITYID_INVALID && is_pushable) {
-            return id;
-        }
-        //}
+    bool handle_move_left(inputstate& is, bool is_dead);
 
-        return ENTITYID_INVALID;
-    }
+    bool handle_move_right(inputstate& is, bool is_dead);
 
-    entityid tile_has_door(vec3 v) {
-        shared_ptr<dungeon_floor> df = d.get_current_floor();
-        //shared_ptr<tile_t> t = df->tile_at(v);
-        tile_t& t = df->tile_at(v);
-        //for (size_t i = 0; i < t->get_entity_count(); i++) {
-        //const entityid id = t->get_cached_door();
-        entityid id = t.get_cached_door();
-        //const entitytype_t type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
-        //if (type == ENTITY_DOOR) {
-        return id;
-        //}
-        //}
-        //return ENTITYID_INVALID;
-    }
+    bool handle_move_up_left(inputstate& is, bool is_dead);
 
-    bool check_hearing(entityid id, vec3 loc) {
-        if (id == ENTITYID_INVALID || vec3_invalid(loc)) {
-            return false;
-        }
-        vec3 hero_loc = ct.get<location>(hero_id).value_or(vec3{-1, -1, -1});
-        // is the hero on the same floor as loc?
-        if (vec3_invalid(hero_loc) || hero_loc.z != loc.z) {
-            return false;
-        }
+    bool handle_move_up_right(inputstate& is, bool is_dead);
 
-        float x0 = hero_loc.x;
-        float y0 = hero_loc.y;
-        float x1 = loc.x;
-        float y1 = loc.y;
-        Vector2 p0 = {x0, y0};
-        Vector2 p1 = {x1, y1};
+    bool handle_move_down_left(inputstate& is, bool is_dead);
 
-        float dist = Vector2Distance(p0, p1);
+    bool handle_move_down_right(inputstate& is, bool is_dead);
 
-        float hearing = ct.get<hearing_distance>(hero_id).value_or(3);
-
-        return dist <= hearing;
-    }
-
-    bool try_entity_move(entityid id, vec3 v) {
-        massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
-        minfo2("entity %d is trying to move: (%d,%d,%d)", id, v.x, v.y, v.z);
-        ct.set<direction>(id, get_dir_from_xy(v.x, v.y));
-        ct.set<update>(id, true);
-        // entity location
-        massert(ct.has<location>(id), "id %d has no location", id);
-
-        vec3 loc = ct.get<location>(id).value_or((vec3){-1, -1, -1});
-
-        massert(!vec3_invalid(loc), "id %d location invalid", id);
-        // entity's new location
-        // we will have a special case for traversing floors so ignore v.z
-        vec3 aloc = {loc.x + v.x, loc.y + v.y, loc.z};
-
-        minfo2("entity %d is trying to move to (%d,%d,%d)", id, aloc.x, aloc.y, aloc.z);
-
-        shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
-
-        if (aloc.x < 0 || aloc.x >= df->get_width() || aloc.y < 0 || aloc.y >= df->get_height()) {
-            merror2("destination is invalid: (%d, %d, %d)", aloc.x, aloc.y, aloc.z);
-            return false;
-        }
-
-        //shared_ptr<tile_t> tile = df->tile_at(aloc);
-        tile_t& tile = df->tile_at(aloc);
-        //if (!tile_is_walkable(tile->get_type())) {
-        if (!tile_is_walkable(tile.get_type())) {
-            if (!(god_mode && id == hero_id)) {
-                merror2("tile is not walkable");
-                return false;
-            }
-        }
-        entityid box_id = tile_has_box(aloc.x, aloc.y, aloc.z);
-        if (box_id != ENTITYID_INVALID) {
-            merror2("box present, trying to push");
-            return handle_box_push(box_id, v);
-        }
-        entityid pushable_id = tile_has_pushable(aloc.x, aloc.y, aloc.z);
-        if (pushable_id != ENTITYID_INVALID) {
-            merror2("pushable present, trying to push");
-            return handle_box_push(pushable_id, v);
-        }
-        bool has_solid = tile_has_solid(aloc.x, aloc.y, aloc.z);
-        if (has_solid) {
-            merror2("solid present, cannot move");
-            return false;
-        }
-        //else if (get_cached_live_npc(tile) != INVALID) {
-        else if (tile.get_cached_live_npc() != INVALID) {
-            merror2("live npcs present, cannot move");
-            return false;
-        }
-
-        //else if (tile_has_live_npcs(tile_at_cur_floor(aloc))) {
-        //    merror2("live npcs present, cannot move");
-        //    return false;
-        //}
-        //else if (tile_has_player(tile_at_cur_floor(aloc))) {
-        //    merror2("player present, cannot move");
-        //    return false;
-        //}
-        entityid door_id = tile_has_door(aloc);
-        if (door_id != ENTITYID_INVALID) {
-            massert(ct.has<door_open>(door_id), "door_id %d doesnt have a door_open component", door_id);
-            if (!ct.get<door_open>(door_id).value_or(false)) {
-                merror2("door is closed");
-                return false;
-            }
-        }
-        // if door, door is open
-        // remove the entity from the current tile
-
-        if (!df->df_remove_at(id, loc)) {
-            merror2("Failed to remove %d from (%d, %d)", id, loc.x, loc.y);
-            return false;
-        }
-
-        // force cache update
-        //recompute_entity_cache_at(loc);
-        // add the entity to the new tile
-
-        auto type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
-
-        if (df->df_add_at(id, type, aloc) == ENTITYID_INVALID) {
-            merror2("Failed to add %d to (%d, %d)", id, aloc.x, aloc.y);
-            return false;
-        }
-
-        // force cache update
-        //recompute_entity_cache_at(aloc);
-        ct.set<location>(id, aloc);
-        float mx = v.x * DEFAULT_TILE_SIZE;
-        float my = v.y * DEFAULT_TILE_SIZE;
-        ct.set<spritemove>(id, (Rectangle){mx, my, 0, 0});
-        if (check_hearing(hero_id, aloc)) {
-            // crashes in unittest if missing this check
-            if (IsAudioDeviceReady())
-                PlaySound(sfx[SFX_STEP_STONE_1]);
-        }
-        ct.set<steps_taken>(id, ct.get<steps_taken>(id).value_or(0) + 1);
-        msuccess2("npc %d moved to (%d,%d,%d)", id, aloc.x, aloc.y, aloc.z);
-        return true;
-    }
-
-    bool handle_move_up(inputstate& is, bool is_dead) {
-        //if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_W) || inputstate_is_pressed(is, KEY_KP_8)) {
-        if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_KP_8)) {
-            if (is_dead) {
-                return add_message("You cannot move while dead");
-            }
-            try_entity_move(hero_id, (vec3){0, -1, 0});
-            flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            return true;
-        }
-        return false;
-    }
-
-    bool handle_move_down(inputstate& is, bool is_dead) {
-        //if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_X) || inputstate_is_pressed(is, KEY_KP_2)) {
-        if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_KP_2)) {
-            if (is_dead)
-                return add_message("You cannot move while dead");
-            try_entity_move(hero_id, (vec3){0, 1, 0});
-            flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            return true;
-        }
-        return false;
-    }
-
-    bool handle_move_left(inputstate& is, bool is_dead) {
-        //if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_A) || inputstate_is_pressed(is, KEY_KP_4)) {
-        if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_KP_4)) {
-            if (is_dead)
-                return add_message("You cannot move while dead");
-            try_entity_move(hero_id, (vec3){-1, 0, 0});
-            flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            return true;
-        }
-        return false;
-    }
-
-    bool handle_move_right(inputstate& is, bool is_dead) {
-        //if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_D) || inputstate_is_pressed(is, KEY_KP_6)) {
-        if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_KP_6)) {
-            if (is_dead)
-                return add_message("You cannot move while dead");
-            try_entity_move(hero_id, (vec3){1, 0, 0});
-            flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            return true;
-        }
-        return false;
-    }
-
-    bool handle_move_up_left(inputstate& is, bool is_dead) {
-        //if (inputstate_is_pressed(is, KEY_Q) || inputstate_is_pressed(is, KEY_KP_7)) {
-        if (inputstate_is_pressed(is, KEY_KP_7)) {
-            if (is_dead) {
-                return add_message("You cannot move while dead");
-            }
-            try_entity_move(hero_id, (vec3){-1, -1, 0});
-            flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            return true;
-        }
-        return false;
-    }
-
-    bool handle_move_up_right(inputstate& is, bool is_dead) {
-        //if (inputstate_is_pressed(is, KEY_E) || inputstate_is_pressed(is, KEY_KP_9)) {
-        if (inputstate_is_pressed(is, KEY_KP_9)) {
-            if (is_dead) {
-                add_message("You cannot move while dead");
-                return true;
-            }
-            try_entity_move(hero_id, (vec3){1, -1, 0});
-            flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            return true;
-        }
-        return false;
-    }
-
-    bool handle_move_down_left(inputstate& is, bool is_dead) {
-        //if (inputstate_is_pressed(is, KEY_Z) || inputstate_is_pressed(is, KEY_KP_1)) {
-        if (inputstate_is_pressed(is, KEY_KP_1)) {
-            if (is_dead)
-                return add_message("You cannot move while dead");
-            try_entity_move(hero_id, (vec3){-1, 1, 0});
-            flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            return true;
-        }
-        return false;
-    }
-
-    bool handle_move_down_right(inputstate& is, bool is_dead) {
-        //if (inputstate_is_pressed(is, KEY_C) || inputstate_is_pressed(is, KEY_KP_3)) {
-        if (inputstate_is_pressed(is, KEY_KP_3)) {
-            if (is_dead)
-                return add_message("You cannot move while dead");
-            try_entity_move(hero_id, (vec3){1, 1, 0});
-            flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            return true;
-        }
-        return false;
-    }
-
-    vec3 get_loc_facing_player() {
-        optional<vec3> maybe_loc = ct.get<location>(hero_id);
-        if (maybe_loc.has_value()) {
-            vec3 loc = ct.get<location>(hero_id).value();
-            direction_t dir = ct.get<direction>(hero_id).value();
-            if (dir == DIR_UP)
-                loc.y -= 1;
-            else if (dir == DIR_DOWN)
-                loc.y += 1;
-            else if (dir == DIR_LEFT)
-                loc.x -= 1;
-            else if (dir == DIR_RIGHT)
-                loc.x += 1;
-            else if (dir == DIR_UP_LEFT) {
-                loc.x -= 1;
-                loc.y -= 1;
-            }
-            else if (dir == DIR_UP_RIGHT) {
-                loc.x += 1;
-                loc.y -= 1;
-            }
-            else if (dir == DIR_DOWN_LEFT) {
-                loc.x -= 1;
-                loc.y += 1;
-            }
-            else if (dir == DIR_DOWN_RIGHT) {
-                loc.x += 1;
-                loc.y += 1;
-            }
-            return loc;
-        }
-        return vec3{-1, -1, -1};
-    }
+    vec3 get_loc_facing_player();
 
     entityid get_cached_live_npc(shared_ptr<tile_t> t) {
         if (t == nullptr) {
@@ -1125,393 +736,25 @@ public:
         return false;
     }
 
-    entityid tile_get_item(shared_ptr<tile_t> t) {
-        //recompute_entity_cache(t);
-        return t->get_cached_item();
-    }
+    entityid tile_get_item(shared_ptr<tile_t> t);
 
-    bool try_entity_pull(entityid id) {
-        minfo("try_entity_pull(%d)", id);
-        massert(id != ENTITYID_INVALID, "Entity is NULL!");
-        ct.set<update>(id, true);
-        vec3 loc = ct.get<location>(id).value_or(vec3{-1, -1, -1});
-        massert(!vec3_invalid(loc), "loc is invalid");
-        auto df = d.get_floor(loc.z);
-        auto tile = df->tile_at(loc);
-        // get the id's direction
-        direction_t facing_d = ct.get<direction>(id).value_or(DIR_NONE);
-        massert(facing_d != DIR_NONE, "direction d is none");
-        // opposite dir
-        direction_t d = get_opposite_dir(facing_d);
-        vec3 v = get_loc_from_dir(d);
-        vec3 aloc = {loc.x + v.x, loc.y + v.y, loc.z};
-        vec3 fv = get_loc_from_dir(facing_d);
-        vec3 bloc = {loc.x + fv.x, loc.y + fv.y, loc.z};
-        tile_t& tile_dest = df->tile_at(aloc);
-        if (aloc.x < 0 || aloc.x >= df->get_width() || aloc.y < 0 || aloc.y >= df->get_height()) {
-            merror("destination is invalid: (%d, %d, %d)", aloc.x, aloc.y, aloc.z);
-            return false;
-        }
-        if (!tile_is_walkable(tile_dest.get_type())) {
-            //if (!(god_mode && id == hero_id)) {
-            merror("tile is not walkable");
-            return false;
-        }
-        entityid box_id = tile_has_box(aloc.x, aloc.y, aloc.z);
-        if (box_id != ENTITYID_INVALID) {
-            merror("box present, can't push and pull simultaneously");
-            return false;
-        }
-        bool has_solid = tile_has_solid(aloc.x, aloc.y, aloc.z);
-        if (has_solid) {
-            merror("solid present, cannot move");
-            return false;
-        }
-        //else if (get_cached_live_npc(tile_dest)) {
-        else if (tile_dest.get_cached_live_npc()) {
-            merror("live npcs present, cannot move");
-            return false;
-        }
-        //else if (tile_has_live_npcs(tile_at_cur_floor(aloc))) {
-        //    merror2("live npcs present, cannot move");
-        //    return false;
-        //}
-        //else if (tile_has_player(tile_at_cur_floor(aloc))) {
-        else if (tile_at_cur_floor(aloc).get_cached_player_present()) {
-            merror("player present, cannot move");
-            return false;
-        }
-        entityid door_id = tile_has_door(aloc);
-        if (door_id != ENTITYID_INVALID) {
-            massert(ct.has<door_open>(door_id), "door_id %d doesnt have a door_open component", door_id);
-            if (!ct.get<door_open>(door_id).value_or(false)) {
-                merror("door is closed");
-                return false;
-            }
-        }
+    bool try_entity_pull(entityid id);
 
-        entityid box_id2 = tile_has_pullable(bloc.x, bloc.y, bloc.z);
-        if (box_id2 == ENTITYID_INVALID) {
-            return false;
-        }
+    bool try_entity_pickup(entityid id);
 
-        // remove the entity from the current tile
-        if (!df->df_remove_at(id, loc)) {
-            merror("Failed to remove %d from (%d, %d)", id, loc.x, loc.y);
-            return false;
-        }
-        // force cache update
-        //recompute_entity_cache_at(loc);
-        // add the entity to the new tile
-        auto type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
-        if (df->df_add_at(id, type, aloc) == ENTITYID_INVALID) {
-            merror("Failed to add %d to (%d, %d)", id, aloc.x, aloc.y);
-            return false;
-        }
-        // force cache update
-        //recompute_entity_cache_at(aloc);
-        ct.set<location>(id, aloc);
-        float mx = v.x * DEFAULT_TILE_SIZE;
-        float my = v.y * DEFAULT_TILE_SIZE;
-        ct.set<spritemove>(id, (Rectangle){mx, my, 0, 0});
-        if (check_hearing(hero_id, aloc)) {
-            // crashes in unittest if missing this check
-            if (IsAudioDeviceReady()) {
-                PlaySound(sfx[SFX_STEP_STONE_1]);
-            }
-        }
-        ct.set<steps_taken>(id, ct.get<steps_taken>(id).value_or(0) + 1);
+    bool handle_pickup_item(inputstate& is, bool is_dead);
 
-        msuccess("npc %d moved to (%d,%d,%d)", id, aloc.x, aloc.y, aloc.z);
+    bool try_entity_stairs(entityid id);
 
-        // check to see if pullable
-        // for now i will be lazy
-        // and skip this check
-        try_entity_move(box_id2, v);
-        msuccess("try_entity_pull(%d)", id);
-        return true;
-    }
+    bool handle_traverse_stairs(inputstate& is, bool is_dead);
 
-    bool try_entity_pickup(entityid id) {
-        massert(id != ENTITYID_INVALID, "Entity is NULL!");
-        ct.set<update>(id, true);
-        // check if the player is on a tile with an item
-        optional<vec3> maybe_loc = ct.get<location>(id);
-        if (!maybe_loc.has_value()) {
-            merror("id %d has no location", id);
-            return false;
-        }
-        vec3 loc = maybe_loc.value();
-        shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
-        tile_t& tile = df->tile_at(loc);
-        bool item_picked_up = false;
-        // lets try using our new cached_item via tile_get_item
-        entityid item_id = tile.get_cached_item();
-        if (item_id != ENTITYID_INVALID && add_to_inventory(id, item_id)) {
-            //tile->tile_remove(item_id);
-            tile.tile_remove(item_id);
-            PlaySound(sfx[SFX_CONFIRM_01]);
-            item_picked_up = true;
-            string item_name = ct.get<name>(item_id).value_or("no-name-item");
-            add_message_history("You picked up %s", item_name.c_str());
-        }
-        else if (item_id == ENTITYID_INVALID) {
-            mwarning("No item cached");
-        }
-        entitytype_t t = ct.get<entitytype>(id).value_or(ENTITY_NONE);
-        if (t == ENTITY_PLAYER) {
-            flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        }
-        return item_picked_up;
-    }
+    bool try_entity_open_door(entityid id, vec3 loc);
 
-    bool handle_pickup_item(inputstate& is, bool is_dead) {
-        //if (!inputstate_is_pressed(is, KEY_SLASH)) {
-        if (!inputstate_is_pressed(is, KEY_S)) {
-            return false;
-        }
-        if (is_dead) {
-            return add_message("You cannot pick up items while dead");
-        }
-        try_entity_pickup(hero_id);
-        flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        return true;
-    }
+    bool handle_open_door(inputstate& is, bool is_dead);
 
-    bool try_entity_stairs(entityid id) {
-        massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
-        ct.set<update>(id, true);
-        vec3 loc = ct.get<location>(id).value();
-        // first, we prob want to get the tile at this location
-        int current_floor = d.current_floor;
-        shared_ptr<dungeon_floor> df = d.floors[current_floor];
-        tile_t& t = df->tile_at(loc);
-        // check the tile type
-        if (t.get_type() == TILE_UPSTAIRS) {
-            // can't go up on the top floor
-            // otherwise...
-            if (current_floor == 0) {
-                add_message("You are already on the top floor!");
-            }
-            else {
-                // go upstairs
-                // we have to remove the player from the old tile
-                df->df_remove_at(hero_id, loc);
-                d.current_floor--;
-                int new_floor = d.current_floor;
-                shared_ptr<dungeon_floor> df2 = d.floors[new_floor];
-                vec3 uloc = df2->get_downstairs_loc();
-                df2->df_add_at(hero_id, ENTITY_PLAYER, uloc);
-                ct.set<location>(hero_id, uloc);
-                flag = GAMESTATE_FLAG_PLAYER_ANIM;
-                PlaySound(sfx.at(SFX_STEP_STONE_1));
-                return true;
-            }
-        }
-        else if (t.get_type() == TILE_DOWNSTAIRS) {
-            // can't go down on the bottom floor
-            // otherwise...
-            if ((size_t)current_floor < d.floors.size() - 1) {
-                // go downstairs
-                // we have to remove the player from the old tile
-                df->df_remove_at(hero_id, loc);
-                d.current_floor++;
-                int new_floor = d.current_floor;
-                shared_ptr<dungeon_floor> df2 = d.floors[new_floor];
-                vec3 uloc = df2->get_upstairs_loc();
-                df2->df_add_at(hero_id, ENTITY_PLAYER, uloc);
-                ct.set<location>(hero_id, uloc);
-                flag = GAMESTATE_FLAG_PLAYER_ANIM;
-                PlaySound(sfx.at(SFX_STEP_STONE_1));
-                return true;
-            }
-            // bottom floor
-            else {
-                add_message("You can't go downstairs anymore!");
-            }
-        }
-        return false;
-    }
+    void try_entity_cast_spell(entityid id, int tgt_x, int tgt_y);
 
-    bool handle_traverse_stairs(inputstate& is, bool is_dead) {
-        //if (inputstate_is_pressed(is, KEY_PERIOD)) {
-        if (inputstate_is_pressed(is, KEY_Z)) {
-            if (is_dead) {
-                return add_message("You cannot traverse stairs while dead");
-            }
-            try_entity_stairs(hero_id);
-            return true;
-        }
-        return false;
-    }
-
-    bool try_entity_open_door(entityid id, vec3 loc) {
-        massert(id != ENTITYID_INVALID, "id is invalid");
-        if (!tile_has_door(loc)) {
-            return false;
-        }
-        shared_ptr<dungeon_floor> df = d.get_current_floor();
-        //shared_ptr<tile_t> t = df->tile_at(loc);
-        tile_t& t = df->tile_at(loc);
-
-        //entityid door_id = t->get_cached_door();
-        entityid door_id = t.get_cached_door();
-        if (door_id != INVALID) {
-            optional<bool> maybe_is_open = ct.get<door_open>(door_id);
-            massert(maybe_is_open.has_value(), "door %d has no `is_open` component", door_id);
-            ct.set<door_open>(door_id, !maybe_is_open.value());
-            PlaySound(sfx.at(SFX_CHEST_OPEN));
-            return true;
-        }
-
-        //for (size_t i = 0; i < t->get_entity_count(); i++) {
-        //const entityid myid = t->get_entity_at(i);
-        //const entitytype_t type = ct.get<entitytype>(myid).value_or(ENTITY_NONE);
-        //if (type != ENTITY_DOOR) {
-        //    continue;
-        //}
-        //optional<bool> maybe_is_open = ct.get<door_open>(myid);
-        //massert(maybe_is_open.has_value(), "door %d has no `is_open` component", myid);
-        //ct.set<door_open>(myid, !maybe_is_open.value());
-        //PlaySound(sfx.at(SFX_CHEST_OPEN));
-        //return true;
-        //}
-        return false;
-    }
-
-    bool handle_open_door(inputstate& is, bool is_dead) {
-        if (inputstate_is_pressed(is, KEY_O)) {
-            if (is_dead) {
-                return add_message("You cannot open doors while dead");
-            }
-            vec3 loc = get_loc_facing_player();
-            try_entity_open_door(hero_id, loc);
-            flag = GAMESTATE_FLAG_PLAYER_ANIM;
-            return true;
-        }
-        return false;
-    }
-
-    void try_entity_cast_spell(entityid id, int tgt_x, int tgt_y) {
-        optional<vec3> maybe_loc = ct.get<location>(id);
-        if (!maybe_loc.has_value()) {
-            merror("no location for entity id %d", id);
-            return;
-        }
-        vec3 loc = maybe_loc.value();
-        shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
-        vec3 spell_loc = {tgt_x, tgt_y, loc.z};
-        //shared_ptr<tile_t> tile = df->tile_at(spell_loc);
-        tile_t& tile = df->tile_at(spell_loc);
-        // Calculate direction based on target position
-        bool ok = false;
-        int dx = tgt_x - loc.x;
-        int dy = tgt_y - loc.y;
-        ct.set<direction>(id, get_dir_from_xy(dx, dy));
-        ct.set<casting>(id, true);
-        ct.set<update>(id, true);
-        // ok...
-        // we are hard-coding a spell cast
-        // in this example, we will 'create' a 'spell entity' of type 'fire' and place it on a tile
-        entityid spell_id = create_spell_at_with(spell_loc);
-        ct.set<spellstate>(id, SPELLSTATE_CAST);
-        ct.set<spelltype>(id, SPELLTYPE_FIRE);
-        ct.set<spell_casting>(id, true);
-        if (spell_id != ENTITYID_INVALID) {
-            ok = true;
-            // lets do an example of processing a spell effect immediately
-            // first we need to iterate the entities on the tile
-            // if there's an NPC we damage it
-
-            //if (tile_has_live_npcs(tile)) {
-            //    entityid npcid = ENTITYID_INVALID;
-            //    for (const entityid id : *tile->get_entities()) {
-            //        if (ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_NPC) {
-            //            npcid = id;
-            //            break;
-            //        }
-            //    }
-            //    uniform_int_distribution<int> gen(1, 6);
-            //    const int dmg = gen(mt);
-            //    ct.set<damaged>(npcid, true);
-            //    ct.set<update>(npcid, true);
-            //    optional<int> maybe_tgt_hp = ct.get<hp>(npcid);
-            //    if (!maybe_tgt_hp.has_value()) {
-            //        merror("target has no HP component");
-            //        return;
-            //    }
-            //    int tgt_hp = maybe_tgt_hp.value();
-            //    if (tgt_hp <= 0) {
-            //        merror("Target is already dead, hp was: %d", tgt_hp);
-            //        ct.set<dead>(npcid, true);
-            //        return;
-            //    }
-            //    tgt_hp -= dmg;
-            //    ct.set<hp>(npcid, tgt_hp);
-            //    if (tgt_hp > 0) {
-            //        ct.set<dead>(npcid, false);
-            //        return;
-            //    }
-            //    const entitytype_t tgttype = ct.get<entitytype>(npcid).value_or(ENTITY_NONE);
-            //    ct.set<dead>(npcid, true);
-            //    shared_ptr<dungeon_floor> df = d.get_current_floor();
-            //    shared_ptr<tile_t> target_tile = df->tile_at(spell_loc);
-            //    target_tile->set_dirty_entities(true);
-            //    if (tgttype == ENTITY_NPC) {
-            //        // increment attacker's xp
-            //        const int old_xp = ct.get<xp>(id).value_or(0);
-            //        const int reward_xp = 1;
-            //        const int new_xp = old_xp + reward_xp;
-            //        ct.set<xp>(id, new_xp);
-            //        // handle item drops
-            //        drop_all_from_inventory(npcid);
-            //    }
-            //    else if (tgttype == ENTITY_PLAYER) {
-            //        add_message("You died");
-            //    }
-            //}
-
-            if (tile_has_door(spell_loc)) {
-                // find the door id
-                //entityid doorid = tile->get_cached_door();
-                entityid doorid = tile.get_cached_door();
-                //for (auto id : *tile->get_entities()) {
-                //if (ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_DOOR) {
-                //doorid = id;
-                //break;
-                //}
-                //}
-                // mark it 'destroyed'
-                // remove it from the tile
-                if (doorid != ENTITYID_INVALID) {
-                    ct.set<destroyed>(doorid, true);
-                    df->df_remove_at(doorid, spell_loc);
-                }
-            }
-            ct.set<destroyed>(spell_id, true);
-        }
-        // did the hero hear this event?
-        bool event_heard = check_hearing(hero_id, (vec3){tgt_x, tgt_y, loc.z});
-        if (ok && event_heard) {
-            PlaySound(sfx[SFX_ITEM_FUSION]);
-        }
-    }
-
-    bool handle_test_cast_spell(inputstate& is, bool is_dead) {
-        if (inputstate_is_pressed(is, KEY_M)) {
-            if (is_dead) {
-                add_message("You cannot cast spells while dead (yet)");
-                return true;
-            }
-            if (ct.get<location>(hero_id).has_value() && ct.get<direction>(hero_id).has_value()) {
-                vec3 loc = get_loc_facing_player();
-                try_entity_cast_spell(hero_id, loc.x, loc.y);
-                flag = GAMESTATE_FLAG_PLAYER_ANIM;
-                return true;
-            }
-        }
-        return false;
-    }
+    bool handle_test_cast_spell(inputstate& is, bool is_dead);
 
     bool handle_restart(inputstate& is);
 
@@ -1642,4 +885,5 @@ public:
 #include "gamestate_input_impl.h"
 #include "gamestate_npc_combat_impl.h"
 #include "gamestate_world_impl.h"
+#include "gamestate_world_interaction_impl.h"
 #include "gamestate_entity_factory_impl.h"
