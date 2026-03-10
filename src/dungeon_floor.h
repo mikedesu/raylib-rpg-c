@@ -14,10 +14,10 @@
 #include <unordered_map>
 #include <vector>
 
-//#define DUNGEON_FLOOR_WIDTH 8
-//#define DUNGEON_FLOOR_HEIGHT 8
-#define DUNGEON_FLOOR_WIDTH 128
-#define DUNGEON_FLOOR_HEIGHT 128
+#define DUNGEON_FLOOR_WIDTH 8
+#define DUNGEON_FLOOR_HEIGHT 8
+//#define DUNGEON_FLOOR_WIDTH 128
+//#define DUNGEON_FLOOR_HEIGHT 128
 //#define DUNGEON_FLOOR_WIDTH 256 // max 256 (so-far)
 //#define DUNGEON_FLOOR_HEIGHT 256 // max 256 (so-far)
 

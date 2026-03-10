@@ -1293,7 +1293,7 @@ public:
         for (int i = 0; i < num_boxes; i++) {
             create_box_at_with(df->get_random_loc());
         }
-        constexpr int monster_count = 2000;
+        constexpr int monster_count = 1;
         for (int j = 0; j < monster_count; j++) {
             //minfo("Placing monster %d...", j);
             const vec3 random_loc = d.get_floor(0)->get_random_loc();
