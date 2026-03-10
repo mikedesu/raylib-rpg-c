@@ -457,246 +457,23 @@ public:
         msg_history.push_back(s);
     }
 
-    void update_tile(tile_t& tile) {
-        tile.set_explored(true);
-        tile.set_visible(true);
-    }
+    void update_tile(tile_t& tile);
 
-    bool path_blocked(vec3 a, vec3 b) {
-        vector<vec3> path = calculate_path_with_thickness(a, b);
-        auto df = d.get_current_floor();
-        for (auto loc : path) {
-            tile_t& t = df->tile_at(loc);
-            if (tiletype_is_none(t.get_type())) {
-                return true;
-            }
-            else if (tiletype_is_wall(t.get_type())) {
-                return true;
-            }
-            // also need to check for a door or other blockades
-            entityid door_id = t.get_cached_door();
-            if (door_id != INVALID) {
-                bool door_is_open = ct.get<door_open>(door_id).value_or(false);
-                if (!door_is_open) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+    bool path_blocked(vec3 a, vec3 b);
 
-    bool update_player_tiles_explored() {
-        if (current_scene != SCENE_GAMEPLAY) {
-            return false;
-        }
-        if (hero_id == ENTITYID_INVALID) {
-            merror2("hero_id is invalid");
-            return false;
-        }
-        auto df = d.get_current_floor();
-        auto maybe_loc = ct.get<location>(hero_id);
-        if (!maybe_loc.has_value()) {
-            merror2("hero location lacks value");
-            return false;
-        }
-        vec3 hero_loc = maybe_loc.value();
-        int light_radius0 = ct.get<light_radius>(hero_id).value_or(1);
-        // Precompute bounds for the loops
-        int min_x = std::max(0, hero_loc.x - light_radius0);
-        int max_x = std::min(df->get_width() - 1, hero_loc.x + light_radius0);
-        int min_y = std::max(0, hero_loc.y - light_radius0);
-        int max_y = std::min(df->get_height() - 1, hero_loc.y + light_radius0);
-        for (int y = min_y; y <= max_y; y++) {
-            for (int x = min_x; x <= max_x; x++) {
-                // Calculate Manhattan distance for diamond shape
-                if (abs(x - hero_loc.x) + abs(y - hero_loc.y) > light_radius0) {
-                    continue;
-                }
-                // we need to see if there is anything blocking us between the player and this hero_location
-                vec3 loc = {x, y, hero_loc.z};
-                if (path_blocked(hero_loc, loc)) {
-                    continue;
-                }
-                tile_t& t = df->tile_at(loc);
-                update_tile(t);
-            }
-        }
-        return true;
-    }
+    bool update_player_tiles_explored();
 
-    bool update_player_state() {
-        if (hero_id == ENTITYID_INVALID) {
-            merror2("hero_id is invalid");
-            return false;
-        }
-        //const unsigned char a = ct.get<txalpha>(hero_id).value_or(255);
-        //if (a < 255) {
-        //    ct.set<txalpha>(hero_id, a + 1);
-        //}
-        if (ct.get<dead>(hero_id).value_or(true)) {
-            merror2("hero_id is dead");
-            gameover = true;
-            return true;
-        }
-        ct.set<blocking>(hero_id, false);
-        ct.set<block_success>(hero_id, false);
-        ct.set<damaged>(hero_id, false);
-        return true;
-    }
+    bool update_player_state();
 
-    void update_spells_state() {
-        minfo2("update_spells_state");
-        for (entityid id = 0; id < next_entityid; id++) {
-            if (id == hero_id || ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_SPELL) {
-                continue;
-            }
-            //unsigned char a = 255;
-            //unsigned char a = ct.get<txalpha>(id).value_or(255);
-            //if (a < 255) {
-            //    a++;
-            //}
-            //ct.set<txalpha>(id, a);
-            bool is_complete = ct.get<spell_complete>(id).value_or(false);
-            bool is_destroyed = ct.get<destroyed>(id).value_or(false);
-            if (is_complete && is_destroyed) {
-                // remove it from the tile
-                auto df = d.get_current_floor();
-                vec3 loc = ct.get<location>(id).value_or(vec3{-1, -1, -1});
-                massert(!vec3_invalid(loc), "location is invalid");
-                if (!df->df_remove_at(id, loc)) {
-                    merror("failed to remove id %d at %d, %d", id, loc.x, loc.y);
-                }
-            }
-        }
-    }
+    void update_spells_state();
 
-    void update_npcs_state() {
-        minfo2("BEGIN update_npcs_state");
-        //minfo2("getting df...")%
-        auto df = d.get_current_floor();
-        //minfo2("getting df_npcs...");
-        //auto df_npcs = df->get_living_npcs();
-        minfo2("begin loop");
-        for (entityid id = 0; id < next_entityid; id++) {
-            auto type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
-            if (type == ENTITY_NPC) {
-                ct.set<damaged>(id, false);
-            }
-        }
-    }
+    void update_npcs_state();
 
-    void logic_init() {
-        minfo("gamestate.logic_init");
-        srand(time(NULL));
-        SetRandomSeed(time(NULL));
-        constexpr float parts = 1.0;
+    void logic_init();
 
-        init_dungeon(BIOME_STONE, 1, parts, 16, 16);
+    void handle_input_title_scene(inputstate& is);
 
-        massert(d.floors.size() > 0, "dungeon.floors.size is 0");
-        place_doors();
-        //place_props();
-        //const vec3 loc0 = d.floors[0].df_get_random_loc();
-        auto df = d.get_current_floor();
-        //auto rl0 = df->df_get_random_loc();
-        //create_weapon_at_with(ct, df->get_random_loc(), dagger_init());
-        //create_weapon_at_with(ct, df->get_random_loc(), axe_init());
-        //create_shield_at_with(ct, df->get_random_loc(), shield_init());
-        //create_shield_at_with(ct, df->get_random_loc(), shield_init());
-        //create_shield_at_with(ct, df->get_random_loc(), shield_init());
-        //create_potion_at_with(d.floors[0].df_get_random_loc(), potion_init(POTION_HP_SMALL));
-        constexpr int num_boxes = 0;
-        for (int i = 0; i < num_boxes; i++) {
-            create_box_at_with(df->get_random_loc());
-        }
-        constexpr int monster_count = 1;
-        for (int j = 0; j < monster_count; j++) {
-            //minfo("Placing monster %d...", j);
-            vec3 random_loc = d.get_floor(0)->get_random_loc();
-            //const entityid id = create_orc_at_with(random_loc, [this](CT& ct, const entityid id) {
-            create_orc_at_with(random_loc, [this](CT& ct, const entityid id) {
-                entityid wpn_id = create_weapon_with([](CT& ct, const entityid id) {
-                    ct.set<name>(id, "Dagger");
-                    ct.set<description>(id, "Stabby stabby.");
-                    ct.set<weapontype>(id, WEAPON_DAGGER);
-                    ct.set<damage>(id, vec3{1, 4, 0});
-                    ct.set<durability>(id, 100);
-                    ct.set<max_durability>(id, 100);
-                    ct.set<rarity>(id, RARITY_COMMON);
-                });
-                entityid potion_id = create_potion_with([](CT& ct, const entityid id) {
-                    ct.set<name>(id, "small healing potion");
-                    ct.set<description>(id, "a small healing potion");
-                    ct.set<potiontype>(id, POTION_HP_SMALL);
-                    ct.set<healing>(id, vec3{1, 6, 0});
-                });
-                add_to_inventory(id, wpn_id);
-                add_to_inventory(id, potion_id);
-                ct.set<equipped_weapon>(id, wpn_id);
-            });
-
-            //minfo("Created orc id %d", id);
-        }
-        msuccess("end creating monsters...");
-        add_message("Welcome to the game! Press enter to cycle messages.");
-        add_message("For help, press ?");
-        // lets not deal with "multi-line" messages...
-        //add_message("This is a multi-line test\nHow will my game handle newlines?");
-        //add_message("This is a multi-line test\nHow will my game handle newlines again?\nOh no lol");
-        //#ifdef START_MESSAGES
-        //add_message("To pick up items, press / ");
-        //add_message("To manage inventory, press i ");
-        //add_message("To equip/unequip an item, highlight and press e ");
-        //add_message("To drop an item, highlight and press q ");
-        //add_message("To attack, press ' ");
-        //add_message("To go up/down a floor, press . ");
-        //add_message("To wait a turn, press s s ");
-        //add_message("To change direction, press s and then [q w e a d z x c] ");
-        //add_message("To open a door, face it and press o ");
-        //#endif
-        msuccess("liblogic_init: Game state initialized");
-    }
-
-    void handle_input_title_scene(inputstate& is) {
-        if (inputstate_is_pressed(is, KEY_ESCAPE)) {
-            do_quit = true;
-            return;
-        }
-        if (inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_SPACE)) {
-            current_scene = SCENE_MAIN_MENU;
-            frame_dirty = true;
-            PlaySound(sfx[SFX_CONFIRM_01]);
-        }
-    }
-
-    void handle_input_main_menu_scene(inputstate& is) {
-        if (inputstate_is_pressed(is, KEY_ENTER) || inputstate_is_pressed(is, KEY_SPACE)) {
-            if (title_screen_selection == 0) {
-                current_scene = SCENE_CHARACTER_CREATION;
-                frame_dirty = true;
-            }
-            PlaySound(sfx.at(SFX_CONFIRM_01));
-        }
-        else if (inputstate_is_pressed(is, KEY_DOWN)) {
-            title_screen_selection++;
-            if (title_screen_selection >= max_title_screen_selections) {
-                title_screen_selection = 0;
-            }
-            PlaySound(sfx.at(SFX_CONFIRM_01));
-        }
-        else if (inputstate_is_pressed(is, KEY_UP)) {
-            title_screen_selection--;
-            if (title_screen_selection < 0) {
-                title_screen_selection = max_title_screen_selections - 1;
-            }
-            PlaySound(sfx.at(SFX_CONFIRM_01));
-        }
-        else if (inputstate_is_pressed(is, KEY_ESCAPE)) {
-            do_quit = true;
-            PlaySound(sfx.at(SFX_CONFIRM_01));
-        }
-        frame_dirty = true;
-    }
+    void handle_input_main_menu_scene(inputstate& is);
 
     entityid create_player_at_with(vec3 loc, string n, with_fun playerInitFunction);
 
@@ -708,87 +485,13 @@ public:
 
     entityid create_spell_at_with(vec3 loc);
 
-    void make_all_npcs_target_player() {
-        massert(hero_id != ENTITYID_INVALID, "hero_id is invalid");
-        for (entityid id = 0; id < next_entityid; id++) {
-            entitytype_t t = ct.get<entitytype>(id).value_or(ENTITY_NONE);
-            if (t != ENTITY_NPC) {
-                continue;
-            }
-            ct.set<target_id>(id, hero_id);
-        }
-    }
+    void make_all_npcs_target_player();
 
-    void handle_input_character_creation_scene(inputstate& is) {
-        if (inputstate_is_pressed(is, KEY_ESCAPE)) {
-            do_quit = true;
-            return;
-        }
-        if (inputstate_is_pressed(is, KEY_ENTER)) {
-            PlaySound(sfx.at(SFX_CONFIRM_01));
-            // we need to copy the character creation stats to the hero entity
-            // hero has already been created, so its id is available
-            int myhd = chara_creation.hitdie;
-            int maxhp_roll = -1;
-            while (maxhp_roll < 1) {
-                maxhp_roll = do_roll_best_of_3(vec3{1, myhd, 0}) + get_stat_bonus(chara_creation.constitution);
-            }
-            shared_ptr<dungeon_floor> df = d.floors[0];
-            vec3 start_loc = df->get_random_loc();
-            massert(!vec3_invalid(start_loc), "start_loc is (-1,-1,-1) - no valid start location exists");
-            entity_turn = create_player_at_with(start_loc, "darkmage", [this, maxhp_roll](CT& ct, entityid id) {
-                // set stats from char_creation
-                ct.set<strength>(id, chara_creation.strength);
-                ct.set<dexterity>(id, chara_creation.dexterity);
-                ct.set<constitution>(id, chara_creation.constitution);
-                ct.set<intelligence>(id, chara_creation.intelligence);
-                ct.set<wisdom>(id, chara_creation.wisdom);
-                ct.set<charisma>(id, chara_creation.charisma);
-                ct.set<hd>(id, (vec3){1, chara_creation.hitdie, 0});
-                ct.set<hp>(hero_id, maxhp_roll);
-                ct.set<maxhp>(hero_id, maxhp_roll);
-            });
-            massert(hero_id != ENTITYID_INVALID, "heroid is invalid");
-            // temporary wedge-in code
-            // set all the NPCs to target the hero
+    void handle_input_character_creation_scene(inputstate& is);
 
-            make_all_npcs_target_player();
-            current_scene = SCENE_GAMEPLAY;
-        }
-        else if (inputstate_is_pressed(is, KEY_SPACE)) {
-            // re-roll character creation stats
-            PlaySound(sfx.at(SFX_CONFIRM_01));
-            chara_creation.strength = do_roll_best_of_3((vec3){3, 6, 0});
-            chara_creation.dexterity = do_roll_best_of_3((vec3){3, 6, 0});
-            chara_creation.intelligence = do_roll_best_of_3((vec3){3, 6, 0});
-            chara_creation.wisdom = do_roll_best_of_3((vec3){3, 6, 0});
-            chara_creation.constitution = do_roll_best_of_3((vec3){3, 6, 0});
-            chara_creation.charisma = do_roll_best_of_3((vec3){3, 6, 0});
-        }
-        else if (inputstate_is_pressed(is, KEY_LEFT)) {
-            PlaySound(sfx.at(SFX_CONFIRM_01));
-            int race = chara_creation.race;
-            if (chara_creation.race > 1) {
-                race--;
-            }
-            else {
-                race = RACE_COUNT - 1;
-            }
-            chara_creation.race = (race_t)race;
-            chara_creation.hitdie = get_racial_hd(chara_creation.race);
-        }
-        else if (inputstate_is_pressed(is, KEY_RIGHT)) {
-            PlaySound(sfx.at(SFX_CONFIRM_01));
-            int race = chara_creation.race;
-            if (race < RACE_COUNT - 1)
-                race++;
-            else
-                race = RACE_NONE + 1;
-            chara_creation.race = (race_t)race;
-            chara_creation.hitdie = get_racial_hd(chara_creation.race);
-        }
-        frame_dirty = true;
-    }
+    void handle_test_flag();
+
+    void tick(inputstate& is);
 
     bool remove_from_inventory(entityid actor_id, entityid item_id) {
         auto maybe_inventory = ct.get<inventory>(actor_id);
@@ -2907,80 +2610,9 @@ public:
         }
     }
 
-    void handle_test_flag() {
-        minfo2(
-            "handle test flag: %s",
-            flag == GAMESTATE_FLAG_PLAYER_ANIM    ? "player anim"
-            : flag == GAMESTATE_FLAG_PLAYER_INPUT ? "player input"
-            : flag == GAMESTATE_FLAG_NPC_TURN     ? "npc turn"
-            : flag == GAMESTATE_FLAG_NPC_ANIM     ? "npc anim"
-                                                  : "Unknown");
-        if (flag == GAMESTATE_FLAG_PLAYER_ANIM) {
-            //minfo("player anim");
-#ifndef NPCS_ALL_AT_ONCE
-            entity_turn++;
-            if (entity_turn >= next_entityid) {
-                entity_turn = 1;
-            }
-#endif
-            //minfo("handle test flag: %d", turn_count);
-            flag = GAMESTATE_FLAG_NPC_TURN;
-        }
-        else if (flag == GAMESTATE_FLAG_NPC_ANIM) {
-            //minfo("npc anim");
-#ifndef NPCS_ALL_AT_ONCE
-            entity_turn++;
-
-            if (entity_turn >= next_entityid) {
-                entity_turn = 1;
-            }
-
-            if (entity_turn == hero_id) {
-                flag = GAMESTATE_FLAG_PLAYER_INPUT;
-                turn_count++;
-            }
-            else {
-                flag = GAMESTATE_FLAG_NPC_TURN;
-            }
-#else
-            flag = GAMESTATE_FLAG_PLAYER_INPUT;
-            //minfo("handle test flag: %d", turn_count);
-            turn_count++;
-#endif
-        }
-    }
-
-    void tick(inputstate& is) {
-        minfo3("tick");
-        // Spawn NPCs periodically
-        //try_spawn_npc(g);
-        //massert(r0, "update player tiles explored failed");
-
-        if (!update_player_tiles_explored()) {
-            merror3("update player tiles explored failed");
-        }
-
-        if (!update_player_state()) {
-            merror3("update player state failed");
-        }
-
-        update_npcs_state();
-        update_spells_state();
-        handle_input(is);
-        handle_npcs();
-#ifdef DEBUG
-        update_debug_panel_buffer(is);
-#endif
-        currenttime = time(NULL);
-        currenttimetm = localtime(&currenttime);
-        strftime(currenttimebuf, GAMESTATE_SIZEOFTIMEBUF, "Current Time: %Y-%m-%d %H:%M:%S", currenttimetm);
-        if (test) {
-            handle_test_flag();
-        }
-        ticks++;
-        minfo2("end tick");
-    }
 };
 
+#include "gamestate_lifecycle_impl.h"
+#include "gamestate_scene_impl.h"
 #include "gamestate_world_impl.h"
 #include "gamestate_entity_factory_impl.h"
