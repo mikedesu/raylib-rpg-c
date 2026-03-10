@@ -68,13 +68,13 @@ public:
 
 
 
-    //inline shared_ptr<dungeon_floor> create_floor(biome_t type, int width, int height) {
-    inline shared_ptr<dungeon_floor> create_floor(biome_t type) {
-        //massert(width > 0, "width is 0");
-        //massert(height > 0, "height is 0");
+    inline shared_ptr<dungeon_floor> create_floor(
+        biome_t type,
+        int width = DEFAULT_DUNGEON_FLOOR_WIDTH,
+        int height = DEFAULT_DUNGEON_FLOOR_HEIGHT
+    ) {
         massert(!is_locked, "dungeon is locked");
-        shared_ptr<dungeon_floor> df = make_shared<dungeon_floor>();
-        //df->init(floors.size(), type, width, height);
+        shared_ptr<dungeon_floor> df = make_shared<dungeon_floor>(width, height);
         df->init(floors.size(), type);
         return df;
     }

@@ -14,18 +14,14 @@
 #include <unordered_map>
 #include <vector>
 
-#define DUNGEON_FLOOR_WIDTH 8
-#define DUNGEON_FLOOR_HEIGHT 8
-//#define DUNGEON_FLOOR_WIDTH 128
-//#define DUNGEON_FLOOR_HEIGHT 128
-//#define DUNGEON_FLOOR_WIDTH 256 // max 256 (so-far)
-//#define DUNGEON_FLOOR_HEIGHT 256 // max 256 (so-far)
-
 using std::function;
 using std::make_shared;
 using std::shared_ptr;
 using std::unordered_map;
 using std::vector;
+
+static constexpr int DEFAULT_DUNGEON_FLOOR_WIDTH = 8;
+static constexpr int DEFAULT_DUNGEON_FLOOR_HEIGHT = 8;
 
 class dungeon_floor {
 private:
@@ -35,8 +31,13 @@ private:
     biome_t biome;
     vec3 downstairs_loc;
     vec3 upstairs_loc;
+    vector<tile_t> grid;
 
-    tile_t grid[DUNGEON_FLOOR_HEIGHT][DUNGEON_FLOOR_WIDTH];
+    inline size_t tile_index(const vec3 loc) const {
+        massert(loc.x >= 0 && loc.x < width, "x is out of bounds");
+        massert(loc.y >= 0 && loc.y < height, "y is out of bounds");
+        return static_cast<size_t>(loc.y) * static_cast<size_t>(width) + static_cast<size_t>(loc.x);
+    }
 
 public:
     const vec3 get_upstairs_loc() {
@@ -64,11 +65,8 @@ public:
     }
 
     inline tile_t& tile_at(vec3 loc) {
-        // given that tiles is a 2D vector of shared pointers to tile_t
-        // we can access the tile using the x and y coordinates
-        // and calculate the index
         minfo3("tile_at: (%d, %d, %d)", loc.x, loc.y, loc.z);
-        return grid[loc.y][loc.x];
+        return grid[tile_index(loc)];
     }
 
     inline void df_set_can_have_door(const vec3 loc) {
@@ -165,13 +163,12 @@ public:
         // creating a new dungeon floor
         // init floor vars
         floor = f;
-        width = DUNGEON_FLOOR_WIDTH;
-        height = DUNGEON_FLOOR_HEIGHT;
         biome = t;
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                grid[i][j].set_type(TILE_NONE);
-            }
+        massert(width > 0, "width must be greater than zero");
+        massert(height > 0, "height must be greater than zero");
+        grid.assign(static_cast<size_t>(width) * static_cast<size_t>(height), tile_t{});
+        for (tile_t& tile : grid) {
+            tile.set_type(TILE_NONE);
         }
         msuccess2("Created dungeon floor %d with dimensions %dx%d", floor, width, height);
     }
@@ -363,7 +360,13 @@ public:
         return loc;
     }
 
-    dungeon_floor() {
+    dungeon_floor(int width = DEFAULT_DUNGEON_FLOOR_WIDTH, int height = DEFAULT_DUNGEON_FLOOR_HEIGHT)
+        : floor(0)
+        , width(width)
+        , height(height)
+        , biome(BIOME_NONE) {
+        massert(width > 0, "width must be greater than zero");
+        massert(height > 0, "height must be greater than zero");
         upstairs_loc = {-1, -1, -1};
         downstairs_loc = {-1, -1, -1};
     }
