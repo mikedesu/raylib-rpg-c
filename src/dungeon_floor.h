@@ -33,48 +33,48 @@ private:
     vec3 upstairs_loc;
     vector<tile_t> grid;
 
-    inline size_t tile_index(const vec3 loc) const {
+    inline size_t tile_index(vec3 loc) const {
         massert(loc.x >= 0 && loc.x < width, "x is out of bounds");
         massert(loc.y >= 0 && loc.y < height, "y is out of bounds");
         return static_cast<size_t>(loc.y) * static_cast<size_t>(width) + static_cast<size_t>(loc.x);
     }
 
 public:
-    const vec3 get_upstairs_loc() {
+    vec3 get_upstairs_loc() {
         return upstairs_loc;
     }
 
-    const vec3 get_downstairs_loc() {
+    vec3 get_downstairs_loc() {
         return downstairs_loc;
     }
 
-    const biome_t get_biome() {
+    biome_t get_biome() {
         return biome;
     }
 
-    const int get_height() {
+    int get_height() {
         return height;
     }
 
-    const int get_width() {
+    int get_width() {
         return width;
     }
 
-    const int get_floor() {
+    int get_floor() {
         return floor;
     }
 
-    inline tile_t& tile_at(vec3 loc) {
+    tile_t& tile_at(vec3 loc) {
         minfo3("tile_at: (%d, %d, %d)", loc.x, loc.y, loc.z);
         return grid[tile_index(loc)];
     }
 
-    inline void df_set_can_have_door(const vec3 loc) {
+    void df_set_can_have_door(vec3 loc) {
         tile_t& tile = tile_at(loc);
         tile.set_can_have_door(true);
     }
 
-    inline bool df_is_good_door_loc(vec3 loc) {
+    bool df_is_good_door_loc(vec3 loc) {
         auto tile = tile_at(loc);
         if (loc.x >= 1 && loc.y >= 1 && loc.x < width - 1 && loc.y < height - 1) {
             tile_t& t0 = tile_at((vec3){loc.x - 1, loc.y - 1, loc.z});
@@ -103,7 +103,7 @@ public:
         return false;
     }
 
-    inline bool tile_is_good_for_upgrade(vec3 loc) {
+    bool tile_is_good_for_upgrade(vec3 loc) {
         auto tile = tile_at(loc);
         if (loc.x >= 1 && loc.y >= 1 && loc.x < width - 1 && loc.y < height - 1) {
             auto t0 = tile_at((vec3){loc.x - 1, loc.y - 1, loc.z});
@@ -126,16 +126,16 @@ public:
         return false;
     }
 
-    inline void df_set_tile(const tiletype_t type, const int x, const int y) {
+    void df_set_tile(tiletype_t type, int x, int y) {
         tile_t& current = tile_at((vec3){x, y, -1});
         current.set_type(type);
     }
 
-    const inline tiletype_t random_tiletype(const tiletype_t a, const tiletype_t b) {
+    tiletype_t random_tiletype(tiletype_t a, tiletype_t b) {
         return (tiletype_t)GetRandomValue(a, b);
     }
 
-    inline void set_area(const tiletype_t a, const tiletype_t b, const Rectangle r) {
+    void set_area(tiletype_t a, tiletype_t b, Rectangle r) {
         for (int x = r.x; x < r.x + r.width && x < width; x++) {
             for (int y = r.y; y < r.y + r.height && y < height; y++) {
                 const tiletype_t t = random_tiletype(a, b);
@@ -144,7 +144,7 @@ public:
         }
     }
 
-    inline void df_set_perimeter(const tiletype_t a, const tiletype_t b, const Rectangle r) {
+    void df_set_perimeter(tiletype_t a, tiletype_t b, Rectangle r) {
         for (int x = r.x; x < r.x + r.width; x++) {
             const tiletype_t t = random_tiletype(a, b);
             df_set_tile(t, x, r.y);
@@ -158,7 +158,7 @@ public:
         }
     }
 
-    inline void init(const int f, const biome_t t) {
+    void init(int f, biome_t t) {
         massert(f >= 0, "floor must be greater than or equal to zero");
         // creating a new dungeon floor
         // init floor vars
@@ -173,11 +173,11 @@ public:
         msuccess2("Created dungeon floor %d with dimensions %dx%d", floor, width, height);
     }
 
-    inline void df_xform(function<void()> mLambda) {
+    void df_xform(function<void()> mLambda) {
         mLambda();
     }
 
-    inline int df_get_possible_downstairs_count_in_area(const Rectangle r) {
+    int df_get_possible_downstairs_count_in_area(Rectangle r) {
         massert(r.x >= 0, "x is less than zero");
         massert(r.x < width, "x is out of bounds");
         massert(r.y >= 0, "y is less than zero");
@@ -199,7 +199,7 @@ public:
         return count;
     }
 
-    inline int df_get_possible_upstairs_count_in_area(const Rectangle r) {
+    int df_get_possible_upstairs_count_in_area(Rectangle r) {
         massert(r.x >= 0, "x is less than zero");
         massert(r.x < width, "x is out of bounds");
         massert(r.y >= 0, "y is less than zero");
@@ -220,7 +220,7 @@ public:
         return count;
     }
 
-    inline shared_ptr<vector<vec3>> df_get_possible_upstairs_locs_in_area(const Rectangle r) {
+    shared_ptr<vector<vec3>> df_get_possible_upstairs_locs_in_area(Rectangle r) {
         auto locations = make_shared<vector<vec3>>();
         massert(locations, "failed to make_shared locations");
         // now we can loop thru the dungeon floor again and fill the array with the locations
@@ -236,7 +236,7 @@ public:
         return locations;
     }
 
-    inline shared_ptr<vector<vec3>> df_get_possible_downstairs_locs_in_area(const Rectangle r) {
+    shared_ptr<vector<vec3>> df_get_possible_downstairs_locs_in_area(Rectangle r) {
         massert(r.x >= 0, "x is less than zero");
         massert(r.x < width, "x is out of bounds");
         massert(r.y >= 0, "y is less than zero");
@@ -256,30 +256,30 @@ public:
         return locations;
     }
 
-    inline int df_get_possible_upstairs_count() {
+    int df_get_possible_upstairs_count() {
         return df_get_possible_upstairs_count_in_area((Rectangle){0, 0, (float)width, (float)height});
     }
 
-    inline int df_get_possible_downstairs_count() {
+    int df_get_possible_downstairs_count() {
         return df_get_possible_downstairs_count_in_area((Rectangle){0, 0, (float)width, (float)height});
     }
 
-    inline shared_ptr<vector<vec3>> df_get_possible_upstairs_locs() {
+    shared_ptr<vector<vec3>> df_get_possible_upstairs_locs() {
         auto locs = df_get_possible_upstairs_locs_in_area((Rectangle){0, 0, (float)width, (float)height});
         massert(locs, "failed to get possible upstairs locations");
         return locs;
     }
 
-    inline shared_ptr<vector<vec3>> df_get_possible_downstairs_locs() {
+    shared_ptr<vector<vec3>> df_get_possible_downstairs_locs() {
         auto locs = df_get_possible_downstairs_locs_in_area((Rectangle){0, 0, (float)width, (float)height});
         massert(locs, "failed to get possible downstairs locations");
         return locs;
     }
 
-    inline void df_free() {
+    void df_free() {
     }
 
-    inline entityid df_add_at(entityid id, entitytype_t type, vec3 loc) {
+    entityid df_add_at(entityid id, entitytype_t type, vec3 loc) {
         if (id == ENTITYID_INVALID) {
             minfo("id is invalid");
             return ENTITYID_INVALID;
@@ -295,7 +295,7 @@ public:
         return result;
     }
 
-    inline bool df_remove_at(entityid id, vec3 l) {
+    bool df_remove_at(entityid id, vec3 l) {
         massert(id != ENTITYID_INVALID, "id is -1");
         massert(l.x >= 0 && l.x < width, "x is out of bounds");
         massert(l.y >= 0 && l.y < height, "y is out of bounds");
@@ -312,11 +312,11 @@ public:
         return true;
     }
 
-    inline void df_set_all_tiles(const tiletype_t type) {
+    void df_set_all_tiles(tiletype_t type) {
         set_area(type, type, (Rectangle){0, 0, (float)width, (float)height});
     }
 
-    const inline vec3 get_random_loc() {
+    vec3 get_random_loc() {
         vector<vec3> tmp;
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
@@ -341,7 +341,7 @@ public:
         return tmp[GetRandomValue(0, tmp.size() - 1)];
     }
 
-    const inline vec3 df_get_random_loc_of_type(const tiletype_t type) {
+    vec3 df_get_random_loc_of_type(tiletype_t type) {
         vector<vec3> tmp;
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
@@ -354,7 +354,7 @@ public:
             }
         }
         if (tmp.size() == 0) {
-            return (vec3){-1, -1, -1};
+            return vec3{-1, -1, -1};
         }
         vec3 loc = tmp[GetRandomValue(0, tmp.size() - 1)];
         return loc;
