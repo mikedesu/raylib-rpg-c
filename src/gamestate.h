@@ -892,31 +892,25 @@ public:
     }
 
     inline void set_npc_starting_stats(const entityid id) {
-        const race_t rt = ct.get<race>(id).value_or(RACE_NONE);
+        race_t rt = ct.get<race>(id).value_or(RACE_NONE);
         if (rt == RACE_NONE) {
             return;
         }
         // stats racial modifiers for stats
-        const int str_m = get_racial_modifiers(rt, 0);
-        const int dex_m = get_racial_modifiers(rt, 1);
-        const int int_m = get_racial_modifiers(rt, 2);
-        const int wis_m = get_racial_modifiers(rt, 3);
-        const int con_m = get_racial_modifiers(rt, 4);
-        const int cha_m = get_racial_modifiers(rt, 5);
+        int str_m = get_racial_modifiers(rt, 0);
+        int dex_m = get_racial_modifiers(rt, 1);
+        int int_m = get_racial_modifiers(rt, 2);
+        int wis_m = get_racial_modifiers(rt, 3);
+        int con_m = get_racial_modifiers(rt, 4);
+        int cha_m = get_racial_modifiers(rt, 5);
         // default to 3-18 for stats
         uniform_int_distribution<int> gen(3, 18);
-        //const int strength_ = GetRandomValue(3, 18) + str_m;
-        //const int dexterity_ = GetRandomValue(3, 18) + dex_m;
-        //const int intelligence_ = GetRandomValue(3, 18) + int_m;
-        //const int wisdom_ = GetRandomValue(3, 18) + wis_m;
-        //const int constitution_ = GetRandomValue(3, 18) + con_m;
-        //const int charisma_ = GetRandomValue(3, 18) + cha_m;
-        const int strength_ = gen(mt) + str_m;
-        const int dexterity_ = gen(mt) + dex_m;
-        const int intelligence_ = gen(mt) + int_m;
-        const int wisdom_ = gen(mt) + wis_m;
-        const int constitution_ = gen(mt) + con_m;
-        const int charisma_ = gen(mt) + cha_m;
+        int strength_ = gen(mt) + str_m;
+        int dexterity_ = gen(mt) + dex_m;
+        int intelligence_ = gen(mt) + int_m;
+        int wisdom_ = gen(mt) + wis_m;
+        int constitution_ = gen(mt) + con_m;
+        int charisma_ = gen(mt) + cha_m;
         ct.set<strength>(id, strength_);
         ct.set<dexterity>(id, dexterity_);
         ct.set<intelligence>(id, intelligence_);
@@ -943,9 +937,8 @@ public:
         default: break;
         }
         uniform_int_distribution<int> gen2(1, hitdie.y);
-        //const int my_maxhp = std::max(1, GetRandomValue(1, hitdie.y) + get_stat_bonus(constitution_));
-        const int my_maxhp = std::max(1, gen2(mt) + get_stat_bonus(constitution_));
-        const int my_hp = my_maxhp;
+        int my_maxhp = std::max(1, gen2(mt) + get_stat_bonus(constitution_));
+        int my_hp = my_maxhp;
         ct.set<maxhp>(id, my_maxhp);
         ct.set<hp>(id, my_hp);
         ct.set<base_ac>(id, 10);
@@ -972,19 +965,17 @@ public:
         // all NPCs begin at level 1. level-up mechanisms will be determined elsewhere
         ct.set<level>(id, 1);
         ct.set<xp>(id, 0);
-
         ct.set<hunger_points>(id, hunger_points_t{100, 100});
-
-        //ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_NONE);
-        ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_RANDOM_MOVE);
+        ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_NONE);
+        //ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_RANDOM_MOVE);
         //ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_MOVE_TO_TARGET);
         //ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_ATTACK_TARGET_IF_ADJACENT);
         //ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_RANDOM_MOVE_AND_ATTACK_TARGET_IF_ADJACENT);
         ct.set<target_path>(id, make_shared<vector<vec3>>());
     }
 
-    inline entityid create_npc_with(const race_t rt, with_fun npcInitFunction) {
-        const entityid id = add_entity();
+    entityid create_npc_with(race_t rt, with_fun npcInitFunction) {
+        entityid id = add_entity();
         set_npc_defaults(id);
         ct.set<race>(id, rt);
         set_npc_starting_stats(id);
