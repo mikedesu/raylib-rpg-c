@@ -11,12 +11,14 @@ This file is the handoff note for the `gamestate.h` cleanup work.
 - Extracted player input and menu handling out of `gamestate.h` into `gamestate_input_impl.h`.
 - Extracted NPC AI, combat resolution, and pathfinding out of `gamestate.h` into `gamestate_npc_combat_impl.h`.
 - Extracted world interaction helpers out of `gamestate.h` into `gamestate_world_interaction_impl.h`.
+- Restored dead-body pulling after the dead NPC tile-cache refactor by updating `try_entity_pull()` in `gamestate_world_interaction_impl.h`.
 
 ## Current State
 
 - `gamestate.h` was reduced significantly and now acts more like a top-level coordinator.
 - The project still uses implementation headers included at the bottom of `gamestate.h`.
 - This is intentional for now because the build is still effectively single-translation-unit oriented (`main.cpp` includes `gamestate.h` directly).
+- Dead NPCs now live on tiles via `dead_npc_cache` in `dungeon_tile.h`, so pull/interact behavior has to account for that storage path explicitly.
 
 ## Files Added
 
@@ -51,6 +53,15 @@ These are the best remaining cleanup seams for the next session:
 2. Debug and diagnostics
    - `update_debug_panel_buffer`
    - possibly related profiling/debug helpers
+
+## Notes For Next Session
+
+- Re-check the dead-body interaction path before doing more world-interaction cleanup.
+- `try_entity_pull()` was manually adjusted after the extraction because corpse pulling broke when dead NPCs stopped being represented only through the old tile caches.
+- If world interaction is revisited again, compare behavior across:
+  - boxes
+  - dead NPC bodies
+  - any logic that still assumes `get_cached_live_npc()` or `get_cached_box()` is the only source of truth
 
 ## Longer-Term Cleanup Ideas
 
