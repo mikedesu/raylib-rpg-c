@@ -104,10 +104,10 @@ static inline void draw_inventory_menu(gamestate& g) {
 
                     // new-style component table access
                     const string my_name = g.ct.get<name>(selection_id).value_or("no-name");
-                    const int fontsize = 10;
+                    const int fontsize = 20;
                     const int cur_x = right_box.x + 10;
                     int cur_y = right_box.y + 10;
-                    const int y_incr = 10;
+                    const int y_incr = 20;
 
                     DrawText(my_name.c_str(), cur_x, cur_y, fontsize, WHITE);
                     cur_y += y_incr;

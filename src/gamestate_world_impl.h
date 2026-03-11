@@ -52,6 +52,93 @@ inline bool dungeon_room_fits(Rectangle candidate, const vector<room>& rooms, in
     }
     return true;
 }
+
+inline bool dungeon_prop_is_solid(proptype_t type) {
+    switch (type) {
+    case PROP_DUNGEON_STATUE_00:
+    case PROP_DUNGEON_WOODEN_TABLE_00:
+    case PROP_DUNGEON_WOODEN_TABLE_01:
+    case PROP_DUNGEON_WOODEN_BARREL_OPEN_TOP_EMPTY:
+    case PROP_DUNGEON_WOODEN_BARREL_OPEN_TOP_WATER:
+        return true;
+    default:
+        return false;
+    }
+}
+
+inline bool dungeon_prop_is_pushable(proptype_t type) {
+    switch (type) {
+    case PROP_DUNGEON_STATUE_00:
+        return true;
+    default:
+        return false;
+    }
+}
+
+inline const char* dungeon_prop_name(proptype_t type) {
+    switch (type) {
+    case PROP_DUNGEON_STATUE_00: return "statue";
+    case PROP_DUNGEON_TORCH_00: return "torch";
+    case PROP_DUNGEON_CANDLE_00: return "candle";
+    case PROP_DUNGEON_JAR_00: return "jar";
+    case PROP_DUNGEON_PLATE_00: return "plate";
+    case PROP_DUNGEON_WOODEN_BARREL_OPEN_TOP_EMPTY: return "empty barrel";
+    case PROP_DUNGEON_WOODEN_BARREL_OPEN_TOP_WATER: return "water barrel";
+    case PROP_DUNGEON_WOODEN_CHAIR_00: return "wooden chair";
+    case PROP_DUNGEON_WOODEN_TABLE_00: return "wooden table";
+    case PROP_DUNGEON_WOODEN_TABLE_01: return "wooden table";
+    case PROP_DUNGEON_BANNER_00:
+    case PROP_DUNGEON_BANNER_01:
+    case PROP_DUNGEON_BANNER_02:
+        return "banner";
+    default:
+        return "prop";
+    }
+}
+
+inline const char* dungeon_prop_description(proptype_t type) {
+    switch (type) {
+    case PROP_DUNGEON_STATUE_00: return "A heavy carved statue.";
+    case PROP_DUNGEON_TORCH_00: return "A wall torch repurposed as floor clutter.";
+    case PROP_DUNGEON_CANDLE_00: return "A small candle.";
+    case PROP_DUNGEON_JAR_00: return "A ceramic jar.";
+    case PROP_DUNGEON_PLATE_00: return "A dusty plate.";
+    case PROP_DUNGEON_WOODEN_BARREL_OPEN_TOP_EMPTY: return "An empty wooden barrel.";
+    case PROP_DUNGEON_WOODEN_BARREL_OPEN_TOP_WATER: return "A wooden barrel filled with water.";
+    case PROP_DUNGEON_WOODEN_CHAIR_00: return "A wooden chair.";
+    case PROP_DUNGEON_WOODEN_TABLE_00:
+    case PROP_DUNGEON_WOODEN_TABLE_01:
+        return "A sturdy wooden table.";
+    default:
+        return "A dungeon prop.";
+    }
+}
+
+inline with_fun dungeon_prop_init(proptype_t type) {
+    return [type](CT& ct, const entityid id) {
+        ct.set<name>(id, dungeon_prop_name(type));
+        ct.set<description>(id, dungeon_prop_description(type));
+        ct.set<solid>(id, dungeon_prop_is_solid(type));
+        ct.set<pushable>(id, dungeon_prop_is_pushable(type));
+    };
+}
+
+inline proptype_t dungeon_random_floor_prop_type(mt19937& mt) {
+    static constexpr proptype_t floor_prop_types[] = {
+        PROP_DUNGEON_STATUE_00,
+        PROP_DUNGEON_TORCH_00,
+        PROP_DUNGEON_CANDLE_00,
+        PROP_DUNGEON_JAR_00,
+        PROP_DUNGEON_PLATE_00,
+        PROP_DUNGEON_WOODEN_BARREL_OPEN_TOP_EMPTY,
+        PROP_DUNGEON_WOODEN_BARREL_OPEN_TOP_WATER,
+        PROP_DUNGEON_WOODEN_CHAIR_00,
+        PROP_DUNGEON_WOODEN_TABLE_00,
+        PROP_DUNGEON_WOODEN_TABLE_01,
+    };
+    uniform_int_distribution<int> dist(0, static_cast<int>(sizeof(floor_prop_types) / sizeof(floor_prop_types[0])) - 1);
+    return floor_prop_types[dist(mt)];
+}
 }
 
 inline void gamestate::create_and_add_df_0(biome_t type, int w, int h, int df_count, float parts) {
@@ -244,6 +331,13 @@ inline entityid gamestate::create_prop_with(proptype_t type, with_fun initFun) {
 
 inline entityid gamestate::create_prop_at_with(proptype_t type, vec3 loc, with_fun initFun) {
     shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
+    tile_t& tile = df->tile_at(loc);
+    if (!tile_is_walkable(tile.get_type())) {
+        return ENTITYID_INVALID;
+    }
+    if (tile.entity_count() > 0) {
+        return ENTITYID_INVALID;
+    }
     entityid id = create_prop_with(type, initFun);
     if (id == ENTITYID_INVALID) {
         return ENTITYID_INVALID;
@@ -257,81 +351,43 @@ inline entityid gamestate::create_prop_at_with(proptype_t type, vec3 loc, with_f
 }
 
 inline int gamestate::place_props() {
-    auto defaultInit = [](CT& ct, const entityid id) {};
     int placed_props = 0;
     for (int z = 0; z < (int)d.floors.size(); z++) {
         shared_ptr<dungeon_floor> df = d.get_floor(z);
+        vector<vec3> candidates;
         for (int x = 0; x < df->get_width(); x++) {
             for (int y = 0; y < df->get_height(); y++) {
                 vec3 loc = {x, y, z};
                 tile_t& t = df->tile_at(loc);
+                if (!tile_is_walkable(t.get_type())) {
+                    continue;
+                }
                 if (t.get_type() == TILE_UPSTAIRS || t.get_type() == TILE_DOWNSTAIRS) {
                     continue;
                 }
                 if (t.get_can_have_door()) {
                     continue;
                 }
-                if (t.tile_is_wall()) {
-                    uniform_int_distribution<int> gen(0, 20);
-                    int flip = gen(mt);
-                    if (flip == 0) {
-                        uniform_int_distribution<int> gen2(1, 3);
-                        int r = gen2(mt);
-                        switch (r) {
-                        case 1: {
-                            entityid id = create_prop_at_with(PROP_DUNGEON_BANNER_00, loc, defaultInit);
-                            if (id != ENTITYID_INVALID) {
-                                placed_props++;
-                            }
-                        } break;
-                        case 2: {
-                            entityid id = create_prop_at_with(PROP_DUNGEON_BANNER_01, loc, defaultInit);
-                            if (id != ENTITYID_INVALID) {
-                                placed_props++;
-                            }
-                        } break;
-                        case 3: {
-                            entityid id = create_prop_at_with(PROP_DUNGEON_BANNER_02, loc, defaultInit);
-                            if (id != ENTITYID_INVALID) {
-                                placed_props++;
-                            }
-                        } break;
-                        default: break;
-                        }
-                    }
+                if (t.entity_count() != 0) {
+                    continue;
                 }
-                else {
-                    uniform_int_distribution<int> gen(0, 20);
-                    int flip = gen(mt);
-                    if (flip == 0) {
-                        entityid id = create_prop_at_with(PROP_DUNGEON_WOODEN_TABLE_00, loc, defaultInit);
-                        ct.set<solid>(id, true);
-                        if (id != INVALID) {
-                            placed_props++;
-                        }
-                    }
-                    else if (flip == 1) {
-                        entityid id = create_prop_at_with(PROP_DUNGEON_WOODEN_TABLE_01, loc, defaultInit);
-                        if (id != INVALID) {
-                            placed_props++;
-                            ct.set<solid>(id, true);
-                        }
-                    }
-                    else if (flip == 2) {
-                        entityid id = create_prop_at_with(PROP_DUNGEON_WOODEN_CHAIR_00, loc, defaultInit);
-                        if (id != INVALID) {
-                            placed_props++;
-                        }
-                    }
-                    else if (flip == 3) {
-                        entityid id = create_prop_at_with(PROP_DUNGEON_STATUE_00, loc, defaultInit);
-                        if (id != INVALID) {
-                            placed_props++;
-                            ct.set<solid>(id, true);
-                            ct.set<pushable>(id, true);
-                        }
-                    }
-                }
+                candidates.push_back(loc);
+            }
+        }
+
+        if (candidates.empty()) {
+            continue;
+        }
+
+        std::shuffle(candidates.begin(), candidates.end(), mt);
+        const int target_prop_count = dungeon_clamp_int(static_cast<int>(candidates.size()) / 24, 1, 6);
+        const int prop_count = std::min(target_prop_count, static_cast<int>(candidates.size()));
+        for (int i = 0; i < prop_count; i++) {
+            const vec3 loc = candidates[i];
+            const proptype_t type = dungeon_random_floor_prop_type(mt);
+            entityid id = create_prop_at_with(type, loc, dungeon_prop_init(type));
+            if (id != ENTITYID_INVALID) {
+                placed_props++;
             }
         }
     }

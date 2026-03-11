@@ -41,6 +41,12 @@ inline bool gamestate::tile_has_solid(int x, int y, int z) {
         return true;
     }
 
+    id = t.get_cached_prop();
+    is_solid = ct.get<solid>(id).value_or(false);
+    if (id != ENTITYID_INVALID && is_solid) {
+        return true;
+    }
+
     id = t.get_cached_door();
     is_solid = ct.get<solid>(id).value_or(false);
     if (id != ENTITYID_INVALID && is_solid) {

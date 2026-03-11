@@ -19,7 +19,6 @@ static inline bool create_spritegroup(gamestate& g, entityid id, int* keys, int 
 
     massert(group, "spritegroup is NULL");
     //disabling this check until dungeon_floor created
-    auto df = g.d.get_current_floor();
     auto maybe_loc = g.ct.get<location>(id);
 
     minfo("checking if has location");
@@ -27,6 +26,9 @@ static inline bool create_spritegroup(gamestate& g, entityid id, int* keys, int 
     if (maybe_loc.has_value()) {
         minfo("it DOES have a location");
         const vec3 loc = maybe_loc.value();
+        massert(loc.z >= 0 && static_cast<size_t>(loc.z) < g.d.get_floor_count(), "location z out of bounds: %d", loc.z);
+        auto df = g.d.get_floor(loc.z);
+        massert(df, "dungeon floor is NULL");
         massert(loc.x >= 0 && loc.x < df->get_width(), "location x out of bounds: %d", loc.x);
         massert(loc.y >= 0 && loc.y < df->get_height(), "location y out of bounds: %d", loc.y);
 

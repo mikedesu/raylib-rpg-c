@@ -500,6 +500,7 @@ public:
                     continue;
                 }
                 if (tile.get_cached_live_npc() != INVALID || tile.get_dead_npc_count() > 0 || tile.get_cached_item() != INVALID ||
+                    tile.get_cached_prop() != INVALID ||
                     tile.get_cached_box() != INVALID || tile.get_cached_door() != INVALID) {
                     continue;
                 }

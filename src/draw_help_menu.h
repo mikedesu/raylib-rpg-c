@@ -4,46 +4,59 @@
 #include "libgame_defines.h"
 
 static inline void draw_help_menu(gamestate& g) {
-    const char* text = "Help Menu\n"
-                       "\n"
-                       "Move: numpad 1-9, no 5\n"
-                       "Face / wait: numpad 5\n"
-                       "Camera mode: b\n"
-                       "Zoom: - and =\n"
-                       "\n"
-                       "Pick up item: s\n"
-                       "Attack: a\n"
-                       "Pull: space\n"
-                       "Open door: o\n"
-                       "Use stairs: .\n"
-                       "Toggle full light: l\n"
-                       "\n"
-                       "Inventory: i\n"
-                       "Inventory equip/use: e or enter\n"
-                       "Inventory drop: q\n"
-                       "Inventory close: esc or i\n"
-                       "\n"
-                       "Options: `\n"
-                       "Open this help menu: ?\n"
-                       "Debug panel: p\n"
-                       "Quit prompt: esc\n"
-                       "\n"
-                       "@evildojo666";
+    const string text = "Help Menu\n"
+                        "\n"
+                        "Move: numpad 1-9, no 5\n"
+                        "Face / wait: numpad 5\n"
+                        "Camera mode: b\n"
+                        "Zoom: - and =\n"
+                        "\n"
+                        "Pick up item: s\n"
+                        "Attack: a\n"
+                        "Pull: space\n"
+                        "Open door: o\n"
+                        "Use stairs: .\n"
+                        "Toggle full light: l\n"
+                        "\n"
+                        "Inventory: i\n"
+                        "Inventory equip/use: e or enter\n"
+                        "Inventory drop: q\n"
+                        "Inventory close: esc or i\n"
+                        "\n"
+                        "Options: `\n"
+                        "Open this help menu: ?\n"
+                        "Debug panel: p\n"
+                        "Quit prompt: esc\n"
+                        "\n"
+                        "@evildojo666";
 
+    constexpr int font_size = 20;
+    constexpr int line_spacing = 4;
+    const int padding = DEFAULT_PAD * 2;
 
-    constexpr int font_size = 10;
+    int max_text_width = 0;
+    int line_count = 0;
+    size_t line_start = 0;
+    while (line_start <= text.size()) {
+        const size_t line_end = text.find('\n', line_start);
+        const string line = line_end == string::npos ? text.substr(line_start) : text.substr(line_start, line_end - line_start);
+        const int line_width = MeasureText(line.c_str(), font_size);
+        if (line_width > max_text_width) {
+            max_text_width = line_width;
+        }
+        line_count++;
+        if (line_end == string::npos) {
+            break;
+        }
+        line_start = line_end + 1;
+    }
 
-    constexpr int line_count = 21;
+    const int text_height = line_count * font_size + (line_count - 1) * line_spacing;
 
-    constexpr int text_height = font_size * line_count;
-
-    const int text_width = MeasureText(text, font_size);
-
-    const int box_x = DEFAULT_TARGET_WIDTH / 2 - text_width / 2 - DEFAULT_PAD * 2;
-    const int box_y = DEFAULT_TARGET_HEIGHT / 2 - text_height / 2 - DEFAULT_PAD * 2;
-
-    const int box_width = text_width + DEFAULT_PAD * 2;
-    const int box_height = text_height + DEFAULT_PAD * 2;
+    const int box_width = max_text_width + padding * 2;
+    const int box_height = text_height + padding * 2;
+    const int box_x = (DEFAULT_TARGET_WIDTH - box_width) / 2;
+    const int box_y = (DEFAULT_TARGET_HEIGHT - box_height) / 2;
 
     constexpr Color box_color = Color{0, 0, 255, 127};
     DrawRectangle(box_x, box_y, box_width, box_height, box_color);
@@ -57,9 +70,19 @@ static inline void draw_help_menu(gamestate& g) {
 
     DrawRectangleLinesEx({box_x_f, box_y_f, box_w_f, box_h_f}, thick, box_outline_color);
 
-    const int text_x = box_x + DEFAULT_PAD;
-    const int text_y = box_y + DEFAULT_PAD;
-    DrawText(text, text_x, text_y, font_size, WHITE);
+    const int text_x = box_x + padding;
+    int text_y = box_y + padding;
+    line_start = 0;
+    while (line_start <= text.size()) {
+        const size_t line_end = text.find('\n', line_start);
+        const string line = line_end == string::npos ? text.substr(line_start) : text.substr(line_start, line_end - line_start);
+        DrawText(line.c_str(), text_x, text_y, font_size, WHITE);
+        text_y += font_size + line_spacing;
+        if (line_end == string::npos) {
+            break;
+        }
+        line_start = line_end + 1;
+    }
 
 
 

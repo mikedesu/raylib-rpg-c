@@ -19,6 +19,7 @@ private:
     bool dirty_entities;
     tiletype_t type;
     entityid cached_live_npc;
+    entityid cached_prop;
     entityid cached_box;
     entityid cached_door;
     dead_npc_cache dead_npcs;
@@ -28,6 +29,7 @@ public:
     inline size_t entity_count() {
         size_t count = 0;
         count += cached_live_npc != INVALID ? 1 : 0;
+        count += cached_prop != INVALID ? 1 : 0;
         count += cached_box != INVALID ? 1 : 0;
         count += cached_door != INVALID ? 1 : 0;
 
@@ -39,6 +41,14 @@ public:
 
     void set_cached_box(entityid id) {
         cached_box = id;
+    }
+
+    void set_cached_prop(entityid id) {
+        cached_prop = id;
+    }
+
+    entityid get_cached_prop() {
+        return cached_prop;
     }
 
     entityid get_cached_box() {
@@ -141,6 +151,7 @@ public:
     inline void tile_reset_cache() {
         cached_player_present = false;
         cached_live_npc = ENTITYID_INVALID;
+        cached_prop = ENTITYID_INVALID;
         dead_npcs = dead_npc_cache(); // Reset cache
         items = item_cache();
         cached_box = ENTITYID_INVALID;
@@ -179,6 +190,9 @@ public:
                 return INVALID;
             }
         }
+        else if (type == ENTITY_PROP) {
+            cached_prop = id;
+        }
         else if (type == ENTITY_BOX) {
             cached_box = id;
         }
@@ -199,6 +213,10 @@ public:
             return id;
         }
         else if (dead_npcs.remove_id(id)) {
+            return id;
+        }
+        else if (id == cached_prop) {
+            cached_prop = INVALID;
             return id;
         }
         else if (id == cached_box) {
