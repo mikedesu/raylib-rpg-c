@@ -35,7 +35,7 @@ inline bool dungeon_rects_overlap(Rectangle a, Rectangle b, int padding = 0) {
     return ax0 < bx1 && ax1 > bx0 && ay0 < by1 && ay1 > by0;
 }
 
-inline bool dungeon_room_fits(Rectangle candidate, const vector<room>& rooms, int width, int height) {
+inline bool dungeon_room_fits(Rectangle candidate, const vector<room>& rooms, int width, int height, int overlap_padding = 1) {
     if (candidate.width <= 0 || candidate.height <= 0) {
         return false;
     }
@@ -46,7 +46,7 @@ inline bool dungeon_room_fits(Rectangle candidate, const vector<room>& rooms, in
         return false;
     }
     for (const room& existing : rooms) {
-        if (dungeon_rects_overlap(candidate, existing.get_area(), 1)) {
+        if (dungeon_rects_overlap(candidate, existing.get_area(), overlap_padding)) {
             return false;
         }
     }
@@ -71,10 +71,11 @@ inline void gamestate::create_and_add_df_1(biome_t type, int w, int h, int df_co
     vector<room> rooms;
     constexpr direction_t dirs[] = {DIR_LEFT, DIR_RIGHT, DIR_UP, DIR_DOWN};
 
-    const int min_room_w = 3;
-    const int min_room_h = 3;
-    const int max_room_w = dungeon_clamp_int(w / 10, 4, 6);
-    const int max_room_h = dungeon_clamp_int(h / 10, 4, 6);
+    const bool compact_map = w <= 8 && h <= 8;
+    const int min_room_w = compact_map ? 2 : 3;
+    const int min_room_h = compact_map ? 2 : 3;
+    const int max_room_w = compact_map ? 2 : dungeon_clamp_int(w / 10, 4, 6);
+    const int max_room_h = compact_map ? 2 : dungeon_clamp_int(h / 10, 4, 6);
     const int start_w = dungeon_random_range(mt, min_room_w, max_room_w);
     const int start_h = dungeon_random_range(mt, min_room_h, max_room_h);
     Rectangle start_area = dungeon_make_rect(w / 2 - start_w / 2, h / 2 - start_h / 2, start_w, start_h);
@@ -82,9 +83,15 @@ inline void gamestate::create_and_add_df_1(biome_t type, int w, int h, int df_co
     rooms.push_back(room(0, TextFormat("room-%d", 0), TextFormat("room-%d description", 0), start_area));
 
     const int dungeon_area = w * h;
-    const int density_divisor = dungeon_clamp_int(static_cast<int>(48.0f / parts), 24, 64);
-    const int target_room_count = dungeon_clamp_int(dungeon_area / density_divisor, 6, 96);
-    const int max_gap = dungeon_clamp_int((w + h) / 96, 1, 2);
+    const int density_divisor = compact_map
+        ? dungeon_clamp_int(static_cast<int>(16.0f / parts), 8, 16)
+        : dungeon_clamp_int(static_cast<int>(48.0f / parts), 24, 64);
+    const int target_room_count = compact_map
+        ? dungeon_clamp_int(dungeon_area / density_divisor, 4, 5)
+        : dungeon_clamp_int(dungeon_area / density_divisor, 6, 96);
+    const int min_gap = compact_map ? 0 : 1;
+    const int max_gap = compact_map ? 0 : dungeon_clamp_int((w + h) / 96, 1, 2);
+    const int overlap_padding = compact_map ? 0 : 1;
     int attempts_remaining = target_room_count * 96;
     while (static_cast<int>(rooms.size()) < target_room_count && attempts_remaining-- > 0) {
         const int anchor_index = dungeon_random_range(mt, 0, static_cast<int>(rooms.size()) - 1);
@@ -92,9 +99,9 @@ inline void gamestate::create_and_add_df_1(biome_t type, int w, int h, int df_co
         const direction_t dir = dirs[dungeon_random_range(mt, 0, 3)];
         const int room_w = dungeon_random_range(mt, min_room_w, max_room_w);
         const int room_h = dungeon_random_range(mt, min_room_h, max_room_h);
-        const int gap = dungeon_random_range(mt, 1, max_gap);
+        const int gap = dungeon_random_range(mt, min_gap, max_gap);
         Rectangle candidate = df->df_get_adjacent_area(anchor.get_area(), dir, gap, room_w, room_h);
-        if (!dungeon_room_fits(candidate, rooms, w, h)) {
+        if (!dungeon_room_fits(candidate, rooms, w, h, overlap_padding)) {
             continue;
         }
         Rectangle painted = df->df_paint_adjacent_floor_area(anchor.get_area(), dir, gap, room_w, room_h, 1);

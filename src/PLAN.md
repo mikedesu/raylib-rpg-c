@@ -214,3 +214,4 @@ These are the best remaining cleanup seams for the next session:
   - current manual testing suggests it underuses space and collapses to tiny single-room layouts
   - a single `3x3` or `3x4` room leaves too much of an `8x8` floor unused
   - revisit how room count, seed room size, and corridor placement scale at very small dimensions
+  - technically, logistically/logically, a floor could have a single 1x1 tile, but we do not want this in the map generator. map-generator minimum room size is 2x2. 
