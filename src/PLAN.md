@@ -35,6 +35,11 @@ This file is the handoff note for the `gamestate.h` cleanup work.
 - Tuned the new generator so larger floors scale by room count and density rather than by making each room much larger.
 - Increased the default gameplay dungeon bootstrap from `16x16` to `64x64` in `gamestate_lifecycle_impl.h`.
 - Made `room` geometry/name/description getters `const` so generation code can safely inspect room metadata through const references.
+- Added a gameplay-only quit confirmation prompt:
+  - `Escape` in gameplay now opens a simple `Y/N` confirm message instead of instantly quitting
+  - the prompt uses a reusable confirm control mode layered onto the existing message-box drawing path
+  - outside gameplay scenes, `Escape` still instant-quits
+  - web builds (`-DPLATFORM_WEB -DWEB`) now treat confirmed quit as a return-to-title reset instead of closing the app
 
 ## Current State
 
@@ -229,32 +234,22 @@ Continue with:
 
 ## Definite Next Things
 
-1. When in the primary gameplay scene, when pressing escape, currently it instantly exits the game. I want to incrementally modify this behavior. This was a fine start but I need to present the player with a window that asks if they really want to exit, with a yes or no menu toggle in the window that pops up. Current message window behavior does not offer things like Yes/No or any toggleable optionality when presenting a message to the player. "Do You Really Want To Quit? Y/N", "Are You Sure You Want To Quit? Press Y or N" could be acceptable instead of a whole real "toggle" like I have in the Title Screen or in the Character Creation Screen. The simpler the better. So, to summarize, we need:
-  - Message Windows that can offer a selection that returns a true/false or etc. depending on what the user inputs
-  - Use the new Message Window to implement a "quit" safeguard before exiting...
-    - "Do You Want To Exit? Y/N" or "Are You Sure You Want To Exit? Press Y or N"
-    - We still press Escape once to bring up the "HandleQuit" Message Window
-    - Outside of the Gameplay Scene, Escape will instant-quit the game still
-  - If the game was built as a web binary using `-DPLATFORM_WEB -DWEB`, then we wouldnt want to process quit this way. Instead, quitting the game by pressing escape and then answering "Y" to the quit dialog would result in being returned to the game title screen and the gamestate object being refreshed/renewed for a possible new game. 
-
-
-2. Reduce the dungeon floor size to 8x8 to begin with. We tested 64x64 last time and it feels really good with the new maze generation algorithm. I want to verify that it works at 8x8, then 16x16, then 32x32. This should give us a lot of variety when generating floors.
+1. Reduce the dungeon floor size to 8x8 to begin with. We tested 64x64 last time and it feels really good with the new maze generation algorithm. I want to verify that it works at 8x8, then 16x16, then 32x32. This should give us a lot of variety when generating floors.
   - [ ] 8x8 tested (human must verify before proceeding)
   - [ ] 16x16 tested (human must verify before proceeding)
   - [ ] 32x32 tested (human must verify before proceeding)
   - [ ] 8x16 tested (human must verify before proceeding)
   - [ ] 16x8 tested (human must verify before proceeding)
 
-3. Prepare to generate a 2nd dungeon floor and add it to the gamestate dungeon's list of floors.
+2. Prepare to generate a 2nd dungeon floor and add it to the gamestate dungeon's list of floors.
   - 1st floor: 8x8
   - 2nd floor: 16x16
 
-4. Update the floor generation algorithms so that we assign 2 randomly-selected but different tiles (x, y) per floor (z) to be the `UPSTAIRS` and `DOWNSTAIRS` tiles. 
+3. Update the floor generation algorithms so that we assign 2 randomly-selected but different tiles (x, y) per floor (z) to be the `UPSTAIRS` and `DOWNSTAIRS` tiles. 
 
-5. Implement the `try_entity_go_upstairs` and `try_entity_go_downstairs` or similar functions necessary to handle any entity attempting to ascend or descend a staircase
+4. Implement the `try_entity_go_upstairs` and `try_entity_go_downstairs` or similar functions necessary to handle any entity attempting to ascend or descend a staircase
   - Method fails and produces a message history log stating the entity tried to go upstairs but there was no stairs, or some other error (yet to be decided) occurs
   - Same goes for downstairs
   - On success, gamestate dungeon's `current_floor` will point to the proper floor...the "top" of the dungeon begins at floor 0, and descending means the `current_floor` increases. 
   - Attempting to ascend floors on floor 0 will result in a message box stating an error if the player/hero attempts to do so, and a message history log for other entities if they attempt to do so
   - Attempting to descend floors on the last floor in gamestate.d.floors will result in a similar popup if the hero attempts it, and a message history log if attempted by another entity (NPC, etc)
-
