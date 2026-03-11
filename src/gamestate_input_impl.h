@@ -1,5 +1,64 @@
 #pragma once
 
+inline void gamestate::open_confirm_prompt(confirm_action_t action, const char* fmt, ...) {
+    massert(fmt, "format string is NULL");
+    char buffer[MAX_MSG_LENGTH] = {0};
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(buffer, MAX_MSG_LENGTH - 1, fmt, args);
+    va_end(args);
+    confirm_prompt_message = buffer;
+    confirm_action = action;
+    display_confirm_prompt = true;
+    controlmode_before_confirm = controlmode;
+    controlmode = CONTROLMODE_CONFIRM_PROMPT;
+    frame_dirty = true;
+}
+
+inline void gamestate::handle_confirm_quit() {
+#ifdef WEB
+    logic_close();
+    reset();
+    logic_init();
+#else
+    do_quit = true;
+#endif
+    frame_dirty = true;
+}
+
+inline void gamestate::resolve_confirm_prompt(bool confirmed) {
+    const confirm_action_t action = confirm_action;
+    display_confirm_prompt = false;
+    confirm_action = CONFIRM_ACTION_NONE;
+    confirm_prompt_message.clear();
+    controlmode = controlmode_before_confirm == CONTROLMODE_CONFIRM_PROMPT ? CONTROLMODE_PLAYER : controlmode_before_confirm;
+    controlmode_before_confirm = CONTROLMODE_PLAYER;
+    frame_dirty = true;
+    if (!confirmed) {
+        return;
+    }
+    switch (action) {
+    case CONFIRM_ACTION_QUIT:
+        handle_confirm_quit();
+        break;
+    case CONFIRM_ACTION_NONE:
+    default:
+        break;
+    }
+}
+
+inline void gamestate::handle_input_confirm_prompt(inputstate& is) {
+    massert(controlmode == CONTROLMODE_CONFIRM_PROMPT, "controlmode isnt in confirm prompt: %d", controlmode);
+    if (inputstate_is_pressed(is, KEY_Y)) {
+        PlaySound(sfx[SFX_CONFIRM_01]);
+        resolve_confirm_prompt(true);
+    }
+    else if (inputstate_is_pressed(is, KEY_N) || inputstate_is_pressed(is, KEY_ESCAPE)) {
+        PlaySound(sfx[SFX_CONFIRM_01]);
+        resolve_confirm_prompt(false);
+    }
+}
+
 inline void gamestate::handle_camera_move(inputstate& is) {
     if (inputstate_is_held(is, KEY_RIGHT)) {
         cam2d.offset.x += cam2d.zoom;
@@ -202,7 +261,7 @@ inline void gamestate::handle_input_gameplay_controlmode_player(inputstate& is) 
         return;
     }
     if (inputstate_is_pressed(is, KEY_ESCAPE)) {
-        do_quit = true;
+        open_confirm_prompt(CONFIRM_ACTION_QUIT, "Do You Want To Exit? Press Y or N");
         return;
     }
     handle_camera_zoom(is);
@@ -253,10 +312,6 @@ inline void gamestate::handle_input_gameplay_controlmode_player(inputstate& is) 
     else if (inputstate_is_pressed(is, KEY_SPACE)) {
         try_entity_pull(hero_id);
         flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        return;
-    }
-    else if (inputstate_is_pressed(is, KEY_ESCAPE)) {
-        do_quit = true;
         return;
     }
     if (handle_change_dir(is) || handle_change_dir_intent(is) || handle_display_inventory(is)) {
@@ -317,6 +372,10 @@ inline void gamestate::handle_input_help_menu(inputstate& is) {
 
 inline void gamestate::handle_input_gameplay_scene(inputstate& is) {
     minfo2("handle input gameplay scene");
+    if (controlmode == CONTROLMODE_CONFIRM_PROMPT) {
+        handle_input_confirm_prompt(is);
+        return;
+    }
     if (inputstate_is_pressed(is, KEY_B)) {
         if (controlmode == CONTROLMODE_PLAYER) {
             controlmode = CONTROLMODE_CAMERA;

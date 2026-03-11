@@ -66,9 +66,15 @@ using std::chrono::time_point;
 extern float music_volume;
 extern float master_volume;
 
+typedef enum {
+    CONFIRM_ACTION_NONE = 0,
+    CONFIRM_ACTION_QUIT,
+} confirm_action_t;
+
 class gamestate {
 public:
     controlmode_t controlmode;
+    controlmode_t controlmode_before_confirm;
     debugpanel_t debugpanel;
     entityid hero_id;
     entityid new_entityid_begin;
@@ -97,6 +103,7 @@ public:
     bool display_inventory_menu;
     bool display_action_menu;
     bool display_option_menu;
+    bool display_confirm_prompt;
     bool do_quit;
     bool dirty_entities;
     bool display_help_menu;
@@ -149,6 +156,8 @@ public:
     Font font;
     ComponentTable ct;
     option_menu options_menu;
+    confirm_action_t confirm_action;
+    string confirm_prompt_message;
 
     void set_seed() {
         srand(time(NULL));
@@ -237,6 +246,7 @@ public:
         display_action_menu = false;
         display_inventory_menu = false;
         display_help_menu = false;
+        display_confirm_prompt = false;
         do_quit = false;
         cam_changed = false;
         gameover = dirty_entities = false;
@@ -266,6 +276,7 @@ public:
         cam2d.rotation = 0.0;
         fadealpha = 0.0;
         controlmode = CONTROLMODE_PLAYER;
+        controlmode_before_confirm = CONTROLMODE_PLAYER;
         // current displayed dungeon floor
         flag = GAMESTATE_FLAG_PLAYER_INPUT;
         font_size = GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE;
@@ -310,6 +321,8 @@ public:
         current_scene = SCENE_TITLE;
         music_volume = DEFAULT_MUSIC_VOLUME;
         last_click_screen_pos = Vector2{-1, -1};
+        confirm_action = CONFIRM_ACTION_NONE;
+        confirm_prompt_message.clear();
         msg_system.clear();
         msg_history.clear();
         ct.clear();
@@ -510,6 +523,14 @@ public:
     void handle_hero_item_use();
 
     void handle_input_inventory(inputstate& is);
+
+    void open_confirm_prompt(confirm_action_t action, const char* fmt, ...);
+
+    void resolve_confirm_prompt(bool confirmed);
+
+    void handle_input_confirm_prompt(inputstate& is);
+
+    void handle_confirm_quit();
 
     //inl_count_0 + 2bool handle_quit_pressed(const inputstate& is) {
     //    if (inputstate_is_pressed(is, KEY_ESCAPE)) {

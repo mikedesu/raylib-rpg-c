@@ -4,10 +4,9 @@
 #include "libgame_defines.h"
 
 static inline void draw_message_box(gamestate& g) {
-    if (!g.msg_system_is_active || g.msg_system.size() == 0) {
+    if (!g.display_confirm_prompt && (!g.msg_system_is_active || g.msg_system.size() == 0)) {
         return;
     }
-
 
     constexpr int w = DEFAULT_TARGET_WIDTH;
     constexpr int font_size = DEFAULT_MSG_WINDOW_FONT_SIZE;
@@ -15,7 +14,7 @@ static inline void draw_message_box(gamestate& g) {
     constexpr float text_height = font_size;
     constexpr float y = (DEFAULT_TARGET_HEIGHT - text_height) / 2.0 - DEFAULT_PAD;
 
-    const string msg = g.msg_system.at(0);
+    const string msg = g.display_confirm_prompt ? g.confirm_prompt_message : g.msg_system.at(0);
 
 
     char tmp[1024] = {0};
