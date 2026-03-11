@@ -211,6 +211,7 @@ These are the best remaining cleanup seams for the next session:
    - door candidate count
    - walkable tile count
 7. Revisit `parts` so it becomes a real density/style control instead of a mostly indirect heuristic input.
+   - note: `parts` was short for "partition", as in quadrants of the cartesian X/Y plane. 4.0 = 4 partitions/quadrants. 
 8. Add alternate generation styles later using the same painting API rather than replacing the API:
    - sparse stronghold
    - dense catacombs
@@ -222,15 +223,32 @@ These are the best remaining cleanup seams for the next session:
 
 ## Definite Next Things
 
-1. Improve interconnection after the initial room-growth pass.
-  - the generator now handles `8x8` more credibly, so the next quality step is less about fit and more about topology
-  - add loop-making or nearby-room connection passes so layouts read less tree-like
+- [ ] Re-factor libdraw.h from the top down and associated drawing functions, methods, classes, and files
+  - Pay attention to the object and definition hierarchy in order to understand the relationship between the gamestate and the rendered textures
+  - Our goal is flexibility: as you can see, I am adding new `ENTITY_TYPE_` values that distinguish `NPC` from `ITEM` from `DOOR` from `BOX` from `PROP` etc.
+  - We are doing this in preparation for adding `PROP`s back into the game.
+  - `PROP` placement should be a separate layer during floor-generation from the generation of the floor layout
+    - Naturally, we cannot place `PROP` entities on a floor with no-layout.
+  - `PROP` entities will be drawn on a per-tile basis in `draw_dungeon_floor.h` just like other entities.
+- [ ] There might be remnants of a `create_prop_at` and `create_prop_at_with` function or method that we could use to create PROPs.
+  - in `texture_ids.h` there is 
+```
+#define TX_PROP_WOODEN_TABLE_00 383
+#define TX_PROP_WOODEN_CHAIR_00 384
+#define TX_PROP_BANNER_01 385
+#define TX_PROP_WOODEN_BARREL_OPEN_TOP_WATER 386
+#define TX_PROP_TORCH_00 387
+#define TX_PROP_STATUE_00 388
+#define TX_PROP_WOODEN_TABLE_01 389
+#define TX_PROP_WOODEN_BARREL_OPEN_TOP_EMPTY 390
+#define TX_PROP_CANDLE_00 391
+#define TX_PROP_BANNER_00 392
+#define TX_PROP_WHITE_STATUE_DOWN_00 393
+#define TX_PROP_JAR_00 394
+#define TX_PROP_WOODEN_BOX_OPEN_TOP_EMPTY 395
+#define TX_PROP_WOODEN_BOX_OPEN_TOP_WATERY 396
+#define TX_PROP_BANNER_02 397
+#define TX_PROP_PLATE_00 398
+```
+  this can be used in the management of different types of props. this needs to be extendible as this is only a small set of possible props i might include. this is just what is available now.
 
-2. Add more corridor flexibility.
-  - consider L-corridors or similar options so room attachment is not limited to straight-axis overlap
-  - keep the existing connected-room feel, but reduce the number of rejected placements caused by alignment constraints
-
-3. Preserve the small-map floor rules explicitly.
-  - compact maps should keep the `2x2` minimum room size
-  - compact maps should keep zero-gap adjacency available where needed
-  - avoid regressing `8x8` back toward single-room collapse while improving the broader generator
