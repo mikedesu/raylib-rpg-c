@@ -226,34 +226,28 @@ These are the best remaining cleanup seams for the next session:
 - [ ] Re-factor libdraw.h from the top down and associated drawing functions, methods, classes, and files
   - Pay attention to the object and definition hierarchy in order to understand the relationship between the gamestate and the rendered textures
   - Our goal is flexibility: as you can see, I am adding new `ENTITY_TYPE_` values that distinguish `NPC` from `ITEM` from `DOOR` from `BOX` from `PROP` etc.
-  - We are doing this in preparation for adding `PROP`s back into the game.
-  - `PROP` placement should be a separate layer during floor-generation from the generation of the floor layout
-    - Naturally, we cannot place `PROP` entities on a floor with no-layout.
-  - `PROP` entities will be drawn on a per-tile basis in `draw_dungeon_floor.h` just like other entities.
-- [ ] There might be remnants of a `create_prop_at` and `create_prop_at_with` function or method that we could use to create PROPs.
-  - in `texture_ids.h` there is 
-```
-#define TX_PROP_WOODEN_TABLE_00 383
-#define TX_PROP_WOODEN_CHAIR_00 384
-//#define TX_PROP_BANNER_01 385
-#define TX_PROP_WOODEN_BARREL_OPEN_TOP_WATER 386
-#define TX_PROP_TORCH_00 387
-#define TX_PROP_STATUE_00 388
-#define TX_PROP_WOODEN_TABLE_01 389
-#define TX_PROP_WOODEN_BARREL_OPEN_TOP_EMPTY 390
-#define TX_PROP_CANDLE_00 391
-//#define TX_PROP_BANNER_00 392
-#define TX_PROP_WHITE_STATUE_DOWN_00 393
-#define TX_PROP_JAR_00 394
-#define TX_PROP_WOODEN_BOX_OPEN_TOP_EMPTY 395
-#define TX_PROP_WOODEN_BOX_OPEN_TOP_WATERY 396
-#define TX_PROP_BANNER_02 397
-#define TX_PROP_PLATE_00 398
-```
-  this can be used in the management of different types of props. this needs to be extendible as this is only a small set of possible props i might include. this is just what is available now.
-- [ ] In the same way that we create an NPC, a sword, and a shield, and a box on floor 1, we also want to generate a prop. 
-  - [ ] `PROP`s are not items and cannot be picked up
-  - [ ] `PROP` entities may or may not be "passable"
-    - i.e. you cannot walk through a `TX_PROP_WOODEN_TABLE_00` or a `TX_PROP_WOODEN_BARREL_OPEN_TOP_WATER`, but maybe you can walk over a `TX_PROP_TORCH_00`. 
-  - [ ] i have commented out `//#define TX_PROP_BANNER_01 385` and `//#define TX_PROP_BANNER_00 392` so that you do not attempt to use that texture for now. the reason being we are not currently using `WALL` tiles during generation. `WALL` tiles may or may not come back, i have not yet decided. 
+  - `PROP` support is back in the active gameplay path now:
+    - props can be created with `create_prop_with` / `create_prop_at_with`
+    - props are cached on tiles and drawn in `draw_dungeon_floor.h`
+    - props are placed during gameplay bootstrap as a separate post-layout layer
+  - focus the next refactor on ownership and layering clarity, not on rediscovering whether prop support exists
+  - preserve the rule that spritegroup creation must resolve bounds against `loc.z`, not always `current_floor`
 
+- [ ] Tighten the current `PROP` system instead of re-adding it from scratch
+  - `PROP`s are not items and cannot be picked up
+  - `PROP` entities may or may not be passable
+    - e.g. a wooden table or water barrel should block movement, while something like a torch or plate may remain passable
+  - current prop type coverage is now extendible, but placement logic is still simple and should become more intentional
+  - banner textures that depend on wall usage should stay out of the active floor-prop pool for now:
+    - `TX_PROP_BANNER_01`
+    - `TX_PROP_BANNER_00`
+    - wall tiles may or may not return later, so do not rebuild current prop flow around them yet
+
+- [ ] Improve prop placement quality
+  - props should remain a separate layer after floor layout generation
+  - avoid placing solid props in ways that create bad chokepoints or block obvious traversal
+  - start distinguishing decorative clutter from large blocking props so room dressing feels more intentional
+
+- [ ] Record recent UI/layout fixes so future cleanup does not regress them
+  - help menu text box sizing was updated to measure real multiline content instead of relying on stale fixed dimensions
+  - inventory detail text on the right-hand panel was increased to `20`
