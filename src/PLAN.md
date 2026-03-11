@@ -31,6 +31,19 @@ This file is the handoff note for the `gamestate.h` cleanup work.
   - floor `1`: `16x16`
 - Added random staircase assignment per floor and bound stairs traversal to `.`
 - Added a per-floor full-light debug toggle on `l`, with debug/help text support
+- Re-activated `PROP` support in the active gameplay path:
+  - props are now cached on tiles and drawn in `draw_dungeon_floor.h`
+  - props are placed during gameplay bootstrap as a separate post-layout layer
+  - prop types/sprite mappings were expanded to cover a broader initial floor-prop set
+  - prop solidity/passability now flows through the same gameplay checks as other tile entities
+- Fixed a cross-floor renderer assumption exposed by props:
+  - spritegroup creation now validates entity locations against `loc.z` instead of always using `current_floor`
+- Applied a first-pass top-down `libdraw` refactor:
+  - split scene-texture rendering, window presentation, and frame-stat bookkeeping into separate headers
+  - reduced `libdraw_frame.h` back toward frame orchestration instead of mixed ownership
+- Refreshed two stale UI layouts:
+  - help menu bounds now measure real multiline text content
+  - inventory right-side detail text now renders at `20`
 
 ## Current State
 
@@ -44,7 +57,9 @@ This file is the handoff note for the `gamestate.h` cleanup work.
   - fixed-capacity caches for dead NPCs and items
 - Multi-item tiles are now supported at the storage layer, but rendering and pickup still intentionally treat the top cached item as the visible/interactive representative.
 - Renderer code is still implementation-header based, but `libdraw.h` now reads as a composition root instead of a monolith.
-- Scene draw dispatch, render-target lifecycle, and per-frame orchestration are now separated enough to refactor further without changing runtime behavior first.
+- Scene draw dispatch, render-target lifecycle, window presentation, and per-frame orchestration are now more cleanly separated.
+- `libdraw_frame.h` is no longer carrying scene rendering, target composition, and frame-stat bookkeeping all in one place.
+- The current renderer still depends on global render-texture state and implementation headers, but the ownership seams are much clearer than before.
 - Dungeon generation no longer defaults to a single open rectangle.
 - The current dungeon bootstrap now creates a `64x64` floor for gameplay testing.
 - The current generator produces:
@@ -75,6 +90,9 @@ This file is the handoff note for the `gamestate.h` cleanup work.
 - `libdraw_scene_dispatch.h`
 - `libdraw_frame.h`
 - `libdraw_lifecycle.h`
+- `libdraw_scene_render.h`
+- `libdraw_window_present.h`
+- `libdraw_frame_stats.h`
 
 ## Verified
 
@@ -88,19 +106,25 @@ make clean && CXXFLAGS="-DDEBUG_ASSERT=1 -DNPCS_ALL_AT_ONCE -DDEBUG=1 -DMASTER_V
 - Additional verification this session:
   - repeated `make clean && make game` rebuilds succeeded through compile and link after each dungeon-generation change
   - after updating `log_build_stats.sh`, `make clean && make game` now completes successfully end-to-end
+  - prop reintegration changes rebuilt cleanly after tile-cache/render/bootstrap updates
+  - first-pass `libdraw` structural split rebuilt cleanly after the new header breakdown
+  - manual runtime verification:
+    - props now show up in gameplay
+    - help menu and inventory detail text sizing changes look correct
 
 ## Next Refactor Targets
 
 These are the best remaining cleanup seams for the next session:
 
 1. `libdraw.h` / renderer organization
-   - split render lifecycle/bootstrap from per-frame scene dispatch
+   - continue the top-down cleanup after the first-pass structural split
    - identify a cleaner top-down structure around:
-     - render init / shutdown
-     - render target orchestration
-     - scene-specific draw dispatch
+     - render target ownership/bootstrap
+     - scene-specific composition boundaries
+     - window presentation
      - sprite update pre/post passes
-   - use `draw_frame_2d.h` as a likely composition root for gameplay rendering and look for similar seams in title/character-creation paths
+     - remaining global renderer state
+   - use `draw_frame_2d.h` as the gameplay composition root and look for similar cleanup seams in title/character-creation paths
 
 2. Debug and diagnostics
    - `update_debug_panel_buffer`
@@ -230,8 +254,17 @@ These are the best remaining cleanup seams for the next session:
     - props can be created with `create_prop_with` / `create_prop_at_with`
     - props are cached on tiles and drawn in `draw_dungeon_floor.h`
     - props are placed during gameplay bootstrap as a separate post-layout layer
-  - focus the next refactor on ownership and layering clarity, not on rediscovering whether prop support exists
+  - first-pass structural split is already in place:
+    - scene-texture rendering
+    - window presentation
+    - frame-stat bookkeeping
+    are now broken out into dedicated headers
+  - focus the next refactor on deeper ownership and layering clarity, not on rediscovering whether prop support exists
   - preserve the rule that spritegroup creation must resolve bounds against `loc.z`, not always `current_floor`
+  - likely next renderer pass:
+    - reduce remaining global-state coupling
+    - tighten naming/composition around target textures
+    - decide whether `libdraw_scene_dispatch.h` should remain as a compatibility include or disappear entirely
 
 - [ ] Tighten the current `PROP` system instead of re-adding it from scratch
   - `PROP`s are not items and cannot be picked up
