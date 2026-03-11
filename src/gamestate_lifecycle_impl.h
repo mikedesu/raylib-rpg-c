@@ -126,6 +126,8 @@ inline void gamestate::logic_init() {
     for (int i = 0; i < num_boxes; i++) {
         create_box_at_with(df->get_random_loc());
     }
+    create_weapon_at_with(ct, df->get_random_loc(), sword_init());
+    create_shield_at_with(ct, df->get_random_loc(), shield_init());
     constexpr int monster_count = 1;
     for (int j = 0; j < monster_count; j++) {
         vec3 random_loc = d.get_floor(0)->get_random_loc();
