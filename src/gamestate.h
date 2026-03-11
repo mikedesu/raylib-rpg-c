@@ -417,37 +417,74 @@ public:
     /** @brief Create a weapon item entity and apply weapon-specific initialization. */
     entityid create_weapon_with(with_fun weaponInitFunction);
 
+    /** @brief Return the default component initializer for dagger items. */
     with_fun dagger_init();
 
+    /** @brief Return the default component initializer for axe items. */
     with_fun axe_init();
 
+    /** @brief Return the default component initializer for sword items. */
     with_fun sword_init();
 
+    /** @brief Return the default component initializer for shield items. */
     with_fun shield_init();
 
+    /**
+     * @brief Return the default component initializer for a potion type.
+     *
+     * @param pt Logical potion type to assign to the created item.
+     */
     with_fun potion_init(potiontype_t pt);
 
+    /**
+     * @brief Return the default component initializer for the player actor.
+     *
+     * @param maxhp_roll Rolled maximum hit point seed to apply at creation.
+     */
     with_fun player_init(int maxhp_roll);
 
     /** @brief Create and place a weapon item at a specific dungeon location. */
     entityid create_weapon_at_with(ComponentTable& ct, vec3 loc, with_fun weaponInitFunction);
 
+    /**
+     * @brief Create and place a weapon item at a random valid location.
+     *
+     * @param ct Component table that receives the created entity components.
+     * @param weaponInitFunction Additional item-specific initialization.
+     * @return The created entity id, or `ENTITYID_INVALID` on failure.
+     */
     entityid create_weapon_at_random_loc_with(CT& ct, with_fun weaponInitFunction);
 
+    /**
+     * @brief Create a shield item entity and apply shield-specific initialization.
+     *
+     * @param ct Component table that receives the created entity components.
+     * @param shieldInitFunction Additional item-specific initialization.
+     * @return The created entity id, or `ENTITYID_INVALID` on failure.
+     */
     entityid create_shield_with(ComponentTable& ct, with_fun shieldInitFunction);
 
     /** @brief Create and place a shield item at a specific dungeon location. */
     entityid create_shield_at_with(ComponentTable& ct, vec3 loc, with_fun shieldInitFunction);
 
+    /**
+     * @brief Create a potion item entity and apply potion-specific initialization.
+     *
+     * @param potionInitFunction Additional item-specific initialization.
+     * @return The created entity id, or `ENTITYID_INVALID` on failure.
+     */
     entityid create_potion_with(with_fun potionInitFunction);
 
     /** @brief Create and place a potion item at a specific dungeon location. */
     entityid create_potion_at_with(vec3 loc, with_fun potionInitFunction);
 
+    /** @brief Return a random monster race suitable for generic floor population. */
     race_t random_monster_type();
 
+    /** @brief Roll and assign starting stat values for an NPC actor. */
     void set_npc_starting_stats(entityid id);
 
+    /** @brief Apply baseline NPC components and default runtime values. */
     void set_npc_defaults(entityid id);
 
     /** @brief Create an NPC entity of the requested race and apply extra initialization. */
@@ -461,6 +498,7 @@ public:
         return t.get_cached_box();
     }
 
+    /** @brief Return the pullable entity cached on a tile, if any. */
     entityid tile_has_pullable(int x, int y, int z);
 
     /** @brief Create and place an NPC entity on the dungeon floor. */
@@ -473,8 +511,21 @@ public:
      */
     bool add_to_inventory(entityid actor_id, entityid item_id);
 
+    /**
+     * @brief Create an orc NPC entity with additional initialization.
+     *
+     * @param monsterInitFunction Additional NPC-specific initialization.
+     * @return The created entity id, or `ENTITYID_INVALID` on failure.
+     */
     entityid create_orc_with(with_fun monsterInitFunction);
 
+    /**
+     * @brief Create and place an orc NPC entity at a dungeon location.
+     *
+     * @param loc Dungeon-space location, including floor in `z`.
+     * @param monsterInitFunction Additional NPC-specific initialization.
+     * @return The created entity id, or `ENTITYID_INVALID` on failure.
+     */
     entityid create_orc_at_with(vec3 loc, with_fun monsterInitFunction);
 
     /**
@@ -495,6 +546,11 @@ public:
         return true;
     }
 
+    /**
+     * @brief Append a formatted message to the persistent message history.
+     *
+     * @warning This does not activate the transient on-screen message queue.
+     */
     void add_message_history(const char* fmt, ...) {
         massert(fmt, "format string is NULL");
         char buffer[MAX_MSG_LENGTH];
@@ -506,39 +562,72 @@ public:
         msg_history.push_back(s);
     }
 
+    /** @brief Refresh derived per-tile state after gameplay mutations. */
     void update_tile(tile_t& tile);
 
+    /** @brief Return whether movement or line travel between two points is blocked. */
     bool path_blocked(vec3 a, vec3 b);
 
+    /** @brief Refresh explored and visible tile state from the player's current position. */
     bool update_player_tiles_explored();
 
+    /** @brief Recompute player-facing derived runtime state for the current tick. */
     bool update_player_state();
 
+    /** @brief Advance active spell state and spell-related runtime effects. */
     void update_spells_state();
 
+    /** @brief Refresh NPC state before or during their turn processing. */
     void update_npcs_state();
 
     /** @brief Initialize gameplay state, generate floors, and seed initial entities. */
     void logic_init();
 
+    /** @brief Handle input while the title scene is active. */
     void handle_input_title_scene(inputstate& is);
 
+    /** @brief Handle input while the main menu scene is active. */
     void handle_input_main_menu_scene(inputstate& is);
 
+    /**
+     * @brief Create and place the player actor at a dungeon location.
+     *
+     * @param loc Dungeon-space location, including floor in `z`.
+     * @param n Player-visible name to assign.
+     * @param playerInitFunction Additional player-specific initialization.
+     * @return The created entity id, or `ENTITYID_INVALID` on failure.
+     */
     entityid create_player_at_with(vec3 loc, string n, with_fun playerInitFunction);
 
+    /** @brief Create a box entity with default components. */
     entityid create_box_with();
 
+    /**
+     * @brief Create and place a box entity at a dungeon location.
+     *
+     * @param loc Dungeon-space location, including floor in `z`.
+     * @return The created entity id, or `ENTITYID_INVALID` on failure.
+     */
     entityid create_box_at_with(vec3 loc);
 
+    /** @brief Create a spell entity with default components. */
     entityid create_spell_with();
 
+    /**
+     * @brief Create and place a spell entity at a dungeon location.
+     *
+     * @param loc Dungeon-space location, including floor in `z`.
+     * @return The created entity id, or `ENTITYID_INVALID` on failure.
+     */
     entityid create_spell_at_with(vec3 loc);
 
+    /** @brief Retarget all active NPCs toward the player actor. */
     void make_all_npcs_target_player();
 
+    /** @brief Handle input while the character creation scene is active. */
     void handle_input_character_creation_scene(inputstate& is);
 
+    /** @brief Apply any enabled test or debug flags for the current tick. */
     void handle_test_flag();
 
     /**
@@ -548,46 +637,66 @@ public:
      */
     void tick(inputstate& is);
 
+    /**
+     * @brief Remove an item entity from an actor inventory.
+     *
+     * @return `true` on success.
+     */
     bool remove_from_inventory(entityid actor_id, entityid item_id);
 
     /** @brief Drop an item from an actor inventory back into the world. */
     bool drop_from_inventory(entityid actor_id, entityid item_id);
 
+    /** @brief Drop every inventory item currently carried by an actor. */
     bool drop_all_from_inventory(entityid actor_id);
 
+    /** @brief Equip a weapon from the hero inventory. */
     void handle_hero_inventory_equip_weapon(entityid item_id);
 
+    /** @brief Equip a shield from the hero inventory. */
     void handle_hero_inventory_equip_shield(entityid item_id);
 
+    /** @brief Equip the selected hero inventory item according to its type. */
     void handle_hero_inventory_equip_item(entityid item_id);
 
+    /** @brief Equip the currently selected item in the hero inventory UI. */
     void handle_hero_inventory_equip();
 
+    /** @brief Drop the currently selected item from the hero inventory UI. */
     bool drop_item_from_hero_inventory();
 
+    /** @brief Return whether an actor inventory currently contains an item entity. */
     bool is_in_inventory(entityid actor_id, entityid item_id);
 
+    /** @brief Consume a potion item from an actor inventory and apply its effect. */
     bool use_potion(entityid actor_id, entityid item_id);
 
     void logic_close() {
         d.floors.clear();
     }
 
+    /** @brief Handle free-camera movement input. */
     void handle_camera_move(inputstate& is);
 
+    /** @brief Apply hero-facing potion usage behavior for the selected item. */
     void handle_hero_potion_use(entityid id);
 
+    /** @brief Use the currently selected item in the hero inventory UI. */
     void handle_hero_item_use();
 
+    /** @brief Handle input while the inventory UI is active. */
     void handle_input_inventory(inputstate& is);
 
     /** @brief Open the yes/no confirmation prompt with a formatted message. */
     void open_confirm_prompt(confirm_action_t action, const char* fmt, ...);
 
+    /** @brief Resolve the active confirmation prompt with the chosen answer. */
     void resolve_confirm_prompt(bool confirmed);
 
+    /** @brief Handle input while a yes/no confirmation prompt is active. */
     void handle_input_confirm_prompt(inputstate& is);
 
+    /** @brief Execute the quit action associated with the active confirmation prompt. */
     void handle_confirm_quit();
 
     //inl_count_0 + 2bool handle_quit_pressed(const inputstate& is) {
@@ -598,33 +707,46 @@ public:
     //    return false;
     //}
 
+    /** @brief Advance the visible message queue to the next pending message. */
     void cycle_messages();
 
+    /** @brief Handle player input that advances the message queue. */
     bool handle_cycle_messages(inputstate& is);
 
+    /** @brief Test helper for message queue cycling behavior. */
     bool handle_cycle_messages_test();
 
+    /** @brief Handle free-camera zoom input. */
     void handle_camera_zoom(inputstate& is);
 
+    /** @brief Update the player actor's facing direction. */
     void change_player_dir(direction_t dir);
 
+    /** @brief Handle direct player facing-direction input. */
     bool handle_change_dir(inputstate& is);
 
+    /** @brief Handle input that begins a direction-selection intent. */
     bool handle_change_dir_intent(inputstate& is);
 
+    /** @brief Handle the per-floor debug full-light toggle input. */
     bool handle_toggle_full_light(inputstate& is);
 
+    /** @brief Handle input that opens or toggles the inventory UI. */
     bool handle_display_inventory(inputstate& is);
 
     /** @brief Return whether the addressed tile currently contains a solid blocking entity. */
     bool tile_has_solid(int x, int y, int z);
 
+    /** @brief Attempt to push a box-like entity in the requested direction. */
     bool handle_box_push(entityid id, vec3 v);
 
+    /** @brief Return the pushable entity cached on a tile, if any. */
     entityid tile_has_pushable(int x, int y, int z);
 
+    /** @brief Return the door entity cached at a dungeon location, if any. */
     entityid tile_has_door(vec3 v);
 
+    /** @brief Return whether an entity can perceive activity at the target location by hearing. */
     bool check_hearing(entityid id, vec3 loc);
 
     /**
@@ -634,22 +756,31 @@ public:
      */
     bool try_entity_move(entityid id, vec3 v);
 
+    /** @brief Handle upward movement input for the active actor. */
     bool handle_move_up(inputstate& is, bool is_dead);
 
+    /** @brief Handle downward movement input for the active actor. */
     bool handle_move_down(inputstate& is, bool is_dead);
 
+    /** @brief Handle leftward movement input for the active actor. */
     bool handle_move_left(inputstate& is, bool is_dead);
 
+    /** @brief Handle rightward movement input for the active actor. */
     bool handle_move_right(inputstate& is, bool is_dead);
 
+    /** @brief Handle up-left diagonal movement input for the active actor. */
     bool handle_move_up_left(inputstate& is, bool is_dead);
 
+    /** @brief Handle up-right diagonal movement input for the active actor. */
     bool handle_move_up_right(inputstate& is, bool is_dead);
 
+    /** @brief Handle down-left diagonal movement input for the active actor. */
     bool handle_move_down_left(inputstate& is, bool is_dead);
 
+    /** @brief Handle down-right diagonal movement input for the active actor. */
     bool handle_move_down_right(inputstate& is, bool is_dead);
 
+    /** @brief Return the dungeon location directly in front of the player actor. */
     vec3 get_loc_facing_player();
 
     entityid get_cached_live_npc(shared_ptr<tile_t> t) {
@@ -660,30 +791,51 @@ public:
         return t->get_cached_live_npc();
     }
 
+    /** @brief Compute the current armor class for an entity. */
     int compute_armor_class(entityid id);
 
+    /** @brief Resolve whether an attack roll hits the target. */
     bool compute_attack_roll(entityid attacker, entityid target);
 
+    /** @brief Compute attack damage from attacker to target after current modifiers. */
     int compute_attack_damage(entityid attacker, entityid target);
 
+    /** @brief Apply weapon durability loss after an attack exchange. */
     void handle_weapon_durability_loss(entityid atk_id, entityid tgt_id);
 
+    /** @brief Apply shield durability loss after a defended attack exchange. */
     void handle_shield_durability_loss(entityid defender, entityid attacker);
 
+    /** @brief Return the experience value granted by defeating an NPC. */
     int get_npc_xp(entityid id);
 
+    /** @brief Award NPC-defeat experience to the acting entity. */
     void update_npc_xp(entityid id, entityid target_id);
 
+    /** @brief Apply gameplay side effects after resolving an attack attempt. */
     void process_attack_results(tile_t& tile, entityid atk_id, entityid tgt_id, bool atk_successful);
 
+    /** @brief Play shield-block audio feedback for a defending entity. */
     void handle_shield_block_sfx(entityid target_id);
 
+    /**
+     * @brief Resolve a direct attack against a target entity on a tile.
+     *
+     * @return Detailed attack result describing hit, miss, or block outcome.
+     */
     attack_result_t process_attack_entity(tile_t& tile, entityid attacker_id, entityid target_id);
 
+    /** @brief Play attack-result audio feedback for an entity action. */
     void handle_attack_sfx(entityid attacker, attack_result_t result);
 
+    /** @brief Set the active gamestate flag for the next attack animation phase. */
     void set_gamestate_flag_for_attack_animation(entitytype_t type);
 
+    /**
+     * @brief Attempt a melee attack from an entity toward a target tile.
+     *
+     * @return Detailed attack result describing the resolved outcome.
+     */
     attack_result_t try_entity_attack(entityid id, int x, int y);
 
     bool handle_attack(inputstate& is, bool is_dead) {
@@ -702,40 +854,62 @@ public:
         return false;
     }
 
+    /** @brief Return the top visible item cached on a tile, if any. */
     entityid tile_get_item(shared_ptr<tile_t> t);
 
+    /** @brief Attempt to pull an adjacent pullable entity with the acting entity. */
     bool try_entity_pull(entityid id);
 
+    /** @brief Attempt to pick up the top item at the acting entity's location. */
     bool try_entity_pickup(entityid id);
 
+    /** @brief Handle pickup input for the active actor. */
     bool handle_pickup_item(inputstate& is, bool is_dead);
 
+    /** @brief Attempt to traverse stairs at the acting entity's current location. */
     bool try_entity_stairs(entityid id);
 
+    /** @brief Handle stairs traversal input for the active actor. */
     bool handle_traverse_stairs(inputstate& is, bool is_dead);
 
+    /** @brief Attempt to open a door entity at the requested location. */
     bool try_entity_open_door(entityid id, vec3 loc);
 
+    /** @brief Handle door-opening input for the active actor. */
     bool handle_open_door(inputstate& is, bool is_dead);
 
+    /** @brief Attempt to cast a spell from an entity toward a target tile. */
     void try_entity_cast_spell(entityid id, int tgt_x, int tgt_y);
 
+    /** @brief Handle the current spell-cast test input path. */
     bool handle_test_cast_spell(inputstate& is, bool is_dead);
 
+    /** @brief Handle input that requests a full gameplay restart. */
     bool handle_restart(inputstate& is);
 
+    /** @brief Handle gameplay-scene input while in direct player control mode. */
     void handle_input_gameplay_controlmode_player(inputstate& is);
 
+    /** @brief Handle input while the action menu is active. */
     void handle_input_action_menu(inputstate& is);
 
+    /** @brief Handle input while the options menu is active. */
     void handle_input_option_menu(inputstate& is);
 
+    /** @brief Handle input while the help menu is active. */
     void handle_input_help_menu(inputstate& is);
 
+    /** @brief Dispatch input handling for the active gameplay scene UI state. */
     void handle_input_gameplay_scene(inputstate& is);
 
+    /** @brief Dispatch input handling for the active scene and control mode. */
     void handle_input(inputstate& is);
 
+    /**
+     * @brief Rebuild the debug panel text buffer from current runtime state.
+     *
+     * @warning This routine is debug-facing and reads broadly from renderer and gameplay state.
+     */
     void update_debug_panel_buffer(inputstate& is) {
         minfo2("update debug panel buffer");
         // Static buffers to avoid reallocating every frame
@@ -835,16 +1009,22 @@ public:
         msuccess2("successfully updated debug panel buffer");
     }
 
+    /** @brief Return whether two entities occupy adjacent dungeon tiles. */
     bool is_entity_adjacent(entityid id0, entityid id1);
 
+    /** @brief Refresh the current pathfinding route for an entity's active target. */
     void update_path_to_target(entityid id);
 
+    /** @brief Attempt to move an entity one step along its current target path. */
     bool try_entity_move_to_target(entityid id);
 
+    /** @brief Attempt to move an entity using a random roaming step. */
     bool try_entity_move_random(entityid id);
 
+    /** @brief Execute one NPC turn or behavior step for the given entity. */
     bool handle_npc(entityid id);
 
+    /** @brief Process the current batch of NPC turns for the gameplay tick. */
     void handle_npcs();
 
 };

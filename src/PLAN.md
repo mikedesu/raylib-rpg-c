@@ -52,6 +52,7 @@ This file is the handoff note for the `gamestate.h` cleanup work.
 - Started the first core-header documentation pass:
   - added file/class/API docs to `libdraw*.h` headers touched during the renderer refactor
   - added first-pass documentation to `gamestate.h`, `dungeon_floor.h`, and `dungeon_tile.h`
+  - added first-pass Doxygen documentation to `main.cpp` for the process entrypoint, outer loop, and shared runtime globals
   - verified HTML generation to `docs/api/html/index.html`
 
 ## Current State
@@ -74,7 +75,7 @@ This file is the handoff note for the `gamestate.h` cleanup work.
 - Documentation coverage is still partial:
   - the infrastructure is in place
   - renderer headers have a first-pass of docs
-  - `gamestate.h`, `dungeon_floor.h`, and `dungeon_tile.h` have begun the core API pass
+  - `gamestate.h`, `dungeon_floor.h`, `dungeon_tile.h`, and `main.cpp` have begun the core API pass
   - many remaining headers still need declaration-level documentation
 - Dungeon generation no longer defaults to a single open rectangle.
 - The current dungeon bootstrap now creates a `64x64` floor for gameplay testing.
@@ -155,6 +156,7 @@ These are the best remaining cleanup seams for the next session:
 
 4. Documentation coverage
    - continue the declaration-level Doxygen pass on the core headers
+   - continue from `main.cpp` into adjacent entry/runtime surfaces when they are touched
    - document ownership, side effects, and failure behavior where names are not enough
    - keep docs focused on API meaning, not implementation trivia
 
@@ -281,6 +283,7 @@ These are the best remaining cleanup seams for the next session:
   - [x] Javadoc-style Doxygen comments are now the project standard for new API declarations
 
 - [ ] Continue the first core-header documentation pass
+  - `main.cpp` entrypoint documentation is now in place
   - next priority headers:
     - `gamestate.h` remaining declarations
     - `dungeon.h`
@@ -296,7 +299,7 @@ These are the best remaining cleanup seams for the next session:
   - breadcrumb for next session:
     - open `docs/DOCUMENTATION.md`
     - run `make docs`
-    - continue from `gamestate.h` rather than starting a new header family at random
+    - continue from the remaining `gamestate.h` declarations rather than starting a new header family at random
 
 - [ ] Re-factor libdraw.h from the top down and associated drawing functions, methods, classes, and files
   - Pay attention to the object and definition hierarchy in order to understand the relationship between the gamestate and the rendered textures
