@@ -235,6 +235,8 @@ Continue with:
     - "Do You Want To Exit? Y/N" or "Are You Sure You Want To Exit? Press Y or N"
     - We still press Escape once to bring up the "HandleQuit" Message Window
     - Outside of the Gameplay Scene, Escape will instant-quit the game still
+  - If the game was built as a web binary using `-DPLATFORM_WEB -DWEB`, then we wouldnt want to process quit this way. Instead, quitting the game by pressing escape and then answering "Y" to the quit dialog would result in being returned to the game title screen and the gamestate object being refreshed/renewed for a possible new game. 
+
 
 2. Reduce the dungeon floor size to 8x8 to begin with. We tested 64x64 last time and it feels really good with the new maze generation algorithm. I want to verify that it works at 8x8, then 16x16, then 32x32. This should give us a lot of variety when generating floors.
   - [ ] 8x8 tested (human must verify before proceeding)
