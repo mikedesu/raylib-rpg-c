@@ -349,7 +349,7 @@ inline entityid gamestate::create_player_at_with(vec3 loc, string n, with_fun pl
     constexpr int hp_ = 10;
     constexpr int maxhp_ = 10;
     constexpr int vis_dist = 20;
-    constexpr int light_rad = 20;
+    constexpr int light_rad = 3;
     constexpr int hear_dist = 3;
     set_hero_id(id);
     ct.set<entitytype>(id, ENTITY_PLAYER);
