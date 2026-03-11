@@ -23,7 +23,7 @@ private:
     Rectangle area;
 
 public:
-    room_id get_id()
+    room_id get_id() const
     {
         return id;
     }
@@ -39,7 +39,7 @@ public:
 
 
 
-    float get_h()
+    float get_h() const
     {
         return area.height;
     }
@@ -47,7 +47,7 @@ public:
 
 
 
-    float get_w()
+    float get_w() const
     {
         return area.width;
     }
@@ -55,7 +55,7 @@ public:
 
 
 
-    float get_y()
+    float get_y() const
     {
         return area.y;
     }
@@ -63,7 +63,7 @@ public:
 
 
 
-    float get_x()
+    float get_x() const
     {
         return area.x;
     }
@@ -79,7 +79,7 @@ public:
 
 
 
-    Rectangle get_area()
+    Rectangle get_area() const
     {
         return area;
     }
@@ -87,7 +87,7 @@ public:
 
 
 
-    string get_description()
+    string get_description() const
     {
         return description;
     }
@@ -103,7 +103,7 @@ public:
 
 
 
-    string get_name()
+    string get_name() const
     {
         return name;
     }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "biome.h"
+#include "direction.h"
 #include "dungeon_tile.h"
 #include <functional>
 
@@ -127,6 +128,149 @@ public:
             for (int y = r.y; y < r.y + r.height && y < height; y++) {
                 const tiletype_t t = random_tiletype(a, b);
                 df_set_tile(t, x, y);
+            }
+        }
+    }
+
+    Rectangle df_clamp_area(Rectangle r) const {
+        int x0 = static_cast<int>(r.x);
+        int y0 = static_cast<int>(r.y);
+        int x1 = x0 + static_cast<int>(r.width);
+        int y1 = y0 + static_cast<int>(r.height);
+        x0 = x0 < 0 ? 0 : x0;
+        y0 = y0 < 0 ? 0 : y0;
+        x1 = x1 < 0 ? 0 : x1;
+        y1 = y1 < 0 ? 0 : y1;
+        x1 = x1 > width ? width : x1;
+        y1 = y1 > height ? height : y1;
+        x1 = x1 < x0 ? x0 : x1;
+        y1 = y1 < y0 ? y0 : y1;
+        return Rectangle{static_cast<float>(x0), static_cast<float>(y0), static_cast<float>(x1 - x0), static_cast<float>(y1 - y0)};
+    }
+
+    bool df_area_is_valid(Rectangle r) const {
+        return r.width > 0 && r.height > 0 && r.x >= 0 && r.y >= 0 && r.x + r.width <= width && r.y + r.height <= height;
+    }
+
+    Rectangle df_paint_area(tiletype_t a, tiletype_t b, Rectangle r) {
+        Rectangle clamped = df_clamp_area(r);
+        if (clamped.width <= 0 || clamped.height <= 0) {
+            return Rectangle{0, 0, 0, 0};
+        }
+        set_area(a, b, clamped);
+        return clamped;
+    }
+
+    Rectangle df_paint_floor_area(Rectangle r) {
+        return df_paint_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, r);
+    }
+
+    Rectangle df_get_adjacent_area(Rectangle origin, direction_t dir, int gap, int area_width, int area_height) const {
+        int x = static_cast<int>(origin.x);
+        int y = static_cast<int>(origin.y);
+        switch (dir) {
+        case DIR_LEFT:
+            x = static_cast<int>(origin.x) - gap - area_width;
+            y = static_cast<int>(origin.y) + (static_cast<int>(origin.height) - area_height) / 2;
+            break;
+        case DIR_RIGHT:
+            x = static_cast<int>(origin.x + origin.width) + gap;
+            y = static_cast<int>(origin.y) + (static_cast<int>(origin.height) - area_height) / 2;
+            break;
+        case DIR_UP:
+            x = static_cast<int>(origin.x) + (static_cast<int>(origin.width) - area_width) / 2;
+            y = static_cast<int>(origin.y) - gap - area_height;
+            break;
+        case DIR_DOWN:
+            x = static_cast<int>(origin.x) + (static_cast<int>(origin.width) - area_width) / 2;
+            y = static_cast<int>(origin.y + origin.height) + gap;
+            break;
+        default: return Rectangle{0, 0, 0, 0};
+        }
+        return Rectangle{static_cast<float>(x), static_cast<float>(y), static_cast<float>(area_width), static_cast<float>(area_height)};
+    }
+
+    Rectangle df_get_connector_area(Rectangle a, Rectangle b, int thickness = 1) const {
+        const int corridor_thickness = thickness < 1 ? 1 : thickness;
+        if (a.x + a.width <= b.x || b.x + b.width <= a.x) {
+            const int overlap_start = static_cast<int>(a.y > b.y ? a.y : b.y);
+            const int overlap_end = static_cast<int>((a.y + a.height) < (b.y + b.height) ? (a.y + a.height) : (b.y + b.height));
+            if (overlap_end <= overlap_start) {
+                return Rectangle{0, 0, 0, 0};
+            }
+            const int center_y = overlap_start + (overlap_end - overlap_start - 1) / 2;
+            const int y = center_y - corridor_thickness / 2;
+            if (a.x + a.width <= b.x) {
+                return df_clamp_area(Rectangle{a.x + a.width, static_cast<float>(y), b.x - (a.x + a.width), static_cast<float>(corridor_thickness)});
+            }
+            return df_clamp_area(Rectangle{b.x + b.width, static_cast<float>(y), a.x - (b.x + b.width), static_cast<float>(corridor_thickness)});
+        }
+
+        if (a.y + a.height <= b.y || b.y + b.height <= a.y) {
+            const int overlap_start = static_cast<int>(a.x > b.x ? a.x : b.x);
+            const int overlap_end = static_cast<int>((a.x + a.width) < (b.x + b.width) ? (a.x + a.width) : (b.x + b.width));
+            if (overlap_end <= overlap_start) {
+                return Rectangle{0, 0, 0, 0};
+            }
+            const int center_x = overlap_start + (overlap_end - overlap_start - 1) / 2;
+            const int x = center_x - corridor_thickness / 2;
+            if (a.y + a.height <= b.y) {
+                return df_clamp_area(Rectangle{static_cast<float>(x), a.y + a.height, static_cast<float>(corridor_thickness), b.y - (a.y + a.height)});
+            }
+            return df_clamp_area(Rectangle{static_cast<float>(x), b.y + b.height, static_cast<float>(corridor_thickness), a.y - (b.y + b.height)});
+        }
+
+        return Rectangle{0, 0, 0, 0};
+    }
+
+    Rectangle df_paint_connector(Rectangle a, Rectangle b, int thickness = 1) {
+        Rectangle connector = df_get_connector_area(a, b, thickness);
+        if (connector.width <= 0 || connector.height <= 0) {
+            return connector;
+        }
+        return df_paint_floor_area(connector);
+    }
+
+    Rectangle df_paint_adjacent_floor_area(Rectangle origin, direction_t dir, int gap, int area_width, int area_height, int corridor_width = 1) {
+        Rectangle adjacent = df_get_adjacent_area(origin, dir, gap, area_width, area_height);
+        if (!df_area_is_valid(adjacent)) {
+            return Rectangle{0, 0, 0, 0};
+        }
+        df_paint_floor_area(adjacent);
+        df_paint_connector(origin, adjacent, corridor_width);
+        return adjacent;
+    }
+
+    void df_upgrade_floor_tiles() {
+        for (int y = 1; y < height - 1; y++) {
+            for (int x = 1; x < width - 1; x++) {
+                vec3 loc = {x, y, floor};
+                if (!tile_is_good_for_upgrade(loc)) {
+                    continue;
+                }
+                df_set_tile(TILE_FLOOR_STONE_10, x, y);
+            }
+        }
+    }
+
+    void df_refresh_door_candidates() {
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                vec3 loc = {x, y, floor};
+                tile_t& tile = tile_at(loc);
+                tile.set_can_have_door(false);
+            }
+        }
+        for (int y = 1; y < height - 1; y++) {
+            for (int x = 1; x < width - 1; x++) {
+                vec3 loc = {x, y, floor};
+                tile_t& tile = tile_at(loc);
+                if (!tile_is_walkable(tile.get_type())) {
+                    continue;
+                }
+                if (df_is_good_door_loc(loc)) {
+                    tile.set_can_have_door(true);
+                }
             }
         }
     }

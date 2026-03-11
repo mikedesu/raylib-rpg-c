@@ -1,86 +1,100 @@
 #pragma once
 
+namespace {
+inline int dungeon_random_range(mt19937& mt, int min_value, int max_value) {
+    if (max_value <= min_value) {
+        return min_value;
+    }
+    uniform_int_distribution<int> dist(min_value, max_value);
+    return dist(mt);
+}
+
+inline Rectangle dungeon_make_rect(int x, int y, int w, int h) {
+    return Rectangle{static_cast<float>(x), static_cast<float>(y), static_cast<float>(w), static_cast<float>(h)};
+}
+
+inline bool dungeon_rects_overlap(Rectangle a, Rectangle b, int padding = 0) {
+    const int ax0 = static_cast<int>(a.x) - padding;
+    const int ay0 = static_cast<int>(a.y) - padding;
+    const int ax1 = static_cast<int>(a.x + a.width) + padding;
+    const int ay1 = static_cast<int>(a.y + a.height) + padding;
+    const int bx0 = static_cast<int>(b.x);
+    const int by0 = static_cast<int>(b.y);
+    const int bx1 = static_cast<int>(b.x + b.width);
+    const int by1 = static_cast<int>(b.y + b.height);
+    return ax0 < bx1 && ax1 > bx0 && ay0 < by1 && ay1 > by0;
+}
+
+inline bool dungeon_room_fits(Rectangle candidate, const vector<room>& rooms, int width, int height) {
+    if (candidate.width <= 0 || candidate.height <= 0) {
+        return false;
+    }
+    if (candidate.x < 1 || candidate.y < 1) {
+        return false;
+    }
+    if (candidate.x + candidate.width > width - 1 || candidate.y + candidate.height > height - 1) {
+        return false;
+    }
+    for (const room& existing : rooms) {
+        if (dungeon_rects_overlap(candidate, existing.get_area(), 1)) {
+            return false;
+        }
+    }
+    return true;
+}
+}
+
 inline void gamestate::create_and_add_df_0(biome_t type, int w, int h, int df_count, float parts) {
+    (void)df_count;
+    (void)parts;
     auto df = d.create_floor(type, w, h);
-    float dw = df->get_width();
-    float dh = df->get_height();
-    vector<room> rooms;
-    room r(0, TextFormat("room-%d", 0), TextFormat("room-%d description", 0), Rectangle{0, 0, dw, dh});
-    df->set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, r.get_area());
+    Rectangle room_area = dungeon_make_rect(1, 1, w - 2, h - 2);
+    df->df_paint_floor_area(room_area);
+    df->df_upgrade_floor_tiles();
+    df->df_refresh_door_candidates();
     d.add_floor(df);
 }
 
 inline void gamestate::create_and_add_df_1(biome_t type, int w, int h, int df_count, float parts) {
-    float min_room_w = 2;
+    (void)df_count;
     auto df = d.create_floor(type, w, h);
-    float dw = df->get_width();
-    float dh = df->get_height();
     vector<room> rooms;
-    vector<room> doorways;
-    minfo2("creating rooms");
-    for (int i = 0; i < parts; i++) {
-        for (int j = 0; j < parts; j++) {
-            Rectangle q = {(dw / parts) * j, (dh / parts) * i, dw / parts, dh / parts};
-            float max_room_w = q.width / 2.0;
-            uniform_int_distribution<int> pgx(q.x, q.x + q.width / 2.0 - 1);
-            uniform_int_distribution<int> pgy(q.y, q.y + q.height / 2.0 - 1);
-            uniform_int_distribution<int> sg(min_room_w, max_room_w);
-            Rectangle ra1 = {static_cast<float>(pgx(mt)), static_cast<float>(pgy(mt)), static_cast<float>(sg(mt)), static_cast<float>(sg(mt))};
-            room_id rid = i * parts + j;
-            room r(rid, TextFormat("room-%d", rid), TextFormat("room-%d description", rid), ra1);
-            rooms.push_back(r);
+    constexpr direction_t dirs[] = {DIR_LEFT, DIR_RIGHT, DIR_UP, DIR_DOWN};
+
+    const int max_room_w = w > 7 ? 5 : w - 3;
+    const int max_room_h = h > 7 ? 5 : h - 3;
+    const int start_w = dungeon_random_range(mt, 3, max_room_w);
+    const int start_h = dungeon_random_range(mt, 3, max_room_h);
+    Rectangle start_area = dungeon_make_rect(w / 2 - start_w / 2, h / 2 - start_h / 2, start_w, start_h);
+    start_area = df->df_paint_floor_area(start_area);
+    rooms.push_back(room(0, TextFormat("room-%d", 0), TextFormat("room-%d description", 0), start_area));
+
+    int target_room_count = 4 + static_cast<int>(parts);
+    if (w >= 20 || h >= 20) {
+        target_room_count++;
+    }
+    int attempts_remaining = target_room_count * 16;
+    while (static_cast<int>(rooms.size()) < target_room_count && attempts_remaining-- > 0) {
+        const int anchor_index = dungeon_random_range(mt, 0, static_cast<int>(rooms.size()) - 1);
+        const room& anchor = rooms[anchor_index];
+        const direction_t dir = dirs[dungeon_random_range(mt, 0, 3)];
+        const int room_w = dungeon_random_range(mt, 3, max_room_w);
+        const int room_h = dungeon_random_range(mt, 3, max_room_h);
+        const int gap = dungeon_random_range(mt, 1, 2);
+        Rectangle candidate = df->df_get_adjacent_area(anchor.get_area(), dir, gap, room_w, room_h);
+        if (!dungeon_room_fits(candidate, rooms, w, h)) {
+            continue;
         }
-    }
-    minfo2("setting rooms");
-    for (size_t i = 0; i < rooms.size(); i++) {
-        df->set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, rooms[i].get_area());
-    }
-    minfo2("sorting rooms");
-    std::sort(rooms.begin(), rooms.end(), [](room& a, room& b) { return a.get_x() < b.get_x() && a.get_y() < b.get_y(); });
-    for (size_t y = 0; y < parts; y++) {
-        for (size_t x = 0; x < parts; x++) {
-            size_t index = y * parts + x;
-            room& r = rooms[index];
-            int rx = r.get_x() + r.get_w() / 2;
-            int ry = r.get_y() + r.get_h() / 2;
-            float rix = rx;
-            float riy = ry;
-            if (x < parts - 1) {
-                room& r2 = rooms[index + 1];
-                int rx_e = r.get_x() + r.get_w();
-                float rxf_e = r.get_x() + r.get_w();
-                int rjx_e = r2.get_x();
-                float rw = rjx_e - rx_e;
-                Rectangle c0 = {rxf_e, riy, rw, 1};
-                df->set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, c0);
-                tile_t& first_tile = df->tile_at(vec3{rx_e, ry, -1});
-                first_tile.set_can_have_door(true);
-                int rw_i = rw;
-                tile_t& last_tile = df->tile_at(vec3{rx_e + rw_i - 1, ry, -1});
-                last_tile.set_can_have_door(true);
-            }
-            if (y < parts - 1) {
-                size_t index2 = (y + 1) * parts + x;
-                room& r2 = rooms[index2];
-                int ry_e = r.get_y() + r.get_h();
-                float ryf_e = r.get_y() + r.get_h();
-                int rjy_e = r2.get_y();
-                float rh = rjy_e - ry_e;
-                Rectangle c0 = {rix, ryf_e, 1, rh};
-                df->set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, c0);
-                tile_t& first_tile = df->tile_at(vec3{rx, ry_e, -1});
-                first_tile.set_can_have_door(true);
-            }
+        Rectangle painted = df->df_paint_adjacent_floor_area(anchor.get_area(), dir, gap, room_w, room_h, 1);
+        if (painted.width <= 0 || painted.height <= 0) {
+            continue;
         }
+        room_id rid = static_cast<room_id>(rooms.size());
+        rooms.push_back(room(rid, TextFormat("room-%d", rid), TextFormat("room-%d description", rid), painted));
     }
-    for (int y = 1; y < dh - 1; y++) {
-        for (int x = 1; x < dw - 1; x++) {
-            vec3 loc = {x, y, -1};
-            if (df->tile_is_good_for_upgrade(loc)) {
-                df->set_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_10, Rectangle{static_cast<float>(loc.x), static_cast<float>(loc.y), 1, 1});
-            }
-        }
-    }
+
+    df->df_upgrade_floor_tiles();
+    df->df_refresh_door_candidates();
 
     d.add_floor(df);
 }
@@ -98,7 +112,7 @@ inline void gamestate::init_dungeon(biome_t type, int df_count, float parts, int
         return;
     }
     for (int i = 0; i < df_count; i++) {
-        create_and_add_df_0(type, width, height, df_count, parts);
+        create_and_add_df_1(type, width, height, df_count, parts);
     }
     minfo2("END floor creation loop");
     d.is_initialized = true;
