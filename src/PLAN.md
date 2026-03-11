@@ -121,6 +121,26 @@ These are the best remaining cleanup seams for the next session:
 - Re-check the dead-body interaction path before doing more world-interaction cleanup.
 - `try_entity_pull()` now has explicit bounds checks for both the actor destination and the pull source tile.
 - Item stacking now exists at the tile-cache layer; if interaction/render behavior changes again, keep storage concerns separate from presentation concerns.
+- Manual floor-size testing note:
+  - `8x8` was tested by a human 3 times
+  - observed results were a single small room each time: one `3x3`, then two `3x4`
+  - current impression: the generator is not using the small map area as efficiently as it could
+  - leave the algorithm alone for now and continue size-variation testing first
+- Manual floor-size testing note:
+  - `16x16` was tested by a human 4 times
+  - all 4 runs produced 6 interconnected rooms in differing arrangements
+  - no room appeared unreachable during normal play, though full certainty would require a god-mode inspection pass
+  - overall feel was good
+- Manual floor-size testing note:
+  - `32x32` was tested by a human 2 times
+  - both runs produced about 21 interconnected rooms in good formations
+  - all observed rooms appeared reachable; no disconnected rooms were noticed during testing
+- Manual floor-size testing note:
+  - `8x16` was human-tested and felt fine
+  - observed result: 3 interconnected rooms
+- Manual floor-size testing note:
+  - `16x8` was human-tested and felt good
+  - observed result: 3 interconnected rooms
 - Current item-stack presentation is intentionally minimal:
   - draw only the top cached item on the floor
   - pickup still operates on the top cached item
@@ -235,11 +255,16 @@ Continue with:
 ## Definite Next Things
 
 1. Reduce the dungeon floor size to 8x8 to begin with. We tested 64x64 last time and it feels really good with the new maze generation algorithm. I want to verify that it works at 8x8, then 16x16, then 32x32. This should give us a lot of variety when generating floors.
-  - [ ] 8x8 tested (human must verify before proceeding)
-  - [ ] 16x16 tested (human must verify before proceeding)
-  - [ ] 32x32 tested (human must verify before proceeding)
-  - [ ] 8x16 tested (human must verify before proceeding)
-  - [ ] 16x8 tested (human must verify before proceeding)
+  - [x] 8x8 tested
+  - note: 3 human runs produced only single-room layouts (`3x3`, `3x4`, `3x4`)
+  - [x] 16x16 tested
+  - note: 4 human runs produced 6 interconnected rooms in varying layouts; felt good
+  - [x] 32x32 tested
+  - note: 2 human runs produced about 21 interconnected rooms in good formations; no disconnected rooms noticed
+  - [x] 8x16 tested
+  - note: observed 3 interconnected rooms; felt fine
+  - [x] 16x8 tested
+  - note: observed 3 interconnected rooms; felt good
 
 2. Prepare to generate a 2nd dungeon floor and add it to the gamestate dungeon's list of floors.
   - 1st floor: 8x8
@@ -253,3 +278,8 @@ Continue with:
   - On success, gamestate dungeon's `current_floor` will point to the proper floor...the "top" of the dungeon begins at floor 0, and descending means the `current_floor` increases. 
   - Attempting to ascend floors on floor 0 will result in a message box stating an error if the player/hero attempts to do so, and a message history log for other entities if they attempt to do so
   - Attempting to descend floors on the last floor in gamestate.d.floors will result in a similar popup if the hero attempts it, and a message history log if attempted by another entity (NPC, etc)
+
+5. Add a full-light floor-visibility debug toggle
+  - allow a dungeon floor to ignore normal vision/discovery rules and draw every tile regardless of distance from the player
+  - likely model this as a boolean on `dungeon_floor` so it can be toggled on/off mid-game
+  - useful for debugging generation quality, unreachable spaces, and hidden/disconnected regions without requiring god-mode movement

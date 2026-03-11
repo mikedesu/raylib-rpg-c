@@ -117,7 +117,7 @@ inline void gamestate::logic_init() {
     SetRandomSeed(time(NULL));
     constexpr float parts = 1.0;
 
-    init_dungeon(BIOME_STONE, 1, parts, 64, 64);
+    init_dungeon(BIOME_STONE, 1, parts, 16, 8);
 
     massert(d.floors.size() > 0, "dungeon.floors.size is 0");
     place_doors();
