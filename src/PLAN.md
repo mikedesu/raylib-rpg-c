@@ -235,14 +235,14 @@ These are the best remaining cleanup seams for the next session:
 ```
 #define TX_PROP_WOODEN_TABLE_00 383
 #define TX_PROP_WOODEN_CHAIR_00 384
-#define TX_PROP_BANNER_01 385
+//#define TX_PROP_BANNER_01 385
 #define TX_PROP_WOODEN_BARREL_OPEN_TOP_WATER 386
 #define TX_PROP_TORCH_00 387
 #define TX_PROP_STATUE_00 388
 #define TX_PROP_WOODEN_TABLE_01 389
 #define TX_PROP_WOODEN_BARREL_OPEN_TOP_EMPTY 390
 #define TX_PROP_CANDLE_00 391
-#define TX_PROP_BANNER_00 392
+//#define TX_PROP_BANNER_00 392
 #define TX_PROP_WHITE_STATUE_DOWN_00 393
 #define TX_PROP_JAR_00 394
 #define TX_PROP_WOODEN_BOX_OPEN_TOP_EMPTY 395
@@ -251,4 +251,9 @@ These are the best remaining cleanup seams for the next session:
 #define TX_PROP_PLATE_00 398
 ```
   this can be used in the management of different types of props. this needs to be extendible as this is only a small set of possible props i might include. this is just what is available now.
+- [ ] In the same way that we create an NPC, a sword, and a shield, and a box on floor 1, we also want to generate a prop. 
+  - [ ] `PROP`s are not items and cannot be picked up
+  - [ ] `PROP` entities may or may not be "passable"
+    - i.e. you cannot walk through a `TX_PROP_WOODEN_TABLE_00` or a `TX_PROP_WOODEN_BARREL_OPEN_TOP_WATER`, but maybe you can walk over a `TX_PROP_TORCH_00`. 
+  - [ ] i have commented out `//#define TX_PROP_BANNER_01 385` and `//#define TX_PROP_BANNER_00 392` so that you do not attempt to use that texture for now. the reason being we are not currently using `WALL` tiles during generation. `WALL` tiles may or may not come back, i have not yet decided. 
 
