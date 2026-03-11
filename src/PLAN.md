@@ -21,6 +21,11 @@ This file is the handoff note for the `gamestate.h` cleanup work.
 - Ran the planned floor-size test pass and recorded the results:
   - `8x8` underuses space and tends to collapse to tiny single-room layouts
   - `16x16`, `32x32`, `8x16`, and `16x8` all produced acceptable-to-good interconnected layouts in manual testing
+- Improved the small-map generator for `8x8`:
+  - added a compact-map branch with `2x2` minimum/maximum room sizing for `8x8`
+  - allowed zero-gap adjacency and removed extra overlap padding for compact maps
+  - tuned compact-map room-count targeting down to a realistic `4-5` rooms
+  - manual verification after the change showed `8x8` feels noticeably better and uses space more effectively
 - Updated gameplay bootstrap to generate 2 floors:
   - floor `0`: `8x8`
   - floor `1`: `16x16`
@@ -50,6 +55,10 @@ This file is the handoff note for the `gamestate.h` cleanup work.
   - keep rooms relatively small
   - add more rooms as floor area increases
   - keep gap/corridor lengths short so bigger maps read as denser, not emptier
+- Very small maps now use a dedicated compact-map generation path:
+  - `8x8` floors allow `2x2` rooms
+  - `8x8` floors allow direct adjacency without a mandatory one-tile gap
+  - compact-map spacing rules are intentionally looser than the general generator so the tiny interior can still support multiple regions
 
 ## Files Added
 
@@ -111,7 +120,7 @@ These are the best remaining cleanup seams for the next session:
   - storage now supports multiple items per tile
   - presentation is still intentionally minimal: draw and pick up only the top cached item
 - Manual floor-size takeaways:
-  - `8x8`: weak result, repeatedly collapsed into a single small room (`3x3`, `3x4`, `3x4`)
+  - `8x8`: improved after the compact-map tuning pass; no longer feels stuck in the previous tiny-single-room failure mode
   - `16x16`: good, 4 runs all produced 6 interconnected rooms
   - `32x32`: good, 2 runs produced about 21 interconnected rooms with no obvious disconnected spaces
   - `8x16` and `16x8`: acceptable, both produced 3 interconnected rooms
@@ -182,6 +191,9 @@ These are the best remaining cleanup seams for the next session:
 - Important design lesson from this session:
   - scaling dungeon generation should primarily increase structure count/connectivity density
   - it should not primarily increase room footprint
+- Additional small-map lesson:
+  - `8x8` needs its own geometry rules
+  - applying the same minimum room size, gap, and spacing assumptions used by larger maps underutilizes the tiny playable interior
 
 ## Possible Next Things
 
@@ -210,8 +222,15 @@ These are the best remaining cleanup seams for the next session:
 
 ## Definite Next Things
 
-1. Improve the small-map generator for `8x8`.
-  - current manual testing suggests it underuses space and collapses to tiny single-room layouts
-  - a single `3x3` or `3x4` room leaves too much of an `8x8` floor unused
-  - revisit how room count, seed room size, and corridor placement scale at very small dimensions
-  - technically, logistically/logically, a floor could have a single 1x1 tile, but we do not want this in the map generator. map-generator minimum room size is 2x2. 
+1. Improve interconnection after the initial room-growth pass.
+  - the generator now handles `8x8` more credibly, so the next quality step is less about fit and more about topology
+  - add loop-making or nearby-room connection passes so layouts read less tree-like
+
+2. Add more corridor flexibility.
+  - consider L-corridors or similar options so room attachment is not limited to straight-axis overlap
+  - keep the existing connected-room feel, but reduce the number of rejected placements caused by alignment constraints
+
+3. Preserve the small-map floor rules explicitly.
+  - compact maps should keep the `2x2` minimum room size
+  - compact maps should keep zero-gap adjacency available where needed
+  - avoid regressing `8x8` back toward single-room collapse while improving the broader generator
