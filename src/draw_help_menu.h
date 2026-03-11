@@ -6,29 +6,34 @@
 static inline void draw_help_menu(gamestate& g) {
     const char* text = "Help Menu\n"
                        "\n"
-                       "Movement: numpad\n"
-                       "Change direction: numpad 5\n"
-                       "Wait one turn: numpad 5 twice\n"
+                       "Move: numpad 1-9, no 5\n"
+                       "Face / wait: numpad 5\n"
+                       "Camera mode: b\n"
+                       "Zoom: - and =\n"
                        "\n"
                        "Pick up item: s\n"
                        "Attack: a\n"
+                       "Pull: space\n"
+                       "Open door: o\n"
                        "Use stairs: .\n"
                        "Toggle full light: l\n"
-                        "\n"
-                       "Open Inventory: i\n"
-                       "Equip item: e\n"
-                       "Drop item: \n"
-                       "Leave Inventory: escape -or- i"
                        "\n"
+                       "Inventory: i\n"
+                       "Inventory equip/use: e or enter\n"
+                       "Inventory drop: q\n"
+                       "Inventory close: esc or i\n"
+                       "\n"
+                       "Options: `\n"
                        "Open this help menu: ?\n"
+                       "Debug panel: p\n"
+                       "Quit prompt: esc\n"
                        "\n"
                        "@evildojo666";
 
 
     constexpr int font_size = 10;
 
-    constexpr int line_count_0 = 17;
-    constexpr int line_count = line_count_0 + 2;
+    constexpr int line_count = 21;
 
     constexpr int text_height = font_size * line_count;
 

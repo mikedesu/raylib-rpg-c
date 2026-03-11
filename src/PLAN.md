@@ -4,42 +4,28 @@ This file is the handoff note for the `gamestate.h` cleanup work.
 
 ## Completed This Session
 
-- Extracted world generation and placement methods out of `gamestate.h` into `gamestate_world_impl.h`.
-- Extracted entity factory and setup methods out of `gamestate.h` into `gamestate_entity_factory_impl.h`.
-- Extracted lifecycle/bootstrap/update flow out of `gamestate.h` into `gamestate_lifecycle_impl.h`.
-- Extracted scene/bootstrap handlers out of `gamestate.h` into `gamestate_scene_impl.h`.
-- Extracted player input and menu handling out of `gamestate.h` into `gamestate_input_impl.h`.
-- Extracted NPC AI, combat resolution, and pathfinding out of `gamestate.h` into `gamestate_npc_combat_impl.h`.
-- Extracted world interaction helpers out of `gamestate.h` into `gamestate_world_interaction_impl.h`.
-- Restored dead-body pulling after the dead NPC tile-cache refactor by updating `try_entity_pull()` in `gamestate_world_interaction_impl.h`.
-- Extracted inventory management helpers out of `gamestate.h` into `gamestate_inventory_impl.h`.
-- Fixed an edge-of-map crash in `try_entity_pull()` by validating both the pull destination and the pull source before accessing floor tiles.
-- Reworked tile item storage from a single cached item to a fixed-capacity `item_cache`, preserving the cache-oriented tile model while allowing multiple items per tile.
-- Updated floor rendering so item stacks currently draw a single representative top item instead of overlapping every cached item sprite.
-- Split `libdraw.h` into smaller renderer-focused headers:
-  - `libdraw_context.h` for shared renderer globals
-  - `libdraw_scene_dispatch.h` for scene-to/from-texture dispatch
-  - `libdraw_frame.h` for per-frame orchestration
-  - `libdraw_lifecycle.h` for init/shutdown and render-target bootstrap
-- Reduced `libdraw.h` to a thin composition header so the public include stays stable while ownership is clearer.
-- Re-enabled test box creation during `gamestate` init.
-- Re-enabled box drawing in `draw_dungeon_floor.h`.
-- Reduced the hero default light radius from the temporary testing value down to `3`.
-- Introduced a first-pass dungeon floor painting API in `dungeon_floor.h`:
-  - clamped rectangle painting
-  - adjacent-region placement
-  - straight connector/corridor carving
-  - floor upgrade pass
-  - door-candidate refresh pass
-- Replaced the one-big-room dungeon bootstrap with connected room-and-corridor generation in `gamestate_world_impl.h`.
-- Tuned the new generator so larger floors scale by room count and density rather than by making each room much larger.
-- Increased the default gameplay dungeon bootstrap from `16x16` to `64x64` in `gamestate_lifecycle_impl.h`.
-- Made `room` geometry/name/description getters `const` so generation code can safely inspect room metadata through const references.
-- Added a gameplay-only quit confirmation prompt:
-  - `Escape` in gameplay now opens a simple `Y/N` confirm message instead of instantly quitting
-  - the prompt uses a reusable confirm control mode layered onto the existing message-box drawing path
-  - outside gameplay scenes, `Escape` still instant-quits
-  - web builds (`-DPLATFORM_WEB -DWEB`) now treat confirmed quit as a return-to-title reset instead of closing the app
+- Refactored `gamestate.h` into responsibility-specific implementation headers for world generation, lifecycle, scenes, input, combat/AI, world interaction, and inventory.
+- Split `libdraw.h` into smaller renderer-focused headers and kept `libdraw.h` as the stable composition include.
+- Stabilized several gameplay systems:
+  - restored/fixed dead-body pulling, including edge-of-map bounds validation
+  - changed tile item storage to a fixed-capacity cache while keeping floor rendering/pickup on the top item
+  - re-enabled boxes and reset the hero light radius back down to `3`
+- Reworked dungeon generation away from the single-room bootstrap:
+  - added a first-pass floor-painting API
+  - switched to connected room-and-corridor generation
+  - tuned scaling toward more rooms/density instead of oversized rooms
+- Added a gameplay-only quit confirmation flow:
+  - `Escape` in gameplay now opens a simple `Y/N` confirm prompt
+  - non-gameplay scenes still instant-quit
+  - web builds return to title/reset instead of closing the app
+- Ran the planned floor-size test pass and recorded the results:
+  - `8x8` underuses space and tends to collapse to tiny single-room layouts
+  - `16x16`, `32x32`, `8x16`, and `16x8` all produced acceptable-to-good interconnected layouts in manual testing
+- Updated gameplay bootstrap to generate 2 floors:
+  - floor `0`: `8x8`
+  - floor `1`: `16x16`
+- Added random staircase assignment per floor and bound stairs traversal to `.`
+- Added a per-floor full-light debug toggle on `l`, with debug/help text support
 
 ## Current State
 
@@ -90,10 +76,9 @@ make clean && CXXFLAGS="-DDEBUG_ASSERT=1 -DNPCS_ALL_AT_ONCE -DDEBUG=1 -DMASTER_V
 ```
 
 - Code compiles and links successfully.
-- The final `make game` step still reports failure because `log_build_stats.sh` tries to write `/home/darkmage/current_loc.txt`, which is outside the sandbox. The `game` binary is still produced.
 - Additional verification this session:
   - repeated `make clean && make game` rebuilds succeeded through compile and link after each dungeon-generation change
-  - the same post-build `log_build_stats.sh` permission failure still causes `make game` to return nonzero even though the binary is produced
+  - after updating `log_build_stats.sh`, `make clean && make game` now completes successfully end-to-end
 
 ## Next Refactor Targets
 
@@ -118,41 +103,25 @@ These are the best remaining cleanup seams for the next session:
 
 ## Notes For Next Session
 
-- Re-check the dead-body interaction path before doing more world-interaction cleanup.
-- `try_entity_pull()` now has explicit bounds checks for both the actor destination and the pull source tile.
-- Item stacking now exists at the tile-cache layer; if interaction/render behavior changes again, keep storage concerns separate from presentation concerns.
-- Manual floor-size testing note:
-  - `8x8` was tested by a human 3 times
-  - observed results were a single small room each time: one `3x3`, then two `3x4`
-  - current impression: the generator is not using the small map area as efficiently as it could
-  - leave the algorithm alone for now and continue size-variation testing first
-- Manual floor-size testing note:
-  - `16x16` was tested by a human 4 times
-  - all 4 runs produced 6 interconnected rooms in differing arrangements
-  - no room appeared unreachable during normal play, though full certainty would require a god-mode inspection pass
-  - overall feel was good
-- Manual floor-size testing note:
-  - `32x32` was tested by a human 2 times
-  - both runs produced about 21 interconnected rooms in good formations
-  - all observed rooms appeared reachable; no disconnected rooms were noticed during testing
-- Manual floor-size testing note:
-  - `8x16` was human-tested and felt fine
-  - observed result: 3 interconnected rooms
-- Manual floor-size testing note:
-  - `16x8` was human-tested and felt good
-  - observed result: 3 interconnected rooms
-- Current item-stack presentation is intentionally minimal:
-  - draw only the top cached item on the floor
-  - pickup still operates on the top cached item
-- If world interaction is revisited again, compare behavior across:
-  - boxes
-  - dead NPC bodies
-  - any logic that still assumes `get_cached_live_npc()` or `get_cached_box()` is the only source of truth
-- The old one-big-room `16x16` generation path is no longer the default gameplay path.
-- The new dungeon generation work is now in a good first-pass state rather than being the main glaring gameplay problem.
-- Doors and boxes are available again, so the map-generation pass can now start producing layouts that actually justify them.
-- The current generator is still tree-like in spirit because each new room is attached from an anchor room.
-- The next quality jump is likely more interconnection, not simply more density.
+- World-interaction caution:
+  - re-check the dead-body interaction path before more cleanup in that area
+  - `try_entity_pull()` now has explicit source/destination bounds checks and should stay that way
+  - if interaction logic changes again, compare behavior across boxes, dead bodies, and any code that still assumes single-source tile caches
+- Item-stack reminder:
+  - storage now supports multiple items per tile
+  - presentation is still intentionally minimal: draw and pick up only the top cached item
+- Manual floor-size takeaways:
+  - `8x8`: weak result, repeatedly collapsed into a single small room (`3x3`, `3x4`, `3x4`)
+  - `16x16`: good, 4 runs all produced 6 interconnected rooms
+  - `32x32`: good, 2 runs produced about 21 interconnected rooms with no obvious disconnected spaces
+  - `8x16` and `16x8`: acceptable, both produced 3 interconnected rooms
+- Dungeon-generation state:
+  - the old one-big-room path is no longer the default
+  - the current generator is in a solid first-pass state and produces connected room/corridor layouts
+  - it still reads as tree-like because growth anchors from existing rooms
+  - the next quality jump is more interconnection, not just more density
+- Gameplay-layout implication:
+  - doors and boxes are available again, so future generation passes can start leaning into chokepoints and room purpose more intentionally
 
 ## Libdraw Review Notes
 
@@ -183,19 +152,6 @@ These are the best remaining cleanup seams for the next session:
   - combat/AI
   - inventory/items
   - rendering/debug-facing state preparation
-
-## Suggested Starting Point Next Time
-
-Continue with:
-
-1. Add secondary cross-connections between already-placed rooms so larger floors stop reading as a simple branch/tree structure.
-2. Extend the floor painting API from rectangles plus straight connectors into richer primitives:
-   - L-shaped corridors
-   - variable-width hallways
-   - explicit region objects or paint operations
-3. Revisit door placement after more interconnection exists so doors appear at intentional chokepoints instead of every merely valid candidate.
-4. Review `gamestate_world_impl.h` and `dungeon_floor.h` first, since that is now the active gameplay iteration area.
-5. Keep the next pass focused on structure/connectivity/readability before moving on to decoration.
 
 ## Dungeon Generation Intent
 
@@ -254,32 +210,7 @@ Continue with:
 
 ## Definite Next Things
 
-1. Reduce the dungeon floor size to 8x8 to begin with. We tested 64x64 last time and it feels really good with the new maze generation algorithm. I want to verify that it works at 8x8, then 16x16, then 32x32. This should give us a lot of variety when generating floors.
-  - [x] 8x8 tested
-  - note: 3 human runs produced only single-room layouts (`3x3`, `3x4`, `3x4`)
-  - [x] 16x16 tested
-  - note: 4 human runs produced 6 interconnected rooms in varying layouts; felt good
-  - [x] 32x32 tested
-  - note: 2 human runs produced about 21 interconnected rooms in good formations; no disconnected rooms noticed
-  - [x] 8x16 tested
-  - note: observed 3 interconnected rooms; felt fine
-  - [x] 16x8 tested
-  - note: observed 3 interconnected rooms; felt good
-
-2. Prepare to generate a 2nd dungeon floor and add it to the gamestate dungeon's list of floors.
-  - 1st floor: 8x8
-  - 2nd floor: 16x16
-
-3. Update the floor generation algorithms so that we assign 2 randomly-selected but different tiles (x, y) per floor (z) to be the `UPSTAIRS` and `DOWNSTAIRS` tiles. 
-
-4. Implement the `try_entity_go_upstairs` and `try_entity_go_downstairs` or similar functions necessary to handle any entity attempting to ascend or descend a staircase
-  - Method fails and produces a message history log stating the entity tried to go upstairs but there was no stairs, or some other error (yet to be decided) occurs
-  - Same goes for downstairs
-  - On success, gamestate dungeon's `current_floor` will point to the proper floor...the "top" of the dungeon begins at floor 0, and descending means the `current_floor` increases. 
-  - Attempting to ascend floors on floor 0 will result in a message box stating an error if the player/hero attempts to do so, and a message history log for other entities if they attempt to do so
-  - Attempting to descend floors on the last floor in gamestate.d.floors will result in a similar popup if the hero attempts it, and a message history log if attempted by another entity (NPC, etc)
-
-5. Add a full-light floor-visibility debug toggle
-  - allow a dungeon floor to ignore normal vision/discovery rules and draw every tile regardless of distance from the player
-  - likely model this as a boolean on `dungeon_floor` so it can be toggled on/off mid-game
-  - useful for debugging generation quality, unreachable spaces, and hidden/disconnected regions without requiring god-mode movement
+1. Improve the small-map generator for `8x8`.
+  - current manual testing suggests it underuses space and collapses to tiny single-room layouts
+  - a single `3x3` or `3x4` room leaves too much of an `8x8` floor unused
+  - revisit how room count, seed room size, and corridor placement scale at very small dimensions

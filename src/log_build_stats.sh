@@ -15,4 +15,4 @@ MONTHS=$(scc -i cpp,h,py,sh,frag | grep -i effort | awk '{print $5}');
 #echo $COST 
 echo $TIMESTAMP $LINES $MONTHS $COST >> build-stats.csv;
 
-echo "Current  LOC: $(cat build-stats.csv | tail -n1 | awk -F" " '{print $2}')" > ~/current_loc.txt;
+#echo "Current  LOC: $(cat build-stats.csv | tail -n1 | awk -F" " '{print $2}')" > ~/current_loc.txt;

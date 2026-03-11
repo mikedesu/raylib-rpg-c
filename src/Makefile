@@ -45,7 +45,7 @@ all: game index.html tests
 # Desktop build
 game: main.o
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $(CFLAGS) $^ -L. $(RAYLIB_LIBS)   -o $@ 
-	./log_build_stats.sh
+	bash log_build_stats.sh
 
 
 main.o: main.cpp
