@@ -156,11 +156,6 @@ public:
     }
 
     inline entityid tile_add(entityid id, entitytype_t type) {
-        cached_player_present = false;
-        cached_live_npc = ENTITYID_INVALID;
-        cached_item = ENTITYID_INVALID;
-        cached_box = ENTITYID_INVALID;
-        cached_door = ENTITYID_INVALID;
         if (type == ENTITY_PLAYER) {
             cached_player_present = true;
             cached_live_npc = id;
@@ -175,6 +170,9 @@ public:
         else if (type == ENTITY_BOX) {
             cached_box = id;
         }
+        else if (type == ENTITY_DOOR) {
+            cached_door = id;
+        }
         dirty_entities = true;
         return id;
     }
@@ -183,6 +181,9 @@ public:
         massert(id != ENTITYID_INVALID, "tile_remove: id is invalid");
         if (id == cached_live_npc) {
             cached_live_npc = INVALID;
+            if (cached_player_present) {
+                cached_player_present = false;
+            }
             return id;
         }
         else if (dead_npcs.remove_id(id)) {
