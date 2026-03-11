@@ -132,4 +132,7 @@ These are the best remaining cleanup seams for the next session:
 
 Continue with:
 
-`Clean up the extracted libdraw units further, starting with scene dispatch and target orchestration, while preserving current rendering behavior.`
+1. Re-enable box creation during `gamestate` init, following the same pattern already used for `create_weapon` and `create_shield`.
+2. Re-enable box drawing in `draw_dungeon_floor.h`.
+3. Re-enable door placement.
+4. Re-enable drawing of doors.
