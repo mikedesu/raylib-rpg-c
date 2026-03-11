@@ -223,6 +223,10 @@ Continue with:
    - dense catacombs
    - chamber-and-hub layouts
 
+## Future Things
+
+1. The web build that uses `emcc` in the `Makefile` packages the game assets in a way that I can push the game build to itch.io so that people may play the game in their browser. I am interested in finding a way for us to package assets in a way that cannot be easily reverse-engineered and stolen as that would result in a violation of the licensing the assets were sold under (makes sense right?). I'd love to allow people to play a compiled binary or build and run the game themselves but the assets need to be delivered in a way that is safe to distribute without reasonable threat of theft.
+
 ## Definite Next Things
 
 1. When in the primary gameplay scene, when pressing escape, currently it instantly exits the game. I want to incrementally modify this behavior. This was a fine start but I need to present the player with a window that asks if they really want to exit, with a yes or no menu toggle in the window that pops up. Current message window behavior does not offer things like Yes/No or any toggleable optionality when presenting a message to the player. "Do You Really Want To Quit? Y/N", "Are You Sure You Want To Quit? Press Y or N" could be acceptable instead of a whole real "toggle" like I have in the Title Screen or in the Character Creation Screen. The simpler the better. So, to summarize, we need:
