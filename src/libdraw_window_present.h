@@ -3,6 +3,11 @@
 #include "libdraw_context.h"
 #include "libdraw_scene_render.h"
 
+/**
+ * @brief Re-render the active scene only when the cached frame is dirty.
+ *
+ * @param g Active game state controlling frame dirtiness.
+ */
 static inline void libdraw_refresh_dirty_scene(gamestate& g) {
     if (!g.frame_dirty) {
         return;
@@ -15,6 +20,11 @@ static inline void libdraw_refresh_dirty_scene(gamestate& g) {
     msuccess3("frame is no longer dirty");
 }
 
+/**
+ * @brief Compose the current scene texture into the shared window-sized target texture.
+ *
+ * @param g Active game state.
+ */
 static inline void libdraw_compose_scene_to_window_target(gamestate& g) {
     BeginTextureMode(target);
     ClearBackground(BLUE);
@@ -22,6 +32,11 @@ static inline void libdraw_compose_scene_to_window_target(gamestate& g) {
     EndTextureMode();
 }
 
+/**
+ * @brief Present the shared target texture to the OS window.
+ *
+ * @param g Active game state.
+ */
 static inline void libdraw_present_window_target(gamestate& g) {
     (void)g;
     win_dest.width = GetScreenWidth();

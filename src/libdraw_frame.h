@@ -4,6 +4,15 @@
 #include "libdraw_update_sprites.h"
 #include "libdraw_window_present.h"
 
+/**
+ * @brief Execute one full renderer frame.
+ *
+ * Runs sprite pre-update work, redraws the current scene when the frame is
+ * marked dirty, presents the composed render target to the window, records
+ * frame timing stats, and then advances post-draw sprite state.
+ *
+ * @param g Active game state used by the renderer.
+ */
 static inline void drawframe(gamestate& g) {
     minfo3("drawframe");
     const double start_time = libdraw_frame_begin_time();

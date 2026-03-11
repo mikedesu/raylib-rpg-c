@@ -1,5 +1,9 @@
 #pragma once
 
+/** @file gamestate.h
+ *  @brief Top-level gameplay state, orchestration, and API surface for the game runtime.
+ */
+
 #include "ComponentTable.h"
 #include "ComponentTraits.h"
 #include "attack_result.h"
@@ -71,6 +75,13 @@ typedef enum {
     CONFIRM_ACTION_QUIT,
 } confirm_action_t;
 
+/**
+ * @brief Central runtime object for gameplay, world state, entities, UI state, and high-level flow.
+ *
+ * The project currently treats `gamestate` as the main coordination surface for
+ * dungeon generation, entity creation, input handling, combat, inventory, and
+ * renderer-facing state preparation.
+ */
 class gamestate {
 public:
     controlmode_t controlmode;
@@ -358,32 +369,52 @@ public:
         return d.get_current_floor()->tile_at(loc);
     }
 
+    /** @brief Create and add a simple floor using the legacy one-room bootstrap path. */
     void create_and_add_df_0(biome_t type, int w, int h, int df_count, float parts);
 
+    /** @brief Create and add a generated floor using the current room-and-corridor generator. */
     void create_and_add_df_1(biome_t type, int w, int h, int df_count, float parts);
 
+    /** @brief Randomly assign upstairs and downstairs locations on a single floor. */
     bool assign_random_stairs_to_floor(shared_ptr<dungeon_floor> df);
 
+    /** @brief Randomly assign stairs across all currently created floors. */
     bool assign_random_stairs();
 
+    /**
+     * @brief Initialize a dungeon with generated floors and stairs.
+     *
+     * @param type Biome to apply to created floors.
+     * @param df_count Number of floors to create.
+     * @param parts Density/style tuning input for generation.
+     * @param width Floor width.
+     * @param height Floor height.
+     */
     void init_dungeon(biome_t type, int df_count, float parts, int width = DEFAULT_DUNGEON_FLOOR_WIDTH, int height = DEFAULT_DUNGEON_FLOOR_HEIGHT);
 
+    /** @brief Create a door entity and apply additional component initialization. */
     entityid create_door_with(with_fun doorInitFunction);
 
     bool tile_has_player(shared_ptr<tile_t> t) {
         return t->get_cached_player_present();
     }
 
+    /** @brief Create and place a door entity on a floor tile. */
     entityid create_door_at_with(vec3 loc, with_fun doorInitFunction);
 
+    /** @brief Scan current floors for valid door candidates and place door entities. */
     size_t place_doors();
 
+    /** @brief Create a prop entity of the requested logical type. */
     entityid create_prop_with(proptype_t type, with_fun initFun);
 
+    /** @brief Create and place a prop entity on a tile. */
     entityid create_prop_at_with(proptype_t type, vec3 loc, with_fun initFun);
 
+    /** @brief Populate generated floors with props after layout generation completes. */
     int place_props();
 
+    /** @brief Create a weapon item entity and apply weapon-specific initialization. */
     entityid create_weapon_with(with_fun weaponInitFunction);
 
     with_fun dagger_init();
@@ -398,16 +429,19 @@ public:
 
     with_fun player_init(int maxhp_roll);
 
+    /** @brief Create and place a weapon item at a specific dungeon location. */
     entityid create_weapon_at_with(ComponentTable& ct, vec3 loc, with_fun weaponInitFunction);
 
     entityid create_weapon_at_random_loc_with(CT& ct, with_fun weaponInitFunction);
 
     entityid create_shield_with(ComponentTable& ct, with_fun shieldInitFunction);
 
+    /** @brief Create and place a shield item at a specific dungeon location. */
     entityid create_shield_at_with(ComponentTable& ct, vec3 loc, with_fun shieldInitFunction);
 
     entityid create_potion_with(with_fun potionInitFunction);
 
+    /** @brief Create and place a potion item at a specific dungeon location. */
     entityid create_potion_at_with(vec3 loc, with_fun potionInitFunction);
 
     race_t random_monster_type();
@@ -416,6 +450,7 @@ public:
 
     void set_npc_defaults(entityid id);
 
+    /** @brief Create an NPC entity of the requested race and apply extra initialization. */
     entityid create_npc_with(race_t rt, with_fun npcInitFunction);
 
     entityid tile_has_box(int x, int y, int z) {
@@ -428,14 +463,25 @@ public:
 
     entityid tile_has_pullable(int x, int y, int z);
 
+    /** @brief Create and place an NPC entity on the dungeon floor. */
     entityid create_npc_at_with(race_t rt, vec3 loc, with_fun npcInitFunction);
 
+    /**
+     * @brief Add an item entity to an actor's inventory.
+     *
+     * @return `true` on success.
+     */
     bool add_to_inventory(entityid actor_id, entityid item_id);
 
     entityid create_orc_with(with_fun monsterInitFunction);
 
     entityid create_orc_at_with(vec3 loc, with_fun monsterInitFunction);
 
+    /**
+     * @brief Push a formatted message into the active message queue.
+     *
+     * @return `true` after the message is queued.
+     */
     bool add_message(const char* fmt, ...) {
         massert(fmt, "format string is NULL");
         char buffer[MAX_MSG_LENGTH];
@@ -472,6 +518,7 @@ public:
 
     void update_npcs_state();
 
+    /** @brief Initialize gameplay state, generate floors, and seed initial entities. */
     void logic_init();
 
     void handle_input_title_scene(inputstate& is);
@@ -494,10 +541,16 @@ public:
 
     void handle_test_flag();
 
+    /**
+     * @brief Advance one gameplay tick from the latest input snapshot.
+     *
+     * This is the main per-frame game update entry point.
+     */
     void tick(inputstate& is);
 
     bool remove_from_inventory(entityid actor_id, entityid item_id);
 
+    /** @brief Drop an item from an actor inventory back into the world. */
     bool drop_from_inventory(entityid actor_id, entityid item_id);
 
     bool drop_all_from_inventory(entityid actor_id);
@@ -528,6 +581,7 @@ public:
 
     void handle_input_inventory(inputstate& is);
 
+    /** @brief Open the yes/no confirmation prompt with a formatted message. */
     void open_confirm_prompt(confirm_action_t action, const char* fmt, ...);
 
     void resolve_confirm_prompt(bool confirmed);
@@ -562,6 +616,7 @@ public:
 
     bool handle_display_inventory(inputstate& is);
 
+    /** @brief Return whether the addressed tile currently contains a solid blocking entity. */
     bool tile_has_solid(int x, int y, int z);
 
     bool handle_box_push(entityid id, vec3 v);
@@ -572,6 +627,11 @@ public:
 
     bool check_hearing(entityid id, vec3 loc);
 
+    /**
+     * @brief Attempt to move an entity by a delta vector.
+     *
+     * @return `true` when the move succeeds.
+     */
     bool try_entity_move(entityid id, vec3 v);
 
     bool handle_move_up(inputstate& is, bool is_dead);

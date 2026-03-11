@@ -4,6 +4,11 @@
 #include "libdraw_from_texture.h"
 #include "libdraw_to_texture.h"
 
+/**
+ * @brief Render the active scene into its scene-specific render texture.
+ *
+ * @param g Active game state that selects the scene and provides draw context.
+ */
 static inline void libdraw_render_current_scene_to_scene_texture(gamestate& g) {
     switch (g.current_scene) {
     case SCENE_TITLE:
@@ -26,6 +31,11 @@ static inline void libdraw_render_current_scene_to_scene_texture(gamestate& g) {
     }
 }
 
+/**
+ * @brief Draw the active scene's render texture into the shared presentation target.
+ *
+ * @param g Active game state that selects the current scene.
+ */
 static inline void libdraw_draw_current_scene_from_scene_texture(gamestate& g) {
     switch (g.current_scene) {
     case SCENE_TITLE:

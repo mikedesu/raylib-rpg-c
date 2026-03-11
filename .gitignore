@@ -59,3 +59,7 @@ tests
 tests.cpp
 *.perf
 perf.data.old
+docs/api
+docs/api/*
+src/docs/api
+src/docs/api/*

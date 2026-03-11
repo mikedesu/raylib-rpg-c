@@ -44,6 +44,15 @@ This file is the handoff note for the `gamestate.h` cleanup work.
 - Refreshed two stale UI layouts:
   - help menu bounds now measure real multiline text content
   - inventory right-side detail text now renders at `20`
+- Established first-pass API documentation infrastructure:
+  - adopted Doxygen as the project documentation generator
+  - added a `Doxyfile`
+  - added `make docs` and `make docs-clean`
+  - added `docs/DOCUMENTATION.md` to define the Javadoc-style comment standard
+- Started the first core-header documentation pass:
+  - added file/class/API docs to `libdraw*.h` headers touched during the renderer refactor
+  - added first-pass documentation to `gamestate.h`, `dungeon_floor.h`, and `dungeon_tile.h`
+  - verified HTML generation to `docs/api/html/index.html`
 
 ## Current State
 
@@ -60,6 +69,13 @@ This file is the handoff note for the `gamestate.h` cleanup work.
 - Scene draw dispatch, render-target lifecycle, window presentation, and per-frame orchestration are now more cleanly separated.
 - `libdraw_frame.h` is no longer carrying scene rendering, target composition, and frame-stat bookkeeping all in one place.
 - The current renderer still depends on global render-texture state and implementation headers, but the ownership seams are much clearer than before.
+- Doxygen is now the active documentation standard for the codebase.
+- Generated API docs can now be built locally with `make docs`.
+- Documentation coverage is still partial:
+  - the infrastructure is in place
+  - renderer headers have a first-pass of docs
+  - `gamestate.h`, `dungeon_floor.h`, and `dungeon_tile.h` have begun the core API pass
+  - many remaining headers still need declaration-level documentation
 - Dungeon generation no longer defaults to a single open rectangle.
 - The current dungeon bootstrap now creates a `64x64` floor for gameplay testing.
 - The current generator produces:
@@ -111,6 +127,9 @@ make clean && CXXFLAGS="-DDEBUG_ASSERT=1 -DNPCS_ALL_AT_ONCE -DDEBUG=1 -DMASTER_V
   - manual runtime verification:
     - props now show up in gameplay
     - help menu and inventory detail text sizing changes look correct
+  - documentation verification:
+    - `make docs` succeeds with Doxygen `1.9.4`
+    - generated HTML output is present under `docs/api/html`
 
 ## Next Refactor Targets
 
@@ -133,6 +152,11 @@ These are the best remaining cleanup seams for the next session:
 3. Remaining `gamestate.h` stragglers
    - small inline helpers that still fit better in extracted implementation headers
    - reassess whether any world-interaction or input-adjacent helpers should be grouped further
+
+4. Documentation coverage
+   - continue the declaration-level Doxygen pass on the core headers
+   - document ownership, side effects, and failure behavior where names are not enough
+   - keep docs focused on API meaning, not implementation trivia
 
 ## Notes For Next Session
 
@@ -247,11 +271,32 @@ These are the best remaining cleanup seams for the next session:
 
 ## Definite Next Things
 
-- [ ] decide on a `javadoc`-style infrastructure for generating automated documentation.
-  - [ ] generating documentation should be a `Makefile` target
-  - [ ] the goal being human accessibility when working with the APIs across the various .h files
-  - [ ] new methods, classes, and functions will also need to conform to the documentation standard we decide
-  - [ ] generating documentation should be outlined in some text-file, though i am not sure where...
+- [x] decide on a `javadoc`-style infrastructure for generating automated documentation.
+  - [x] generating documentation is now a `Makefile` target:
+    - `make docs`
+    - `make docs-clean`
+  - [x] the documentation standard is now outlined in:
+    - `docs/DOCUMENTATION.md`
+  - [x] Doxygen is the chosen tool for HTML API generation
+  - [x] Javadoc-style Doxygen comments are now the project standard for new API declarations
+
+- [ ] Continue the first core-header documentation pass
+  - next priority headers:
+    - `gamestate.h` remaining declarations
+    - `dungeon.h`
+    - `ComponentTable.h`
+    - `ComponentTraits.h`
+  - after that, move into the renderer/gameplay support headers that define the most important public helper surfaces
+  - prefer documenting declarations in headers instead of duplicating comments on implementation definitions
+  - focus on:
+    - class purpose
+    - ownership/state assumptions
+    - mutation side effects
+    - failure behavior / invalid return cases
+  - breadcrumb for next session:
+    - open `docs/DOCUMENTATION.md`
+    - run `make docs`
+    - continue from `gamestate.h` rather than starting a new header family at random
 
 - [ ] Re-factor libdraw.h from the top down and associated drawing functions, methods, classes, and files
   - Pay attention to the object and definition hierarchy in order to understand the relationship between the gamestate and the rendered textures

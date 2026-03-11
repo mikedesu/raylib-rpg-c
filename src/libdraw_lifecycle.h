@@ -56,6 +56,11 @@ static inline void libdraw_init_rest(gamestate& g) {
     libdraw_init_resources(g);
 }
 
+/**
+ * @brief Initialize the render window, render targets, textures, shaders, and audio state.
+ *
+ * @param g Active game state that owns runtime renderer configuration.
+ */
 static inline void libdraw_init(gamestate& g) {
     const int w = DEFAULT_WIN_WIDTH;
     const int h = DEFAULT_WIN_HEIGHT;
@@ -70,6 +75,12 @@ static inline void libdraw_init(gamestate& g) {
     libdraw_init_rest(g);
 }
 
+/**
+ * @brief Return whether the application should leave the main render loop.
+ *
+ * @param g Active game state.
+ * @return `true` when the game has requested shutdown.
+ */
 static inline bool libdraw_windowshouldclose(gamestate& g) {
     return g.do_quit;
 }
@@ -86,6 +97,9 @@ static inline void libdraw_close_partial() {
     UnloadRenderTexture(target);
 }
 
+/**
+ * @brief Shutdown renderer-owned resources and close the game window.
+ */
 static inline void libdraw_close() {
     libdraw_close_partial();
     CloseWindow();

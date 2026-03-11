@@ -1,5 +1,9 @@
 #pragma once
 
+/** @file dungeon_tile.h
+ *  @brief Tile-level storage for floor geometry, visibility, and cached entities.
+ */
+
 #include "ComponentTraits.h"
 #include "dead_npc_cache.h"
 #include "dungeon_tile_type.h"
@@ -10,6 +14,14 @@
 #include "mprint.h"
 #include "tile_id.h"
 
+/**
+ * @brief Runtime storage for a single dungeon tile.
+ *
+ * A tile owns its tile type, fog-of-war state, door candidacy, and a compact
+ * cache of entities currently occupying the tile. The cache is optimized for
+ * the gameplay renderer and movement/interaction checks, so it stores
+ * different entity categories in different ways.
+ */
 class tile_t {
 private:
     bool can_have_door;
@@ -26,6 +38,11 @@ private:
     item_cache items;
 
 public:
+    /**
+     * @brief Return the number of cached entities currently represented on this tile.
+     *
+     * @return Count of cached live entities, dead bodies, and item stack entries.
+     */
     inline size_t entity_count() {
         size_t count = 0;
         count += cached_live_npc != INVALID ? 1 : 0;
@@ -67,6 +84,7 @@ public:
         massert(items.add_id(id), "item cache is full");
     }
 
+    /** @brief Return the top visible item from the tile item cache. */
     entityid get_cached_item() {
         return items.top();
     }
@@ -83,6 +101,7 @@ public:
         cached_live_npc = id;
     }
 
+    /** @brief Return the primary live NPC cached on this tile, if any. */
     entityid get_cached_live_npc() {
         return cached_live_npc;
     }
@@ -124,6 +143,7 @@ public:
         visible = b;
     }
 
+    /** @brief Return whether this tile is currently visible to the player. */
     bool get_visible() {
         return visible;
     }
@@ -136,6 +156,7 @@ public:
         type = t;
     }
 
+    /** @brief Return whether this tile may currently host a generated door. */
     bool get_can_have_door() {
         return can_have_door;
     }
@@ -148,6 +169,11 @@ public:
         return tiletype_is_wall(type);
     }
 
+    /**
+     * @brief Clear all cached entity occupancy from the tile.
+     *
+     * This does not change the tile type or fog-of-war state.
+     */
     inline void tile_reset_cache() {
         cached_player_present = false;
         cached_live_npc = ENTITYID_INVALID;
@@ -163,6 +189,11 @@ public:
         return true;
     }
 
+    /**
+     * @brief Initialize the tile to a fresh runtime state with the given tile type.
+     *
+     * @param t Tile type to assign during initialization.
+     */
     inline void tile_init(tiletype_t t) {
         minfo2("tile_init(%d)", t);
         type = t;
@@ -175,6 +206,13 @@ public:
         tile_reset_cache();
     }
 
+    /**
+     * @brief Add an entity to the tile's category-specific cache.
+     *
+     * @param id Entity id to cache on the tile.
+     * @param type Logical entity type that controls which cache slot is used.
+     * @return The entity id on success, or `INVALID` when the cache cannot accept it.
+     */
     inline entityid tile_add(entityid id, entitytype_t type) {
         if (type == ENTITY_PLAYER) {
             cached_player_present = true;
@@ -203,6 +241,12 @@ public:
         return id;
     }
 
+    /**
+     * @brief Remove an entity from whichever tile cache currently owns it.
+     *
+     * @param id Entity id to remove.
+     * @return The removed entity id, or `INVALID` if the tile did not contain it.
+     */
     inline entityid tile_remove(entityid id) {
         massert(id != ENTITYID_INVALID, "tile_remove: id is invalid");
         if (id == cached_live_npc) {
@@ -255,6 +299,7 @@ public:
         minfo2("destroying tile");
     }
 
+    /** @brief Return the top cached dead NPC on this tile, if any. */
     entityid get_cached_dead_npc() {
         return dead_npcs.top();
     }

@@ -39,6 +39,9 @@ WEB_OPTIONS = -DPLATFORM_WEB -DWEB -DSPAWN_MONSTERS -DNPCS_ALL_AT_ONCE -DSTART_M
 
 
 
+# Phony targets
+.PHONY: all clean docs docs-clean
+
 # Targets
 all: game index.html tests
 
@@ -63,8 +66,13 @@ tests: tests.cpp
 tests.cpp: unit_test.h
 	cxxtestgen --error-printer -o tests.cpp unit_test.h 
 
+# Documentation
+docs:
+	doxygen Doxyfile
+
+docs-clean:
+	rm -rf docs/api
+
 
 clean:
 	rm -rfv game *.o *.gch time.txt index.html index.js index.wasm index.data test tests.cpp tests
-
-
