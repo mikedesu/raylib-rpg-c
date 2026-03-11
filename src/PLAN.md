@@ -22,6 +22,9 @@ This file is the handoff note for the `gamestate.h` cleanup work.
   - `libdraw_frame.h` for per-frame orchestration
   - `libdraw_lifecycle.h` for init/shutdown and render-target bootstrap
 - Reduced `libdraw.h` to a thin composition header so the public include stays stable while ownership is clearer.
+- Re-enabled test box creation during `gamestate` init.
+- Re-enabled box drawing in `draw_dungeon_floor.h`.
+- Reduced the hero default light radius from the temporary testing value down to `3`.
 
 ## Current State
 
@@ -97,6 +100,9 @@ These are the best remaining cleanup seams for the next session:
   - boxes
   - dead NPC bodies
   - any logic that still assumes `get_cached_live_npc()` or `get_cached_box()` is the only source of truth
+- The current dungeon floor generation still effectively produces one large rectangular playable area inside a `16x16` grid.
+- That generation approach is now the main design problem to solve next, ahead of more refactor-only cleanup.
+- Doors and boxes are available again, so the map-generation pass can now start producing layouts that actually justify them.
 
 ## Libdraw Review Notes
 
@@ -132,7 +138,24 @@ These are the best remaining cleanup seams for the next session:
 
 Continue with:
 
-1. Re-enable box creation during `gamestate` init, following the same pattern already used for `create_weapon` and `create_shield`.
-2. Re-enable box drawing in `draw_dungeon_floor.h`.
-3. Re-enable door placement.
-4. Re-enable drawing of doors.
+1. Upgrade dungeon floor generation so floors stop being one big rectangle and instead produce a more maze-like layout.
+2. Introduce adjacent rooms connected by narrower passageways/corridors.
+3. Make the passageways and room transitions deliberate enough that door placement becomes a natural part of the generated layout.
+4. Review `gamestate_world_impl.h` and `dungeon_floor.h` first, since that is where the current floor-shape assumptions likely live.
+5. Keep the first pass focused on generation shape and connectivity, not decoration.
+
+## Dungeon Generation Intent
+
+- The next major gameplay-facing improvement is dungeon floor creation, not more header extraction.
+- The target feel is:
+  - multiple adjacent rooms
+  - corridors/passageways between them
+  - more maze-like traversal
+  - chokepoints that make door placement meaningful
+- Avoid generating a single open rectangular floor as the default layout.
+- First-pass success criteria:
+  - the player spawns into a connected dungeon
+  - the floor reads as rooms plus hallways rather than one open chamber
+  - there are obvious doorway candidates between spaces
+  - existing entity placement (`player`, `NPC`, `items`, `boxes`) still works on valid walkable tiles
+- After the shape generation is improved, revisit door-placement rules so doors are placed because of the map layout rather than as a cosmetic afterthought.
