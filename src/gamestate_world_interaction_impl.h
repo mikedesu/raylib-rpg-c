@@ -409,12 +409,17 @@ inline bool gamestate::try_entity_pull(entityid id) {
     vec3 fv = get_loc_from_dir(facing_d);
     vec3 bloc = {loc.x + fv.x, loc.y + fv.y, loc.z};
 
-    tile_t& tile_dest = df->tile_at(aloc);
-
     if (aloc.x < 0 || aloc.x >= df->get_width() || aloc.y < 0 || aloc.y >= df->get_height()) {
         merror("destination is invalid: (%d, %d, %d)", aloc.x, aloc.y, aloc.z);
         return false;
     }
+
+    if (bloc.x < 0 || bloc.x >= df->get_width() || bloc.y < 0 || bloc.y >= df->get_height()) {
+        merror("pull source is invalid: (%d, %d, %d)", bloc.x, bloc.y, bloc.z);
+        return false;
+    }
+
+    tile_t& tile_dest = df->tile_at(aloc);
 
     if (!tile_is_walkable(tile_dest.get_type())) {
         merror("tile is not walkable");
