@@ -5,6 +5,7 @@
 #include "dungeon_tile_type.h"
 #include "entityid.h"
 #include "entitytype.h"
+#include "item_cache.h"
 #include "massert.h"
 #include "mprint.h"
 #include "tile_id.h"
@@ -18,20 +19,20 @@ private:
     bool dirty_entities;
     tiletype_t type;
     entityid cached_live_npc;
-    entityid cached_item;
     entityid cached_box;
     entityid cached_door;
     dead_npc_cache dead_npcs;
+    item_cache items;
 
 public:
     inline size_t entity_count() {
         size_t count = 0;
         count += cached_live_npc != INVALID ? 1 : 0;
-        count += cached_item != INVALID ? 1 : 0;
         count += cached_box != INVALID ? 1 : 0;
         count += cached_door != INVALID ? 1 : 0;
 
         count += dead_npcs.get_count();
+        count += items.get_count();
 
         return count;
     }
@@ -53,11 +54,19 @@ public:
     }
 
     void set_cached_item(entityid id) {
-        cached_item = id;
+        massert(items.add_id(id), "item cache is full");
     }
 
     entityid get_cached_item() {
-        return cached_item;
+        return items.top();
+    }
+
+    entityid get_cached_item_at(size_t index) {
+        return items.at(index);
+    }
+
+    size_t get_item_count() {
+        return items.get_count();
     }
 
     void set_cached_live_npc(entityid id) {
@@ -133,7 +142,7 @@ public:
         cached_player_present = false;
         cached_live_npc = ENTITYID_INVALID;
         dead_npcs = dead_npc_cache(); // Reset cache
-        cached_item = ENTITYID_INVALID;
+        items = item_cache();
         cached_box = ENTITYID_INVALID;
         cached_door = ENTITYID_INVALID;
     }
@@ -165,7 +174,10 @@ public:
             // Dead NPCs are now handled through dead_npc_cache
         }
         else if (type == ENTITY_ITEM) {
-            cached_item = id;
+            if (!items.add_id(id)) {
+                merror("tile_add: item cache is full");
+                return INVALID;
+            }
         }
         else if (type == ENTITY_BOX) {
             cached_box = id;
@@ -197,8 +209,7 @@ public:
             cached_door = INVALID;
             return id;
         }
-        else if (id == cached_item) {
-            cached_item = INVALID;
+        else if (items.remove_id(id)) {
             return id;
         }
         return INVALID;
