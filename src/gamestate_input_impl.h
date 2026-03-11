@@ -248,6 +248,18 @@ inline bool gamestate::handle_display_inventory(inputstate& is) {
     return false;
 }
 
+inline bool gamestate::handle_toggle_full_light(inputstate& is) {
+    if (!inputstate_is_pressed(is, KEY_L)) {
+        return false;
+    }
+    shared_ptr<dungeon_floor> df = d.get_current_floor();
+    massert(df, "current floor is null");
+    df->toggle_full_light();
+    add_message_history("Floor %d full-light %s", df->get_floor(), df->get_full_light() ? "enabled" : "disabled");
+    frame_dirty = true;
+    return true;
+}
+
 inline bool gamestate::handle_restart(inputstate& is) {
     if (inputstate_is_pressed(is, KEY_R)) {
         do_restart = true;
@@ -314,7 +326,7 @@ inline void gamestate::handle_input_gameplay_controlmode_player(inputstate& is) 
         flag = GAMESTATE_FLAG_PLAYER_ANIM;
         return;
     }
-    if (handle_change_dir(is) || handle_change_dir_intent(is) || handle_display_inventory(is)) {
+    if (handle_toggle_full_light(is) || handle_change_dir(is) || handle_change_dir_intent(is) || handle_display_inventory(is)) {
         return;
     }
     else if (handle_move_up(is, is_dead) || handle_move_down(is, is_dead) || handle_move_left(is, is_dead) || handle_move_right(is, is_dead)) {

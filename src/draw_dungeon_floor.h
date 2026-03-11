@@ -25,7 +25,11 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, int x, int y, int z, in
     massert(y >= 0 && y < df->get_height(), "y is oob");
     massert(!vec3_invalid(vec3{x, y, z}), "loc is invalid");
     tile_t& tile = df->tile_at(vec3{x, y, z});
-    if (tile.get_type() == TILE_NONE || !tile.get_visible() || !tile.get_explored()) {
+    const bool full_light = df->get_full_light();
+    if (tile.get_type() == TILE_NONE) {
+        return true;
+    }
+    if (!full_light && (!tile.get_visible() || !tile.get_explored())) {
         return true;
     }
     // Get tile texture
@@ -33,7 +37,7 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, int x, int y, int z, in
     massert(txkey >= 0, "txkey is invalid");
     Texture2D* texture = &txinfo[txkey].texture;
     massert(texture->id > 0, "texture->id is <= 0");
-    const unsigned char a = distance > light_dist ? 102 : 255;
+    const unsigned char a = full_light ? 255 : distance > light_dist ? 102 : 255;
     const Color draw_color = Color{255, 255, 255, a};
     DrawTexturePro(*texture, src, dest, Vector2{0, 0}, 0, draw_color);
     return true;
@@ -43,6 +47,7 @@ static inline void
 draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type_0, int vision_dist, int light_rad, function<bool(gamestate&, entityid)> extra_check) {
     auto df = g.d.get_current_floor();
     auto hero_loc = g.ct.get<location>(g.hero_id).value_or(vec3{-1, -1, -1});
+    const bool full_light = df->get_full_light();
     //massert(!vec3_invalid(hero_loc), "hero loc is invalid");
     // we should be only checking tiles
     // within the hero's light radius / vision distance
@@ -54,19 +59,22 @@ draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type_0, int vision_dist
     //
     //
     // we have a similar double-loop in the gamestate.tick() method,
-    const int min_x = std::max(0, hero_loc.x - light_rad);
-    const int max_x = std::min(df->get_width() - 1, hero_loc.x + light_rad);
-    const int min_y = std::max(0, hero_loc.y - light_rad);
-    const int max_y = std::min(df->get_height() - 1, hero_loc.y + light_rad);
+    const int min_x = full_light ? 0 : std::max(0, hero_loc.x - light_rad);
+    const int max_x = full_light ? df->get_width() - 1 : std::min(df->get_width() - 1, hero_loc.x + light_rad);
+    const int min_y = full_light ? 0 : std::max(0, hero_loc.y - light_rad);
+    const int max_y = full_light ? df->get_height() - 1 : std::min(df->get_height() - 1, hero_loc.y + light_rad);
     for (int y = min_y; y <= max_y; y++) {
         for (int x = min_x; x <= max_x; x++) {
-            if (abs(x - hero_loc.x) + abs(y - hero_loc.y) > light_rad) {
+            if (!full_light && abs(x - hero_loc.x) + abs(y - hero_loc.y) > light_rad) {
                 continue;
             }
             const vec3 loc = {x, y, g.d.current_floor};
             tile_t& tile = df->tile_at(loc);
             auto tiletype = tile.get_type();
             if (tiletype_is_none(tiletype) || tiletype_is_wall(tiletype)) {
+                continue;
+            }
+            if (!full_light && (!tile.get_visible() || !tile.get_explored())) {
                 continue;
             }
             if (tile.entity_count() == 0) {

@@ -19,6 +19,7 @@ private:
     biome_t biome;
     vec3 downstairs_loc;
     vec3 upstairs_loc;
+    bool full_light;
     vector<tile_t> grid;
 
     inline size_t tile_index(vec3 loc) const {
@@ -50,6 +51,18 @@ public:
 
     int get_floor() {
         return floor;
+    }
+
+    bool get_full_light() {
+        return full_light;
+    }
+
+    void set_full_light(bool enabled) {
+        full_light = enabled;
+    }
+
+    void toggle_full_light() {
+        full_light = !full_light;
     }
 
     bool df_set_upstairs_loc(vec3 loc) {
@@ -523,7 +536,8 @@ public:
         : floor(0)
         , width(width)
         , height(height)
-        , biome(BIOME_NONE) {
+        , biome(BIOME_NONE)
+        , full_light(false) {
         massert(width > 0, "width must be greater than zero");
         massert(height > 0, "height must be greater than zero");
         upstairs_loc = {-1, -1, -1};

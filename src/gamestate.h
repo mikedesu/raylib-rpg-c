@@ -558,6 +558,8 @@ public:
 
     bool handle_change_dir_intent(inputstate& is);
 
+    bool handle_toggle_full_light(inputstate& is);
+
     bool handle_display_inventory(inputstate& is);
 
     bool tile_has_solid(int x, int y, int z);
@@ -690,6 +692,7 @@ public:
         int df_h = df->get_height();
         // Determine control mode and flag strings
         const char* control_mode = controlmode == CONTROLMODE_CAMERA ? "Camera" : controlmode == CONTROLMODE_PLAYER ? "Player" : "Unknown";
+        const int full_light = df->get_full_light();
         // zero out the buffer
         //memset(debugpanel.buffer, 0, sizeof(debugpanel.buffer));
 
@@ -727,6 +730,7 @@ public:
             "df.width x height: %dx%d\n"
             "living npcs on floor: %lu\n"
             "dead npcs on floor: %lu\n"
+            "full light: %d\n"
             "god_mode: %d\n"
             "player direction: %d\n"
             "master volume: %0.1f\n"
@@ -763,6 +767,7 @@ public:
             df_h,
             0L,
             0L,
+            full_light,
             god_mode,
             player_dir,
             master_volume);
