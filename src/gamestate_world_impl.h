@@ -1,6 +1,16 @@
 #pragma once
 
 namespace {
+inline int dungeon_clamp_int(int value, int min_value, int max_value) {
+    if (value < min_value) {
+        return min_value;
+    }
+    if (value > max_value) {
+        return max_value;
+    }
+    return value;
+}
+
 inline int dungeon_random_range(mt19937& mt, int min_value, int max_value) {
     if (max_value <= min_value) {
         return min_value;
@@ -61,26 +71,28 @@ inline void gamestate::create_and_add_df_1(biome_t type, int w, int h, int df_co
     vector<room> rooms;
     constexpr direction_t dirs[] = {DIR_LEFT, DIR_RIGHT, DIR_UP, DIR_DOWN};
 
-    const int max_room_w = w > 7 ? 5 : w - 3;
-    const int max_room_h = h > 7 ? 5 : h - 3;
-    const int start_w = dungeon_random_range(mt, 3, max_room_w);
-    const int start_h = dungeon_random_range(mt, 3, max_room_h);
+    const int min_room_w = 3;
+    const int min_room_h = 3;
+    const int max_room_w = dungeon_clamp_int(w / 10, 4, 6);
+    const int max_room_h = dungeon_clamp_int(h / 10, 4, 6);
+    const int start_w = dungeon_random_range(mt, min_room_w, max_room_w);
+    const int start_h = dungeon_random_range(mt, min_room_h, max_room_h);
     Rectangle start_area = dungeon_make_rect(w / 2 - start_w / 2, h / 2 - start_h / 2, start_w, start_h);
     start_area = df->df_paint_floor_area(start_area);
     rooms.push_back(room(0, TextFormat("room-%d", 0), TextFormat("room-%d description", 0), start_area));
 
-    int target_room_count = 4 + static_cast<int>(parts);
-    if (w >= 20 || h >= 20) {
-        target_room_count++;
-    }
-    int attempts_remaining = target_room_count * 16;
+    const int dungeon_area = w * h;
+    const int density_divisor = dungeon_clamp_int(static_cast<int>(48.0f / parts), 24, 64);
+    const int target_room_count = dungeon_clamp_int(dungeon_area / density_divisor, 6, 96);
+    const int max_gap = dungeon_clamp_int((w + h) / 96, 1, 2);
+    int attempts_remaining = target_room_count * 96;
     while (static_cast<int>(rooms.size()) < target_room_count && attempts_remaining-- > 0) {
         const int anchor_index = dungeon_random_range(mt, 0, static_cast<int>(rooms.size()) - 1);
         const room& anchor = rooms[anchor_index];
         const direction_t dir = dirs[dungeon_random_range(mt, 0, 3)];
-        const int room_w = dungeon_random_range(mt, 3, max_room_w);
-        const int room_h = dungeon_random_range(mt, 3, max_room_h);
-        const int gap = dungeon_random_range(mt, 1, 2);
+        const int room_w = dungeon_random_range(mt, min_room_w, max_room_w);
+        const int room_h = dungeon_random_range(mt, min_room_h, max_room_h);
+        const int gap = dungeon_random_range(mt, 1, max_gap);
         Rectangle candidate = df->df_get_adjacent_area(anchor.get_area(), dir, gap, room_w, room_h);
         if (!dungeon_room_fits(candidate, rooms, w, h)) {
             continue;

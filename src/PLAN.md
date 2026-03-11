@@ -25,6 +25,16 @@ This file is the handoff note for the `gamestate.h` cleanup work.
 - Re-enabled test box creation during `gamestate` init.
 - Re-enabled box drawing in `draw_dungeon_floor.h`.
 - Reduced the hero default light radius from the temporary testing value down to `3`.
+- Introduced a first-pass dungeon floor painting API in `dungeon_floor.h`:
+  - clamped rectangle painting
+  - adjacent-region placement
+  - straight connector/corridor carving
+  - floor upgrade pass
+  - door-candidate refresh pass
+- Replaced the one-big-room dungeon bootstrap with connected room-and-corridor generation in `gamestate_world_impl.h`.
+- Tuned the new generator so larger floors scale by room count and density rather than by making each room much larger.
+- Increased the default gameplay dungeon bootstrap from `16x16` to `64x64` in `gamestate_lifecycle_impl.h`.
+- Made `room` geometry/name/description getters `const` so generation code can safely inspect room metadata through const references.
 
 ## Current State
 
@@ -39,6 +49,16 @@ This file is the handoff note for the `gamestate.h` cleanup work.
 - Multi-item tiles are now supported at the storage layer, but rendering and pickup still intentionally treat the top cached item as the visible/interactive representative.
 - Renderer code is still implementation-header based, but `libdraw.h` now reads as a composition root instead of a monolith.
 - Scene draw dispatch, render-target lifecycle, and per-frame orchestration are now separated enough to refactor further without changing runtime behavior first.
+- Dungeon generation no longer defaults to a single open rectangle.
+- The current dungeon bootstrap now creates a `64x64` floor for gameplay testing.
+- The current generator produces:
+  - many small connected rooms
+  - short corridors between adjacent regions
+  - viable door candidate chokepoints inferred from tile neighborhoods
+- The current scaling direction is intentionally density-first:
+  - keep rooms relatively small
+  - add more rooms as floor area increases
+  - keep gap/corridor lengths short so bigger maps read as denser, not emptier
 
 ## Files Added
 
@@ -66,6 +86,9 @@ make clean && CXXFLAGS="-DDEBUG_ASSERT=1 -DNPCS_ALL_AT_ONCE -DDEBUG=1 -DMASTER_V
 
 - Code compiles and links successfully.
 - The final `make game` step still reports failure because `log_build_stats.sh` tries to write `/home/darkmage/current_loc.txt`, which is outside the sandbox. The `game` binary is still produced.
+- Additional verification this session:
+  - repeated `make clean && make game` rebuilds succeeded through compile and link after each dungeon-generation change
+  - the same post-build `log_build_stats.sh` permission failure still causes `make game` to return nonzero even though the binary is produced
 
 ## Next Refactor Targets
 
@@ -100,9 +123,11 @@ These are the best remaining cleanup seams for the next session:
   - boxes
   - dead NPC bodies
   - any logic that still assumes `get_cached_live_npc()` or `get_cached_box()` is the only source of truth
-- The current dungeon floor generation still effectively produces one large rectangular playable area inside a `16x16` grid.
-- That generation approach is now the main design problem to solve next, ahead of more refactor-only cleanup.
+- The old one-big-room `16x16` generation path is no longer the default gameplay path.
+- The new dungeon generation work is now in a good first-pass state rather than being the main glaring gameplay problem.
 - Doors and boxes are available again, so the map-generation pass can now start producing layouts that actually justify them.
+- The current generator is still tree-like in spirit because each new room is attached from an anchor room.
+- The next quality jump is likely more interconnection, not simply more density.
 
 ## Libdraw Review Notes
 
@@ -138,11 +163,14 @@ These are the best remaining cleanup seams for the next session:
 
 Continue with:
 
-1. Upgrade dungeon floor generation so floors stop being one big rectangle and instead produce a more maze-like layout.
-2. Introduce adjacent rooms connected by narrower passageways/corridors.
-3. Make the passageways and room transitions deliberate enough that door placement becomes a natural part of the generated layout.
-4. Review `gamestate_world_impl.h` and `dungeon_floor.h` first, since that is where the current floor-shape assumptions likely live.
-5. Keep the first pass focused on generation shape and connectivity, not decoration.
+1. Add secondary cross-connections between already-placed rooms so larger floors stop reading as a simple branch/tree structure.
+2. Extend the floor painting API from rectangles plus straight connectors into richer primitives:
+   - L-shaped corridors
+   - variable-width hallways
+   - explicit region objects or paint operations
+3. Revisit door placement after more interconnection exists so doors appear at intentional chokepoints instead of every merely valid candidate.
+4. Review `gamestate_world_impl.h` and `dungeon_floor.h` first, since that is now the active gameplay iteration area.
+5. Keep the next pass focused on structure/connectivity/readability before moving on to decoration.
 
 ## Dungeon Generation Intent
 
@@ -159,3 +187,38 @@ Continue with:
   - there are obvious doorway candidates between spaces
   - existing entity placement (`player`, `NPC`, `items`, `boxes`) still works on valid walkable tiles
 - After the shape generation is improved, revisit door-placement rules so doors are placed because of the map layout rather than as a cosmetic afterthought.
+
+## Dungeon Generation Progress
+
+- First-pass dungeon floor generation is now in place and working:
+  - connected room growth from an initial seed room
+  - adjacent region placement
+  - straight corridor carving between regions
+  - automatic door candidate refresh based on local tile topology
+- The current `64x64` gameplay bootstrap was useful because it exposed the difference between:
+  - bad scaling by enlarging rooms
+  - better scaling by increasing room count and density
+- Important design lesson from this session:
+  - scaling dungeon generation should primarily increase structure count/connectivity density
+  - it should not primarily increase room footprint
+
+## Possible Next Things
+
+1. Add loop-making passes that connect nearby existing rooms after the initial growth pass.
+2. Add L-corridor support so room adjacency is not limited to perfect overlap on one axis.
+3. Introduce region metadata on `dungeon_floor` so rooms/corridors are tracked explicitly instead of only implied by painted tiles.
+4. Split door candidacy into:
+   - geometrically valid
+   - gameplay desirable
+   so later passes can be selective.
+5. Add dedicated spawn-selection rules so player/NPC/item placement can prefer rooms over corridors when useful.
+6. Add lightweight debug visualization or counters for:
+   - room count
+   - corridor count
+   - door candidate count
+   - walkable tile count
+7. Revisit `parts` so it becomes a real density/style control instead of a mostly indirect heuristic input.
+8. Add alternate generation styles later using the same painting API rather than replacing the API:
+   - sparse stronghold
+   - dense catacombs
+   - chamber-and-hub layouts
