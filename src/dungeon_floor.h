@@ -52,6 +52,34 @@ public:
         return floor;
     }
 
+    bool df_set_upstairs_loc(vec3 loc) {
+        massert(loc.x >= 0 && loc.x < width, "x is out of bounds");
+        massert(loc.y >= 0 && loc.y < height, "y is out of bounds");
+        loc.z = floor;
+        tile_t& tile = tile_at(loc);
+        if (!tile_is_possible_upstairs(tile.get_type())) {
+            return false;
+        }
+        upstairs_loc = loc;
+        tile.set_type(TILE_UPSTAIRS);
+        tile.set_can_have_door(false);
+        return true;
+    }
+
+    bool df_set_downstairs_loc(vec3 loc) {
+        massert(loc.x >= 0 && loc.x < width, "x is out of bounds");
+        massert(loc.y >= 0 && loc.y < height, "y is out of bounds");
+        loc.z = floor;
+        tile_t& tile = tile_at(loc);
+        if (!tile_is_possible_downstairs(tile.get_type())) {
+            return false;
+        }
+        downstairs_loc = loc;
+        tile.set_type(TILE_DOWNSTAIRS);
+        tile.set_can_have_door(false);
+        return true;
+    }
+
     tile_t& tile_at(vec3 loc) {
         minfo3("tile_at: (%d, %d, %d)", loc.x, loc.y, loc.z);
         return grid[tile_index(loc)];
@@ -360,7 +388,7 @@ public:
                 tile_t& tile = tile_at(vec3{x0, y0, -1});
                 // there wont be any entities yet so do not check for them
                 if (tile_is_possible_upstairs(tile.get_type())) {
-                    locations->push_back(vec3{x0, y0, 0});
+                    locations->push_back(vec3{x0, y0, floor});
                 }
             }
         }
@@ -380,7 +408,7 @@ public:
                 tile_t& tile = tile_at(vec3{x0, y0, -1});
                 // there wont be any entities yet so do not check for them
                 if (tile_is_possible_downstairs(tile.get_type())) {
-                    locations->push_back(vec3{x0, y0, 0});
+                    locations->push_back(vec3{x0, y0, floor});
                 }
             }
         }

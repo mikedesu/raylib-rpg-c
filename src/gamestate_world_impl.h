@@ -111,6 +111,50 @@ inline void gamestate::create_and_add_df_1(biome_t type, int w, int h, int df_co
     d.add_floor(df);
 }
 
+inline bool gamestate::assign_random_stairs_to_floor(shared_ptr<dungeon_floor> df) {
+    massert(df, "dungeon floor is null");
+    auto upstairs_locs = df->df_get_possible_upstairs_locs();
+    if (!upstairs_locs || upstairs_locs->empty()) {
+        merror("no valid upstairs location exists for floor %d", df->get_floor());
+        return false;
+    }
+
+    uniform_int_distribution<int> upstairs_dist(0, static_cast<int>(upstairs_locs->size()) - 1);
+    const vec3 upstairs_loc = upstairs_locs->at(upstairs_dist(mt));
+    if (!df->df_set_upstairs_loc(upstairs_loc)) {
+        merror("failed to assign upstairs for floor %d", df->get_floor());
+        return false;
+    }
+
+    auto downstairs_locs = df->df_get_possible_downstairs_locs();
+    if (!downstairs_locs || downstairs_locs->empty()) {
+        merror("no valid downstairs location exists for floor %d", df->get_floor());
+        return false;
+    }
+
+    uniform_int_distribution<int> downstairs_dist(0, static_cast<int>(downstairs_locs->size()) - 1);
+    const vec3 downstairs_loc = downstairs_locs->at(downstairs_dist(mt));
+    if (vec3_equal(upstairs_loc, downstairs_loc)) {
+        merror("upstairs and downstairs resolved to the same tile on floor %d", df->get_floor());
+        return false;
+    }
+    if (!df->df_set_downstairs_loc(downstairs_loc)) {
+        merror("failed to assign downstairs for floor %d", df->get_floor());
+        return false;
+    }
+    return true;
+}
+
+inline bool gamestate::assign_random_stairs() {
+    massert(d.floors.size() > 0, "dungeon has no floors");
+    for (size_t i = 0; i < d.floors.size(); i++) {
+        if (!assign_random_stairs_to_floor(d.get_floor(i))) {
+            return false;
+        }
+    }
+    return true;
+}
+
 inline void gamestate::init_dungeon(biome_t type, int df_count, float parts, int width, int height) {
     minfo2("init_dungeon");
     massert(df_count > 0, "df_count is <= 0");
@@ -126,6 +170,7 @@ inline void gamestate::init_dungeon(biome_t type, int df_count, float parts, int
     for (int i = 0; i < df_count; i++) {
         create_and_add_df_1(type, width, height, df_count, parts);
     }
+    massert(assign_random_stairs(), "failed to assign dungeon stairs");
     minfo2("END floor creation loop");
     d.is_initialized = true;
 }

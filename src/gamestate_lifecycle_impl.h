@@ -116,8 +116,12 @@ inline void gamestate::logic_init() {
     srand(time(NULL));
     SetRandomSeed(time(NULL));
     constexpr float parts = 1.0;
-
-    init_dungeon(BIOME_STONE, 1, parts, 16, 8);
+    massert(!d.is_initialized, "dungeon is already initialized");
+    create_and_add_df_1(BIOME_STONE, 8, 8, 2, parts);
+    create_and_add_df_1(BIOME_STONE, 16, 16, 2, parts);
+    massert(assign_random_stairs(), "failed to assign dungeon stairs");
+    d.current_floor = 0;
+    d.is_initialized = true;
 
     massert(d.floors.size() > 0, "dungeon.floors.size is 0");
     place_doors();

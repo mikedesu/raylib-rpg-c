@@ -362,6 +362,10 @@ public:
 
     void create_and_add_df_1(biome_t type, int w, int h, int df_count, float parts);
 
+    bool assign_random_stairs_to_floor(shared_ptr<dungeon_floor> df);
+
+    bool assign_random_stairs();
+
     void init_dungeon(biome_t type, int df_count, float parts, int width = DEFAULT_DUNGEON_FLOOR_WIDTH, int height = DEFAULT_DUNGEON_FLOOR_HEIGHT);
 
     entityid create_door_with(with_fun doorInitFunction);

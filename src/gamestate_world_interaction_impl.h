@@ -517,7 +517,7 @@ inline bool gamestate::try_entity_stairs(entityid id) {
 }
 
 inline bool gamestate::handle_traverse_stairs(inputstate& is, bool is_dead) {
-    if (inputstate_is_pressed(is, KEY_Z)) {
+    if (inputstate_is_pressed(is, KEY_PERIOD)) {
         if (is_dead) {
             return add_message("You cannot traverse stairs while dead");
         }
