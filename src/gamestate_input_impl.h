@@ -19,49 +19,6 @@ inline void gamestate::handle_camera_move(inputstate& is) {
     }
 }
 
-inline void gamestate::handle_hero_potion_use(entityid id) {
-    entitytype_t type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
-    if (type != ENTITY_ITEM) {
-        return;
-    }
-    itemtype_t i_type = ct.get<itemtype>(id).value_or(ITEM_NONE);
-    if (i_type == ITEM_NONE || i_type != ITEM_POTION) {
-        return;
-    }
-    if (use_potion(hero_id, id)) {
-        flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        controlmode = CONTROLMODE_PLAYER;
-        display_inventory_menu = false;
-    }
-}
-
-inline void gamestate::handle_hero_item_use() {
-    size_t index = inventory_cursor.y * 7 + inventory_cursor.x;
-    if (index < 0) {
-        return;
-    }
-    optional<shared_ptr<vector<entityid>>> maybe_inventory = ct.get<inventory>(hero_id);
-    if (!maybe_inventory || !maybe_inventory.has_value()) {
-        return;
-    }
-    shared_ptr<vector<entityid>> inventory = maybe_inventory.value();
-    if (index >= inventory->size()) {
-        return;
-    }
-    entityid item_id = inventory->at(index);
-    entitytype_t type = ct.get<entitytype>(item_id).value_or(ENTITY_NONE);
-    if (type != ENTITY_ITEM) {
-        return;
-    }
-    itemtype_t i_type = ct.get<itemtype>(item_id).value_or(ITEM_NONE);
-    if (i_type == ITEM_NONE) {
-        return;
-    }
-    if (i_type == ITEM_POTION) {
-        handle_hero_potion_use(item_id);
-    }
-}
-
 inline void gamestate::handle_input_inventory(inputstate& is) {
     if (controlmode != CONTROLMODE_INVENTORY || !display_inventory_menu) {
         return;

@@ -479,146 +479,25 @@ public:
 
     void tick(inputstate& is);
 
-    bool remove_from_inventory(entityid actor_id, entityid item_id) {
-        auto maybe_inventory = ct.get<inventory>(actor_id);
-        if (!maybe_inventory.has_value()) {
-            merror("maybe_inventory has no value for actor id %d", actor_id);
-            return false;
-        }
-        auto my_items = maybe_inventory.value();
-        bool success = false;
-        for (auto it = my_items->begin(); it != my_items->end(); it++) {
-            if (*it == item_id) {
-                my_items->erase(it);
-                success = true;
-                break;
-            }
-        }
-
-        if (!success) {
-            merror("Failed to find item id %d", item_id);
-        }
-        else {
-            msuccess("Successfully removed item id %d", item_id);
-        }
-        return success;
-    }
+    bool remove_from_inventory(entityid actor_id, entityid item_id);
 
     bool drop_from_inventory(entityid actor_id, entityid item_id);
 
     bool drop_all_from_inventory(entityid actor_id);
 
-    void handle_hero_inventory_equip_weapon(entityid item_id) {
-        // Check if this is the currently equipped weapon
-        entityid current_weapon = ct.get<equipped_weapon>(hero_id).value_or(ENTITYID_INVALID);
-        // Unequip if it's already equipped
-        if (current_weapon == item_id) {
-            ct.set<equipped_weapon>(hero_id, ENTITYID_INVALID);
-        }
-        // Equip the new weapon
-        else {
-            ct.set<equipped_weapon>(hero_id, item_id);
-        }
-        flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        controlmode = CONTROLMODE_PLAYER;
-        display_inventory_menu = false;
-    }
+    void handle_hero_inventory_equip_weapon(entityid item_id);
 
-    void handle_hero_inventory_equip_shield(entityid item_id) {
-        // Check if this is the currently equipped weapon
-        entityid current_shield = ct.get<equipped_shield>(hero_id).value_or(ENTITYID_INVALID);
-        // Unequip if it's already equipped
-        if (current_shield == item_id)
-            ct.set<equipped_shield>(hero_id, ENTITYID_INVALID);
-        // Equip the new shield
-        else
-            ct.set<equipped_shield>(hero_id, item_id);
-        flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        controlmode = CONTROLMODE_PLAYER;
-        display_inventory_menu = false;
-    }
+    void handle_hero_inventory_equip_shield(entityid item_id);
 
-    void handle_hero_inventory_equip_item(entityid item_id) {
-        itemtype_t item_type = ct.get<itemtype>(item_id).value_or(ITEM_NONE);
-        switch (item_type) {
-        case ITEM_NONE: break;
-        case ITEM_WEAPON: handle_hero_inventory_equip_weapon(item_id); break;
-        case ITEM_SHIELD: handle_hero_inventory_equip_shield(item_id); break;
-        default: break;
-        }
-    }
+    void handle_hero_inventory_equip_item(entityid item_id);
 
-    void handle_hero_inventory_equip() {
-        PlaySound(sfx.at(SFX_EQUIP_01));
-        // equip item: get the item id of the current selection
-        size_t index = inventory_cursor.y * 7 + inventory_cursor.x;
-        auto my_inventory = ct.get<inventory>(hero_id);
-        if (!my_inventory) {
-            return;
-        }
-        if (!my_inventory.has_value()) {
-            return;
-        }
-        auto inventory = my_inventory.value();
-        if (index < 0 || index >= inventory->size()) {
-            return;
-        }
-        entityid item_id = inventory->at(index);
-        entitytype_t type = ct.get<entitytype>(item_id).value_or(ENTITY_NONE);
-        if (type == ENTITY_ITEM) {
-            handle_hero_inventory_equip_item(item_id);
-        }
-    }
+    void handle_hero_inventory_equip();
 
     bool drop_item_from_hero_inventory();
 
-    bool is_in_inventory(entityid actor_id, entityid item_id) {
-        auto maybe_inventory = ct.get<inventory>(actor_id);
-        if (!maybe_inventory.has_value()) {
-            merror("maybe_inventory has no value for actor id %d", actor_id);
-            return false;
-        }
-        auto my_items = maybe_inventory.value();
-        for (auto it = my_items->begin(); it != my_items->end(); it++) {
-            if (*it == item_id) {
-                return true;
-            }
-        }
-        return false;
-    }
+    bool is_in_inventory(entityid actor_id, entityid item_id);
 
-    bool use_potion(entityid actor_id, entityid item_id) {
-        massert(actor_id != ENTITYID_INVALID, "actor_id is invalid");
-        massert(item_id != ENTITYID_INVALID, "actor_id is invalid");
-        bool is_item = ct.get<entitytype>(item_id).value_or(ENTITY_NONE) == ENTITY_ITEM;
-        bool is_potion = ct.get<itemtype>(item_id).value_or(ITEM_NONE) == ITEM_POTION;
-        bool in_inventory = is_in_inventory(actor_id, item_id);
-        if (is_item && is_potion && in_inventory) {
-            // get the item's effects
-            optional<vec3> maybe_heal = ct.get<healing>(item_id);
-            if (maybe_heal && maybe_heal.has_value()) {
-                vec3 heal = maybe_heal.value();
-                int amount = do_roll(heal);
-                int myhp = ct.get<hp>(actor_id).value_or(-1);
-                int mymaxhp = ct.get<maxhp>(actor_id).value_or(-1);
-                ct.set<hp>(actor_id, mymaxhp ? mymaxhp : myhp + amount);
-                if (actor_id == hero_id) {
-                    string n = ct.get<name>(actor_id).value_or("no-name");
-                    add_message_history("%s used a healing potion", n.c_str());
-                    add_message_history("%s restored %d hp", n.c_str(), amount);
-                }
-            }
-            else {
-                merror("Potion has no healing component");
-                return false;
-            }
-            // consume the potion by removing it
-            remove_from_inventory(actor_id, item_id);
-            return true;
-        }
-        merror("id %d is not an item, potion, or isnt in the inventory", item_id);
-        return false;
-    }
+    bool use_potion(entityid actor_id, entityid item_id);
 
     void logic_close() {
         d.floors.clear();
@@ -882,6 +761,7 @@ public:
 
 #include "gamestate_lifecycle_impl.h"
 #include "gamestate_scene_impl.h"
+#include "gamestate_inventory_impl.h"
 #include "gamestate_input_impl.h"
 #include "gamestate_npc_combat_impl.h"
 #include "gamestate_world_impl.h"

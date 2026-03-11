@@ -12,6 +12,8 @@ This file is the handoff note for the `gamestate.h` cleanup work.
 - Extracted NPC AI, combat resolution, and pathfinding out of `gamestate.h` into `gamestate_npc_combat_impl.h`.
 - Extracted world interaction helpers out of `gamestate.h` into `gamestate_world_interaction_impl.h`.
 - Restored dead-body pulling after the dead NPC tile-cache refactor by updating `try_entity_pull()` in `gamestate_world_interaction_impl.h`.
+- Extracted inventory management helpers out of `gamestate.h` into `gamestate_inventory_impl.h`.
+- Fixed an edge-of-map crash in `try_entity_pull()` by validating both the pull destination and the pull source before accessing floor tiles.
 
 ## Current State
 
@@ -19,6 +21,7 @@ This file is the handoff note for the `gamestate.h` cleanup work.
 - The project still uses implementation headers included at the bottom of `gamestate.h`.
 - This is intentional for now because the build is still effectively single-translation-unit oriented (`main.cpp` includes `gamestate.h` directly).
 - Dead NPCs now live on tiles via `dead_npc_cache` in `dungeon_tile.h`, so pull/interact behavior has to account for that storage path explicitly.
+- Inventory mutations, equip/unequip handling, and potion use now live in `gamestate_inventory_impl.h`.
 
 ## Files Added
 
@@ -29,6 +32,7 @@ This file is the handoff note for the `gamestate.h` cleanup work.
 - `gamestate_input_impl.h`
 - `gamestate_npc_combat_impl.h`
 - `gamestate_world_interaction_impl.h`
+- `gamestate_inventory_impl.h`
 
 ## Verified
 
@@ -45,19 +49,18 @@ make clean && CXXFLAGS="-DDEBUG_ASSERT=1 -DNPCS_ALL_AT_ONCE -DDEBUG=1 -DMASTER_V
 
 These are the best remaining cleanup seams for the next session:
 
-1. Inventory management helpers
-   - equip/unequip
-   - item use
-   - inventory mutations and related utility functions
-
-2. Debug and diagnostics
+1. Debug and diagnostics
    - `update_debug_panel_buffer`
    - possibly related profiling/debug helpers
+
+2. Remaining `gamestate.h` stragglers
+   - small inline helpers that still fit better in extracted implementation headers
+   - reassess whether any world-interaction or input-adjacent helpers should be grouped further
 
 ## Notes For Next Session
 
 - Re-check the dead-body interaction path before doing more world-interaction cleanup.
-- `try_entity_pull()` was manually adjusted after the extraction because corpse pulling broke when dead NPCs stopped being represented only through the old tile caches.
+- `try_entity_pull()` now has explicit bounds checks for both the actor destination and the pull source tile.
 - If world interaction is revisited again, compare behavior across:
   - boxes
   - dead NPC bodies
@@ -79,4 +82,4 @@ These are the best remaining cleanup seams for the next session:
 
 Continue with:
 
-`Refactor the remaining inventory management helpers out of gamestate.h, using PLAN.md as the handoff note.`
+`Refactor the remaining debug/diagnostic helpers out of gamestate.h, using PLAN.md as the handoff note.`
