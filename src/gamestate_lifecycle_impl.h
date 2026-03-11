@@ -122,7 +122,7 @@ inline void gamestate::logic_init() {
     massert(d.floors.size() > 0, "dungeon.floors.size is 0");
     place_doors();
     auto df = d.get_current_floor();
-    constexpr int num_boxes = 0;
+    constexpr int num_boxes = 1;
     for (int i = 0; i < num_boxes; i++) {
         create_box_at_with(df->get_random_loc());
     }
