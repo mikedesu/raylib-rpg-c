@@ -16,6 +16,12 @@ This file is the handoff note for the `gamestate.h` cleanup work.
 - Fixed an edge-of-map crash in `try_entity_pull()` by validating both the pull destination and the pull source before accessing floor tiles.
 - Reworked tile item storage from a single cached item to a fixed-capacity `item_cache`, preserving the cache-oriented tile model while allowing multiple items per tile.
 - Updated floor rendering so item stacks currently draw a single representative top item instead of overlapping every cached item sprite.
+- Split `libdraw.h` into smaller renderer-focused headers:
+  - `libdraw_context.h` for shared renderer globals
+  - `libdraw_scene_dispatch.h` for scene-to/from-texture dispatch
+  - `libdraw_frame.h` for per-frame orchestration
+  - `libdraw_lifecycle.h` for init/shutdown and render-target bootstrap
+- Reduced `libdraw.h` to a thin composition header so the public include stays stable while ownership is clearer.
 
 ## Current State
 
@@ -28,6 +34,8 @@ This file is the handoff note for the `gamestate.h` cleanup work.
   - single-slot caches for player/live NPC, box, and door
   - fixed-capacity caches for dead NPCs and items
 - Multi-item tiles are now supported at the storage layer, but rendering and pickup still intentionally treat the top cached item as the visible/interactive representative.
+- Renderer code is still implementation-header based, but `libdraw.h` now reads as a composition root instead of a monolith.
+- Scene draw dispatch, render-target lifecycle, and per-frame orchestration are now separated enough to refactor further without changing runtime behavior first.
 
 ## Files Added
 
@@ -40,6 +48,10 @@ This file is the handoff note for the `gamestate.h` cleanup work.
 - `gamestate_world_interaction_impl.h`
 - `gamestate_inventory_impl.h`
 - `item_cache.h`
+- `libdraw_context.h`
+- `libdraw_scene_dispatch.h`
+- `libdraw_frame.h`
+- `libdraw_lifecycle.h`
 
 ## Verified
 
@@ -102,6 +114,7 @@ These are the best remaining cleanup seams for the next session:
   - target-texture orchestration helpers
   - sprite-update pre/post pipeline coordination
 - The current system appears to have a coherent feel already; the refactor goal should be structural clarity and smaller ownership surfaces, not changing rendering behavior.
+- First-pass structural split has been applied; the next pass should focus on deeper cleanup inside the extracted units rather than moving more code around blindly.
 
 ## Longer-Term Cleanup Ideas
 
@@ -119,4 +132,4 @@ These are the best remaining cleanup seams for the next session:
 
 Continue with:
 
-`Refactor libdraw.h into smaller renderer-focused implementation units, using PLAN.md as the handoff note and preserving current rendering behavior.`
+`Clean up the extracted libdraw units further, starting with scene dispatch and target orchestration, while preserving current rendering behavior.`

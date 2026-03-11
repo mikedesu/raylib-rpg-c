@@ -2,17 +2,12 @@
 
 #include "ComponentTraits.h"
 #include "draw_handle_gamestate_flag.h"
-#include "gamestate.h"
 #include "handle_dirty_entities.h"
+#include "libdraw_context.h"
 #include "libgame_defines.h"
 #include "load_music.h"
 #include "update_sprite.h"
 #include <raylib.h>
-
-
-extern Music music;
-extern unordered_map<entityid, spritegroup*> spritegroups;
-extern int ANIM_SPEED;
 
 
 static inline void libdraw_update_sprites_pre(gamestate& g) {

@@ -5,12 +5,7 @@
 #include "draw_handle_debug_panel.h"
 #include "draw_hud.h"
 #include "draw_title_screen.h"
-#include "gamestate.h"
-
-extern RenderTexture2D title_target_texture;
-extern RenderTexture2D char_creation_target_texture;
-extern RenderTexture2D hud_target_texture;
-extern RenderTexture2D main_game_target_texture;
+#include "libdraw_context.h"
 
 static inline void draw_hud_to_texture(gamestate& g) {
     BeginTextureMode(hud_target_texture);
