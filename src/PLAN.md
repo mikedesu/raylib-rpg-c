@@ -247,6 +247,12 @@ These are the best remaining cleanup seams for the next session:
 
 ## Definite Next Things
 
+- [ ] decide on a `javadoc`-style infrastructure for generating automated documentation.
+  - [ ] generating documentation should be a `Makefile` target
+  - [ ] the goal being human accessibility when working with the APIs across the various .h files
+  - [ ] new methods, classes, and functions will also need to conform to the documentation standard we decide
+  - [ ] generating documentation should be outlined in some text-file, though i am not sure where...
+
 - [ ] Re-factor libdraw.h from the top down and associated drawing functions, methods, classes, and files
   - Pay attention to the object and definition hierarchy in order to understand the relationship between the gamestate and the rendered textures
   - Our goal is flexibility: as you can see, I am adding new `ENTITY_TYPE_` values that distinguish `NPC` from `ITEM` from `DOOR` from `BOX` from `PROP` etc.
