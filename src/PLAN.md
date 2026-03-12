@@ -17,6 +17,12 @@ Compact handoff for active refactor and test work.
   - floor `0`: `8x8`
   - floor `1`: `16x16`
 - Props are back in the active gameplay path and flow through tile caches, placement, rendering, and solidity checks.
+- Doors are back in the active gameplay path:
+  - generated candidate marking
+  - entity placement
+  - rendering
+  - `KEY_O` open/close interaction
+  - closed-door tile discovery without revealing tiles beyond the door
 - Doxygen is the active documentation standard; `make docs` works.
 
 ## Recent Completed Work
@@ -25,7 +31,9 @@ Compact handoff for active refactor and test work.
 - Reintroduced and stabilized props, boxes, multi-item tiles, dead-body pulling, and quit confirmation.
 - Added docs infrastructure plus first-pass docs for core headers.
 - Built a real test suite under `test_suites/` while keeping `make tests` as the single fast runner.
-- Expanded unit coverage to 49 passing tests across:
+- Re-enabled first-pass door generation/rendering/interaction and tightened tile-level single-door caching.
+- Tightened prop placement so generated props avoid chokepoints and doorway approaches that can soft-block room ingress.
+- Expanded unit coverage to 54 passing tests across:
   - gamestate lifecycle
   - dungeon/bootstrap
   - placement
@@ -40,6 +48,9 @@ Compact handoff for active refactor and test work.
   - `logic_init()` had the same skipped stairs-assignment bug
   - `tile_has_door(vec3)` incorrectly used `current_floor` instead of `loc.z`
   - non-`NPCS_ALL_AT_ONCE` turn handling could route non-NPC ids into `handle_npc()` and throw `std::bad_optional_access`
+  - generated closed doors were not rendered/discovered correctly on first sight because tile discovery treated the door tile itself as fully blocked
+  - prop placement could soft-block room ingress by placing solid props on chokepoints or immediate doorway approaches
+  - `tile_t` could accept a second `ENTITY_DOOR` cache entry on the same tile
 
 ## Verification
 
@@ -57,11 +68,11 @@ make clean && make tests && ./tests
 
 ## High-Value Backlog
 
-- [ ] Re-enable door entity creation and placement
-  - [ ] implemented as a separate pass from dungeon floor creation, similar to how props are placed
-  - [ ] simple door placement at first
+- [x] Re-enable door entity creation and placement
+  - [x] implemented as a separate pass from dungeon floor creation, similar to how props are placed
+  - [x] simple door placement at first
   - [ ] more intelligent door placement later
-- [ ] re-enable `try_entity_open_door` method when `KEY_O` is pressed
+- [x] re-enable `try_entity_open_door` method when `KEY_O` is pressed
 
 
 - [ ] Continue top-down `libdraw.h` cleanup
@@ -95,7 +106,8 @@ make clean && make tests && ./tests
 
 - [ ] Tighten current `PROP` system
   - solid vs passable props needs more intentional rules
-  - placement quality still needs chokepoint/soft-lock awareness
+  - [x] first-pass chokepoint/doorway soft-lock avoidance
+  - placement quality still needs broader layout-awareness beyond the first-pass chokepoint rule
   - keep banner textures out of the active floor-prop pool for now
 
 - [ ] Preserve recent UI/layout fixes
@@ -129,6 +141,8 @@ make clean && make tests && ./tests
   - [x] deterministic positive door placement
   - [x] `place_props()` zero-on-empty
   - [x] deterministic positive prop placement
+  - [x] closed door tile is discoverable while sight beyond the door stays blocked
+  - [x] tile cache rejects a second door on the same tile
   - [ ] richer mixed occupancy behavior: boxes/props/doors/items/live NPCs/dead NPCs/player
 
 - [ ] Entity factory shape
@@ -151,6 +165,7 @@ make clean && make tests && ./tests
   - [x] push/pull behavior
   - [x] dead-body pull behavior via `dead_npc_cache`
   - [x] `loc.z`-sensitive interaction logic
+  - [x] `KEY_O` door open/close behavior
 
 - [ ] Combat / simulation
   - [x] single-monster spawn sanity
@@ -164,7 +179,8 @@ make clean && make tests && ./tests
 - [ ] Path/layout
   - [ ] corridor/connectivity checks
   - [ ] no disconnected player start
-  - [ ] door/prop placement should not create obvious soft-locks
+  - [x] first-pass door/prop placement no longer creates the obvious doorway soft-lock found this session
+  - [ ] broader door/prop placement should not create obvious soft-locks
 
 - [ ] ComponentTable
   - [x] set/get/has/remove/clear across multiple kinds
