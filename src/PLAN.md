@@ -336,11 +336,76 @@ These are the best remaining cleanup seams for the next session:
     - tighten naming/composition around target textures
     - decide whether `libdraw_scene_dispatch.h` should remain as a compatibility include or disappear entirely
 
-- [ ] Re-examine the unit test surfaces in `unit_test.h` and `unit_test_old.h`
-  - determine which tests still reflect the current architecture and gameplay behavior
-  - identify stale, duplicated, or misleading coverage between the old and current test headers
-  - decide whether to migrate, delete, consolidate, or replace the old test path
-  - treat this as an important maintenance item, not a low-priority cleanup footnote
+- [ ] Rebuild the active unit/integration test backlog in `unit_test.h` while preserving `unit_test_old.h` as the resurrection source
+  - `unit_test_old.h` is not a dead file; it is the holding area for larger gameplay-simulation tests that need to be revived carefully against the current architecture
+  - immediate unit-test implementation checklist:
+    - [ ] re-audit every legacy test in `unit_test_old.h` and mark it as:
+      - [ ] migrate as-is
+      - [ ] update for new architecture/semantics
+      - [ ] split into smaller deterministic tests
+      - [ ] retire only if it is provably misleading or superseded
+    - [ ] add `gamestate` lifecycle tests:
+      - [x] reset/default state invariants
+      - [x] entity id allocation and dirty-entity bookkeeping
+      - [x] hero assignment/reset behavior
+      - [x] message-system/history behavior
+      - [x] camera-state reset behavior
+      - [ ] music-state reset/default behavior
+    - [ ] add dungeon/bootstrap tests:
+      - [x] `init_dungeon()` floor-count semantics
+      - [x] generated floor dimensions and valid walkable spawn selection
+      - [x] compact-map (`8x8`) generation sanity checks
+      - [x] multi-floor bootstrap correctness
+      - [x] upstairs/downstairs placement validity
+    - [ ] add tile/entity placement tests:
+      - [x] `place_doors()` returns zero on empty dungeon and positive counts on valid generated floors
+      - [x] placed doors land only on geometrically valid door candidate tiles
+      - [x] `place_props()` returns zero on empty dungeon and positive counts on valid generated floors
+      - [x] props remain on their own cache path and respect passability rules
+      - [ ] boxes, props, doors, items, live NPCs, dead NPCs, and player occupancy interact correctly on tiles
+    - [ ] add entity-factory/component-shape tests:
+      - [x] dagger creation populates `entitytype`, `itemtype`, `weapontype`, `name`, and tile location correctly
+      - [x] shield creation populates `entitytype`, `itemtype`, `shieldtype`, `name`, and tile location correctly
+      - [x] potion creation populates `entitytype`, `itemtype`, `potiontype`, `name`, and tile location correctly
+      - [x] prop creation populates `entitytype`, `proptype`, passability-related components, and tile caches correctly
+      - [x] random monster creation populates race/name/inventory/location/dead-state correctly
+    - [ ] add inventory/equipment tests:
+      - [x] picking up the top item from multi-item tiles
+      - [x] inventory insertion/removal bookkeeping
+      - [x] equip/unequip weapon flow
+      - [x] equip/unequip shield flow
+      - [x] potion consumption and resulting state changes
+    - [ ] add gameplay interaction tests:
+      - [ ] movement blocked by walls, doors, boxes, and solid props as appropriate
+      - [ ] push/pull behavior across bounds and cache transitions
+      - [ ] dead-body interaction behavior using `dead_npc_cache`
+      - [ ] cross-floor location-sensitive logic that must honor `loc.z`
+    - [ ] add combat/turn-simulation tests:
+      - [ ] single-monster spawn/init sanity
+      - [ ] multi-monster uniqueness/count constraints
+      - [ ] max-monster and too-many-monster boundary behavior
+      - [ ] `logic_init()` gameplay bootstrap sanity
+      - [ ] 1v1 combat simulation over many ticks with stable invariants
+      - [ ] long-running gameplay simulation tests over hundreds/thousands of turns to catch crashes, invalid state, or impossible transitions
+    - [ ] add path/layout tests:
+      - [ ] corridor generation/connectivity checks
+      - [ ] no disconnected player start
+      - [ ] door/prop placement does not create obvious soft-locks
+    - [ ] expand `ComponentTable` coverage:
+      - [x] set/get/has/remove/clear across many component kinds
+      - [ ] overwrite semantics for existing components
+      - [x] shared-pointer component storage behavior (`inventory`, etc.)
+      - [ ] large multi-entity insert/remove churn
+    - [ ] add `libdraw.h` and renderer-adjacent tests where deterministic seams exist:
+      - [ ] renderer lifecycle state init/teardown invariants
+      - [ ] spritegroup creation honors entity type and `loc.z` bounds
+      - [ ] scene dispatch reaches the expected composition path for title/gameplay/help/debug scenes
+      - [ ] frame-stat bookkeeping sanity
+      - [ ] render-target/bootstrap ownership assumptions that can be validated without brittle pixel-golden tests
+    - [ ] decide on test categorization and execution policy:
+      - [x] lightweight deterministic unit tests always run in `make tests`
+      - [x] active tests are now split by domain under `test_suites/` while `unit_test.h` remains a thin aggregation header for the single `tests` runner
+      - [ ] heavier gameplay-simulation tests remain enabled but may need clear grouping or build flags if runtime becomes too large
 
 - [ ] Tighten the current `PROP` system instead of re-adding it from scratch
   - `PROP`s are not items and cannot be picked up

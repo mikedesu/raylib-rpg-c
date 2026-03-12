@@ -264,7 +264,12 @@ inline void gamestate::init_dungeon(biome_t type, int df_count, float parts, int
     for (int i = 0; i < df_count; i++) {
         create_and_add_df_1(type, width, height, df_count, parts);
     }
-    massert(assign_random_stairs(), "failed to assign dungeon stairs");
+    const bool stairs_assigned = assign_random_stairs();
+    massert(stairs_assigned, "failed to assign dungeon stairs");
+    if (!stairs_assigned) {
+        merror("failed to assign dungeon stairs");
+        return;
+    }
     minfo2("END floor creation loop");
     d.is_initialized = true;
 }
