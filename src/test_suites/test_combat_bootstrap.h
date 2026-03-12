@@ -74,6 +74,30 @@ public:
         TS_ASSERT_EQUALS(count_live_npcs_on_floor(g, 0), 1U);
     }
 
+    void testCreateOrcStopsAtWalkableTileCapacityWithoutLeakingIds() {
+        gamestate g;
+        add_floor(g, 3, 3);
+
+        std::set<entityid> ids;
+        for (int y = 0; y < 3; ++y) {
+            for (int x = 0; x < 3; ++x) {
+                const entityid id = g.create_orc_at_with(vec3{x, y, 0}, [](CT&, const entityid) {});
+                TS_ASSERT_DIFFERS(id, ENTITYID_INVALID);
+                ids.insert(id);
+            }
+        }
+
+        TS_ASSERT_EQUALS(ids.size(), 9U);
+        TS_ASSERT_EQUALS(count_live_npcs_on_floor(g, 0), 9U);
+
+        const entityid before_next_entity = g.next_entityid;
+        const entityid extra = g.create_orc_at_with(vec3{1, 1, 0}, [](CT&, const entityid) {});
+
+        TS_ASSERT_EQUALS(extra, ENTITYID_INVALID);
+        TS_ASSERT_EQUALS(g.next_entityid, before_next_entity);
+        TS_ASSERT_EQUALS(count_live_npcs_on_floor(g, 0), 9U);
+    }
+
     void testLogicInitBuildsGameplayBootstrap() {
         gamestate g;
         g.test = true;

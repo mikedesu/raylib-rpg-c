@@ -128,7 +128,7 @@ make clean && make tests && ./tests
   - [x] hero assignment/reset
   - [x] message queue/history behavior
   - [x] camera reset behavior
-  - [ ] music reset/default behavior
+  - [x] music reset/default behavior
 
 - [ ] Dungeon/bootstrap
   - [x] floor-count semantics
@@ -174,7 +174,7 @@ make clean && make tests && ./tests
   - [x] multi-monster uniqueness/count constraints
   - [x] `logic_init()` bootstrap sanity
   - [x] bounded tick/turn smoke test
-  - [ ] max-monster / too-many-monster boundary behavior
+  - [x] max-monster / too-many-monster boundary behavior
   - [ ] bounded 1v1 combat simulation with stable invariants
   - [ ] longer simulation tests over hundreds/thousands of turns
 
@@ -187,8 +187,8 @@ make clean && make tests && ./tests
 - [ ] ComponentTable
   - [x] set/get/has/remove/clear across multiple kinds
   - [x] shared-pointer storage behavior
-  - [ ] overwrite semantics
-  - [ ] high-churn multi-entity insert/remove coverage
+  - [x] overwrite semantics
+  - [x] high-churn multi-entity insert/remove coverage
 
 - [ ] Renderer-adjacent deterministic seams
   - [ ] lifecycle init/teardown invariants

@@ -54,4 +54,77 @@ public:
         TS_ASSERT(!table.has<inventory>(7));
         TS_ASSERT(!table.get<name>(7).has_value());
     }
+
+    void testComponentTableSetOverwritesExistingValue() {
+        ComponentTable table;
+
+        table.set<hp>(5, 12);
+        table.set<hp>(5, 19);
+        table.set<name>(5, "orc");
+        table.set<name>(5, "ogre");
+
+        TS_ASSERT(table.has<hp>(5));
+        TS_ASSERT(table.has<name>(5));
+        TS_ASSERT_EQUALS(table.get<hp>(5).value_or(-1), 19);
+        TS_ASSERT_EQUALS(table.get<name>(5).value_or("missing"), "ogre");
+
+        auto hpStore = table.getStore<hp>();
+        auto nameStore = table.getStore<name>();
+        TS_ASSERT_EQUALS(hpStore->size(), 1U);
+        TS_ASSERT_EQUALS(nameStore->size(), 1U);
+    }
+
+    void testComponentTableHighChurnInsertRemoveAcrossKinds() {
+        ComponentTable table;
+
+        for (entityid id = 1; id <= 64; ++id) {
+            table.set<hp>(id, static_cast<int>(id * 3));
+            table.set<maxhp>(id, static_cast<int>(id * 3 + 2));
+            table.set<location>(id, vec3{static_cast<int>(id), static_cast<int>(id + 1), static_cast<int>(id % 2)});
+        }
+
+        for (entityid id = 1; id <= 64; ++id) {
+            TS_ASSERT(table.has<hp>(id));
+            TS_ASSERT_EQUALS(table.get<hp>(id).value_or(-1), static_cast<int>(id * 3));
+            TS_ASSERT_EQUALS(table.get<maxhp>(id).value_or(-1), static_cast<int>(id * 3 + 2));
+        }
+
+        for (entityid id = 2; id <= 64; id += 2) {
+            TS_ASSERT(table.remove<hp>(id));
+            TS_ASSERT(table.remove<location>(id));
+        }
+
+        for (entityid id = 1; id <= 64; ++id) {
+            const bool removed = (id % 2) == 0;
+            TS_ASSERT_EQUALS(table.has<hp>(id), !removed);
+            TS_ASSERT_EQUALS(table.has<location>(id), !removed);
+            TS_ASSERT(table.has<maxhp>(id));
+        }
+
+        for (entityid id = 2; id <= 64; id += 2) {
+            table.set<hp>(id, static_cast<int>(id * 5));
+            table.set<location>(id, vec3{99, static_cast<int>(id), 1});
+        }
+
+        for (entityid id = 1; id <= 64; ++id) {
+            TS_ASSERT(table.has<hp>(id));
+            TS_ASSERT(table.has<maxhp>(id));
+            TS_ASSERT(table.has<location>(id));
+
+            const int expectedHp = (id % 2) == 0 ? static_cast<int>(id * 5) : static_cast<int>(id * 3);
+            const vec3 loc = table.get<location>(id).value_or(vec3{-1, -1, -1});
+
+            TS_ASSERT_EQUALS(table.get<hp>(id).value_or(-1), expectedHp);
+            TS_ASSERT_EQUALS(table.get<maxhp>(id).value_or(-1), static_cast<int>(id * 3 + 2));
+            if ((id % 2) == 0) {
+                TS_ASSERT_EQUALS(loc.x, 99);
+                TS_ASSERT_EQUALS(loc.y, static_cast<int>(id));
+                TS_ASSERT_EQUALS(loc.z, 1);
+            } else {
+                TS_ASSERT_EQUALS(loc.x, static_cast<int>(id));
+                TS_ASSERT_EQUALS(loc.y, static_cast<int>(id + 1));
+                TS_ASSERT_EQUALS(loc.z, static_cast<int>(id % 2));
+            }
+        }
+    }
 };

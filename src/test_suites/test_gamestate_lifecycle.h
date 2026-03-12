@@ -131,4 +131,30 @@ public:
         TS_ASSERT_DELTA(g.cam2d.zoom, DEFAULT_ZOOM_LEVEL, 0.001f);
         TS_ASSERT_DELTA(g.cam2d.rotation, 0.0f, 0.001f);
     }
+
+    void testGamestateMusicDefaultsAndResetBehavior() {
+        gamestate g;
+
+        TS_ASSERT_DELTA(g.music_volume, DEFAULT_MUSIC_VOLUME, 0.001f);
+        TS_ASSERT(!g.music_volume_changed);
+        TS_ASSERT_EQUALS(g.current_music_index, 0U);
+        TS_ASSERT(!g.music_file_paths.empty());
+
+        const std::vector<std::string> initialMusicPaths = g.music_file_paths;
+
+        g.music_volume = 0.25f;
+        g.music_volume_changed = true;
+        g.current_music_index = 9;
+        g.music_file_paths.clear();
+        g.music_file_paths.push_back("broken/path.ogg");
+
+        g.reset();
+
+        TS_ASSERT_DELTA(g.music_volume, DEFAULT_MUSIC_VOLUME, 0.001f);
+        TS_ASSERT(!g.music_volume_changed);
+        TS_ASSERT_EQUALS(g.current_music_index, 0U);
+        TS_ASSERT(!g.music_file_paths.empty());
+        TS_ASSERT_DIFFERS(g.music_file_paths.front(), "broken/path.ogg");
+        TS_ASSERT_EQUALS(g.music_file_paths, initialMusicPaths);
+    }
 };
