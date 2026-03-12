@@ -2,6 +2,29 @@
 
 Compact handoff for active refactor and test work.
 
+## Immediate New Feature Development
+- We are changing how HP and MaxHP work immediately
+  - [ ] create a `vec2.h` that functions like a `vec3` but for an integer x and y.
+  - [ ] update `ComponentTraits.h` so that we have a single `hp` trait defined with the following:
+  ```
+struct hp { };
+template <>
+struct ComponentTraits<hp> {
+    using Type = vec2;
+};
+  ```
+  - [ ] get rid of the `maxhp` component
+  - [ ] doing the above will break a ton of code that we will need to fix but we will do so until it is DONE
+- Friendly and non-friendly NPCs
+  - [ ] determines "attack-on-sight"-type behavior
+  - [ ] friendly NPCs just wander around etc, non-friendly NPCs attack on sight
+- Treasure Chest entities
+  - [ ] Function like an inventory that doesn't belong to an NPC
+    - [ ] Is still a real physical entity
+      - [ ] Has a location
+      - [ ] Has HP/MaxHP
+
+
 ## Current State
 
 - `gamestate.h` is now a top-level coordinator with implementation headers split by responsibility:
