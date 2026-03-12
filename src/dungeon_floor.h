@@ -135,6 +135,29 @@ public:
         tile.set_can_have_door(true);
     }
 
+    int df_count_walkable_cardinal_neighbors(vec3 loc) {
+        static constexpr vec3 offsets[] = {
+            vec3{0, -1, 0},
+            vec3{-1, 0, 0},
+            vec3{1, 0, 0},
+            vec3{0, 1, 0},
+        };
+
+        int count = 0;
+        for (const vec3 offset : offsets) {
+            const vec3 neighbor_loc = {loc.x + offset.x, loc.y + offset.y, loc.z};
+            if (neighbor_loc.x < 0 || neighbor_loc.x >= width || neighbor_loc.y < 0 || neighbor_loc.y >= height) {
+                continue;
+            }
+            tile_t& neighbor = tile_at(neighbor_loc);
+            if (tile_is_walkable(neighbor.get_type())) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
     /**
      * @brief Return whether a walkable tile forms a valid geometric door candidate.
      *
@@ -142,32 +165,56 @@ public:
      * @return `true` when the tile matches the local doorway topology rules.
      */
     bool df_is_good_door_loc(vec3 loc) {
-        auto tile = tile_at(loc);
-        if (loc.x >= 1 && loc.y >= 1 && loc.x < width - 1 && loc.y < height - 1) {
-            tile_t& t0 = tile_at((vec3){loc.x - 1, loc.y - 1, loc.z});
-            tile_t& t1 = tile_at((vec3){loc.x - 1, loc.y, loc.z});
-            tile_t& t2 = tile_at((vec3){loc.x - 1, loc.y + 1, loc.z});
-            tile_t& t3 = tile_at((vec3){loc.x, loc.y - 1, loc.z});
-            tile_t& t4 = tile_at((vec3){loc.x, loc.y + 1, loc.z});
-            tile_t& t5 = tile_at((vec3){loc.x + 1, loc.y - 1, loc.z});
-            tile_t& t6 = tile_at((vec3){loc.x + 1, loc.y, loc.z});
-            tile_t& t7 = tile_at((vec3){loc.x + 1, loc.y + 1, loc.z});
-            auto tw0 = t0.tile_is_wall();
-            auto tw1 = t1.tile_is_wall();
-            auto tw2 = t2.tile_is_wall();
-            auto tw3 = t3.tile_is_wall();
-            auto tw4 = t4.tile_is_wall();
-            auto tw5 = t5.tile_is_wall();
-            auto tw6 = t6.tile_is_wall();
-            auto tw7 = t7.tile_is_wall();
-            if (tw3 && tw4 && !(tw0 || tw1 || tw2 || tw5 || tw6 || tw7)) {
-                return true;
-            }
-            if (tw1 && tw6 && !(tw0 || tw2 || tw3 || tw4 || tw5 || tw7)) {
-                return true;
-            }
+        tile_t& tile = tile_at(loc);
+        if (!tile_is_walkable(tile.get_type())) {
+            return false;
         }
-        return false;
+        if (loc.x < 1 || loc.y < 1 || loc.x >= width - 1 || loc.y >= height - 1) {
+            return false;
+        }
+
+        const vec3 left_loc = {loc.x - 1, loc.y, loc.z};
+        const vec3 right_loc = {loc.x + 1, loc.y, loc.z};
+        const vec3 up_loc = {loc.x, loc.y - 1, loc.z};
+        const vec3 down_loc = {loc.x, loc.y + 1, loc.z};
+
+        tile_t& left = tile_at(left_loc);
+        tile_t& right = tile_at(right_loc);
+        tile_t& up = tile_at(up_loc);
+        tile_t& down = tile_at(down_loc);
+
+        const bool left_walkable = tile_is_walkable(left.get_type());
+        const bool right_walkable = tile_is_walkable(right.get_type());
+        const bool up_walkable = tile_is_walkable(up.get_type());
+        const bool down_walkable = tile_is_walkable(down.get_type());
+        const int walkable_neighbors = static_cast<int>(left_walkable) + static_cast<int>(right_walkable) + static_cast<int>(up_walkable) + static_cast<int>(down_walkable);
+        if (walkable_neighbors != 2) {
+            return false;
+        }
+
+        const bool horizontal_passage = left_walkable && right_walkable && !up_walkable && !down_walkable;
+        const bool vertical_passage = up_walkable && down_walkable && !left_walkable && !right_walkable;
+        if (!horizontal_passage && !vertical_passage) {
+            return false;
+        }
+
+        if (horizontal_passage) {
+            const bool left_has_branch =
+                tile_is_walkable(tile_at(vec3{left_loc.x, left_loc.y - 1, left_loc.z}).get_type()) ||
+                tile_is_walkable(tile_at(vec3{left_loc.x, left_loc.y + 1, left_loc.z}).get_type());
+            const bool right_has_branch =
+                tile_is_walkable(tile_at(vec3{right_loc.x, right_loc.y - 1, right_loc.z}).get_type()) ||
+                tile_is_walkable(tile_at(vec3{right_loc.x, right_loc.y + 1, right_loc.z}).get_type());
+            return left_has_branch != right_has_branch;
+        }
+
+        const bool up_has_branch =
+            tile_is_walkable(tile_at(vec3{up_loc.x - 1, up_loc.y, up_loc.z}).get_type()) ||
+            tile_is_walkable(tile_at(vec3{up_loc.x + 1, up_loc.y, up_loc.z}).get_type());
+        const bool down_has_branch =
+            tile_is_walkable(tile_at(vec3{down_loc.x - 1, down_loc.y, down_loc.z}).get_type()) ||
+            tile_is_walkable(tile_at(vec3{down_loc.x + 1, down_loc.y, down_loc.z}).get_type());
+        return up_has_branch != down_has_branch;
     }
 
     bool tile_is_good_for_upgrade(vec3 loc) {
@@ -329,6 +376,27 @@ public:
         return df_paint_floor_area(connector);
     }
 
+    void df_mark_connector_door_candidates(Rectangle connector) {
+        if (connector.width <= 0 || connector.height <= 0) {
+            return;
+        }
+
+        if (connector.width >= connector.height) {
+            const int y = static_cast<int>(connector.y + connector.height / 2);
+            const int x0 = static_cast<int>(connector.x);
+            const int x1 = static_cast<int>(connector.x + connector.width - 1);
+            df_set_can_have_door(vec3{x0, y, floor});
+            df_set_can_have_door(vec3{x1, y, floor});
+            return;
+        }
+
+        const int x = static_cast<int>(connector.x + connector.width / 2);
+        const int y0 = static_cast<int>(connector.y);
+        const int y1 = static_cast<int>(connector.y + connector.height - 1);
+        df_set_can_have_door(vec3{x, y0, floor});
+        df_set_can_have_door(vec3{x, y1, floor});
+    }
+
     /**
      * @brief Paint a new room adjacent to an origin room and connect it with a corridor.
      *
@@ -340,7 +408,8 @@ public:
             return Rectangle{0, 0, 0, 0};
         }
         df_paint_floor_area(adjacent);
-        df_paint_connector(origin, adjacent, corridor_width);
+        Rectangle connector = df_paint_connector(origin, adjacent, corridor_width);
+        df_mark_connector_door_candidates(connector);
         return adjacent;
     }
 

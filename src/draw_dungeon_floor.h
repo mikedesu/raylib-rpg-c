@@ -164,7 +164,7 @@ static inline bool draw_dungeon_floor(gamestate& g, int vision_dist, int light_r
         return false;
     };
 
-    //draw_dungeon_floor_entitytype(g, ENTITY_DOOR, vision_dist, light_rad, mydefault);
+    draw_dungeon_floor_entitytype(g, ENTITY_DOOR, vision_dist, light_rad, mydefault);
     draw_dungeon_floor_entitytype(g, ENTITY_PROP, vision_dist, light_rad, mydefault);
     libdraw_draw_player_target_box(g);
     //draw_dungeon_floor_entitytype(g, ENTITY_SPELL, vision_dist, light_rad, mydefault);

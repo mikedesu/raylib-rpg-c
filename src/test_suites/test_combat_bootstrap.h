@@ -77,6 +77,7 @@ public:
     void testLogicInitBuildsGameplayBootstrap() {
         gamestate g;
         g.test = true;
+        g.mt.seed(12345);
 
         g.logic_init();
 
@@ -89,6 +90,7 @@ public:
         TS_ASSERT_EQUALS(g.d.get_floor(1)->get_height(), 16);
         TS_ASSERT(vec3_valid(g.d.get_floor(0)->get_upstairs_loc()));
         TS_ASSERT(vec3_valid(g.d.get_floor(0)->get_downstairs_loc()));
+        TS_ASSERT(count_entities_of_type(g, ENTITY_DOOR) >= 1U);
         TS_ASSERT(count_entities_of_type(g, ENTITY_BOX) >= 1U);
         TS_ASSERT(count_entities_of_type(g, ENTITY_ITEM) >= 2U);
         TS_ASSERT(count_live_npcs_on_floor(g, 0) >= 1U);

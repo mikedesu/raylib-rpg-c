@@ -27,6 +27,28 @@ inline bool gamestate::path_blocked(vec3 a, vec3 b) {
     return false;
 }
 
+inline bool gamestate::visibility_path_blocked(vec3 a, vec3 b) {
+    vector<vec3> path = calculate_path_with_thickness(a, b);
+    auto df = d.get_current_floor();
+    for (auto loc : path) {
+        tile_t& t = df->tile_at(loc);
+        if (tiletype_is_none(t.get_type())) {
+            return true;
+        }
+        if (tiletype_is_wall(t.get_type())) {
+            return true;
+        }
+        entityid door_id = t.get_cached_door();
+        if (door_id != INVALID && !vec3_equal(loc, b)) {
+            bool door_is_open = ct.get<door_open>(door_id).value_or(false);
+            if (!door_is_open) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 inline bool gamestate::update_player_tiles_explored() {
     if (current_scene != SCENE_GAMEPLAY) {
         return false;
@@ -53,7 +75,7 @@ inline bool gamestate::update_player_tiles_explored() {
                 continue;
             }
             vec3 loc = {x, y, hero_loc.z};
-            if (path_blocked(hero_loc, loc)) {
+            if (visibility_path_blocked(hero_loc, loc)) {
                 continue;
             }
             tile_t& t = df->tile_at(loc);

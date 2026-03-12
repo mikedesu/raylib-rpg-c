@@ -21,6 +21,21 @@ private:
         g.d.add_floor(df);
     }
 
+    void add_chokepoint_floor(gamestate& g) {
+        auto df = g.d.create_floor(BIOME_STONE, 7, 7);
+        df->df_set_all_tiles(TILE_NONE);
+        df->df_set_tile(TILE_FLOOR_STONE_00, 1, 3);
+        df->df_set_tile(TILE_FLOOR_STONE_00, 2, 3);
+        df->df_set_tile(TILE_FLOOR_STONE_00, 3, 3);
+        df->df_set_tile(TILE_FLOOR_STONE_00, 4, 2);
+        df->df_set_tile(TILE_FLOOR_STONE_00, 4, 3);
+        df->df_set_tile(TILE_FLOOR_STONE_00, 4, 4);
+        df->df_set_tile(TILE_FLOOR_STONE_00, 5, 2);
+        df->df_set_tile(TILE_FLOOR_STONE_00, 5, 3);
+        df->df_set_tile(TILE_FLOOR_STONE_00, 5, 4);
+        g.d.add_floor(df);
+    }
+
 public:
     void testPlaceDoorsReturnsZeroOnEmptyDungeon() {
         gamestate g;
@@ -30,13 +45,20 @@ public:
 
     void testPlaceDoorsCreatesDoorEntitiesWithTileAndComponentState() {
         gamestate g;
-        add_simple_floor(g);
-        auto df = g.d.get_floor(0);
-
-        // Create a deterministic doorway topology at the center tile.
-        df->df_set_tile(TILE_STONE_WALL_00, 1, 2);
-        df->df_set_tile(TILE_STONE_WALL_00, 3, 2);
-        df->df_refresh_door_candidates();
+        auto floor = g.d.create_floor(BIOME_STONE, 7, 7);
+        floor->df_set_all_tiles(TILE_NONE);
+        floor->df_set_tile(TILE_FLOOR_STONE_00, 1, 3);
+        floor->df_set_tile(TILE_FLOOR_STONE_00, 2, 3);
+        floor->df_set_tile(TILE_FLOOR_STONE_00, 3, 3);
+        floor->df_set_tile(TILE_FLOOR_STONE_00, 4, 2);
+        floor->df_set_tile(TILE_FLOOR_STONE_00, 4, 3);
+        floor->df_set_tile(TILE_FLOOR_STONE_00, 4, 4);
+        floor->df_set_tile(TILE_FLOOR_STONE_00, 5, 2);
+        floor->df_set_tile(TILE_FLOOR_STONE_00, 5, 3);
+        floor->df_set_tile(TILE_FLOOR_STONE_00, 5, 4);
+        g.d.add_floor(floor);
+        floor = g.d.get_floor(0);
+        floor->df_refresh_door_candidates();
 
         const size_t placed = g.place_doors();
         TS_ASSERT(placed > 0);
@@ -108,5 +130,14 @@ public:
         }
 
         TS_ASSERT_EQUALS(verified, static_cast<size_t>(placed));
+    }
+
+    void testPlacePropsSkipsChokepointAndDoorApproachLayouts() {
+        gamestate g;
+        add_chokepoint_floor(g);
+
+        const int placed = g.place_props();
+        TS_ASSERT_EQUALS(placed, 0);
+        TS_ASSERT_EQUALS(count_entities_of_type(g, ENTITY_PROP), 0U);
     }
 };

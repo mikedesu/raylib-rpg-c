@@ -49,6 +49,16 @@ public:
         TS_ASSERT(vec3_equal(g.ct.get<location>(hero).value_or(vec3{-1, -1, -1}), vec3{2, 1, 0}));
     }
 
+    void testCreateDoorAtWithRejectsOccupiedTile() {
+        gamestate g;
+        add_floor(g);
+
+        const entityid prop_id = g.create_prop_at_with(PROP_DUNGEON_STATUE_00, vec3{2, 2, 0}, dungeon_prop_init(PROP_DUNGEON_STATUE_00));
+        TS_ASSERT_DIFFERS(prop_id, ENTITYID_INVALID);
+        TS_ASSERT_EQUALS(g.create_door_at_with(vec3{2, 2, 0}, [](CT&, const entityid) {}), ENTITYID_INVALID);
+        TS_ASSERT_EQUALS(g.d.get_floor(0)->tile_at(vec3{2, 2, 0}).get_cached_door(), ENTITYID_INVALID);
+    }
+
     void testTryEntityMovePushesBox() {
         gamestate g;
         add_floor(g);
@@ -116,5 +126,46 @@ public:
 
         TS_ASSERT(!g.try_entity_move(npc, vec3{1, 0, 0}));
         TS_ASSERT(vec3_equal(g.ct.get<location>(npc).value_or(vec3{-1, -1, -1}), vec3{1, 1, 1}));
+    }
+
+    void testTryEntityOpenDoorUsesDoorLocationFloor() {
+        gamestate g;
+        add_floor(g);
+        add_floor(g);
+        g.d.current_floor = 0;
+
+        const entityid hero = create_hero(g, vec3{1, 1, 0});
+        const entityid door = g.create_door_at_with(vec3{2, 1, 1}, [](CT&, const entityid) {});
+
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(door, ENTITYID_INVALID);
+        TS_ASSERT(!g.ct.get<door_open>(door).value_or(true));
+
+        TS_ASSERT(g.try_entity_open_door(hero, vec3{2, 1, 1}));
+        TS_ASSERT(g.ct.get<door_open>(door).value_or(false));
+    }
+
+    void testUpdatePlayerTilesExploredRevealsClosedDoorTileButNotBeyond() {
+        gamestate g;
+        add_floor(g);
+        g.current_scene = SCENE_GAMEPLAY;
+
+        const entityid hero = create_hero(g, vec3{1, 1, 0});
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+        g.hero_id = hero;
+        g.ct.set<light_radius>(hero, 4);
+
+        const entityid door = g.create_door_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
+        TS_ASSERT_DIFFERS(door, ENTITYID_INVALID);
+        TS_ASSERT(!g.ct.get<door_open>(door).value_or(true));
+
+        TS_ASSERT(g.update_player_tiles_explored());
+
+        tile_t& door_tile = g.d.get_floor(0)->tile_at(vec3{2, 1, 0});
+        tile_t& beyond_tile = g.d.get_floor(0)->tile_at(vec3{3, 1, 0});
+        TS_ASSERT(door_tile.get_visible());
+        TS_ASSERT(door_tile.get_explored());
+        TS_ASSERT(!beyond_tile.get_visible());
+        TS_ASSERT(!beyond_tile.get_explored());
     }
 };

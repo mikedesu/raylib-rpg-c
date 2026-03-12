@@ -537,22 +537,20 @@ inline bool gamestate::handle_traverse_stairs(inputstate& is, bool is_dead) {
 
 inline bool gamestate::try_entity_open_door(entityid id, vec3 loc) {
     massert(id != ENTITYID_INVALID, "id is invalid");
-    if (!tile_has_door(loc)) {
+    const entityid door_id = tile_has_door(loc);
+    if (door_id == ENTITYID_INVALID) {
         return false;
     }
-    shared_ptr<dungeon_floor> df = d.get_current_floor();
+    shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
     tile_t& t = df->tile_at(loc);
-
-    entityid door_id = t.get_cached_door();
-    if (door_id != INVALID) {
-        optional<bool> maybe_is_open = ct.get<door_open>(door_id);
-        massert(maybe_is_open.has_value(), "door %d has no `is_open` component", door_id);
-        ct.set<door_open>(door_id, !maybe_is_open.value());
+    massert(t.get_cached_door() == door_id, "door cache mismatch at (%d, %d, %d)", loc.x, loc.y, loc.z);
+    optional<bool> maybe_is_open = ct.get<door_open>(door_id);
+    massert(maybe_is_open.has_value(), "door %d has no `is_open` component", door_id);
+    ct.set<door_open>(door_id, !maybe_is_open.value());
+    if (IsAudioDeviceReady() && sfx.size() > SFX_CHEST_OPEN) {
         PlaySound(sfx.at(SFX_CHEST_OPEN));
-        return true;
     }
-
-    return false;
+    return true;
 }
 
 inline bool gamestate::handle_open_door(inputstate& is, bool is_dead) {

@@ -139,6 +139,76 @@ inline proptype_t dungeon_random_floor_prop_type(mt19937& mt) {
     uniform_int_distribution<int> dist(0, static_cast<int>(sizeof(floor_prop_types) / sizeof(floor_prop_types[0])) - 1);
     return floor_prop_types[dist(mt)];
 }
+
+inline bool dungeon_prop_tile_is_walkable(tile_t& tile) {
+    const tiletype_t type = tile.get_type();
+    return tile_is_walkable(type) && type != TILE_UPSTAIRS && type != TILE_DOWNSTAIRS;
+}
+
+inline int dungeon_count_walkable_cardinal_neighbors(shared_ptr<dungeon_floor> df, vec3 loc) {
+    static constexpr vec3 offsets[] = {
+        vec3{0, -1, 0},
+        vec3{-1, 0, 0},
+        vec3{1, 0, 0},
+        vec3{0, 1, 0},
+    };
+
+    int count = 0;
+    for (const vec3 offset : offsets) {
+        const vec3 neighbor_loc = {loc.x + offset.x, loc.y + offset.y, loc.z};
+        if (neighbor_loc.x < 0 || neighbor_loc.x >= df->get_width() || neighbor_loc.y < 0 || neighbor_loc.y >= df->get_height()) {
+            continue;
+        }
+        tile_t& neighbor = df->tile_at(neighbor_loc);
+        if (dungeon_prop_tile_is_walkable(neighbor)) {
+            count++;
+        }
+    }
+
+    return count;
+}
+
+inline bool dungeon_is_prop_chokepoint(shared_ptr<dungeon_floor> df, vec3 loc) {
+    return dungeon_count_walkable_cardinal_neighbors(df, loc) <= 2;
+}
+
+inline bool dungeon_is_safe_prop_loc(shared_ptr<dungeon_floor> df, vec3 loc) {
+    tile_t& tile = df->tile_at(loc);
+    if (!dungeon_prop_tile_is_walkable(tile)) {
+        return false;
+    }
+    if (tile.get_can_have_door()) {
+        return false;
+    }
+    if (tile.entity_count() != 0) {
+        return false;
+    }
+    if (dungeon_is_prop_chokepoint(df, loc)) {
+        return false;
+    }
+
+    static constexpr vec3 offsets[] = {
+        vec3{0, -1, 0},
+        vec3{-1, 0, 0},
+        vec3{1, 0, 0},
+        vec3{0, 1, 0},
+    };
+    for (const vec3 offset : offsets) {
+        const vec3 neighbor_loc = {loc.x + offset.x, loc.y + offset.y, loc.z};
+        if (neighbor_loc.x < 0 || neighbor_loc.x >= df->get_width() || neighbor_loc.y < 0 || neighbor_loc.y >= df->get_height()) {
+            continue;
+        }
+        tile_t& neighbor = df->tile_at(neighbor_loc);
+        if (neighbor.get_can_have_door()) {
+            return false;
+        }
+        if (dungeon_prop_tile_is_walkable(neighbor) && dungeon_is_prop_chokepoint(df, neighbor_loc)) {
+            return false;
+        }
+    }
+
+    return true;
+}
 }
 
 inline void gamestate::create_and_add_df_0(biome_t type, int w, int h, int df_count, float parts) {
@@ -200,7 +270,6 @@ inline void gamestate::create_and_add_df_1(biome_t type, int w, int h, int df_co
     }
 
     df->df_upgrade_floor_tiles();
-    df->df_refresh_door_candidates();
 
     d.add_floor(df);
 }
@@ -287,6 +356,12 @@ inline entityid gamestate::create_door_at_with(vec3 loc, with_fun doorInitFuncti
     if (!tile_is_walkable(tile.get_type())) {
         return INVALID;
     }
+    if (tile.get_type() == TILE_UPSTAIRS || tile.get_type() == TILE_DOWNSTAIRS) {
+        return INVALID;
+    }
+    if (tile.entity_count() > 0) {
+        return INVALID;
+    }
     entityid id = create_door_with(doorInitFunction);
     if (id == INVALID) {
         return INVALID;
@@ -363,17 +438,7 @@ inline int gamestate::place_props() {
         for (int x = 0; x < df->get_width(); x++) {
             for (int y = 0; y < df->get_height(); y++) {
                 vec3 loc = {x, y, z};
-                tile_t& t = df->tile_at(loc);
-                if (!tile_is_walkable(t.get_type())) {
-                    continue;
-                }
-                if (t.get_type() == TILE_UPSTAIRS || t.get_type() == TILE_DOWNSTAIRS) {
-                    continue;
-                }
-                if (t.get_can_have_door()) {
-                    continue;
-                }
-                if (t.entity_count() != 0) {
+                if (!dungeon_is_safe_prop_loc(df, loc)) {
                     continue;
                 }
                 candidates.push_back(loc);

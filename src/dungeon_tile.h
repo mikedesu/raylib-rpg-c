@@ -235,6 +235,10 @@ public:
             cached_box = id;
         }
         else if (type == ENTITY_DOOR) {
+            if (cached_door != INVALID) {
+                merror("tile_add: door cache already occupied");
+                return INVALID;
+            }
             cached_door = id;
         }
         dirty_entities = true;

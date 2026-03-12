@@ -205,6 +205,15 @@ public:
         TS_ASSERT_EQUALS(tile.get_cached_item(), 200 + ITEM_CACHE_SIZE - 1);
     }
 
+    void testTileRejectsSecondDoorCacheEntry() {
+        tile_t tile(TILE_FLOOR_STONE_00);
+
+        TS_ASSERT_EQUALS(tile.tile_add(10, ENTITY_DOOR), 10);
+        TS_ASSERT_EQUALS(tile.tile_add(11, ENTITY_DOOR), INVALID);
+        TS_ASSERT_EQUALS(tile.get_cached_door(), 10);
+        TS_ASSERT_EQUALS(tile.entity_count(), 1U);
+    }
+
     void testTileTypeHelpers() {
         tile_t wall(TILE_STONE_WALL_00);
         tile_t floor(TILE_FLOOR_STONE_00);

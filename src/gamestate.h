@@ -568,6 +568,9 @@ public:
     /** @brief Return whether movement or line travel between two points is blocked. */
     bool path_blocked(vec3 a, vec3 b);
 
+    /** @brief Return whether line-of-sight to a tile is blocked, excluding a closed door on the target tile itself. */
+    bool visibility_path_blocked(vec3 a, vec3 b);
+
     /** @brief Refresh explored and visible tile state from the player's current position. */
     bool update_player_tiles_explored();
 
