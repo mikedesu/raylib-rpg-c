@@ -120,8 +120,9 @@ public:
         TS_ASSERT(g.ct.get<update>(id).value_or(false));
         TS_ASSERT(g.ct.get<inventory>(id).has_value());
         TS_ASSERT_EQUALS(g.ct.get<inventory>(id).value()->size(), 0U);
-        TS_ASSERT(g.ct.get<hp>(id).value_or(0) >= 1);
-        TS_ASSERT(g.ct.get<maxhp>(id).value_or(0) >= 1);
+        const vec2 hp_value = g.ct.get<hp>(id).value_or(vec2{0, 0});
+        TS_ASSERT(hp_value.x >= 1);
+        TS_ASSERT(hp_value.y >= 1);
         TS_ASSERT(vec3_equal(g.ct.get<location>(id).value_or(vec3{-1, -1, -1}), loc));
 
         tile_t& tile = g.d.get_floor(0)->tile_at(loc);

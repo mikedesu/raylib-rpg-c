@@ -179,7 +179,7 @@ public:
         TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
         TS_ASSERT_DIFFERS(orc, ENTITYID_INVALID);
 
-        g.ct.set<hp>(orc, 1);
+        g.ct.set<hp>(orc, vec2{1, 1});
         tile_t& target_tile = g.d.get_floor(0)->tile_at(vec3{2, 1, 0});
         g.process_attack_results(target_tile, hero, orc, true);
 

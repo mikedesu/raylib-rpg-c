@@ -75,8 +75,7 @@ inline void gamestate::handle_input_character_creation_scene(inputstate& is) {
             ct.set<wisdom>(id, chara_creation.wisdom);
             ct.set<charisma>(id, chara_creation.charisma);
             ct.set<hd>(id, (vec3){1, chara_creation.hitdie, 0});
-            ct.set<hp>(hero_id, maxhp_roll);
-            ct.set<maxhp>(hero_id, maxhp_roll);
+            ct.set<hp>(id, vec2{maxhp_roll, maxhp_roll});
         });
         massert(hero_id != ENTITYID_INVALID, "heroid is invalid");
         make_all_npcs_target_player();

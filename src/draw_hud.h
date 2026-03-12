@@ -18,7 +18,8 @@ static inline void draw_hud(gamestate& g) {
     constexpr int line_thickness = 2;
 
     const int turn = g.turn_count;
-    const int myhp = g.ct.get<hp>(g.hero_id).value_or(-1), mymaxhp = g.ct.get<maxhp>(g.hero_id).value_or(-1);
+    const vec2 hp_value = g.ct.get<hp>(g.hero_id).value_or(vec2{-1, -1});
+    const int myhp = hp_value.x, mymaxhp = hp_value.y;
     const int mylevel = g.ct.get<level>(g.hero_id).value_or(0), myxp = g.ct.get<xp>(g.hero_id).value_or(0);
     const int attack_bonus = get_stat_bonus(g.ct.get<strength>(g.hero_id).value_or(10));
     const int ac = g.compute_armor_class(g.hero_id);

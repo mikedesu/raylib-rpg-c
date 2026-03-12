@@ -172,9 +172,13 @@ inline bool gamestate::use_potion(entityid actor_id, entityid item_id) {
         if (maybe_heal && maybe_heal.has_value()) {
             vec3 heal = maybe_heal.value();
             int amount = do_roll(heal);
-            int myhp = ct.get<hp>(actor_id).value_or(-1);
-            int mymaxhp = ct.get<maxhp>(actor_id).value_or(-1);
-            ct.set<hp>(actor_id, mymaxhp ? mymaxhp : myhp + amount);
+            vec2 actor_hp = ct.get<hp>(actor_id).value_or(vec2{-1, -1});
+            if (vec2_invalid(actor_hp)) {
+                merror("actor has no hp component");
+                return false;
+            }
+            actor_hp.x = std::min(actor_hp.y, actor_hp.x + amount);
+            ct.set<hp>(actor_id, actor_hp);
             if (actor_id == hero_id) {
                 string n = ct.get<name>(actor_id).value_or("no-name");
                 add_message_history("%s used a healing potion", n.c_str());

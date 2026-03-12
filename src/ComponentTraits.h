@@ -17,6 +17,7 @@
 #include "shield.h"
 #include "spell.h"
 #include "vec3.h"
+#include "vec2.h"
 #include "weapon.h"
 #include <memory>
 #include <raylib.h>
@@ -249,14 +250,7 @@ struct ComponentTraits<xp> {
 struct hp { };
 template <>
 struct ComponentTraits<hp> {
-    using Type = int;
-};
-
-/// @brief Component tag for maximum hit points.
-struct maxhp { };
-template <>
-struct ComponentTraits<maxhp> {
-    using Type = int;
+    using Type = vec2;
 };
 
 /// @brief Component tag for strength.

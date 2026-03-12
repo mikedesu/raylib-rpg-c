@@ -78,8 +78,7 @@ inline with_fun gamestate::player_init(int maxhp_roll) {
         ct.set<wisdom>(id, chara_creation.wisdom);
         ct.set<charisma>(id, chara_creation.charisma);
         ct.set<hd>(id, (vec3){1, chara_creation.hitdie, 0});
-        ct.set<hp>(id, maxhp_roll);
-        ct.set<maxhp>(id, maxhp_roll);
+        ct.set<hp>(id, vec2{maxhp_roll, maxhp_roll});
     };
 }
 
@@ -228,8 +227,7 @@ inline void gamestate::set_npc_starting_stats(entityid id) {
     uniform_int_distribution<int> gen2(1, hitdie.y);
     int my_maxhp = std::max(1, gen2(mt) + get_stat_bonus(constitution_));
     int my_hp = my_maxhp;
-    ct.set<maxhp>(id, my_maxhp);
-    ct.set<hp>(id, my_hp);
+    ct.set<hp>(id, vec2{my_hp, my_maxhp});
     ct.set<base_ac>(id, 10);
     ct.set<hd>(id, hitdie);
 }
@@ -359,8 +357,7 @@ inline entityid gamestate::create_player_at_with(vec3 loc, string n, with_fun pl
     tile.set_cached_player_present(true);
     tile.set_cached_live_npc(id);
 
-    ct.set<hp>(id, hp_);
-    ct.set<maxhp>(id, maxhp_);
+    ct.set<hp>(id, vec2{hp_, maxhp_});
     ct.set<vision_distance>(id, vis_dist);
     ct.set<light_radius>(id, light_rad);
     ct.set<hearing_distance>(id, hear_dist);

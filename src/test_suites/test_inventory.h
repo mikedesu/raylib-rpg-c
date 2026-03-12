@@ -129,14 +129,16 @@ public:
         const entityid potion = g.create_potion_at_with(loc, g.potion_init(POTION_HP_SMALL));
 
         TS_ASSERT(g.add_to_inventory(hero, potion));
-        g.ct.set<hp>(hero, 2);
-        g.ct.set<maxhp>(hero, 10);
+        g.ct.set<hp>(hero, vec2{2, 10});
 
         TS_ASSERT(g.use_potion(hero, potion));
 
         TS_ASSERT(!g.is_in_inventory(hero, potion));
         TS_ASSERT_EQUALS(g.ct.get<inventory>(hero).value()->size(), 0U);
-        TS_ASSERT_EQUALS(g.ct.get<hp>(hero).value_or(0), 10);
+        const vec2 hp_value = g.ct.get<hp>(hero).value_or(vec2{0, 0});
+        TS_ASSERT(hp_value.x >= 3);
+        TS_ASSERT(hp_value.x <= 8);
+        TS_ASSERT_EQUALS(hp_value.y, 10);
         TS_ASSERT(g.msg_history.size() >= 2U);
     }
 };

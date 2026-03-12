@@ -102,17 +102,18 @@ inline void gamestate::process_attack_results(tile_t& tile, entityid atk_id, ent
     ct.set<damaged>(tgt_id, true);
     ct.set<update>(tgt_id, true);
 
-    optional<int> maybe_tgt_hp = ct.get<hp>(tgt_id);
+    optional<vec2> maybe_tgt_hp = ct.get<hp>(tgt_id);
     if (!maybe_tgt_hp.has_value()) {
         merror("target has no HP component");
         return;
     }
 
-    int tgt_hp = maybe_tgt_hp.value() - dmg;
+    vec2 tgt_hp = maybe_tgt_hp.value();
+    tgt_hp.x -= dmg;
     add_message_history("%s deals %d damage to %s", atk_name, dmg, tgt_name);
     ct.set<hp>(tgt_id, tgt_hp);
     handle_weapon_durability_loss(atk_id, tgt_id);
-    if (tgt_hp > 0) {
+    if (tgt_hp.x > 0) {
         return;
     }
 
