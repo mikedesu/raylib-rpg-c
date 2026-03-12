@@ -86,7 +86,9 @@ inline entityid gamestate::tile_has_pushable(int x, int y, int z) {
 }
 
 inline entityid gamestate::tile_has_door(vec3 v) {
-    shared_ptr<dungeon_floor> df = d.get_current_floor();
+    massert(v.z >= 0, "floor is out of bounds");
+    massert(static_cast<size_t>(v.z) < d.floors.size(), "floor is out of bounds");
+    shared_ptr<dungeon_floor> df = d.get_floor(static_cast<size_t>(v.z));
     tile_t& t = df->tile_at(v);
     return t.get_cached_door();
 }

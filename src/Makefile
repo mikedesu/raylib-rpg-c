@@ -65,13 +65,15 @@ tests: tests.cpp
 
 TEST_HEADERS = unit_test.h \
 	test_suites/test_gamestate_lifecycle.h \
+	test_suites/test_combat_bootstrap.h \
 	test_suites/test_dungeon_bootstrap.h \
 	test_suites/test_entity_factory.h \
 	test_suites/test_entity_placement.h \
 	test_suites/test_inventory.h \
 	test_suites/test_tile_cache.h \
 	test_suites/test_component_table.h \
-	test_suites/test_utility_helpers.h
+	test_suites/test_utility_helpers.h \
+	test_suites/test_world_interaction.h
 
 tests.cpp: $(TEST_HEADERS)
 	cxxtestgen --error-printer -o tests.cpp $(TEST_HEADERS)

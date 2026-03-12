@@ -389,9 +389,15 @@ inline bool gamestate::try_entity_move_random(entityid id) {
 inline bool gamestate::handle_npc(entityid id) {
     minfo2("handle npc %d", id);
     massert(id != ENTITYID_INVALID, "Entity is NULL!");
+    if (ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_NPC) {
+        return false;
+    }
     auto id_name = ct.get<name>(id).value_or("no-name");
     auto maybe_dead = ct.get<dead>(id);
     massert(maybe_dead.has_value(), "npc id %d name %s has no dead component", id, id_name.c_str());
+    if (!maybe_dead.has_value()) {
+        return false;
+    }
     bool is_dead = maybe_dead.value();
     if (is_dead) {
         return false;
@@ -449,8 +455,13 @@ inline void gamestate::handle_npcs() {
     if (flag == GAMESTATE_FLAG_NPC_TURN) {
 #ifndef NPCS_ALL_AT_ONCE
         if (entity_turn >= 1 && entity_turn < next_entityid) {
-            handle_npc(entity_turn);
-            flag = GAMESTATE_FLAG_NPC_ANIM;
+            if (ct.get<entitytype>(entity_turn).value_or(ENTITY_NONE) == ENTITY_NPC) {
+                handle_npc(entity_turn);
+                flag = GAMESTATE_FLAG_NPC_ANIM;
+            }
+            else {
+                flag = GAMESTATE_FLAG_NPC_ANIM;
+            }
         }
 #else
         auto df = d.get_current_floor();

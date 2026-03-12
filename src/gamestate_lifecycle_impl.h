@@ -119,7 +119,12 @@ inline void gamestate::logic_init() {
     massert(!d.is_initialized, "dungeon is already initialized");
     create_and_add_df_1(BIOME_STONE, 8, 8, 2, parts);
     create_and_add_df_1(BIOME_STONE, 16, 16, 2, parts);
-    massert(assign_random_stairs(), "failed to assign dungeon stairs");
+    const bool stairs_assigned = assign_random_stairs();
+    massert(stairs_assigned, "failed to assign dungeon stairs");
+    if (!stairs_assigned) {
+        merror("failed to assign dungeon stairs");
+        return;
+    }
     d.current_floor = 0;
     d.is_initialized = true;
 

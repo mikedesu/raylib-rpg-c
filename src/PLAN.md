@@ -376,17 +376,21 @@ These are the best remaining cleanup seams for the next session:
       - [x] equip/unequip shield flow
       - [x] potion consumption and resulting state changes
     - [ ] add gameplay interaction tests:
-      - [ ] movement blocked by walls, doors, boxes, and solid props as appropriate
-      - [ ] push/pull behavior across bounds and cache transitions
-      - [ ] dead-body interaction behavior using `dead_npc_cache`
-      - [ ] cross-floor location-sensitive logic that must honor `loc.z`
+      - [x] movement blocked by walls, doors, boxes, and solid props as appropriate
+      - [x] push/pull behavior across bounds and cache transitions
+      - [x] dead-body interaction behavior using `dead_npc_cache`
+      - [x] cross-floor location-sensitive logic that must honor `loc.z`
+      - note: this pass exposed and fixed a real `tile_has_door(vec3)` floor-selection bug where door checks incorrectly used `current_floor` instead of `loc.z`
     - [ ] add combat/turn-simulation tests:
-      - [ ] single-monster spawn/init sanity
-      - [ ] multi-monster uniqueness/count constraints
+      - [x] single-monster spawn/init sanity
+      - [x] multi-monster uniqueness/count constraints
       - [ ] max-monster and too-many-monster boundary behavior
-      - [ ] `logic_init()` gameplay bootstrap sanity
+      - [x] `logic_init()` gameplay bootstrap sanity
       - [ ] 1v1 combat simulation over many ticks with stable invariants
       - [ ] long-running gameplay simulation tests over hundreds/thousands of turns to catch crashes, invalid state, or impossible transitions
+      - note: this pass exposed and fixed two real bootstrap/runtime bugs:
+        - `logic_init()` had the same skipped `assign_random_stairs()` call pattern as `init_dungeon()` when `DEBUG_ASSERT` was off
+        - non-`NPCS_ALL_AT_ONCE` NPC turn handling could call `handle_npc()` on non-NPC entity ids and throw `std::bad_optional_access`
     - [ ] add path/layout tests:
       - [ ] corridor generation/connectivity checks
       - [ ] no disconnected player start
