@@ -3,10 +3,10 @@
 Compact handoff for active refactor and test work.
 
 ## Immediate New Feature Development
-- [ ] alignment.h
+- [x] alignment.h
   - [x] I have already updated `ComponentTraits.h` to use `alignment_t` for the `alignment` trait
-  - [ ] Write the missing functionality in `alignment.h`
-  - [ ] In the various `gamestate` files, update `npc` creation to include an `alignment` component in the `create_npc_at_with` functions, which should be using separate initialization functions
+  - [x] Write the missing functionality in `alignment.h`
+  - [x] In the various `gamestate` files, update `npc` creation to include an `alignment` component in the `create_npc_at_with` functions, which should be using separate initialization functions
 
 - [ ] Friendly and non-friendly NPCs
   - [ ] determines "attack-on-sight"-type behavior

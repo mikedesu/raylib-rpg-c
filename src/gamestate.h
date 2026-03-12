@@ -443,6 +443,12 @@ public:
      */
     with_fun player_init(int maxhp_roll);
 
+    /** @brief Return the default alignment to assign for a race. */
+    alignment_t default_alignment_for_race(race_t rt);
+
+    /** @brief Return an initializer that assigns an explicit alignment component. */
+    with_fun npc_alignment_init(alignment_t alignment);
+
     /** @brief Create and place a weapon item at a specific dungeon location. */
     entityid create_weapon_at_with(ComponentTable& ct, vec3 loc, with_fun weaponInitFunction);
 

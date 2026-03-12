@@ -14,6 +14,12 @@ private:
     }
 
 public:
+    void testAlignmentToStrReturnsExpectedNames() {
+        TS_ASSERT_EQUALS(alignment_to_str(ALIGNMENT_GOOD_LAWFUL), "lawful good");
+        TS_ASSERT_EQUALS(alignment_to_str(ALIGNMENT_NEUTRAL_NEUTRAL), "true neutral");
+        TS_ASSERT_EQUALS(alignment_to_str(ALIGNMENT_EVIL_CHAOTIC), "chaotic evil");
+    }
+
     void testCreateWeaponAtWithSetsExpectedWeaponComponents() {
         gamestate g;
         const vec3 loc = add_initialized_floor(g);
@@ -114,6 +120,7 @@ public:
         TS_ASSERT_DIFFERS(id, ENTITYID_INVALID);
         TS_ASSERT_EQUALS(g.ct.get<entitytype>(id).value_or(ENTITY_NONE), ENTITY_NPC);
         TS_ASSERT_EQUALS(g.ct.get<race>(id).value_or(RACE_NONE), RACE_ORC);
+        TS_ASSERT_EQUALS(g.ct.get<alignment>(id).value_or(ALIGNMENT_NONE), ALIGNMENT_EVIL_CHAOTIC);
         TS_ASSERT(g.ct.get<name>(id).has_value());
         TS_ASSERT(!g.ct.get<name>(id).value_or("").empty());
         TS_ASSERT(!g.ct.get<dead>(id).value_or(true));

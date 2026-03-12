@@ -82,6 +82,34 @@ inline with_fun gamestate::player_init(int maxhp_roll) {
     };
 }
 
+inline alignment_t gamestate::default_alignment_for_race(race_t rt) {
+    switch (rt) {
+    case RACE_HUMAN: return ALIGNMENT_NEUTRAL_NEUTRAL;
+    case RACE_ELF: return ALIGNMENT_GOOD_CHAOTIC;
+    case RACE_DWARF: return ALIGNMENT_GOOD_LAWFUL;
+    case RACE_HALFLING: return ALIGNMENT_GOOD_NEUTRAL;
+    case RACE_GOBLIN: return ALIGNMENT_EVIL_NEUTRAL;
+    case RACE_ORC: return ALIGNMENT_EVIL_CHAOTIC;
+    case RACE_BAT: return ALIGNMENT_NEUTRAL_NEUTRAL;
+    case RACE_GREEN_SLIME: return ALIGNMENT_NEUTRAL_NEUTRAL;
+    case RACE_WOLF: return ALIGNMENT_NEUTRAL_NEUTRAL;
+    case RACE_WARG: return ALIGNMENT_EVIL_NEUTRAL;
+    case RACE_RAT: return ALIGNMENT_NEUTRAL_NEUTRAL;
+    case RACE_SKELETON: return ALIGNMENT_EVIL_LAWFUL;
+    case RACE_ZOMBIE: return ALIGNMENT_EVIL_NEUTRAL;
+    case RACE_NONE:
+    case RACE_COUNT:
+    default: break;
+    }
+    return ALIGNMENT_NONE;
+}
+
+inline with_fun gamestate::npc_alignment_init(alignment_t alignment_value) {
+    return [alignment_value](CT& ct, const entityid id) {
+        ct.set<alignment>(id, alignment_value);
+    };
+}
+
 inline entityid gamestate::create_weapon_at_with(ComponentTable& ct, vec3 loc, with_fun weaponInitFunction) {
     minfo2("create weapon at with: %d %d %d", loc.x, loc.y, loc.z);
     if (d.floors.size() == 0) {
@@ -258,6 +286,7 @@ inline entityid gamestate::create_npc_with(race_t rt, with_fun npcInitFunction) 
     entityid id = add_entity();
     set_npc_defaults(id);
     ct.set<race>(id, rt);
+    npc_alignment_init(default_alignment_for_race(rt))(ct, id);
     set_npc_starting_stats(id);
     npcInitFunction(ct, id);
     return id;
@@ -342,7 +371,7 @@ inline entityid gamestate::create_player_at_with(vec3 loc, string n, with_fun pl
     minfo2("create player with: loc=(%d, %d, %d), n=%s", loc.x, loc.y, loc.z, n.c_str());
     massert(n != "", "name is empty string");
     race_t rt = chara_creation.race;
-    entityid id = create_npc_at_with(rt, loc, [](CT& ct, const entityid id) {});
+    entityid id = create_npc_at_with(rt, loc, playerInitFunction);
     massert(id != ENTITYID_INVALID, "id is invalid");
     constexpr int hp_ = 10;
     constexpr int maxhp_ = 10;
@@ -363,7 +392,6 @@ inline entityid gamestate::create_player_at_with(vec3 loc, string n, with_fun pl
     ct.set<hearing_distance>(id, hear_dist);
     ct.set<name>(id, n);
     ct.set<dead>(id, false);
-    playerInitFunction(ct, id);
     return id;
 }
 

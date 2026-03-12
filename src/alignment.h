@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 typedef enum {
     ALIGNMENT_NONE = 0,
     ALIGNMENT_GOOD_LAWFUL,
@@ -14,6 +16,20 @@ typedef enum {
     ALIGNMENT_COUNT,
 } alignment_t;
 
-// Functions that will return string representations of each alignment
-// i.e. ALIGNMENT_EVIL_LAWFUL returns "lawful evil"
-// ALIGNMENT_NEUTRAL_NEUTRAL returns "true neutral"
+static inline std::string alignment_to_str(alignment_t alignment) {
+    switch (alignment) {
+    case ALIGNMENT_NONE: return "none";
+    case ALIGNMENT_GOOD_LAWFUL: return "lawful good";
+    case ALIGNMENT_GOOD_NEUTRAL: return "neutral good";
+    case ALIGNMENT_GOOD_CHAOTIC: return "chaotic good";
+    case ALIGNMENT_NEUTRAL_LAWFUL: return "lawful neutral";
+    case ALIGNMENT_NEUTRAL_NEUTRAL: return "true neutral";
+    case ALIGNMENT_NEUTRAL_CHAOTIC: return "chaotic neutral";
+    case ALIGNMENT_EVIL_LAWFUL: return "lawful evil";
+    case ALIGNMENT_EVIL_NEUTRAL: return "neutral evil";
+    case ALIGNMENT_EVIL_CHAOTIC: return "chaotic evil";
+    case ALIGNMENT_COUNT: return "alignment count";
+    default: break;
+    }
+    return "invalid alignment";
+}

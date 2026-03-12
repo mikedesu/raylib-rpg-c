@@ -67,16 +67,7 @@ inline void gamestate::handle_input_character_creation_scene(inputstate& is) {
         shared_ptr<dungeon_floor> df = d.floors[0];
         vec3 start_loc = df->get_random_loc();
         massert(!vec3_invalid(start_loc), "start_loc is (-1,-1,-1) - no valid start location exists");
-        entity_turn = create_player_at_with(start_loc, "darkmage", [this, maxhp_roll](CT& ct, entityid id) {
-            ct.set<strength>(id, chara_creation.strength);
-            ct.set<dexterity>(id, chara_creation.dexterity);
-            ct.set<constitution>(id, chara_creation.constitution);
-            ct.set<intelligence>(id, chara_creation.intelligence);
-            ct.set<wisdom>(id, chara_creation.wisdom);
-            ct.set<charisma>(id, chara_creation.charisma);
-            ct.set<hd>(id, (vec3){1, chara_creation.hitdie, 0});
-            ct.set<hp>(id, vec2{maxhp_roll, maxhp_roll});
-        });
+        entity_turn = create_player_at_with(start_loc, "darkmage", player_init(maxhp_roll));
         massert(hero_id != ENTITYID_INVALID, "heroid is invalid");
         make_all_npcs_target_player();
         current_scene = SCENE_GAMEPLAY;
