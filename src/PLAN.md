@@ -1,297 +1,70 @@
 # GameState Refactor Plan
 
-This file is the handoff note for the `gamestate.h` cleanup work.
-
-## Completed This Session
-
-- Refactored `gamestate.h` into responsibility-specific implementation headers for world generation, lifecycle, scenes, input, combat/AI, world interaction, and inventory.
-- Split `libdraw.h` into smaller renderer-focused headers and kept `libdraw.h` as the stable composition include.
-- Stabilized several gameplay systems:
-  - restored/fixed dead-body pulling, including edge-of-map bounds validation
-  - changed tile item storage to a fixed-capacity cache while keeping floor rendering/pickup on the top item
-  - re-enabled boxes and reset the hero light radius back down to `3`
-- Reworked dungeon generation away from the single-room bootstrap:
-  - added a first-pass floor-painting API
-  - switched to connected room-and-corridor generation
-  - tuned scaling toward more rooms/density instead of oversized rooms
-- Added a gameplay-only quit confirmation flow:
-  - `Escape` in gameplay now opens a simple `Y/N` confirm prompt
-  - non-gameplay scenes still instant-quit
-  - web builds return to title/reset instead of closing the app
-- Ran the planned floor-size test pass and recorded the results:
-  - `8x8` underuses space and tends to collapse to tiny single-room layouts
-  - `16x16`, `32x32`, `8x16`, and `16x8` all produced acceptable-to-good interconnected layouts in manual testing
-- Improved the small-map generator for `8x8`:
-  - added a compact-map branch with `2x2` minimum/maximum room sizing for `8x8`
-  - allowed zero-gap adjacency and removed extra overlap padding for compact maps
-  - tuned compact-map room-count targeting down to a realistic `4-5` rooms
-  - manual verification after the change showed `8x8` feels noticeably better and uses space more effectively
-- Updated gameplay bootstrap to generate 2 floors:
-  - floor `0`: `8x8`
-  - floor `1`: `16x16`
-- Added random staircase assignment per floor and bound stairs traversal to `.`
-- Added a per-floor full-light debug toggle on `l`, with debug/help text support
-- Re-activated `PROP` support in the active gameplay path:
-  - props are now cached on tiles and drawn in `draw_dungeon_floor.h`
-  - props are placed during gameplay bootstrap as a separate post-layout layer
-  - prop types/sprite mappings were expanded to cover a broader initial floor-prop set
-  - prop solidity/passability now flows through the same gameplay checks as other tile entities
-- Fixed a cross-floor renderer assumption exposed by props:
-  - spritegroup creation now validates entity locations against `loc.z` instead of always using `current_floor`
-- Applied a first-pass top-down `libdraw` refactor:
-  - split scene-texture rendering, window presentation, and frame-stat bookkeeping into separate headers
-  - reduced `libdraw_frame.h` back toward frame orchestration instead of mixed ownership
-- Refreshed two stale UI layouts:
-  - help menu bounds now measure real multiline text content
-  - inventory right-side detail text now renders at `20`
-- Established first-pass API documentation infrastructure:
-  - adopted Doxygen as the project documentation generator
-  - added a `Doxyfile`
-  - added `make docs` and `make docs-clean`
-  - added `docs/DOCUMENTATION.md` to define the Javadoc-style comment standard
-- Started the first core-header documentation pass:
-  - added file/class/API docs to `libdraw*.h` headers touched during the renderer refactor
-  - added first-pass documentation to `gamestate.h`, `dungeon_floor.h`, and `dungeon_tile.h`
-  - added first-pass Doxygen documentation to `main.cpp` for the process entrypoint, outer loop, and shared runtime globals
-  - verified HTML generation to `docs/api/html/index.html`
+Compact handoff for active refactor and test work.
 
 ## Current State
 
-- `gamestate.h` was reduced significantly and now acts more like a top-level coordinator.
-- The project still uses implementation headers included at the bottom of `gamestate.h`.
-- This is intentional for now because the build is still effectively single-translation-unit oriented (`main.cpp` includes `gamestate.h` directly).
-- Dead NPCs now live on tiles via `dead_npc_cache` in `dungeon_tile.h`, so pull/interact behavior has to account for that storage path explicitly.
-- Inventory mutations, equip/unequip handling, and potion use now live in `gamestate_inventory_impl.h`.
-- Tile entity storage is now more explicitly cache-based:
-  - single-slot caches for player/live NPC, box, and door
-  - fixed-capacity caches for dead NPCs and items
-- Multi-item tiles are now supported at the storage layer, but rendering and pickup still intentionally treat the top cached item as the visible/interactive representative.
-- Renderer code is still implementation-header based, but `libdraw.h` now reads as a composition root instead of a monolith.
-- Scene draw dispatch, render-target lifecycle, window presentation, and per-frame orchestration are now more cleanly separated.
-- `libdraw_frame.h` is no longer carrying scene rendering, target composition, and frame-stat bookkeeping all in one place.
-- The current renderer still depends on global render-texture state and implementation headers, but the ownership seams are much clearer than before.
-- Doxygen is now the active documentation standard for the codebase.
-- Generated API docs can now be built locally with `make docs`.
-- Documentation coverage is still partial:
-  - the infrastructure is in place
-  - renderer headers have a first-pass of docs
-  - `gamestate.h`, `dungeon_floor.h`, `dungeon_tile.h`, and `main.cpp` have begun the core API pass
-  - many remaining headers still need declaration-level documentation
-- Dungeon generation no longer defaults to a single open rectangle.
-- The current dungeon bootstrap now creates a `64x64` floor for gameplay testing.
-- The current generator produces:
-  - many small connected rooms
-  - short corridors between adjacent regions
-  - viable door candidate chokepoints inferred from tile neighborhoods
-- The current scaling direction is intentionally density-first:
-  - keep rooms relatively small
-  - add more rooms as floor area increases
-  - keep gap/corridor lengths short so bigger maps read as denser, not emptier
-- Very small maps now use a dedicated compact-map generation path:
-  - `8x8` floors allow `2x2` rooms
-  - `8x8` floors allow direct adjacency without a mandatory one-tile gap
-  - compact-map spacing rules are intentionally looser than the general generator so the tiny interior can still support multiple regions
+- `gamestate.h` is now a top-level coordinator with implementation headers split by responsibility:
+  - world/entity factory/lifecycle/scene/input/combat/world interaction/inventory
+- `libdraw.h` was split into smaller renderer-focused headers, but rendering is still implementation-header based and still has global-state seams.
+- Tile/entity storage is cache-based:
+  - single-slot: player/live NPC, prop, box, door
+  - fixed-capacity: dead NPCs, items
+  - presentation/pickup still intentionally use the top cached item only
+- Dungeon generation now uses connected room-and-corridor growth instead of the old one-big-room bootstrap.
+- Small maps use dedicated compact-map rules; `8x8` now supports `2x2` rooms and zero-gap adjacency.
+- Gameplay bootstrap currently builds 2 floors:
+  - floor `0`: `8x8`
+  - floor `1`: `16x16`
+- Props are back in the active gameplay path and flow through tile caches, placement, rendering, and solidity checks.
+- Doxygen is the active documentation standard; `make docs` works.
 
-## Files Added
+## Recent Completed Work
 
-- `gamestate_world_impl.h`
-- `gamestate_entity_factory_impl.h`
-- `gamestate_lifecycle_impl.h`
-- `gamestate_scene_impl.h`
-- `gamestate_input_impl.h`
-- `gamestate_npc_combat_impl.h`
-- `gamestate_world_interaction_impl.h`
-- `gamestate_inventory_impl.h`
-- `item_cache.h`
-- `libdraw_context.h`
-- `libdraw_scene_dispatch.h`
-- `libdraw_frame.h`
-- `libdraw_lifecycle.h`
-- `libdraw_scene_render.h`
-- `libdraw_window_present.h`
-- `libdraw_frame_stats.h`
+- Refactored `gamestate.h` and first-pass `libdraw.h` structure.
+- Reintroduced and stabilized props, boxes, multi-item tiles, dead-body pulling, and quit confirmation.
+- Added docs infrastructure plus first-pass docs for core headers.
+- Built a real test suite under `test_suites/` while keeping `make tests` as the single fast runner.
+- Expanded unit coverage to 49 passing tests across:
+  - gamestate lifecycle
+  - dungeon/bootstrap
+  - placement
+  - entity factories
+  - inventory/equipment
+  - tile/cache helpers
+  - component table
+  - world interaction
+  - combat/bootstrap smoke tests
+- Recent bugs found and fixed by tests:
+  - `init_dungeon()` skipped `assign_random_stairs()` in non-`DEBUG_ASSERT` builds
+  - `logic_init()` had the same skipped stairs-assignment bug
+  - `tile_has_door(vec3)` incorrectly used `current_floor` instead of `loc.z`
+  - non-`NPCS_ALL_AT_ONCE` turn handling could route non-NPC ids into `handle_npc()` and throw `std::bad_optional_access`
 
-## Verified
+## Verification
 
-- Build command used:
+- Desktop build has been repeatedly verified with:
 
 ```sh
 make clean && CXXFLAGS="-DDEBUG_ASSERT=1 -DNPCS_ALL_AT_ONCE -DDEBUG=1 -DMASTER_VOLUME=1.0f -DMUSIC_OFF " make game
 ```
 
-- Code compiles and links successfully.
-- Additional verification this session:
-  - repeated `make clean && make game` rebuilds succeeded through compile and link after each dungeon-generation change
-  - after updating `log_build_stats.sh`, `make clean && make game` now completes successfully end-to-end
-  - prop reintegration changes rebuilt cleanly after tile-cache/render/bootstrap updates
-  - first-pass `libdraw` structural split rebuilt cleanly after the new header breakdown
-  - manual runtime verification:
-    - props now show up in gameplay
-    - help menu and inventory detail text sizing changes look correct
-  - documentation verification:
-    - `make docs` succeeds with Doxygen `1.9.4`
-    - generated HTML output is present under `docs/api/html`
+- Current unit-test verification:
 
-## Next Refactor Targets
+```sh
+make clean && make tests && ./tests
+```
 
-These are the best remaining cleanup seams for the next session:
+## High-Value Backlog
 
-1. `libdraw.h` / renderer organization
-   - continue the top-down cleanup after the first-pass structural split
-   - identify a cleaner top-down structure around:
-     - render target ownership/bootstrap
-     - scene-specific composition boundaries
-     - window presentation
-     - sprite update pre/post passes
-     - remaining global renderer state
-   - use `draw_frame_2d.h` as the gameplay composition root and look for similar cleanup seams in title/character-creation paths
+- [ ] Continue top-down `libdraw.h` cleanup
+  - reduce remaining global-state coupling
+  - tighten target/render ownership
+  - revisit whether `libdraw_scene_dispatch.h` stays as compatibility glue
+  - preserve all `loc.z`-sensitive renderer behavior
 
-2. Debug and diagnostics
-   - `update_debug_panel_buffer`
-   - possibly related profiling/debug helpers
-
-3. Remaining `gamestate.h` stragglers
-   - small inline helpers that still fit better in extracted implementation headers
-   - reassess whether any world-interaction or input-adjacent helpers should be grouped further
-
-4. Documentation coverage
-   - continue the declaration-level Doxygen pass on the core headers
-   - continue from `main.cpp` into adjacent entry/runtime surfaces when they are touched
-   - document ownership, side effects, and failure behavior where names are not enough
-   - keep docs focused on API meaning, not implementation trivia
-
-## Notes For Next Session
-
-- World-interaction caution:
-  - re-check the dead-body interaction path before more cleanup in that area
-  - `try_entity_pull()` now has explicit source/destination bounds checks and should stay that way
-  - if interaction logic changes again, compare behavior across boxes, dead bodies, and any code that still assumes single-source tile caches
-- Item-stack reminder:
-  - storage now supports multiple items per tile
-  - presentation is still intentionally minimal: draw and pick up only the top cached item
-- Manual floor-size takeaways:
-  - `8x8`: improved after the compact-map tuning pass; no longer feels stuck in the previous tiny-single-room failure mode
-  - `16x16`: good, 4 runs all produced 6 interconnected rooms
-  - `32x32`: good, 2 runs produced about 21 interconnected rooms with no obvious disconnected spaces
-  - `8x16` and `16x8`: acceptable, both produced 3 interconnected rooms
-- Dungeon-generation state:
-  - the old one-big-room path is no longer the default
-  - the current generator is in a solid first-pass state and produces connected room/corridor layouts
-  - it still reads as tree-like because growth anchors from existing rooms
-  - the next quality jump is more interconnection, not just more density
-- Gameplay-layout implication:
-  - doors and boxes are available again, so future generation passes can start leaning into chokepoints and room purpose more intentionally
-
-## Libdraw Review Notes
-
-- `libdraw.h` is now the best next refactor target.
-- Highest-value signal:
-  - it mixes renderer lifecycle (`libdraw_init`, `libdraw_close`)
-  - frame orchestration (`drawframe`)
-  - scene dispatch
-  - render target ownership/bootstrap
-  - and sprite-update sequencing
-- `draw_frame_2d.h` already behaves like a gameplay rendering composition unit and is a good anchor for extracting cleaner responsibilities upward.
-- Likely first-pass extraction seams:
-  - render initialization / shutdown helpers
-  - scene draw dispatch helpers
-  - target-texture orchestration helpers
-  - sprite-update pre/post pipeline coordination
-- The current system appears to have a coherent feel already; the refactor goal should be structural clarity and smaller ownership surfaces, not changing rendering behavior.
-- First-pass structural split has been applied; the next pass should focus on deeper cleanup inside the extracted units rather than moving more code around blindly.
-
-## Longer-Term Cleanup Ideas
-
-- Move from implementation headers to real `.cpp` files once the build system is ready for multiple translation units.
-- Re-evaluate whether `gamestate` should keep owning all behavior directly, or whether some of these areas should become subsystems/helpers.
-- Group related methods by responsibility more explicitly:
-  - world/bootstrap
-  - entities/factories
-  - player input
-  - combat/AI
-  - inventory/items
-  - rendering/debug-facing state preparation
-
-## Dungeon Generation Intent
-
-- The next major gameplay-facing improvement is dungeon floor creation, not more header extraction.
-- The target feel is:
-  - multiple adjacent rooms
-  - corridors/passageways between them
-  - more maze-like traversal
-  - chokepoints that make door placement meaningful
-- Avoid generating a single open rectangular floor as the default layout.
-- First-pass success criteria:
-  - the player spawns into a connected dungeon
-  - the floor reads as rooms plus hallways rather than one open chamber
-  - there are obvious doorway candidates between spaces
-  - existing entity placement (`player`, `NPC`, `items`, `boxes`) still works on valid walkable tiles
-- After the shape generation is improved, revisit door-placement rules so doors are placed because of the map layout rather than as a cosmetic afterthought.
-
-## Dungeon Generation Progress
-
-- First-pass dungeon floor generation is now in place and working:
-  - connected room growth from an initial seed room
-  - adjacent region placement
-  - straight corridor carving between regions
-  - automatic door candidate refresh based on local tile topology
-- The current `64x64` gameplay bootstrap was useful because it exposed the difference between:
-  - bad scaling by enlarging rooms
-  - better scaling by increasing room count and density
-- Important design lesson from this session:
-  - scaling dungeon generation should primarily increase structure count/connectivity density
-  - it should not primarily increase room footprint
-- Additional small-map lesson:
-  - `8x8` needs its own geometry rules
-  - applying the same minimum room size, gap, and spacing assumptions used by larger maps underutilizes the tiny playable interior
-
-## Possible Next Things
-
-1. Add loop-making passes that connect nearby existing rooms after the initial growth pass.
-2. Add L-corridor support so room adjacency is not limited to perfect overlap on one axis.
-3. Introduce region metadata on `dungeon_floor` so rooms/corridors are tracked explicitly instead of only implied by painted tiles.
-4. Split door candidacy into:
-   - geometrically valid
-   - gameplay desirable
-   so later passes can be selective.
-5. Add dedicated spawn-selection rules so player/NPC/item placement can prefer rooms over corridors when useful.
-6. Add lightweight debug visualization or counters for:
-   - room count
-   - corridor count
-   - door candidate count
-   - walkable tile count
-7. Revisit `parts` so it becomes a real density/style control instead of a mostly indirect heuristic input.
-   - note: `parts` was short for "partition", as in quadrants of the cartesian X/Y plane. 4.0 = 4 partitions/quadrants. 
-8. Add alternate generation styles later using the same painting API rather than replacing the API:
-   - sparse stronghold
-   - dense catacombs
-   - chamber-and-hub layouts
-
-## Future Things
-
-1. The web build that uses `emcc` in the `Makefile` packages the game assets in a way that I can push the game build to itch.io so that people may play the game in their browser. I am interested in finding a way for us to package assets in a way that cannot be easily reverse-engineered and stolen as that would result in a violation of the licensing the assets were sold under (makes sense right?). I'd love to allow people to play a compiled binary or build and run the game themselves but the assets need to be delivered in a way that is safe to distribute without reasonable threat of theft.
-
-## Definite Next Things
-
-- [x] decide on a `javadoc`-style infrastructure for generating automated documentation.
-  - [x] generating documentation is now a `Makefile` target:
-    - `make docs`
-    - `make docs-clean`
-  - [x] the documentation standard is now outlined in:
-    - `docs/DOCUMENTATION.md`
-  - [x] Doxygen is the chosen tool for HTML API generation
-  - [x] Javadoc-style Doxygen comments are now the project standard for new API declarations
-
-- [x] Continue the first core-header documentation pass
-  - completed in this pass:
-    - `main.cpp`
-    - `gamestate.h`
-    - `dungeon.h`
-    - `ComponentTable.h`
-    - `ComponentTraits.h`
-  - the Doxygen/Javadoc-style standard is now established enough that new code should conform as it is added
-  - remaining documentation work is now a backlog item rather than the immediate focus
-  - immediate documentation backlog checklist:
+- [ ] Continue documentation pass
+  - next likely headers:
     - [ ] `libdraw.h`
     - [ ] `libdraw_context.h`
     - [ ] `inputstate.h`
@@ -312,120 +85,111 @@ These are the best remaining cleanup seams for the next session:
     - [ ] `proptype.h`
     - [ ] `race.h`
     - [ ] `rarity.h`
-  - when documentation work resumes:
-    - open `docs/DOCUMENTATION.md`
-    - run `make docs`
-    - pick the next unchecked file from the checklist instead of restarting a broad pass
 
-- [ ] Re-factor libdraw.h from the top down and associated drawing functions, methods, classes, and files
-  - Pay attention to the object and definition hierarchy in order to understand the relationship between the gamestate and the rendered textures
-  - Our goal is flexibility: as you can see, I am adding new `ENTITY_TYPE_` values that distinguish `NPC` from `ITEM` from `DOOR` from `BOX` from `PROP` etc.
-  - `PROP` support is back in the active gameplay path now:
-    - props can be created with `create_prop_with` / `create_prop_at_with`
-    - props are cached on tiles and drawn in `draw_dungeon_floor.h`
-    - props are placed during gameplay bootstrap as a separate post-layout layer
-  - first-pass structural split is already in place:
-    - scene-texture rendering
-    - window presentation
-    - frame-stat bookkeeping
-    are now broken out into dedicated headers
-  - focus the next refactor on deeper ownership and layering clarity, not on rediscovering whether prop support exists
-  - preserve the rule that spritegroup creation must resolve bounds against `loc.z`, not always `current_floor`
-  - likely next renderer pass:
-    - reduce remaining global-state coupling
-    - tighten naming/composition around target textures
-    - decide whether `libdraw_scene_dispatch.h` should remain as a compatibility include or disappear entirely
+- [ ] Tighten current `PROP` system
+  - solid vs passable props needs more intentional rules
+  - placement quality still needs chokepoint/soft-lock awareness
+  - keep banner textures out of the active floor-prop pool for now
 
-- [ ] Rebuild the active unit/integration test backlog in `unit_test.h` while preserving `unit_test_old.h` as the resurrection source
-  - `unit_test_old.h` is not a dead file; it is the holding area for larger gameplay-simulation tests that need to be revived carefully against the current architecture
-  - immediate unit-test implementation checklist:
-    - [ ] re-audit every legacy test in `unit_test_old.h` and mark it as:
-      - [ ] migrate as-is
-      - [ ] update for new architecture/semantics
-      - [ ] split into smaller deterministic tests
-      - [ ] retire only if it is provably misleading or superseded
-    - [ ] add `gamestate` lifecycle tests:
-      - [x] reset/default state invariants
-      - [x] entity id allocation and dirty-entity bookkeeping
-      - [x] hero assignment/reset behavior
-      - [x] message-system/history behavior
-      - [x] camera-state reset behavior
-      - [ ] music-state reset/default behavior
-    - [ ] add dungeon/bootstrap tests:
-      - [x] `init_dungeon()` floor-count semantics
-      - [x] generated floor dimensions and valid walkable spawn selection
-      - [x] compact-map (`8x8`) generation sanity checks
-      - [x] multi-floor bootstrap correctness
-      - [x] upstairs/downstairs placement validity
-    - [ ] add tile/entity placement tests:
-      - [x] `place_doors()` returns zero on empty dungeon and positive counts on valid generated floors
-      - [x] placed doors land only on geometrically valid door candidate tiles
-      - [x] `place_props()` returns zero on empty dungeon and positive counts on valid generated floors
-      - [x] props remain on their own cache path and respect passability rules
-      - [ ] boxes, props, doors, items, live NPCs, dead NPCs, and player occupancy interact correctly on tiles
-    - [ ] add entity-factory/component-shape tests:
-      - [x] dagger creation populates `entitytype`, `itemtype`, `weapontype`, `name`, and tile location correctly
-      - [x] shield creation populates `entitytype`, `itemtype`, `shieldtype`, `name`, and tile location correctly
-      - [x] potion creation populates `entitytype`, `itemtype`, `potiontype`, `name`, and tile location correctly
-      - [x] prop creation populates `entitytype`, `proptype`, passability-related components, and tile caches correctly
-      - [x] random monster creation populates race/name/inventory/location/dead-state correctly
-    - [ ] add inventory/equipment tests:
-      - [x] picking up the top item from multi-item tiles
-      - [x] inventory insertion/removal bookkeeping
-      - [x] equip/unequip weapon flow
-      - [x] equip/unequip shield flow
-      - [x] potion consumption and resulting state changes
-    - [ ] add gameplay interaction tests:
-      - [x] movement blocked by walls, doors, boxes, and solid props as appropriate
-      - [x] push/pull behavior across bounds and cache transitions
-      - [x] dead-body interaction behavior using `dead_npc_cache`
-      - [x] cross-floor location-sensitive logic that must honor `loc.z`
-      - note: this pass exposed and fixed a real `tile_has_door(vec3)` floor-selection bug where door checks incorrectly used `current_floor` instead of `loc.z`
-    - [ ] add combat/turn-simulation tests:
-      - [x] single-monster spawn/init sanity
-      - [x] multi-monster uniqueness/count constraints
-      - [ ] max-monster and too-many-monster boundary behavior
-      - [x] `logic_init()` gameplay bootstrap sanity
-      - [ ] 1v1 combat simulation over many ticks with stable invariants
-      - [ ] long-running gameplay simulation tests over hundreds/thousands of turns to catch crashes, invalid state, or impossible transitions
-      - note: this pass exposed and fixed two real bootstrap/runtime bugs:
-        - `logic_init()` had the same skipped `assign_random_stairs()` call pattern as `init_dungeon()` when `DEBUG_ASSERT` was off
-        - non-`NPCS_ALL_AT_ONCE` NPC turn handling could call `handle_npc()` on non-NPC entity ids and throw `std::bad_optional_access`
-    - [ ] add path/layout tests:
-      - [ ] corridor generation/connectivity checks
-      - [ ] no disconnected player start
-      - [ ] door/prop placement does not create obvious soft-locks
-    - [ ] expand `ComponentTable` coverage:
-      - [x] set/get/has/remove/clear across many component kinds
-      - [ ] overwrite semantics for existing components
-      - [x] shared-pointer component storage behavior (`inventory`, etc.)
-      - [ ] large multi-entity insert/remove churn
-    - [ ] add `libdraw.h` and renderer-adjacent tests where deterministic seams exist:
-      - [ ] renderer lifecycle state init/teardown invariants
-      - [ ] spritegroup creation honors entity type and `loc.z` bounds
-      - [ ] scene dispatch reaches the expected composition path for title/gameplay/help/debug scenes
-      - [ ] frame-stat bookkeeping sanity
-      - [ ] render-target/bootstrap ownership assumptions that can be validated without brittle pixel-golden tests
-    - [ ] decide on test categorization and execution policy:
-      - [x] lightweight deterministic unit tests always run in `make tests`
-      - [x] active tests are now split by domain under `test_suites/` while `unit_test.h` remains a thin aggregation header for the single `tests` runner
-      - [ ] heavier gameplay-simulation tests remain enabled but may need clear grouping or build flags if runtime becomes too large
+- [ ] Preserve recent UI/layout fixes
+  - help menu box sizing now measures real multiline content
+  - inventory right-side detail text is `20`
 
-- [ ] Tighten the current `PROP` system instead of re-adding it from scratch
-  - `PROP`s are not items and cannot be picked up
-  - `PROP` entities may or may not be passable
-    - e.g. a wooden table or water barrel should block movement, while something like a torch or plate may remain passable
-  - current prop type coverage is now extendible, but placement logic is still simple and should become more intentional
-  - banner textures that depend on wall usage should stay out of the active floor-prop pool for now:
-    - `TX_PROP_BANNER_01`
-    - `TX_PROP_BANNER_00`
-    - wall tiles may or may not return later, so do not rebuild current prop flow around them yet
+## Unit Test Backlog
 
-- [ ] Improve prop placement quality
-  - props should remain a separate layer after floor layout generation
-  - avoid placing solid props in ways that create bad chokepoints or block obvious traversal
-  - start distinguishing decorative clutter from large blocking props so room dressing feels more intentional
+`unit_test_old.h` remains the resurrection source for larger gameplay-simulation tests. Active fast tests live under `test_suites/`.
 
-- [ ] Record recent UI/layout fixes so future cleanup does not regress them
-  - help menu text box sizing was updated to measure real multiline content instead of relying on stale fixed dimensions
-  - inventory detail text on the right-hand panel was increased to `20`
+- [ ] Legacy audit
+  - [ ] classify each old test as migrate/update/split/retire
+
+- [ ] Gamestate lifecycle
+  - [x] reset/default invariants
+  - [x] entity id allocation and dirty range
+  - [x] hero assignment/reset
+  - [x] message queue/history behavior
+  - [x] camera reset behavior
+  - [ ] music reset/default behavior
+
+- [ ] Dungeon/bootstrap
+  - [x] floor-count semantics
+  - [x] dimensions and spawn sanity
+  - [x] compact-map `8x8` sanity
+  - [x] multi-floor correctness
+  - [x] upstairs/downstairs validity
+
+- [ ] Placement
+  - [x] `place_doors()` zero-on-empty
+  - [x] deterministic positive door placement
+  - [x] `place_props()` zero-on-empty
+  - [x] deterministic positive prop placement
+  - [ ] richer mixed occupancy behavior: boxes/props/doors/items/live NPCs/dead NPCs/player
+
+- [ ] Entity factory shape
+  - [x] dagger
+  - [x] shield
+  - [x] potion
+  - [x] prop
+  - [x] orc / monster init shape
+
+- [ ] Inventory/equipment
+  - [x] top-item pickup from stacked tiles
+  - [x] inventory insert/remove bookkeeping
+  - [x] weapon equip/unequip
+  - [x] shield equip/unequip
+  - [x] potion consumption
+  - [x] equipped item drop behavior
+
+- [ ] Gameplay interaction
+  - [x] movement blocked by walls/doors/solid props
+  - [x] push/pull behavior
+  - [x] dead-body pull behavior via `dead_npc_cache`
+  - [x] `loc.z`-sensitive interaction logic
+
+- [ ] Combat / simulation
+  - [x] single-monster spawn sanity
+  - [x] multi-monster uniqueness/count constraints
+  - [x] `logic_init()` bootstrap sanity
+  - [x] bounded tick/turn smoke test
+  - [ ] max-monster / too-many-monster boundary behavior
+  - [ ] bounded 1v1 combat simulation with stable invariants
+  - [ ] longer simulation tests over hundreds/thousands of turns
+
+- [ ] Path/layout
+  - [ ] corridor/connectivity checks
+  - [ ] no disconnected player start
+  - [ ] door/prop placement should not create obvious soft-locks
+
+- [ ] ComponentTable
+  - [x] set/get/has/remove/clear across multiple kinds
+  - [x] shared-pointer storage behavior
+  - [ ] overwrite semantics
+  - [ ] high-churn multi-entity insert/remove coverage
+
+- [ ] Renderer-adjacent deterministic seams
+  - [ ] lifecycle init/teardown invariants
+  - [ ] spritegroup creation honors type and `loc.z`
+  - [ ] scene dispatch routing
+  - [ ] frame-stat bookkeeping
+  - [ ] render-target/bootstrap ownership assumptions
+
+- [ ] Test policy
+  - [x] fast deterministic tests stay in `make tests`
+  - [x] suites are split by domain under `test_suites/`
+  - [ ] decide whether heavy simulations need a separate target or flag
+
+## Design Notes
+
+- Dungeon generation should scale by room count/connectivity density, not by room footprint.
+- `8x8` needs dedicated geometry rules; larger-map assumptions do not scale down cleanly.
+- Future dungeon quality gains should focus on loops/interconnection, not just more density.
+- World-interaction cleanup must preserve explicit dead-body cache handling and bounds checks in `try_entity_pull()`.
+- Longer-term: move from implementation headers to real `.cpp` files once the build is ready for multiple translation units.
+
+## Nice-To-Have Later
+
+- Loop-making pass for dungeon generation
+- L-corridor support
+- explicit room/corridor region metadata
+- smarter spawn-selection rules
+- debug counters/visualization for generation quality
+- safer web asset packaging for browser distribution
