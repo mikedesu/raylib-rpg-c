@@ -282,24 +282,40 @@ These are the best remaining cleanup seams for the next session:
   - [x] Doxygen is the chosen tool for HTML API generation
   - [x] Javadoc-style Doxygen comments are now the project standard for new API declarations
 
-- [ ] Continue the first core-header documentation pass
-  - `main.cpp` entrypoint documentation is now in place
-  - next priority headers:
-    - `gamestate.h` remaining declarations
+- [x] Continue the first core-header documentation pass
+  - completed in this pass:
+    - `main.cpp`
+    - `gamestate.h`
     - `dungeon.h`
     - `ComponentTable.h`
     - `ComponentTraits.h`
-  - after that, move into the renderer/gameplay support headers that define the most important public helper surfaces
-  - prefer documenting declarations in headers instead of duplicating comments on implementation definitions
-  - focus on:
-    - class purpose
-    - ownership/state assumptions
-    - mutation side effects
-    - failure behavior / invalid return cases
-  - breadcrumb for next session:
+  - the Doxygen/Javadoc-style standard is now established enough that new code should conform as it is added
+  - remaining documentation work is now a backlog item rather than the immediate focus
+  - immediate documentation backlog checklist:
+    - [ ] `libdraw.h`
+    - [ ] `libdraw_context.h`
+    - [ ] `inputstate.h`
+    - [ ] `gamestate_inventory.h`
+    - [ ] `libgame_defines.h`
+    - [ ] `character_creation.h`
+    - [ ] `debugpanel.h`
+    - [ ] `scene.h`
+    - [ ] `controlmode.h`
+    - [ ] `entity_actions.h`
+    - [ ] `entitytype.h`
+    - [ ] `entityid.h`
+    - [ ] `item.h`
+    - [ ] `weapon.h`
+    - [ ] `shield.h`
+    - [ ] `potion.h`
+    - [ ] `spell.h`
+    - [ ] `proptype.h`
+    - [ ] `race.h`
+    - [ ] `rarity.h`
+  - when documentation work resumes:
     - open `docs/DOCUMENTATION.md`
     - run `make docs`
-    - continue from the remaining `gamestate.h` declarations rather than starting a new header family at random
+    - pick the next unchecked file from the checklist instead of restarting a broad pass
 
 - [ ] Re-factor libdraw.h from the top down and associated drawing functions, methods, classes, and files
   - Pay attention to the object and definition hierarchy in order to understand the relationship between the gamestate and the rendered textures
@@ -319,6 +335,12 @@ These are the best remaining cleanup seams for the next session:
     - reduce remaining global-state coupling
     - tighten naming/composition around target textures
     - decide whether `libdraw_scene_dispatch.h` should remain as a compatibility include or disappear entirely
+
+- [ ] Re-examine the unit test surfaces in `unit_test.h` and `unit_test_old.h`
+  - determine which tests still reflect the current architecture and gameplay behavior
+  - identify stale, duplicated, or misleading coverage between the old and current test headers
+  - decide whether to migrate, delete, consolidate, or replace the old test path
+  - treat this as an important maintenance item, not a low-priority cleanup footnote
 
 - [ ] Tighten the current `PROP` system instead of re-adding it from scratch
   - `PROP`s are not items and cannot be picked up
