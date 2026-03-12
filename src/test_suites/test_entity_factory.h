@@ -124,6 +124,7 @@ public:
         TS_ASSERT(g.ct.get<name>(id).has_value());
         TS_ASSERT(!g.ct.get<name>(id).value_or("").empty());
         TS_ASSERT(!g.ct.get<dead>(id).value_or(true));
+        TS_ASSERT(g.ct.get<aggro>(id).value_or(false));
         TS_ASSERT(g.ct.get<update>(id).value_or(false));
         TS_ASSERT(g.ct.get<inventory>(id).has_value());
         TS_ASSERT_EQUALS(g.ct.get<inventory>(id).value()->size(), 0U);
@@ -134,6 +135,18 @@ public:
 
         tile_t& tile = g.d.get_floor(0)->tile_at(loc);
         TS_ASSERT_EQUALS(tile.get_cached_live_npc(), id);
+    }
+
+    void testCreateNpcAtWithUsesRaceDefaultsForNameAlignmentAndAggro() {
+        gamestate g;
+        const vec3 loc = add_initialized_floor(g);
+
+        const entityid id = g.create_npc_at_with(RACE_DWARF, loc, [](CT&, const entityid) {});
+
+        TS_ASSERT_DIFFERS(id, ENTITYID_INVALID);
+        TS_ASSERT_EQUALS(g.ct.get<name>(id).value_or(""), "dwarf");
+        TS_ASSERT_EQUALS(g.ct.get<alignment>(id).value_or(ALIGNMENT_NONE), ALIGNMENT_GOOD_LAWFUL);
+        TS_ASSERT(!g.ct.get<aggro>(id).value_or(true));
     }
 
     void testCreatePlayerAtWithUsesCharacterCreationAlignment() {

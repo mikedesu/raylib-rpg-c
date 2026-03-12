@@ -4,16 +4,20 @@ Compact handoff for active refactor and test work.
 
 ## Immediate New Feature Development
 
-- [ ] Friendly and non-friendly NPCs
-  - [ ] determines "attack-on-sight"-type behavior
-  - [ ] friendly NPCs just wander around etc, non-friendly NPCs attack on sight
-  - [ ] after implementing, we need to get rid of the orc on the first floor and replace him with another randomly-generated npc
-    - [ ] get rid of the orc on floor 1
-    - [ ] on floor 1, add a new npc of a randomly chosen race with random stats and make it not-aggressive, that is, its default action is to wander randomly
-    - [ ] on floor 2, add a new npc that is an orc with random stats and make it aggressive, that is, its default action is to:
-      - [ ] if the player is on the same floor, the orc moves toward the player until it is adjacent.
-      - [ ] if the player is on the same floor and adjacent to the orc, the orc attacks the player
-      - [ ] if the player is on a different floor, then the default action is to move around randomly.
+- [x] Friendly and non-friendly NPCs
+  - [x] determines "attack-on-sight"-type behavior
+  - [x] friendly NPCs just wander around etc, non-friendly NPCs attack on sight
+  - [x] after implementing, we need to get rid of the orc on the first floor and replace him with another randomly-generated npc
+    - [x] get rid of the orc on floor 1
+    - [x] on floor 1, add a new npc of a randomly chosen race with random stats and make it not-aggressive, that is, its default action is to wander randomly
+    - [x] on floor 2, add a new npc that is an orc with random stats and make it aggressive, that is, its default action is to:
+      - [x] if the player is on the same floor, the orc moves toward the player until it is adjacent.
+      - [x] if the player is on the same floor and adjacent to the orc, the orc attacks the player
+      - [x] if the player is on a different floor, then the default action is to move around randomly.
+
+- [ ] When the player dies and presses 'R' to restart the game, when playing on desktop (non-web version), the game currently results in the window closing briefly before re-opening.
+  - [ ] i believe this is because we literally re-load raylib in order to refresh everything, but i could be wrong
+  - [ ] ideally, we do NOT want the window to close when restarting the game, but we do want the next scene to be the title screen. 
 
 - Treasure Chest entities
   - [ ] Function like an inventory that doesn't belong to an NPC

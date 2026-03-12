@@ -105,6 +105,18 @@ inline alignment_t gamestate::default_alignment_for_race(race_t rt) {
     return ALIGNMENT_NONE;
 }
 
+inline bool gamestate::alignment_is_aggressive(alignment_t alignment_value) {
+    switch (alignment_value) {
+    case ALIGNMENT_EVIL_LAWFUL:
+    case ALIGNMENT_EVIL_NEUTRAL:
+    case ALIGNMENT_EVIL_CHAOTIC:
+        return true;
+    default:
+        break;
+    }
+    return false;
+}
+
 inline with_fun gamestate::npc_alignment_init(alignment_t alignment_value) {
     return [alignment_value](CT& ct, const entityid id) {
         ct.set<alignment>(id, alignment_value);
@@ -287,9 +299,14 @@ inline entityid gamestate::create_npc_with(race_t rt, with_fun npcInitFunction) 
     entityid id = add_entity();
     set_npc_defaults(id);
     ct.set<race>(id, rt);
-    npc_alignment_init(default_alignment_for_race(rt))(ct, id);
+    const alignment_t default_alignment = default_alignment_for_race(rt);
+    npc_alignment_init(default_alignment)(ct, id);
+    ct.set<aggro>(id, alignment_is_aggressive(default_alignment));
     set_npc_starting_stats(id);
     npcInitFunction(ct, id);
+    if (!ct.get<name>(id).has_value()) {
+        ct.set<name>(id, race2str(rt));
+    }
     return id;
 }
 
@@ -307,6 +324,10 @@ inline entityid gamestate::create_npc_at_with(race_t rt, vec3 loc, with_fun npcI
     }
     if (tile_has_pushable(loc.x, loc.y, loc.z) != ENTITYID_INVALID) {
         merror2("cannot create entity on tile with pushable");
+        return INVALID;
+    }
+    if (tile.get_cached_live_npc() != INVALID) {
+        merror2("cannot create entity on tile with live npc");
         return INVALID;
     }
     entityid id = create_npc_with(rt, npcInitFunction);

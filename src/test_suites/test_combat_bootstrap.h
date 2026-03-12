@@ -34,6 +34,22 @@ private:
         return count;
     }
 
+    entityid find_live_npc_on_floor(gamestate& g, int floor) {
+        for (entityid id = 1; id < g.next_entityid; id++) {
+            if (g.ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_NPC) {
+                continue;
+            }
+            if (g.ct.get<dead>(id).value_or(true)) {
+                continue;
+            }
+            const vec3 loc = g.ct.get<location>(id).value_or(vec3{-1, -1, -1});
+            if (loc.z == floor) {
+                return id;
+            }
+        }
+        return ENTITYID_INVALID;
+    }
+
     void add_floor(gamestate& g, int width = 8, int height = 8) {
         auto df = g.d.create_floor(BIOME_STONE, width, height);
         df->df_set_all_tiles(TILE_FLOOR_STONE_00);
@@ -118,7 +134,94 @@ public:
         TS_ASSERT(count_entities_of_type(g, ENTITY_BOX) >= 1U);
         TS_ASSERT(count_entities_of_type(g, ENTITY_ITEM) >= 2U);
         TS_ASSERT(count_live_npcs_on_floor(g, 0) >= 1U);
+        TS_ASSERT(count_live_npcs_on_floor(g, 1) >= 1U);
         TS_ASSERT(g.msg_system.size() >= 2U);
+    }
+
+    void testLogicInitPlacesFriendlyNpcOnFloorZeroAndAggressiveOrcOnFloorOne() {
+        gamestate g;
+        g.test = true;
+        g.mt.seed(12345);
+
+        g.logic_init();
+
+        const entityid floor_zero_npc = find_live_npc_on_floor(g, 0);
+        const entityid floor_one_npc = find_live_npc_on_floor(g, 1);
+
+        TS_ASSERT_DIFFERS(floor_zero_npc, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(floor_one_npc, ENTITYID_INVALID);
+        TS_ASSERT(!g.ct.get<aggro>(floor_zero_npc).value_or(true));
+        TS_ASSERT_EQUALS(g.ct.get<race>(floor_one_npc).value_or(RACE_NONE), RACE_ORC);
+        TS_ASSERT(g.ct.get<aggro>(floor_one_npc).value_or(false));
+    }
+
+    void testUpdateNpcsStateSetsFriendlyAndHostileDefaultActions() {
+        gamestate g;
+        add_floor(g, 8, 8);
+        add_floor(g, 8, 8);
+
+        const entityid friendly = g.create_npc_at_with(RACE_DWARF, vec3{1, 1, 0}, [](CT&, const entityid) {});
+        const entityid hostile = g.create_orc_at_with(vec3{2, 2, 1}, [](CT&, const entityid) {});
+
+        TS_ASSERT_DIFFERS(friendly, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(hostile, ENTITYID_INVALID);
+
+        g.update_npcs_state();
+
+        TS_ASSERT_EQUALS(g.ct.get<entity_default_action>(friendly).value_or(ENTITY_DEFAULT_ACTION_NONE), ENTITY_DEFAULT_ACTION_RANDOM_MOVE);
+        TS_ASSERT_EQUALS(g.ct.get<entity_default_action>(hostile).value_or(ENTITY_DEFAULT_ACTION_NONE), ENTITY_DEFAULT_ACTION_RANDOM_MOVE);
+        TS_ASSERT_EQUALS(g.ct.get<target_id>(hostile).value_or(ENTITYID_INVALID), ENTITYID_INVALID);
+
+        g.d.current_floor = 1;
+        g.hero_id = g.create_player_at_with(vec3{4, 4, 1}, "hero", g.player_init(10));
+        g.update_npcs_state();
+
+        TS_ASSERT_EQUALS(g.ct.get<target_id>(hostile).value_or(ENTITYID_INVALID), g.hero_id);
+        TS_ASSERT_EQUALS(g.ct.get<entity_default_action>(hostile).value_or(ENTITY_DEFAULT_ACTION_NONE),
+                         ENTITY_DEFAULT_ACTION_MOVE_TO_TARGET_AND_ATTACK_TARGET_IF_ADJACENT);
+
+        g.hero_id = g.create_player_at_with(vec3{3, 2, 1}, "hero_adjacent", g.player_init(10));
+        g.update_npcs_state();
+
+        TS_ASSERT_EQUALS(g.ct.get<entity_default_action>(hostile).value_or(ENTITY_DEFAULT_ACTION_NONE),
+                         ENTITY_DEFAULT_ACTION_ATTACK_TARGET_IF_ADJACENT);
+    }
+
+    void testProvokeNpcTurnsFriendlyNpcHostile() {
+        gamestate g;
+        add_floor(g, 8, 8);
+
+        const entityid friendly = g.create_npc_at_with(RACE_DWARF, vec3{2, 1, 0}, [](CT&, const entityid) {});
+        const entityid hero = g.create_player_at_with(vec3{1, 1, 0}, "hero", g.player_init(10));
+
+        TS_ASSERT_DIFFERS(friendly, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+        TS_ASSERT(!g.ct.get<aggro>(friendly).value_or(true));
+
+        g.provoke_npc(friendly, hero);
+
+        TS_ASSERT(g.ct.get<aggro>(friendly).value_or(false));
+        TS_ASSERT_EQUALS(g.ct.get<target_id>(friendly).value_or(ENTITYID_INVALID), hero);
+        TS_ASSERT_EQUALS(g.ct.get<entity_default_action>(friendly).value_or(ENTITY_DEFAULT_ACTION_NONE),
+                         ENTITY_DEFAULT_ACTION_ATTACK_TARGET_IF_ADJACENT);
+    }
+
+    void testAttackingFriendlyNpcSetsAggro() {
+        gamestate g;
+        add_floor(g, 8, 8);
+
+        const entityid friendly = g.create_npc_at_with(RACE_DWARF, vec3{2, 1, 0}, [](CT&, const entityid) {});
+        const entityid hero = g.create_player_at_with(vec3{1, 1, 0}, "hero", g.player_init(10));
+        tile_t& target_tile = g.d.get_floor(0)->tile_at(vec3{2, 1, 0});
+
+        TS_ASSERT_DIFFERS(friendly, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+        TS_ASSERT(!g.ct.get<aggro>(friendly).value_or(true));
+
+        g.process_attack_entity(target_tile, hero, friendly);
+
+        TS_ASSERT(g.ct.get<aggro>(friendly).value_or(false));
+        TS_ASSERT_EQUALS(g.ct.get<target_id>(friendly).value_or(ENTITYID_INVALID), hero);
     }
 
     void testTickInTestModeAdvancesTicksAndTurnsWithHeroPresent() {

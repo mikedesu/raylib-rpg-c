@@ -129,8 +129,43 @@ inline void gamestate::update_npcs_state() {
         auto type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
         if (type == ENTITY_NPC) {
             ct.set<damaged>(id, false);
+            update_npc_behavior(id);
         }
     }
+}
+
+inline void gamestate::update_npc_behavior(entityid id) {
+    if (ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_NPC) {
+        return;
+    }
+    if (ct.get<dead>(id).value_or(true)) {
+        ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_NONE);
+        ct.set<target_id>(id, ENTITYID_INVALID);
+        return;
+    }
+
+    const bool is_aggressive = ct.get<aggro>(id).value_or(false);
+    if (hero_id == ENTITYID_INVALID || !is_aggressive || !ct.has<location>(hero_id)) {
+        ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_RANDOM_MOVE);
+        ct.set<target_id>(id, ENTITYID_INVALID);
+        return;
+    }
+
+    const vec3 npc_loc = ct.get<location>(id).value_or(vec3{-1, -1, -1});
+    const vec3 hero_loc = ct.get<location>(hero_id).value_or(vec3{-1, -1, -1});
+    if (vec3_invalid(npc_loc) || vec3_invalid(hero_loc) || npc_loc.z != hero_loc.z) {
+        ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_RANDOM_MOVE);
+        ct.set<target_id>(id, ENTITYID_INVALID);
+        return;
+    }
+
+    ct.set<target_id>(id, hero_id);
+    if (is_entity_adjacent(id, hero_id)) {
+        ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_ATTACK_TARGET_IF_ADJACENT);
+        return;
+    }
+
+    ct.set<entity_default_action>(id, ENTITY_DEFAULT_ACTION_MOVE_TO_TARGET_AND_ATTACK_TARGET_IF_ADJACENT);
 }
 
 inline void gamestate::logic_init() {
@@ -160,30 +195,36 @@ inline void gamestate::logic_init() {
     }
     create_weapon_at_with(ct, df->get_random_loc(), sword_init());
     create_shield_at_with(ct, df->get_random_loc(), shield_init());
-    constexpr int monster_count = 1;
-    for (int j = 0; j < monster_count; j++) {
-        vec3 random_loc = d.get_floor(0)->get_random_loc();
-        create_orc_at_with(random_loc, [this](CT& ct, const entityid id) {
-            entityid wpn_id = create_weapon_with([](CT& ct, const entityid id) {
-                ct.set<name>(id, "Dagger");
-                ct.set<description>(id, "Stabby stabby.");
-                ct.set<weapontype>(id, WEAPON_DAGGER);
-                ct.set<damage>(id, vec3{1, 4, 0});
-                ct.set<durability>(id, 100);
-                ct.set<max_durability>(id, 100);
-                ct.set<rarity>(id, RARITY_COMMON);
-            });
-            entityid potion_id = create_potion_with([](CT& ct, const entityid id) {
-                ct.set<name>(id, "small healing potion");
-                ct.set<description>(id, "a small healing potion");
-                ct.set<potiontype>(id, POTION_HP_SMALL);
-                ct.set<healing>(id, vec3{1, 6, 0});
-            });
-            add_to_inventory(id, wpn_id);
-            add_to_inventory(id, potion_id);
-            ct.set<equipped_weapon>(id, wpn_id);
+    auto armed_orc_init = [this](CT& ct, const entityid id) {
+        entityid wpn_id = create_weapon_with([](CT& ct, const entityid id) {
+            ct.set<name>(id, "Dagger");
+            ct.set<description>(id, "Stabby stabby.");
+            ct.set<weapontype>(id, WEAPON_DAGGER);
+            ct.set<damage>(id, vec3{1, 4, 0});
+            ct.set<durability>(id, 100);
+            ct.set<max_durability>(id, 100);
+            ct.set<rarity>(id, RARITY_COMMON);
         });
-    }
+        entityid potion_id = create_potion_with([](CT& ct, const entityid id) {
+            ct.set<name>(id, "small healing potion");
+            ct.set<description>(id, "a small healing potion");
+            ct.set<potiontype>(id, POTION_HP_SMALL);
+            ct.set<healing>(id, vec3{1, 6, 0});
+        });
+        add_to_inventory(id, wpn_id);
+        add_to_inventory(id, potion_id);
+        ct.set<equipped_weapon>(id, wpn_id);
+        ct.set<aggro>(id, true);
+    };
+
+    const race_t friendly_race = static_cast<race_t>(GetRandomValue(RACE_NONE + 1, RACE_COUNT - 1));
+    const vec3 friendly_loc = d.get_floor(0)->get_random_loc();
+    create_npc_at_with(friendly_race, friendly_loc, [](CT& ct, const entityid id) {
+        ct.set<aggro>(id, false);
+    });
+
+    const vec3 hostile_orc_loc = d.get_floor(1)->get_random_loc();
+    create_orc_at_with(hostile_orc_loc, armed_orc_init);
     msuccess("end creating monsters...");
     add_message("Welcome to the game! Press enter to cycle messages.");
     add_message("For help, press ?");

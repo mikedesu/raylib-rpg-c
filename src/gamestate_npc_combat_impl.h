@@ -80,6 +80,28 @@ inline void gamestate::update_npc_xp(entityid id, entityid target_id) {
     ct.set<xp>(id, new_xp);
 }
 
+inline void gamestate::provoke_npc(entityid npc_id, entityid source_id) {
+    if (npc_id == ENTITYID_INVALID) {
+        return;
+    }
+    if (ct.get<entitytype>(npc_id).value_or(ENTITY_NONE) != ENTITY_NPC) {
+        return;
+    }
+    if (ct.get<dead>(npc_id).value_or(true)) {
+        return;
+    }
+
+    ct.set<aggro>(npc_id, true);
+    ct.set<update>(npc_id, true);
+
+    const entityid target = source_id != ENTITYID_INVALID ? source_id : hero_id;
+    if (target != ENTITYID_INVALID) {
+        ct.set<target_id>(npc_id, target);
+    }
+
+    update_npc_behavior(npc_id);
+}
+
 inline void gamestate::process_attack_results(tile_t& tile, entityid atk_id, entityid tgt_id, bool atk_successful) {
     massert(atk_id != ENTITYID_INVALID, "attacker entity id is invalid");
     massert(tgt_id != ENTITYID_INVALID, "target entity id is invalid");
@@ -154,6 +176,9 @@ inline attack_result_t gamestate::process_attack_entity(tile_t& tile, entityid a
     }
     if (ct.get<dead>(target_id).value_or(true)) {
         return ATTACK_RESULT_MISS;
+    }
+    if (type == ENTITY_NPC) {
+        provoke_npc(target_id, attacker_id);
     }
 
     bool attack_successful = compute_attack_roll(attacker_id, target_id);

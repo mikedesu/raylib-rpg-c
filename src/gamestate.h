@@ -447,6 +447,9 @@ public:
     /** @brief Return the default alignment to assign for a race. */
     alignment_t default_alignment_for_race(race_t rt);
 
+    /** @brief Return whether an alignment should default to hostile behavior. */
+    bool alignment_is_aggressive(alignment_t alignment);
+
     /** @brief Return an initializer that assigns an explicit alignment component. */
     with_fun npc_alignment_init(alignment_t alignment);
 
@@ -589,6 +592,9 @@ public:
 
     /** @brief Refresh NPC state before or during their turn processing. */
     void update_npcs_state();
+
+    /** @brief Recompute one NPC's target and default action from its aggression state. */
+    void update_npc_behavior(entityid id);
 
     /** @brief Initialize gameplay state, generate floors, and seed initial entities. */
     void logic_init();
@@ -830,6 +836,9 @@ public:
 
     /** @brief Award NPC-defeat experience to the acting entity. */
     void update_npc_xp(entityid id, entityid target_id);
+
+    /** @brief Flip an NPC into hostile state in response to a violation. */
+    void provoke_npc(entityid npc_id, entityid source_id);
 
     /** @brief Apply gameplay side effects after resolving an attack attempt. */
     void process_attack_results(tile_t& tile, entityid atk_id, entityid tgt_id, bool atk_successful);
