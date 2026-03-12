@@ -33,7 +33,7 @@ Compact handoff for active refactor and test work.
 - Built a real test suite under `test_suites/` while keeping `make tests` as the single fast runner.
 - Re-enabled first-pass door generation/rendering/interaction and tightened tile-level single-door caching.
 - Tightened prop placement so generated props avoid chokepoints and doorway approaches that can soft-block room ingress.
-- Expanded unit coverage to 56 passing tests across:
+- Expanded unit coverage to 57 passing tests across:
   - gamestate lifecycle
   - dungeon/bootstrap
   - placement
@@ -51,6 +51,7 @@ Compact handoff for active refactor and test work.
   - generated closed doors were not rendered/discovered correctly on first sight because tile discovery treated the door tile itself as fully blocked
   - prop placement could soft-block room ingress by placing solid props on chokepoints or immediate doorway approaches
   - `tile_t` could accept a second `ENTITY_DOOR` cache entry on the same tile
+  - lethal combat left the killed NPC in the tile's live-NPC cache while also adding it to the dead-body cache, which blocked movement onto corpse tiles until the live cache entry was cleared
 
 ## Verification
 
@@ -166,6 +167,7 @@ make clean && make tests && ./tests
   - [x] dead-body pull behavior via `dead_npc_cache`
   - [x] `loc.z`-sensitive interaction logic
   - [x] `KEY_O` door open/close behavior
+  - [x] moving onto a tile containing a freshly killed dead NPC
 
 - [ ] Combat / simulation
   - [x] single-monster spawn sanity
@@ -206,6 +208,7 @@ make clean && make tests && ./tests
 - `8x8` needs dedicated geometry rules; larger-map assumptions do not scale down cleanly.
 - Future dungeon quality gains should focus on loops/interconnection, not just more density.
 - World-interaction cleanup must preserve explicit dead-body cache handling and bounds checks in `try_entity_pull()`.
+- NPC death transitions must move the entity from the tile's live-NPC slot into `dead_npc_cache`; corpse tiles remain walkable unless another solid/live blocker is present.
 - Longer-term: move from implementation headers to real `.cpp` files once the build is ready for multiple translation units.
 
 ## Nice-To-Have Later
