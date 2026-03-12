@@ -54,7 +54,7 @@ inline void gamestate::make_all_npcs_target_player() {
 
 inline bool gamestate::try_append_character_creation_char(int codepoint) {
     constexpr size_t max_name_len = 16;
-    if (codepoint < 32 || codepoint > 126) {
+    if (codepoint < 33 || codepoint > 126) {
         return false;
     }
     if (chara_creation.name.size() >= max_name_len) {

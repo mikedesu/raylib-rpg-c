@@ -16,7 +16,7 @@ static inline void draw_character_creation_screen(gamestate& g) {
 
     const char* title_text = "Character Creation";
     const std::array<std::string, 4> instructions = {
-        "Type to change your name",
+        "Type to change your name (no spaces)",
         "Press LEFT/RIGHT to change race",
         "Press UP/DOWN to change alignment",
         "Press SPACE to re-roll, ENTER to confirm",

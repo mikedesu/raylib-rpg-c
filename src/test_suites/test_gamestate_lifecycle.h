@@ -178,6 +178,7 @@ public:
 
         g.chara_creation.name.clear();
         TS_ASSERT(!g.try_append_character_creation_char('\n'));
+        TS_ASSERT(!g.try_append_character_creation_char(' '));
         TS_ASSERT_EQUALS(g.chara_creation.name, "");
         for (int i = 0; i < 16; i++) {
             TS_ASSERT(g.try_append_character_creation_char('a'));
