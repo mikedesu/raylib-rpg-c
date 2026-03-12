@@ -599,6 +599,9 @@ public:
     /** @brief Initialize gameplay state, generate floors, and seed initial entities. */
     void logic_init();
 
+    /** @brief Perform an in-process gameplay restart without recreating the OS window. */
+    void restart_game();
+
     /** @brief Handle input while the title scene is active. */
     void handle_input_title_scene(inputstate& is);
 

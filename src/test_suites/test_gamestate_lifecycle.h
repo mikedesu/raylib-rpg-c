@@ -5,6 +5,12 @@
 
 class GamestateLifecycleTestSuite : public CxxTest::TestSuite {
 public:
+    void press_key(inputstate& is, int key) {
+        const int idx = key / BITS_PER_LONG;
+        const int bit = key % BITS_PER_LONG;
+        is.pressed[idx] |= (1ULL << bit);
+    }
+
     void testGamestateEmpty() {
     }
 
@@ -159,6 +165,79 @@ public:
         TS_ASSERT(!g.music_file_paths.empty());
         TS_ASSERT_DIFFERS(g.music_file_paths.front(), "broken/path.ogg");
         TS_ASSERT_EQUALS(g.music_file_paths, initialMusicPaths);
+    }
+
+    void testRestartGameReinitializesGameplayWithoutLeavingTitleScene() {
+        gamestate g;
+        g.test = true;
+        g.mt.seed(12345);
+        g.logic_init();
+        g.targetwidth = DEFAULT_TARGET_WIDTH;
+        g.targetheight = DEFAULT_TARGET_HEIGHT;
+        g.windowwidth = 1234;
+        g.windowheight = 777;
+
+        g.current_scene = SCENE_GAMEPLAY;
+        g.do_restart = true;
+        g.do_quit = true;
+        g.gameover = true;
+        g.restart_count = 7;
+        g.add_message("stale");
+
+        g.restart_game();
+
+        TS_ASSERT(g.d.is_initialized);
+        TS_ASSERT_EQUALS(g.d.get_floor_count(), 2U);
+        TS_ASSERT_EQUALS(g.current_scene, SCENE_TITLE);
+        TS_ASSERT_EQUALS(g.restart_count, 8U);
+        TS_ASSERT(!g.do_restart);
+        TS_ASSERT(!g.do_quit);
+        TS_ASSERT(!g.gameover);
+        TS_ASSERT(g.frame_dirty);
+        TS_ASSERT(g.msg_system.size() >= 2U);
+        TS_ASSERT_EQUALS(g.msg_system.front(), "Welcome to the game! Press enter to cycle messages.");
+        TS_ASSERT_EQUALS(g.targetwidth, DEFAULT_TARGET_WIDTH);
+        TS_ASSERT_EQUALS(g.targetheight, DEFAULT_TARGET_HEIGHT);
+        TS_ASSERT_EQUALS(g.windowwidth, 1234);
+        TS_ASSERT_EQUALS(g.windowheight, 777);
+        TS_ASSERT_DELTA(g.cam2d.offset.x, DEFAULT_TARGET_WIDTH / 4.0f, 0.001f);
+        TS_ASSERT_DELTA(g.cam2d.offset.y, DEFAULT_TARGET_HEIGHT / 4.0f, 0.001f);
+    }
+
+    void testConfirmPromptResolvesYesInputEvenIfControlmodeDrifted() {
+        gamestate g;
+        g.test = true;
+        inputstate is;
+        inputstate_reset(is);
+
+        g.current_scene = SCENE_GAMEPLAY;
+        g.open_confirm_prompt(CONFIRM_ACTION_QUIT, "quit?");
+        g.controlmode = CONTROLMODE_PLAYER;
+        press_key(is, KEY_Y);
+
+        g.handle_input(is);
+
+        TS_ASSERT(!g.display_confirm_prompt);
+        TS_ASSERT_EQUALS(g.confirm_action, CONFIRM_ACTION_NONE);
+        TS_ASSERT(g.do_quit);
+    }
+
+    void testConfirmPromptResolvesNoInput() {
+        gamestate g;
+        g.test = true;
+        inputstate is;
+        inputstate_reset(is);
+
+        g.current_scene = SCENE_GAMEPLAY;
+        g.open_confirm_prompt(CONFIRM_ACTION_QUIT, "quit?");
+        press_key(is, KEY_N);
+
+        g.handle_input(is);
+
+        TS_ASSERT(!g.display_confirm_prompt);
+        TS_ASSERT_EQUALS(g.confirm_action, CONFIRM_ACTION_NONE);
+        TS_ASSERT(!g.do_quit);
+        TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_PLAYER);
     }
 
     void testCharacterCreationNameHelpersAppendAndBackspace() {

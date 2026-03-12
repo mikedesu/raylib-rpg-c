@@ -53,11 +53,7 @@ int ANIM_SPEED = DEFAULT_ANIM_SPEED;
  * @brief Advance one outer frame of the application loop.
  *
  * Pulls fresh input, advances gameplay simulation, renders the current frame,
- * and performs a full runtime teardown/re-init cycle when gameplay requests a
- * restart.
- *
- * @warning Restart handling tears down both renderer and gameplay state before
- * reinitializing them in place.
+ * and performs an in-process gameplay restart when requested.
  */
 static inline void gameloop() {
     inputstate_update(is);
@@ -65,13 +61,7 @@ static inline void gameloop() {
     drawframe(g);
     if (g.do_restart) {
         msuccess("Restarting game...");
-        libdraw_close();
-        g.logic_close();
-        g.reset();
-        g.logic_init();
-        libdraw_init(g);
-        g.do_restart = false; // Reset restart flag
-        g.restart_count++;
+        g.restart_game();
     }
 }
 

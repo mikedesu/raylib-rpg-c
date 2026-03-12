@@ -17,9 +17,7 @@ inline void gamestate::open_confirm_prompt(confirm_action_t action, const char* 
 
 inline void gamestate::handle_confirm_quit() {
 #ifdef WEB
-    logic_close();
-    reset();
-    logic_init();
+    restart_game();
 #else
     do_quit = true;
 #endif
@@ -48,13 +46,19 @@ inline void gamestate::resolve_confirm_prompt(bool confirmed) {
 }
 
 inline void gamestate::handle_input_confirm_prompt(inputstate& is) {
-    massert(controlmode == CONTROLMODE_CONFIRM_PROMPT, "controlmode isnt in confirm prompt: %d", controlmode);
+    if (controlmode != CONTROLMODE_CONFIRM_PROMPT) {
+        controlmode = CONTROLMODE_CONFIRM_PROMPT;
+    }
     if (inputstate_is_pressed(is, KEY_Y)) {
-        PlaySound(sfx[SFX_CONFIRM_01]);
+        if (!test && IsAudioDeviceReady()) {
+            PlaySound(sfx[SFX_CONFIRM_01]);
+        }
         resolve_confirm_prompt(true);
     }
     else if (inputstate_is_pressed(is, KEY_N) || inputstate_is_pressed(is, KEY_ESCAPE)) {
-        PlaySound(sfx[SFX_CONFIRM_01]);
+        if (!test && IsAudioDeviceReady()) {
+            PlaySound(sfx[SFX_CONFIRM_01]);
+        }
         resolve_confirm_prompt(false);
     }
 }
@@ -423,6 +427,10 @@ inline void gamestate::handle_input(inputstate& is) {
     if (inputstate_is_pressed(is, KEY_P)) {
         debugpanelon = !debugpanelon;
         minfo2("Toggling debug panel: %s", debugpanelon ? "ON" : "OFF");
+    }
+    if (display_confirm_prompt || controlmode == CONTROLMODE_CONFIRM_PROMPT) {
+        handle_input_confirm_prompt(is);
+        return;
     }
     if (current_scene == SCENE_TITLE) {
         handle_input_title_scene(is);

@@ -4,10 +4,10 @@ Compact handoff for active refactor and test work.
 
 ## Immediate New Feature Development
 
-- [ ] Game restart 
-  - [ ] When the player dies and presses 'R' to restart the game, when playing on desktop (non-web version), the game currently results in the window closing briefly before re-opening.
-    - [ ] i believe this is because we literally re-load raylib in order to refresh everything, but i could be wrong
-    - [ ] ideally, we do NOT want the window to close when restarting the game, but we do want the next scene to be the title screen. 
+- [x] Game restart 
+  - [x] When the player dies and presses 'R' to restart the game, when playing on desktop (non-web version), the game currently results in the window closing briefly before re-opening.
+    - [x] i believe this is because we literally re-load raylib in order to refresh everything, but i could be wrong
+    - [x] ideally, we do NOT want the window to close when restarting the game, but we do want the next scene to be the title screen. 
 
 - Treasure Chest entities
   - [ ] Function like an inventory that doesn't belong to an NPC

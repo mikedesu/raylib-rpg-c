@@ -231,6 +231,26 @@ inline void gamestate::logic_init() {
     msuccess("liblogic_init: Game state initialized");
 }
 
+inline void gamestate::restart_game() {
+    const unsigned int previous_restart_count = restart_count;
+    const int previous_target_width = targetwidth;
+    const int previous_target_height = targetheight;
+    const int previous_window_width = windowwidth;
+    const int previous_window_height = windowheight;
+    logic_close();
+    reset();
+    targetwidth = previous_target_width > 0 ? previous_target_width : DEFAULT_TARGET_WIDTH;
+    targetheight = previous_target_height > 0 ? previous_target_height : DEFAULT_TARGET_HEIGHT;
+    windowwidth = previous_window_width > 0 ? previous_window_width : DEFAULT_WIN_WIDTH;
+    windowheight = previous_window_height > 0 ? previous_window_height : DEFAULT_WIN_HEIGHT;
+    cam2d.offset = Vector2{targetwidth / 4.0f, targetheight / 4.0f};
+    logic_init();
+    do_restart = false;
+    restart_count = previous_restart_count + 1;
+    current_scene = SCENE_TITLE;
+    frame_dirty = true;
+}
+
 inline void gamestate::handle_test_flag() {
     minfo2(
         "handle test flag: %s",
