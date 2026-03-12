@@ -3,19 +3,12 @@
 Compact handoff for active refactor and test work.
 
 ## Immediate New Feature Development
-- We are changing how HP and MaxHP work immediately
-  - [ ] create a `vec2.h` that functions like a `vec3` but for an integer x and y.
-  - [ ] update `ComponentTraits.h` so that we have a single `hp` trait defined with the following:
-  ```
-struct hp { };
-template <>
-struct ComponentTraits<hp> {
-    using Type = vec2;
-};
-  ```
-  - [ ] get rid of the `maxhp` component
-  - [ ] doing the above will break a ton of code that we will need to fix but we will do so until it is DONE
-- Friendly and non-friendly NPCs
+- [ ] alignment.h
+  - [x] I have already updated `ComponentTraits.h` to use `alignment_t` for the `alignment` trait
+  - [ ] Write the missing functionality in `alignment.h`
+  - [ ] In the various `gamestate` files, update `npc` creation to include an `alignment` component in the `create_npc_at_with` functions, which should be using separate initialization functions
+
+- [ ] Friendly and non-friendly NPCs
   - [ ] determines "attack-on-sight"-type behavior
   - [ ] friendly NPCs just wander around etc, non-friendly NPCs attack on sight
 - Treasure Chest entities
@@ -47,6 +40,7 @@ struct ComponentTraits<hp> {
   - `KEY_O` open/close interaction
   - closed-door tile discovery without revealing tiles beyond the door
 - Doxygen is the active documentation standard; `make docs` works.
+- HP is now a vec2.
 
 ## Recent Completed Work
 

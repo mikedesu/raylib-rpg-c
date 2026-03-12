@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "alignment.h"
 #include "direction.h"
 #include "entity_actions.h"
 #include "entityid.h"
@@ -16,8 +17,8 @@
 #include "rarity.h"
 #include "shield.h"
 #include "spell.h"
-#include "vec3.h"
 #include "vec2.h"
+#include "vec3.h"
 #include "weapon.h"
 #include <memory>
 #include <raylib.h>
@@ -475,4 +476,11 @@ struct target_path { };
 template <>
 struct ComponentTraits<target_path> {
     using Type = shared_ptr<vector<vec3>>;
+};
+
+/// @brief Component tag for an entity's alignment.
+struct alignment { };
+template <>
+struct ComponentTraits<alignment> {
+    using Type = alignment_t;
 };
