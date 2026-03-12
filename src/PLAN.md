@@ -3,20 +3,23 @@
 Compact handoff for active refactor and test work.
 
 ## Immediate New Feature Development
-- [x] alignment.h
-  - [x] I have already updated `ComponentTraits.h` to use `alignment_t` for the `alignment` trait
-  - [x] Write the missing functionality in `alignment.h`
-  - [x] In the various `gamestate` files, update `npc` creation to include an `alignment` component in the `create_npc_at_with` functions, which should be using separate initialization functions
 
 - [ ] Friendly and non-friendly NPCs
   - [ ] determines "attack-on-sight"-type behavior
   - [ ] friendly NPCs just wander around etc, non-friendly NPCs attack on sight
+  - [ ] after implementing, we need to get rid of the orc on the first floor and replace him with another randomly-generated npc
+    - [ ] get rid of the orc on floor 1
+    - [ ] on floor 1, add a new npc of a randomly chosen race with random stats and make it not-aggressive, that is, its default action is to wander randomly
+    - [ ] on floor 2, add a new npc that is an orc with random stats and make it aggressive, that is, its default action is to:
+      - [ ] if the player is on the same floor, the orc moves toward the player until it is adjacent.
+      - [ ] if the player is on the same floor and adjacent to the orc, the orc attacks the player
+      - [ ] if the player is on a different floor, then the default action is to move around randomly.
+
 - Treasure Chest entities
   - [ ] Function like an inventory that doesn't belong to an NPC
     - [ ] Is still a real physical entity
       - [ ] Has a location
       - [ ] Has HP/MaxHP
-
 
 ## Current State
 
@@ -40,7 +43,9 @@ Compact handoff for active refactor and test work.
   - `KEY_O` open/close interaction
   - closed-door tile discovery without revealing tiles beyond the door
 - Doxygen is the active documentation standard; `make docs` works.
-- HP is now a vec2.
+- `hp` component is now a `vec2`.
+- Entities now have `alignment`
+
 
 ## Recent Completed Work
 
