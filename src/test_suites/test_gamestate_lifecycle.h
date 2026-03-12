@@ -25,6 +25,8 @@ public:
         TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_PLAYER);
         TS_ASSERT_EQUALS(g.confirm_action, CONFIRM_ACTION_NONE);
         TS_ASSERT_EQUALS(g.music_volume, DEFAULT_MUSIC_VOLUME);
+        TS_ASSERT_EQUALS(g.chara_creation.race, RACE_HUMAN);
+        TS_ASSERT_EQUALS(g.chara_creation.alignment, ALIGNMENT_NEUTRAL_NEUTRAL);
         TS_ASSERT_DELTA(g.cam2d.zoom, DEFAULT_ZOOM_LEVEL, 0.001f);
         TS_ASSERT_DELTA(g.cam2d.rotation, 0.0f, 0.001f);
         TS_ASSERT_EQUALS(g.cam2d.target.x, 0.0f);
@@ -67,6 +69,7 @@ public:
         TS_ASSERT_EQUALS(g.next_entityid, 1);
         TS_ASSERT_EQUALS(g.new_entityid_begin, ENTITYID_INVALID);
         TS_ASSERT_EQUALS(g.new_entityid_end, ENTITYID_INVALID);
+        TS_ASSERT_EQUALS(g.chara_creation.alignment, ALIGNMENT_NEUTRAL_NEUTRAL);
         TS_ASSERT(!g.dirty_entities);
         TS_ASSERT_EQUALS(g.d.floors.size(), 0U);
         TS_ASSERT_EQUALS(g.msg_system.size(), 0U);

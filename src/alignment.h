@@ -33,3 +33,17 @@ static inline std::string alignment_to_str(alignment_t alignment) {
     }
     return "invalid alignment";
 }
+
+static inline alignment_t alignment_next(alignment_t alignment) {
+    if (alignment < ALIGNMENT_GOOD_LAWFUL || alignment >= ALIGNMENT_EVIL_CHAOTIC) {
+        return ALIGNMENT_GOOD_LAWFUL;
+    }
+    return static_cast<alignment_t>(alignment + 1);
+}
+
+static inline alignment_t alignment_prev(alignment_t alignment) {
+    if (alignment <= ALIGNMENT_GOOD_LAWFUL || alignment >= ALIGNMENT_COUNT) {
+        return ALIGNMENT_EVIL_CHAOTIC;
+    }
+    return static_cast<alignment_t>(alignment - 1);
+}

@@ -79,6 +79,7 @@ inline with_fun gamestate::player_init(int maxhp_roll) {
         ct.set<charisma>(id, chara_creation.charisma);
         ct.set<hd>(id, (vec3){1, chara_creation.hitdie, 0});
         ct.set<hp>(id, vec2{maxhp_roll, maxhp_roll});
+        ct.set<alignment>(id, chara_creation.alignment);
     };
 }
 

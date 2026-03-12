@@ -1,10 +1,11 @@
 #pragma once
 
-
 #include "gamestate.h"
 #include "libgame_defines.h"
 #include "texture_ids.h"
 #include "textureinfo.h"
+#include <array>
+#include <string>
 
 
 extern textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
@@ -14,7 +15,12 @@ static inline void draw_character_creation_screen(gamestate& g) {
     minfo3("draw character creation scene");
 
     const char* title_text = "Character Creation";
-    const char* remaining_text[] = {"Press SPACE to re-roll stats", "Press LEFT/RIGHT to change race", "Press ENTER to confirm"};
+    const std::array<std::string, 4> instructions = {
+        "Press SPACE to re-roll stats",
+        "Press LEFT/RIGHT to change race",
+        "Press UP/DOWN to change alignment",
+        "Press ENTER to confirm",
+    };
 
     constexpr int font_size_0 = 40;
     constexpr int font_size_1 = 20;
@@ -24,21 +30,10 @@ static inline void draw_character_creation_screen(gamestate& g) {
     constexpr int sy = h / 4;
     constexpr int x = cx;
     constexpr int y0 = sy;
-    constexpr int y1 = y0 + font_size_0 + 10;
-    constexpr int offset = 10;
-    constexpr int offset1 = font_size_1 + offset;
-    constexpr int y2 = y1 + offset1;
-    constexpr int y3 = y2 + offset1;
-    constexpr int y4 = y3 + offset1;
-    constexpr int y5 = y4 + offset1;
-    constexpr int y6 = y5 + offset1;
-    constexpr int y7 = y6 + offset1;
-    constexpr int y8 = y7 + offset1;
-    constexpr int y9 = y8 + offset1;
-    constexpr int y10 = y9 + offset1;
-    constexpr int y11 = y10 + font_size_1 + 8;
-    constexpr int y12 = y11 + font_size_1 + 8;
-    constexpr int y13 = y12 + font_size_1 + 8;
+    constexpr int line_gap = 10;
+    constexpr int line_step = font_size_1 + line_gap;
+    constexpr int stats_start_y = y0 + font_size_0 + 10;
+    constexpr int instructions_start_y = stats_start_y + line_step * 10 + 8;
 
     constexpr float pad = -40;
     constexpr float dst2_y = sy + pad;
@@ -54,16 +49,24 @@ static inline void draw_character_creation_screen(gamestate& g) {
     ClearBackground(BLACK);
     DrawText(title_text, x, y0, font_size_0, WHITE);
 
-    // Draw character stats
-    DrawText(TextFormat("Name: %s", g.chara_creation.name.c_str()), x, y1, font_size_1, WHITE);
-    DrawText(TextFormat("< Race: %s >", race2str(g.chara_creation.race).c_str()), x, y2, font_size_1, WHITE);
-    DrawText(TextFormat("Hitdie: %d", g.chara_creation.hitdie), x, y3, font_size_1, WHITE);
-    DrawText(TextFormat("Strength: %d", g.chara_creation.strength), x, y4, font_size_1, WHITE);
-    DrawText(TextFormat("Dexterity: %d", g.chara_creation.dexterity), x, y5, font_size_1, WHITE);
-    DrawText(TextFormat("Intelligence: %d", g.chara_creation.intelligence), x, y6, font_size_1, WHITE);
-    DrawText(TextFormat("Wisdom: %d", g.chara_creation.wisdom), x, y7, font_size_1, WHITE);
-    DrawText(TextFormat("Constitution: %d", g.chara_creation.constitution), x, y8, font_size_1, WHITE);
-    DrawText(TextFormat("Charisma: %d", g.chara_creation.charisma), x, y9, font_size_1, WHITE);
+    const std::array<std::string, 10> stat_lines = {
+        TextFormat("Name: %s", g.chara_creation.name.c_str()),
+        TextFormat("< Race: %s >", race2str(g.chara_creation.race).c_str()),
+        TextFormat("< Alignment: %s >", alignment_to_str(g.chara_creation.alignment).c_str()),
+        TextFormat("Hitdie: %d", g.chara_creation.hitdie),
+        TextFormat("Strength: %d", g.chara_creation.strength),
+        TextFormat("Dexterity: %d", g.chara_creation.dexterity),
+        TextFormat("Intelligence: %d", g.chara_creation.intelligence),
+        TextFormat("Wisdom: %d", g.chara_creation.wisdom),
+        TextFormat("Constitution: %d", g.chara_creation.constitution),
+        TextFormat("Charisma: %d", g.chara_creation.charisma),
+    };
+
+    int text_y = stats_start_y;
+    for (const std::string& line : stat_lines) {
+        DrawText(line.c_str(), x, text_y, font_size_1, WHITE);
+        text_y += line_step;
+    }
 
     // Draw sprite placeholder
 
@@ -120,10 +123,11 @@ static inline void draw_character_creation_screen(gamestate& g) {
     default: break;
     }
 
-    // Draw instructions
-    DrawText(remaining_text[0], x, y11, font_size_1, WHITE);
-    DrawText(remaining_text[1], x, y12, font_size_1, WHITE);
-    DrawText(remaining_text[2], x, y13, font_size_1, WHITE);
+    text_y = instructions_start_y;
+    for (const std::string& line : instructions) {
+        DrawText(line.c_str(), x, text_y, font_size_1, WHITE);
+        text_y += font_size_1 + 8;
+    }
 
     msuccess3("draw character creation scene");
 }

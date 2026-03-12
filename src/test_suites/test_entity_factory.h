@@ -135,4 +135,17 @@ public:
         tile_t& tile = g.d.get_floor(0)->tile_at(loc);
         TS_ASSERT_EQUALS(tile.get_cached_live_npc(), id);
     }
+
+    void testCreatePlayerAtWithUsesCharacterCreationAlignment() {
+        gamestate g;
+        const vec3 loc = add_initialized_floor(g);
+        g.chara_creation.race = RACE_DWARF;
+        g.chara_creation.alignment = ALIGNMENT_GOOD_LAWFUL;
+
+        const entityid id = g.create_player_at_with(loc, "hero", g.player_init(12));
+
+        TS_ASSERT_DIFFERS(id, ENTITYID_INVALID);
+        TS_ASSERT_EQUALS(g.ct.get<entitytype>(id).value_or(ENTITY_NONE), ENTITY_PLAYER);
+        TS_ASSERT_EQUALS(g.ct.get<alignment>(id).value_or(ALIGNMENT_NONE), ALIGNMENT_GOOD_LAWFUL);
+    }
 };

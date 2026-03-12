@@ -328,6 +328,7 @@ public:
         chara_creation.constitution = 10;
         chara_creation.charisma = 10;
         chara_creation.race = RACE_HUMAN;
+        chara_creation.alignment = ALIGNMENT_NEUTRAL_NEUTRAL;
         chara_creation.hitdie = get_racial_hd(RACE_HUMAN);
         current_scene = SCENE_TITLE;
         music_volume = DEFAULT_MUSIC_VOLUME;

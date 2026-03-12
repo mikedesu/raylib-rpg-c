@@ -105,5 +105,13 @@ inline void gamestate::handle_input_character_creation_scene(inputstate& is) {
         chara_creation.race = (race_t)race;
         chara_creation.hitdie = get_racial_hd(chara_creation.race);
     }
+    else if (inputstate_is_pressed(is, KEY_UP)) {
+        PlaySound(sfx.at(SFX_CONFIRM_01));
+        chara_creation.alignment = alignment_prev(chara_creation.alignment);
+    }
+    else if (inputstate_is_pressed(is, KEY_DOWN)) {
+        PlaySound(sfx.at(SFX_CONFIRM_01));
+        chara_creation.alignment = alignment_next(chara_creation.alignment);
+    }
     frame_dirty = true;
 }

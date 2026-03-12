@@ -1,5 +1,6 @@
 #pragma once
 
+#include "alignment.h"
 #include "race.h"
 #include <string>
 
@@ -9,6 +10,7 @@ typedef struct character_creation_t {
     string name;
 
     race_t race;
+    alignment_t alignment;
 
     int hitdie;
     int strength;
