@@ -57,6 +57,13 @@ make clean && make tests && ./tests
 
 ## High-Value Backlog
 
+- [ ] Re-enable door entity creation and placement
+  - [ ] implemented as a separate pass from dungeon floor creation, similar to how props are placed
+  - [ ] simple door placement at first
+  - [ ] more intelligent door placement later
+- [ ] re-enable `try_entity_open_door` method when `KEY_O` is pressed
+
+
 - [ ] Continue top-down `libdraw.h` cleanup
   - reduce remaining global-state coupling
   - tighten target/render ownership
