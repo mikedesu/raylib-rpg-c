@@ -52,11 +52,45 @@ inline void gamestate::make_all_npcs_target_player() {
     }
 }
 
+inline bool gamestate::try_append_character_creation_char(int codepoint) {
+    constexpr size_t max_name_len = 16;
+    if (codepoint < 32 || codepoint > 126) {
+        return false;
+    }
+    if (chara_creation.name.size() >= max_name_len) {
+        return false;
+    }
+    chara_creation.name.push_back(static_cast<char>(codepoint));
+    return true;
+}
+
+inline bool gamestate::backspace_character_creation_name() {
+    if (chara_creation.name.empty()) {
+        return false;
+    }
+    chara_creation.name.pop_back();
+    return true;
+}
+
+inline bool gamestate::handle_character_creation_text_input(inputstate& is) {
+    bool changed = false;
+    if (inputstate_is_pressed(is, KEY_BACKSPACE)) {
+        changed = backspace_character_creation_name() || changed;
+    }
+    int codepoint = GetCharPressed();
+    while (codepoint > 0) {
+        changed = try_append_character_creation_char(codepoint) || changed;
+        codepoint = GetCharPressed();
+    }
+    return changed;
+}
+
 inline void gamestate::handle_input_character_creation_scene(inputstate& is) {
     if (inputstate_is_pressed(is, KEY_ESCAPE)) {
         do_quit = true;
         return;
     }
+    bool changed = handle_character_creation_text_input(is);
     if (inputstate_is_pressed(is, KEY_ENTER)) {
         PlaySound(sfx.at(SFX_CONFIRM_01));
         int myhd = chara_creation.hitdie;
@@ -67,10 +101,12 @@ inline void gamestate::handle_input_character_creation_scene(inputstate& is) {
         shared_ptr<dungeon_floor> df = d.floors[0];
         vec3 start_loc = df->get_random_loc();
         massert(!vec3_invalid(start_loc), "start_loc is (-1,-1,-1) - no valid start location exists");
-        entity_turn = create_player_at_with(start_loc, "darkmage", player_init(maxhp_roll));
+        const string player_name = chara_creation.name.empty() ? "hero" : chara_creation.name;
+        entity_turn = create_player_at_with(start_loc, player_name, player_init(maxhp_roll));
         massert(hero_id != ENTITYID_INVALID, "heroid is invalid");
         make_all_npcs_target_player();
         current_scene = SCENE_GAMEPLAY;
+        changed = true;
     }
     else if (inputstate_is_pressed(is, KEY_SPACE)) {
         PlaySound(sfx.at(SFX_CONFIRM_01));
@@ -80,6 +116,7 @@ inline void gamestate::handle_input_character_creation_scene(inputstate& is) {
         chara_creation.wisdom = do_roll_best_of_3((vec3){3, 6, 0});
         chara_creation.constitution = do_roll_best_of_3((vec3){3, 6, 0});
         chara_creation.charisma = do_roll_best_of_3((vec3){3, 6, 0});
+        changed = true;
     }
     else if (inputstate_is_pressed(is, KEY_LEFT)) {
         PlaySound(sfx.at(SFX_CONFIRM_01));
@@ -92,6 +129,7 @@ inline void gamestate::handle_input_character_creation_scene(inputstate& is) {
         }
         chara_creation.race = (race_t)race;
         chara_creation.hitdie = get_racial_hd(chara_creation.race);
+        changed = true;
     }
     else if (inputstate_is_pressed(is, KEY_RIGHT)) {
         PlaySound(sfx.at(SFX_CONFIRM_01));
@@ -104,14 +142,19 @@ inline void gamestate::handle_input_character_creation_scene(inputstate& is) {
         }
         chara_creation.race = (race_t)race;
         chara_creation.hitdie = get_racial_hd(chara_creation.race);
+        changed = true;
     }
     else if (inputstate_is_pressed(is, KEY_UP)) {
         PlaySound(sfx.at(SFX_CONFIRM_01));
         chara_creation.alignment = alignment_prev(chara_creation.alignment);
+        changed = true;
     }
     else if (inputstate_is_pressed(is, KEY_DOWN)) {
         PlaySound(sfx.at(SFX_CONFIRM_01));
         chara_creation.alignment = alignment_next(chara_creation.alignment);
+        changed = true;
     }
-    frame_dirty = true;
+    if (changed) {
+        frame_dirty = true;
+    }
 }

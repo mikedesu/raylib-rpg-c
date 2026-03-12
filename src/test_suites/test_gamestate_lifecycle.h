@@ -160,4 +160,30 @@ public:
         TS_ASSERT_DIFFERS(g.music_file_paths.front(), "broken/path.ogg");
         TS_ASSERT_EQUALS(g.music_file_paths, initialMusicPaths);
     }
+
+    void testCharacterCreationNameHelpersAppendAndBackspace() {
+        gamestate g;
+
+        g.chara_creation.name.clear();
+        TS_ASSERT(g.try_append_character_creation_char('A'));
+        TS_ASSERT(g.try_append_character_creation_char('b'));
+        TS_ASSERT(g.try_append_character_creation_char('3'));
+        TS_ASSERT_EQUALS(g.chara_creation.name, "Ab3");
+        TS_ASSERT(g.backspace_character_creation_name());
+        TS_ASSERT_EQUALS(g.chara_creation.name, "Ab");
+    }
+
+    void testCharacterCreationNameHelpersRejectControlCharsAndLengthOverflow() {
+        gamestate g;
+
+        g.chara_creation.name.clear();
+        TS_ASSERT(!g.try_append_character_creation_char('\n'));
+        TS_ASSERT_EQUALS(g.chara_creation.name, "");
+        for (int i = 0; i < 16; i++) {
+            TS_ASSERT(g.try_append_character_creation_char('a'));
+        }
+        TS_ASSERT_EQUALS(g.chara_creation.name.size(), 16U);
+        TS_ASSERT(!g.try_append_character_creation_char('b'));
+        TS_ASSERT_EQUALS(g.chara_creation.name, "aaaaaaaaaaaaaaaa");
+    }
 };

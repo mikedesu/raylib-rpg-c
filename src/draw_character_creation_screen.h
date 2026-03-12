@@ -16,10 +16,10 @@ static inline void draw_character_creation_screen(gamestate& g) {
 
     const char* title_text = "Character Creation";
     const std::array<std::string, 4> instructions = {
-        "Press SPACE to re-roll stats",
+        "Type to change your name",
         "Press LEFT/RIGHT to change race",
         "Press UP/DOWN to change alignment",
-        "Press ENTER to confirm",
+        "Press SPACE to re-roll, ENTER to confirm",
     };
 
     constexpr int font_size_0 = 40;
@@ -50,7 +50,7 @@ static inline void draw_character_creation_screen(gamestate& g) {
     DrawText(title_text, x, y0, font_size_0, WHITE);
 
     const std::array<std::string, 10> stat_lines = {
-        TextFormat("Name: %s", g.chara_creation.name.c_str()),
+        TextFormat("Name: %s_", g.chara_creation.name.c_str()),
         TextFormat("< Race: %s >", race2str(g.chara_creation.race).c_str()),
         TextFormat("< Alignment: %s >", alignment_to_str(g.chara_creation.alignment).c_str()),
         TextFormat("Hitdie: %d", g.chara_creation.hitdie),

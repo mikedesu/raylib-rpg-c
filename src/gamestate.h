@@ -634,6 +634,15 @@ public:
     /** @brief Retarget all active NPCs toward the player actor. */
     void make_all_npcs_target_player();
 
+    /** @brief Append one printable character to the character-creation name buffer. */
+    bool try_append_character_creation_char(int codepoint);
+
+    /** @brief Remove the last character from the character-creation name buffer. */
+    bool backspace_character_creation_name();
+
+    /** @brief Pull typed characters from Raylib into the character-creation name buffer. */
+    bool handle_character_creation_text_input(inputstate& is);
+
     /** @brief Handle input while the character creation scene is active. */
     void handle_input_character_creation_scene(inputstate& is);
 
