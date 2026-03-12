@@ -33,7 +33,7 @@ Compact handoff for active refactor and test work.
 - Built a real test suite under `test_suites/` while keeping `make tests` as the single fast runner.
 - Re-enabled first-pass door generation/rendering/interaction and tightened tile-level single-door caching.
 - Tightened prop placement so generated props avoid chokepoints and doorway approaches that can soft-block room ingress.
-- Expanded unit coverage to 54 passing tests across:
+- Expanded unit coverage to 56 passing tests across:
   - gamestate lifecycle
   - dungeon/bootstrap
   - placement
@@ -143,7 +143,7 @@ make clean && make tests && ./tests
   - [x] deterministic positive prop placement
   - [x] closed door tile is discoverable while sight beyond the door stays blocked
   - [x] tile cache rejects a second door on the same tile
-  - [ ] richer mixed occupancy behavior: boxes/props/doors/items/live NPCs/dead NPCs/player
+  - [x] richer mixed occupancy behavior: boxes/props/doors/items/live NPCs/dead NPCs/player
 
 - [ ] Entity factory shape
   - [x] dagger
