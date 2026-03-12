@@ -118,6 +118,7 @@ inline void gamestate::process_attack_results(tile_t& tile, entityid atk_id, ent
 
     ct.set<dead>(tgt_id, true);
     ct.set<pullable>(tgt_id, true);
+    tile.tile_remove(tgt_id);
     tile.add_dead_npc(tgt_id);
 
     switch (ct.get<entitytype>(tgt_id).value_or(ENTITY_NONE)) {

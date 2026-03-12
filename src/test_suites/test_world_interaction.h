@@ -168,4 +168,28 @@ public:
         TS_ASSERT(!beyond_tile.get_visible());
         TS_ASSERT(!beyond_tile.get_explored());
     }
+
+    void testCanMoveOntoTileContainingFreshlyKilledDeadNpc() {
+        gamestate g;
+        g.test = true;
+        add_floor(g);
+
+        const entityid hero = create_hero(g, vec3{1, 1, 0});
+        const entityid orc = g.create_orc_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(orc, ENTITYID_INVALID);
+
+        g.ct.set<hp>(orc, 1);
+        tile_t& target_tile = g.d.get_floor(0)->tile_at(vec3{2, 1, 0});
+        g.process_attack_results(target_tile, hero, orc, true);
+
+        TS_ASSERT(g.ct.get<dead>(orc).value_or(false));
+        TS_ASSERT_EQUALS(target_tile.get_cached_live_npc(), ENTITYID_INVALID);
+        TS_ASSERT_EQUALS(target_tile.get_cached_dead_npc(), orc);
+
+        TS_ASSERT(g.try_entity_move(hero, vec3{1, 0, 0}));
+        TS_ASSERT(vec3_equal(g.ct.get<location>(hero).value_or(vec3{-1, -1, -1}), vec3{2, 1, 0}));
+        TS_ASSERT_EQUALS(target_tile.get_cached_live_npc(), hero);
+        TS_ASSERT_EQUALS(target_tile.get_cached_dead_npc(), orc);
+    }
 };
