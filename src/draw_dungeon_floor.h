@@ -174,7 +174,6 @@ static inline bool draw_dungeon_floor(gamestate& g, int vision_dist, int light_r
     draw_dungeon_floor_entitytype(g, ENTITY_PROP, vision_dist, light_rad, mydefault);
     draw_dungeon_floor_entitytype(g, ENTITY_CHEST, vision_dist, light_rad, mydefault);
     libdraw_draw_player_target_box(g);
-    //draw_dungeon_floor_entitytype(g, ENTITY_SPELL, vision_dist, light_rad, mydefault);
     // Tiles can now cache multiple items, but the floor renderer still draws only the top item as
     // the representative sprite for the stack. That keeps floor rendering stable until stacked-item
     // presentation is designed explicitly.

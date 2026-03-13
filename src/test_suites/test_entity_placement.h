@@ -140,4 +140,18 @@ public:
         TS_ASSERT_EQUALS(placed, 0);
         TS_ASSERT_EQUALS(count_entities_of_type(g, ENTITY_PROP), 0U);
     }
+
+    void testGetRandomLocSkipsOccupiedChestTile() {
+        gamestate g;
+        add_simple_floor(g, 4, 4);
+
+        auto df = g.d.get_floor(0);
+        const vec3 blocked_loc{1, 1, 0};
+        const entityid chest_id = g.create_chest_at_with(blocked_loc, [](CT&, const entityid) {});
+        TS_ASSERT_DIFFERS(chest_id, ENTITYID_INVALID);
+
+        const vec3 random_loc = df->get_random_loc();
+        TS_ASSERT(vec3_valid(random_loc));
+        TS_ASSERT(!vec3_equal(random_loc, blocked_loc));
+    }
 };

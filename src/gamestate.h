@@ -618,9 +618,6 @@ public:
     /** @brief Recompute player-facing derived runtime state for the current tick. */
     bool update_player_state();
 
-    /** @brief Advance active spell state and spell-related runtime effects. */
-    void update_spells_state();
-
     /** @brief Refresh NPC state before or during their turn processing. */
     void update_npcs_state();
 
@@ -659,17 +656,6 @@ public:
      * @return The created entity id, or `ENTITYID_INVALID` on failure.
      */
     entityid create_box_at_with(vec3 loc);
-
-    /** @brief Create a spell entity with default components. */
-    entityid create_spell_with();
-
-    /**
-     * @brief Create and place a spell entity at a dungeon location.
-     *
-     * @param loc Dungeon-space location, including floor in `z`.
-     * @return The created entity id, or `ENTITYID_INVALID` on failure.
-     */
-    entityid create_spell_at_with(vec3 loc);
 
     /** @brief Retarget all active NPCs toward the player actor. */
     void make_all_npcs_target_player();
@@ -975,12 +961,6 @@ public:
 
     /** @brief Handle NPC/prop interaction input for the active actor. */
     bool handle_interact(inputstate& is, bool is_dead);
-
-    /** @brief Attempt to cast a spell from an entity toward a target tile. */
-    void try_entity_cast_spell(entityid id, int tgt_x, int tgt_y);
-
-    /** @brief Handle the current spell-cast test input path. */
-    bool handle_test_cast_spell(inputstate& is, bool is_dead);
 
     /** @brief Handle input that requests a full gameplay restart. */
     bool handle_restart(inputstate& is);

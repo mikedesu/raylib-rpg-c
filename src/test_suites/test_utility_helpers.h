@@ -31,7 +31,6 @@ public:
         TS_ASSERT_EQUALS(entitytype_to_str(ENTITY_BOX), "box");
         TS_ASSERT_EQUALS(entitytype_to_str(ENTITY_CHEST), "chest");
         TS_ASSERT_EQUALS(entitytype_to_str(ENTITY_DOOR), "door");
-        TS_ASSERT_EQUALS(entitytype_to_str(ENTITY_SPELL), "spell");
         TS_ASSERT_EQUALS(entitytype_to_str(ENTITY_PROP), "prop");
     }
 };

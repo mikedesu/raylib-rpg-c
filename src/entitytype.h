@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-typedef enum { ENTITY_NONE, ENTITY_PLAYER, ENTITY_NPC, ENTITY_ITEM, ENTITY_BOX, ENTITY_CHEST, ENTITY_DOOR, ENTITY_SPELL, ENTITY_PROP, ENTITY_TYPE_COUNT } entitytype_t;
+typedef enum { ENTITY_NONE, ENTITY_PLAYER, ENTITY_NPC, ENTITY_ITEM, ENTITY_BOX, ENTITY_CHEST, ENTITY_DOOR, ENTITY_PROP, ENTITY_TYPE_COUNT } entitytype_t;
 
 static inline std::string entitytype_to_str(entitytype_t t) {
     switch (t) {
@@ -12,7 +12,6 @@ static inline std::string entitytype_to_str(entitytype_t t) {
     case ENTITY_BOX: return "box";
     case ENTITY_CHEST: return "chest";
     case ENTITY_DOOR: return "door";
-    case ENTITY_SPELL: return "spell";
     case ENTITY_PROP: return "prop";
     case ENTITY_TYPE_COUNT: return "entity type count";
     default: break;

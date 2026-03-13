@@ -7,55 +7,6 @@
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
 
-
-static inline void libdraw_set_sg_is_casting(gamestate& g, entityid id, spritegroup* const sg) {
-    massert(id != ENTITYID_INVALID, "entityid is invalid");
-    massert(sg, "spritegroup is NULL");
-    const int cur = SG_ANIM_NPC_ATTACK;
-    sg->set_current(cur);
-    update_weapon_for_entity(g, id, sg);
-    g.ct.set<casting>(id, true);
-}
-
-
-
-
-static inline void libdraw_set_sg_spell_casting(shared_ptr<gamestate> g, entityid id, spritegroup* const sg) {
-    minfo("set sg spell casting");
-    massert(id != ENTITYID_INVALID, "entity id is -1");
-    massert(sg, "spritegroup is NULL");
-    massert(g->ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_SPELL, "entity is not a spell");
-    //spritegroup_set_current(sg, 0);
-    sg->set_current(0);
-}
-
-
-
-
-static inline void libdraw_set_sg_spell_persisting(shared_ptr<gamestate> g, entityid id, spritegroup* const sg) {
-    minfo("set sg spell casting");
-    massert(id != ENTITYID_INVALID, "entity id is -1");
-    massert(sg, "spritegroup is NULL");
-    massert(g->ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_SPELL, "entity is not a spell");
-    //spritegroup_set_current(sg, 1);
-    sg->set_current(1);
-}
-
-
-
-
-static inline void libdraw_set_sg_spell_ending(shared_ptr<gamestate> g, entityid id, spritegroup* const sg) {
-    minfo("set sg spell casting");
-    massert(id != ENTITYID_INVALID, "entity id is -1");
-    massert(sg, "spritegroup is NULL");
-    massert(g->ct.get<entitytype>(id).value_or(ENTITY_NONE) == ENTITY_SPELL, "entity is not a spell");
-    //spritegroup_set_current(sg, 2);
-    sg->set_current(2);
-}
-
-
-
-
 static inline void libdraw_set_sg_block_success(gamestate& g, entityid id, spritegroup* const sg) {
     minfo("set sg block success");
     massert(id != ENTITYID_INVALID, "entity id is -1");

@@ -5,35 +5,35 @@ Compact handoff for active refactor and test work.
 ## Immediate Old Code Cleanup
 
 - [ ] Remove ALL references to spells, magic-use, etc
-  - [ ] Goal
-    - [ ] This will return eventually, but to consolidate the existing codebase, I want to purge magic immediately
-    - [ ] Remove runtime spellcasting behavior, spell entities, spell rendering, spell ECS state, spell-specific tests, and obsolete spell assets/metadata references
-    - [ ] Keep non-spell combat and the rest of the entity/inventory/world-interaction work stable throughout
-  - [ ] Step 1: remove gameplay entry points first
-    - [ ] Delete the spell-cast action path in `gamestate_world_interaction_impl.h`
-    - [ ] Remove the `KEY_M` spell test/debug input hook
-    - [ ] Verify there is no remaining player or NPC path that can spawn or manipulate spells during gameplay
-    - [ ] Verification: `rg -n "try_entity_cast_spell|handle_test_cast_spell|KEY_M" .`
-  - [ ] Step 2: remove spell entity creation and lifecycle handling
-    - [ ] Remove `create_spell_with`, `create_spell_at_with`, and their declarations from `gamestate.h` and `gamestate_entity_factory_impl.h`
-    - [ ] Remove `update_spells_state()` and its call site from the main lifecycle update path
-    - [ ] Remove `ENTITY_SPELL` from shared entity-type plumbing once no callers remain
-    - [ ] Verification: `rg -n "create_spell|update_spells_state|ENTITY_SPELL" .`
-  - [ ] Step 3: remove spell-specific ECS component state
-    - [ ] Remove `spell.h`
-    - [ ] Remove spell-only component tags from `ComponentTraits.h`
-    - [ ] Remove spell-only includes from shared headers
-    - [ ] Decide whether generic `casting` survives; current expectation is to remove it too because it is only used by spellcasting right now
-    - [ ] Verification: `rg -n "spelltype|spellstate|spell_casting|spell_persisting|spell_ending|spell_complete|struct casting" .`
-  - [ ] Step 4: remove rendering and sprite wiring
-    - [ ] Remove spell spritegroup creation from `create_sg_byid.h`
-    - [ ] Remove spell animation state transitions from `libdraw_update_sprites.h`
-    - [ ] Remove spell texture-key includes from `tx_keys.h`
-    - [ ] Delete `tx_keys_spells.h` once no includes remain
-    - [ ] Verification: `rg -n "create_spell_sg_byid|tx_keys_spells|TX_SPELL|ENTITY_SPELL" .`
+  - [x] Goal
+    - [x] This will return eventually, but to consolidate the existing codebase, I want to purge magic immediately
+    - [x] Remove runtime spellcasting behavior, spell entities, spell rendering, spell ECS state, spell-specific tests, and obsolete spell assets/metadata references
+    - [x] Keep non-spell combat and the rest of the entity/inventory/world-interaction work stable throughout
+  - [x] Step 1: remove gameplay entry points first
+    - [x] Delete the spell-cast action path in `gamestate_world_interaction_impl.h`
+    - [x] Remove the `KEY_M` spell test/debug input hook
+    - [x] Verify there is no remaining player or NPC path that can spawn or manipulate spells during gameplay
+    - [x] Verification: `rg -n "try_entity_cast_spell|handle_test_cast_spell|KEY_M" .`
+  - [x] Step 2: remove spell entity creation and lifecycle handling
+    - [x] Remove `create_spell_with`, `create_spell_at_with`, and their declarations from `gamestate.h` and `gamestate_entity_factory_impl.h`
+    - [x] Remove `update_spells_state()` and its call site from the main lifecycle update path
+    - [x] Remove `ENTITY_SPELL` from shared entity-type plumbing once no callers remain
+    - [x] Verification: `rg -n "create_spell|update_spells_state|ENTITY_SPELL" .`
+  - [x] Step 3: remove spell-specific ECS component state
+    - [x] Remove `spell.h`
+    - [x] Remove spell-only component tags from `ComponentTraits.h`
+    - [x] Remove spell-only includes from shared headers
+    - [x] Decide whether generic `casting` survives; current expectation is to remove it too because it is only used by spellcasting right now
+    - [x] Verification: `rg -n "spelltype|spellstate|spell_casting|spell_persisting|spell_ending|spell_complete|struct casting" .`
+  - [x] Step 4: remove rendering and sprite wiring
+    - [x] Remove spell spritegroup creation from `create_sg_byid.h`
+    - [x] Remove spell animation state transitions from `libdraw_update_sprites.h`
+    - [x] Remove spell texture-key includes from `tx_keys.h`
+    - [x] Delete `tx_keys_spells.h` once no includes remain
+    - [x] Verification: `rg -n "create_spell_sg_byid|tx_keys_spells|TX_SPELL|ENTITY_SPELL" .`
   - [ ] Step 5: clean shared enums, helper text, and tests
-    - [ ] Remove spell event enum values from `event_type.h` if they are otherwise unused
-    - [ ] Remove spell expectations from `test_suites/test_utility_helpers.h`
+    - [x] Remove spell event enum values from `event_type.h` if they are otherwise unused
+    - [x] Remove spell expectations from `test_suites/test_utility_helpers.h`
     - [ ] Remove or update any legacy notes/docs that describe spellcasting as active behavior
     - [ ] Verification: `rg -n "spell|magic" test_suites/ unit_test.h unit_test_old.h PLAN.md MESSAGE.md`
   - [ ] Step 6: clean asset/config leftovers

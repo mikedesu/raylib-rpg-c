@@ -16,7 +16,6 @@
 #include "race.h"
 #include "rarity.h"
 #include "shield.h"
-#include "spell.h"
 #include "vec2.h"
 #include "vec3.h"
 #include "weapon.h"
@@ -112,41 +111,6 @@ struct ComponentTraits<direction> {
 struct attacking { };
 template <>
 struct ComponentTraits<attacking> {
-    using Type = bool;
-};
-
-/// @brief Component tag for actor spell-casting state.
-struct casting { };
-template <>
-struct ComponentTraits<casting> {
-    using Type = bool;
-};
-
-/// @brief Component tag for spell entity casting state.
-struct spell_casting { };
-template <>
-struct ComponentTraits<spell_casting> {
-    using Type = bool;
-};
-
-/// @brief Component tag for spell persistence state.
-struct spell_persisting { };
-template <>
-struct ComponentTraits<spell_persisting> {
-    using Type = bool;
-};
-
-/// @brief Component tag for spell shutdown state.
-struct spell_ending { };
-template <>
-struct ComponentTraits<spell_ending> {
-    using Type = bool;
-};
-
-/// @brief Component tag for fully resolved spell state.
-struct spell_complete { };
-template <>
-struct ComponentTraits<spell_complete> {
     using Type = bool;
 };
 
@@ -420,20 +384,6 @@ struct rarity { };
 template <>
 struct ComponentTraits<rarity> {
     using Type = rarity_t;
-};
-
-/// @brief Component tag for spell type selection.
-struct spelltype { };
-template <>
-struct ComponentTraits<spelltype> {
-    using Type = spelltype_t;
-};
-
-/// @brief Component tag for spell lifecycle state.
-struct spellstate { };
-template <>
-struct ComponentTraits<spellstate> {
-    using Type = spellstate_t;
 };
 
 /// @brief Component tag for prop type selection.

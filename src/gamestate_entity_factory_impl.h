@@ -397,6 +397,15 @@ inline entityid gamestate::create_player_at_with(vec3 loc, string n, with_fun pl
     massert(n != "", "name is empty string");
     race_t rt = chara_creation.race;
     entityid id = create_npc_at_with(rt, loc, playerInitFunction);
+    if (id == ENTITYID_INVALID && !vec3_invalid(loc)) {
+        auto spawn_floor = d.get_floor(loc.z);
+        const vec3 fallback_loc = spawn_floor->get_random_loc();
+        if (!vec3_invalid(fallback_loc)) {
+            minfo2("retrying player creation at fallback loc=(%d, %d, %d)", fallback_loc.x, fallback_loc.y, fallback_loc.z);
+            loc = fallback_loc;
+            id = create_npc_at_with(rt, loc, playerInitFunction);
+        }
+    }
     massert(id != ENTITYID_INVALID, "id is invalid");
     constexpr int hp_ = 10;
     constexpr int maxhp_ = 10;
@@ -406,7 +415,7 @@ inline entityid gamestate::create_player_at_with(vec3 loc, string n, with_fun pl
     set_hero_id(id);
     ct.set<entitytype>(id, ENTITY_PLAYER);
 
-    auto df = d.get_current_floor();
+    auto df = d.get_floor(loc.z);
     tile_t& tile = df->tile_at(loc);
     tile.set_cached_player_present(true);
     tile.set_cached_live_npc(id);
@@ -449,28 +458,5 @@ inline entityid gamestate::create_box_at_with(vec3 loc) {
         return ENTITYID_INVALID;
     }
     ct.set<location>(id, loc);
-    return id;
-}
-
-inline entityid gamestate::create_spell_with() {
-    entityid id = add_entity();
-    ct.set<entitytype>(id, ENTITY_SPELL);
-    ct.set<spelltype>(id, SPELLTYPE_FIRE);
-    ct.set<spellstate>(id, SPELLSTATE_NONE);
-    return id;
-}
-
-inline entityid gamestate::create_spell_at_with(vec3 loc) {
-    auto df = d.get_floor(loc.z);
-    auto tile = df->tile_at(loc);
-    if (!tile_is_walkable(tile.get_type())) {
-        return ENTITYID_INVALID;
-    }
-    entityid id = create_spell_with();
-    if (df->df_add_at(id, ENTITY_SPELL, loc) == ENTITYID_INVALID) {
-        return ENTITYID_INVALID;
-    }
-    ct.set<location>(id, loc);
-    ct.set<update>(id, true);
     return id;
 }

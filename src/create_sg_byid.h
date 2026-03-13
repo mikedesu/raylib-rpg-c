@@ -5,7 +5,6 @@
 #include "item.h"
 #include "libdraw_create_spritegroup.h"
 #include "proptype.h"
-#include "spell.h"
 #include "tx_keys_boxes.h"
 #include "tx_keys_chests.h"
 #include "tx_keys_doors.h"
@@ -14,7 +13,6 @@
 #include "tx_keys_potions.h"
 #include "tx_keys_props.h"
 #include "tx_keys_shields.h"
-#include "tx_keys_spells.h"
 #include "tx_keys_weapons.h"
 
 static inline void create_npc_sg_byid(gamestate& g, entityid id) {
@@ -145,14 +143,6 @@ static inline void create_shield_sg_byid(gamestate& g, entityid id) {
     }
 }
 
-static inline void create_spell_sg_byid(gamestate& g, entityid id) {
-    massert(id != ENTITYID_INVALID, "entityid is invalid");
-    switch (g.ct.get<spelltype>(id).value_or(SPELLTYPE_NONE)) {
-    case SPELLTYPE_FIRE: create_sg(g, id, TX_SPELL_FIRE_KEYS, TX_SPELL_FIRE_COUNT); break;
-    default: break;
-    }
-}
-
 static inline void create_item_sg_byid(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     switch (g.ct.get<itemtype>(id).value_or(ITEM_NONE)) {
@@ -196,7 +186,6 @@ static inline void create_sg_byid(gamestate& g, entityid id) {
     case ENTITY_BOX: create_box_sg_byid(g, id); break;
     case ENTITY_CHEST: create_chest_sg_byid(g, id); break;
     case ENTITY_ITEM: create_item_sg_byid(g, id); break;
-    case ENTITY_SPELL: create_spell_sg_byid(g, id); break;
     case ENTITY_PROP: create_prop_sg_byid(g, id); break;
     default: break;
     }

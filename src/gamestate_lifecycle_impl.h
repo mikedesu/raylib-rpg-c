@@ -101,25 +101,6 @@ inline bool gamestate::update_player_state() {
     return true;
 }
 
-inline void gamestate::update_spells_state() {
-    minfo2("update_spells_state");
-    for (entityid id = 0; id < next_entityid; id++) {
-        if (id == hero_id || ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_SPELL) {
-            continue;
-        }
-        bool is_complete = ct.get<spell_complete>(id).value_or(false);
-        bool is_destroyed = ct.get<destroyed>(id).value_or(false);
-        if (is_complete && is_destroyed) {
-            auto df = d.get_current_floor();
-            vec3 loc = ct.get<location>(id).value_or(vec3{-1, -1, -1});
-            massert(!vec3_invalid(loc), "location is invalid");
-            if (!df->df_remove_at(id, loc)) {
-                merror("failed to remove id %d at %d, %d", id, loc.x, loc.y);
-            }
-        }
-    }
-}
-
 inline void gamestate::update_npcs_state() {
     minfo2("BEGIN update_npcs_state");
     auto df = d.get_current_floor();
@@ -301,7 +282,6 @@ inline void gamestate::tick(inputstate& is) {
     }
 
     update_npcs_state();
-    update_spells_state();
     handle_input(is);
     handle_npcs();
 #ifdef DEBUG

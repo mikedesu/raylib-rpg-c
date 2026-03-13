@@ -72,35 +72,6 @@ static inline void libdraw_update_sprites_post(gamestate& g) {
             }
         }
 
-        // this will fire off an infinite loop of spell transitions
-        // from cast, to persist, to end
-        // then repeat
-        // it works, but isnt quite what i want
-        else if (type == ENTITY_SPELL && s->get_num_loops() >= 1) {
-            if (sg->current == 0) {
-                sg->set_current(1);
-                g.ct.set<spell_casting>(id, false);
-                g.ct.set<spell_persisting>(id, true);
-                g.ct.set<spell_ending>(id, false);
-                g.ct.set<spell_complete>(id, false);
-            }
-            else if (sg->current == 1) {
-                sg->set_current(2);
-                g.ct.set<spell_casting>(id, false);
-                g.ct.set<spell_persisting>(id, false);
-                g.ct.set<spell_ending>(id, true);
-                g.ct.set<spell_complete>(id, false);
-            }
-            else if (sg->current == 2) {
-                //spritegroup_set_current(sg, 0);
-                g.ct.set<spell_casting>(id, false);
-                g.ct.set<spell_persisting>(id, false);
-                g.ct.set<spell_ending>(id, false);
-                g.ct.set<spell_complete>(id, true);
-                sg->visible = false;
-            }
-        }
-
         // lets try something
         else if (type == ENTITY_ITEM) {
             const itemtype_t itype = g.ct.get<itemtype>(id).value_or(ITEM_NONE);
