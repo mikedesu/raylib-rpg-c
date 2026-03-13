@@ -18,6 +18,7 @@ static inline void draw_help_menu(gamestate& g) {
                         "Interact / examine: e\n"
                         "Use stairs: .\n"
                         "Toggle full light: l\n"
+                        "Level-up select: arrows + enter\n"
                         "\n"
                         "Inventory: i\n"
                         "Inventory equip/use: e or enter\n"

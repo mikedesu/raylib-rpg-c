@@ -26,6 +26,16 @@ static inline int get_racial_modifiers(race_t r, int stat) {
         case 5: return -2;
         default: return 0;
         }
+    case RACE_GREEN_SLIME:
+        switch (stat) {
+        case 0: return -2;
+        case 1: return -2;
+        case 2: return -2;
+        case 3: return -2;
+        case 4: return -2;
+        case 5: return -2;
+        default: return 0;
+        }
         // other race cases below...
     default: break;
     }

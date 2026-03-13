@@ -77,6 +77,178 @@ inline void gamestate::handle_input_interaction(inputstate& is) {
     }
 }
 
+inline int gamestate::get_level_up_xp_threshold(entityid id) {
+    const int actor_level = ct.get<level>(id).value_or(1) < 1 ? 1 : ct.get<level>(id).value_or(1);
+    return actor_level * 10;
+}
+
+inline void gamestate::open_level_up_modal() {
+    display_level_up_modal = true;
+    level_up_selection = 0;
+    controlmode = CONTROLMODE_LEVEL_UP;
+    frame_dirty = true;
+}
+
+inline bool gamestate::apply_permanent_attribute_increase(entityid id, unsigned int attribute_index, int amount) {
+    if (id == ENTITYID_INVALID || amount == 0) {
+        return false;
+    }
+
+    switch (attribute_index % 6) {
+    case 0:
+        ct.set<strength>(id, ct.get<strength>(id).value_or(10) + amount);
+        return true;
+    case 1:
+        ct.set<dexterity>(id, ct.get<dexterity>(id).value_or(10) + amount);
+        return true;
+    case 2:
+        ct.set<constitution>(id, ct.get<constitution>(id).value_or(10) + amount);
+        return true;
+    case 3:
+        ct.set<intelligence>(id, ct.get<intelligence>(id).value_or(10) + amount);
+        return true;
+    case 4:
+        ct.set<wisdom>(id, ct.get<wisdom>(id).value_or(10) + amount);
+        return true;
+    case 5:
+        ct.set<charisma>(id, ct.get<charisma>(id).value_or(10) + amount);
+        return true;
+    default:
+        break;
+    }
+    return false;
+}
+
+inline int gamestate::roll_level_up_max_hp_gain(entityid id) {
+    if (id == ENTITYID_INVALID) {
+        return 0;
+    }
+    const vec3 hitdie = ct.get<hd>(id).value_or(vec3{1, 1, 0});
+    const int rolled = do_roll(hitdie);
+    return rolled > 0 ? rolled : 1;
+}
+
+inline void gamestate::apply_level_up_rewards(entityid id) {
+    if (id == ENTITYID_INVALID) {
+        return;
+    }
+
+    const int new_level = ct.get<level>(id).value_or(1) + 1;
+    ct.set<level>(id, new_level);
+
+    vec2 hp_value = ct.get<hp>(id).value_or(vec2{1, 1});
+    const int hp_gain = roll_level_up_max_hp_gain(id);
+    hp_value.y += hp_gain;
+    if (hp_value.y < 1) {
+        hp_value.y = 1;
+    }
+    if (hp_value.x > hp_value.y) {
+        hp_value.x = hp_value.y;
+    }
+    ct.set<hp>(id, hp_value);
+}
+
+inline void gamestate::apply_level_up_selection() {
+    if (hero_id == ENTITYID_INVALID || !display_level_up_modal) {
+        return;
+    }
+
+    const char* stat_name = "strength";
+    switch (level_up_selection % 6) {
+    case 0:
+        stat_name = "strength";
+        break;
+    case 1:
+        stat_name = "dexterity";
+        break;
+    case 2:
+        stat_name = "constitution";
+        break;
+    case 3:
+        stat_name = "intelligence";
+        break;
+    case 4:
+        stat_name = "wisdom";
+        break;
+    case 5:
+        stat_name = "charisma";
+        break;
+    default:
+        break;
+    }
+
+    if (!apply_permanent_attribute_increase(hero_id, level_up_selection, 1)) {
+        return;
+    }
+    apply_level_up_rewards(hero_id);
+    pending_level_ups = pending_level_ups > 0 ? pending_level_ups - 1 : 0;
+    display_level_up_modal = false;
+    controlmode = CONTROLMODE_PLAYER;
+    add_message("%s increased by 1", stat_name);
+    add_message_history("%s reached level %d", ct.get<name>(hero_id).value_or("hero").c_str(), ct.get<level>(hero_id).value_or(1));
+    frame_dirty = true;
+
+    if (pending_level_ups > 0) {
+        open_level_up_modal();
+    }
+}
+
+inline void gamestate::maybe_unlock_level_up(entityid id) {
+    if (id != hero_id || ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_PLAYER) {
+        return;
+    }
+
+    const int current_xp = ct.get<xp>(id).value_or(0);
+    int current_level = ct.get<level>(id).value_or(1) + pending_level_ups;
+    if (current_level < 1) {
+        current_level = 1;
+    }
+    while (current_xp >= current_level * 10) {
+        pending_level_ups++;
+        current_level++;
+    }
+
+    if (pending_level_ups > 0 && !display_level_up_modal) {
+        open_level_up_modal();
+    }
+}
+
+inline void gamestate::handle_input_level_up(inputstate& is) {
+    if (controlmode != CONTROLMODE_LEVEL_UP || !display_level_up_modal) {
+        return;
+    }
+    if (inputstate_is_pressed(is, KEY_LEFT)) {
+        if (level_up_selection % 2 == 1) {
+            level_up_selection--;
+        }
+        frame_dirty = true;
+    }
+    else if (inputstate_is_pressed(is, KEY_RIGHT)) {
+        if (level_up_selection % 2 == 0) {
+            level_up_selection++;
+        }
+        frame_dirty = true;
+    }
+    else if (inputstate_is_pressed(is, KEY_UP)) {
+        if (level_up_selection >= 2) {
+            level_up_selection -= 2;
+        }
+        frame_dirty = true;
+    }
+    else if (inputstate_is_pressed(is, KEY_DOWN)) {
+        if (level_up_selection + 2 < 6) {
+            level_up_selection += 2;
+        }
+        frame_dirty = true;
+    }
+    else if (inputstate_is_pressed(is, KEY_ENTER)) {
+        if (!test && IsAudioDeviceReady()) {
+            PlaySound(sfx[SFX_CONFIRM_01]);
+        }
+        apply_level_up_selection();
+    }
+}
+
 inline void gamestate::handle_input_confirm_prompt(inputstate& is) {
     if (controlmode != CONTROLMODE_CONFIRM_PROMPT) {
         controlmode = CONTROLMODE_CONFIRM_PROMPT;
@@ -422,6 +594,10 @@ inline void gamestate::handle_input_help_menu(inputstate& is) {
 
 inline void gamestate::handle_input_gameplay_scene(inputstate& is) {
     minfo2("handle input gameplay scene");
+    if (controlmode == CONTROLMODE_LEVEL_UP) {
+        handle_input_level_up(is);
+        return;
+    }
     if (controlmode == CONTROLMODE_CONFIRM_PROMPT) {
         handle_input_confirm_prompt(is);
         return;
@@ -460,6 +636,9 @@ inline void gamestate::handle_input_gameplay_scene(inputstate& is) {
     }
     else if (controlmode == CONTROLMODE_HELP_MENU) {
         handle_input_help_menu(is);
+    }
+    else if (controlmode == CONTROLMODE_LEVEL_UP) {
+        handle_input_level_up(is);
     }
     else if (controlmode == CONTROLMODE_INTERACTION) {
         handle_input_interaction(is);

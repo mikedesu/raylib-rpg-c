@@ -118,6 +118,7 @@ public:
     bool display_option_menu;
     bool display_confirm_prompt;
     bool display_interaction_modal;
+    bool display_level_up_modal;
     bool do_quit;
     bool dirty_entities;
     bool display_help_menu;
@@ -137,6 +138,7 @@ public:
     unsigned int windowheight;
     unsigned int frame_updates;
     unsigned int inventory_menu_selection;
+    unsigned int level_up_selection;
     unsigned int gameplay_settings_menu_selection;
     unsigned int title_screen_selection;
     unsigned int max_title_screen_selections;
@@ -176,6 +178,7 @@ public:
     entityid active_interaction_entity_id;
     string interaction_title;
     string interaction_body;
+    int pending_level_ups;
 
     void set_seed() {
         srand(time(NULL));
@@ -268,6 +271,7 @@ public:
         display_help_menu = false;
         display_confirm_prompt = false;
         display_interaction_modal = false;
+        display_level_up_modal = false;
         do_quit = false;
         cam_changed = false;
         gameover = dirty_entities = false;
@@ -323,6 +327,7 @@ public:
         turn_count = 0;
         action_selection = 0;
         inventory_menu_selection = 0;
+        level_up_selection = 0;
         msg_history_max_len_msg_measure = 0;
         msg_history_max_len_msg = 0;
         debugpanel.pad_top = 0;
@@ -349,6 +354,7 @@ public:
         active_interaction_entity_id = ENTITYID_INVALID;
         interaction_title.clear();
         interaction_body.clear();
+        pending_level_ups = 0;
         msg_system.clear();
         msg_history.clear();
         ct.clear();
@@ -770,6 +776,30 @@ public:
 
     /** @brief Handle input while an interaction modal is active. */
     void handle_input_interaction(inputstate& is);
+
+    /** @brief Return the XP threshold required for the next level-up. */
+    int get_level_up_xp_threshold(entityid id);
+
+    /** @brief Open the level-up picker and suspend normal gameplay input. */
+    void open_level_up_modal();
+
+    /** @brief Apply a permanent attribute increase outside or inside level-up flow. */
+    bool apply_permanent_attribute_increase(entityid id, unsigned int attribute_index, int amount = 1);
+
+    /** @brief Roll one level-up hit-die reward for the entity's maximum HP. */
+    int roll_level_up_max_hp_gain(entityid id);
+
+    /** @brief Apply generic rewards that happen whenever an entity gains a level. */
+    void apply_level_up_rewards(entityid id);
+
+    /** @brief Apply the currently selected permanent attribute increase. */
+    void apply_level_up_selection();
+
+    /** @brief Award pending level-ups when the actor has reached the XP threshold. */
+    void maybe_unlock_level_up(entityid id);
+
+    /** @brief Handle input while the level-up picker is active. */
+    void handle_input_level_up(inputstate& is);
 
     //inl_count_0 + 2bool handle_quit_pressed(const inputstate& is) {
     //    if (inputstate_is_pressed(is, KEY_ESCAPE)) {

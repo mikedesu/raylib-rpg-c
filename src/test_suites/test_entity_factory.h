@@ -173,6 +173,24 @@ public:
         TS_ASSERT(!g.ct.get<aggro>(id).value_or(true));
     }
 
+    void testCreateGreenSlimeUsesPassiveDefaultsAndRacialModifiers() {
+        gamestate g;
+        const vec3 loc = add_initialized_floor(g);
+
+        const entityid id = g.create_npc_at_with(RACE_GREEN_SLIME, loc, [](CT&, const entityid) {});
+
+        TS_ASSERT_DIFFERS(id, ENTITYID_INVALID);
+        TS_ASSERT_EQUALS(g.ct.get<name>(id).value_or(""), "green slime");
+        TS_ASSERT_EQUALS(g.ct.get<alignment>(id).value_or(ALIGNMENT_NONE), ALIGNMENT_NEUTRAL_NEUTRAL);
+        TS_ASSERT(!g.ct.get<aggro>(id).value_or(true));
+        TS_ASSERT_EQUALS(get_racial_modifiers(RACE_GREEN_SLIME, 0), -2);
+        TS_ASSERT_EQUALS(get_racial_modifiers(RACE_GREEN_SLIME, 1), -2);
+        TS_ASSERT_EQUALS(get_racial_modifiers(RACE_GREEN_SLIME, 2), -2);
+        TS_ASSERT_EQUALS(get_racial_modifiers(RACE_GREEN_SLIME, 3), -2);
+        TS_ASSERT_EQUALS(get_racial_modifiers(RACE_GREEN_SLIME, 4), -2);
+        TS_ASSERT_EQUALS(get_racial_modifiers(RACE_GREEN_SLIME, 5), -2);
+    }
+
     void testCreatePlayerAtWithUsesCharacterCreationAlignment() {
         gamestate g;
         const vec3 loc = add_initialized_floor(g);
@@ -184,6 +202,19 @@ public:
         TS_ASSERT_DIFFERS(id, ENTITYID_INVALID);
         TS_ASSERT_EQUALS(g.ct.get<entitytype>(id).value_or(ENTITY_NONE), ENTITY_PLAYER);
         TS_ASSERT_EQUALS(g.ct.get<alignment>(id).value_or(ALIGNMENT_NONE), ALIGNMENT_GOOD_LAWFUL);
+    }
+
+    void testApplyPermanentAttributeIncreaseCanBeUsedOutsideLevelUp() {
+        gamestate g;
+        const vec3 loc = add_initialized_floor(g);
+        const entityid id = g.create_player_at_with(loc, "hero", g.player_init(12));
+
+        TS_ASSERT_DIFFERS(id, ENTITYID_INVALID);
+        const int old_int = g.ct.get<intelligence>(id).value_or(0);
+
+        TS_ASSERT(g.apply_permanent_attribute_increase(id, 3, 2));
+        TS_ASSERT_EQUALS(g.ct.get<intelligence>(id).value_or(0), old_int + 2);
+        TS_ASSERT_EQUALS(g.ct.get<level>(id).value_or(0), 1);
     }
 
     void testCreateBoxWithSetsDefaultNameAndDescription() {

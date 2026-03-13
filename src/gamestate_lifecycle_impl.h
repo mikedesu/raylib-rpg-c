@@ -155,8 +155,9 @@ inline void gamestate::logic_init() {
     SetRandomSeed(time(NULL));
     constexpr float parts = 1.0;
     massert(!d.is_initialized, "dungeon is already initialized");
-    create_and_add_df_1(BIOME_STONE, 8, 8, 2, parts);
-    create_and_add_df_1(BIOME_STONE, 16, 16, 2, parts);
+    create_and_add_df_1(BIOME_STONE, 8, 8, 3, parts);
+    create_and_add_df_1(BIOME_STONE, 16, 16, 3, parts);
+    create_and_add_df_1(BIOME_STONE, 24, 24, 3, parts);
     const bool stairs_assigned = assign_random_stairs();
     massert(stairs_assigned, "failed to assign dungeon stairs");
     if (!stairs_assigned) {
@@ -177,26 +178,12 @@ inline void gamestate::logic_init() {
     }
     create_weapon_at_with(ct, df->get_random_loc(), sword_init());
     create_shield_at_with(ct, df->get_random_loc(), shield_init());
-    auto armed_orc_init = [this](CT& ct, const entityid id) {
-        entityid wpn_id = create_weapon_with([](CT& ct, const entityid id) {
-            ct.set<name>(id, "Dagger");
-            ct.set<description>(id, "Stabby stabby.");
-            ct.set<weapontype>(id, WEAPON_DAGGER);
-            ct.set<damage>(id, vec3{1, 4, 0});
-            ct.set<durability>(id, 100);
-            ct.set<max_durability>(id, 100);
-            ct.set<rarity>(id, RARITY_COMMON);
-        });
-        entityid potion_id = create_potion_with([](CT& ct, const entityid id) {
-            ct.set<name>(id, "small healing potion");
-            ct.set<description>(id, "a small healing potion");
-            ct.set<potiontype>(id, POTION_HP_SMALL);
-            ct.set<healing>(id, vec3{1, 6, 0});
-        });
-        add_to_inventory(id, wpn_id);
-        add_to_inventory(id, potion_id);
-        ct.set<equipped_weapon>(id, wpn_id);
-        ct.set<aggro>(id, true);
+    auto green_slime_init = [](CT& ct, const entityid id) {
+        ct.set<name>(id, "green slime");
+        ct.set<dialogue_text>(id, "The slime jiggles quietly.");
+        ct.set<aggro>(id, false);
+        ct.set<level>(id, 1);
+        ct.set<xp>(id, 0);
     };
 
     const race_t friendly_race = static_cast<race_t>(GetRandomValue(RACE_NONE + 1, RACE_COUNT - 1));
@@ -205,8 +192,14 @@ inline void gamestate::logic_init() {
         ct.set<aggro>(id, false);
     });
 
-    const vec3 hostile_orc_loc = d.get_floor(1)->get_random_loc();
-    create_orc_at_with(hostile_orc_loc, armed_orc_init);
+    const vec3 floor_one_slime_loc = d.get_floor(1)->get_random_loc();
+    create_npc_at_with(RACE_GREEN_SLIME, floor_one_slime_loc, green_slime_init);
+
+    auto floor_two = d.get_floor(2);
+    for (int i = 0; i < 9; i++) {
+        const vec3 slime_loc = floor_two->get_random_loc();
+        create_npc_at_with(RACE_GREEN_SLIME, slime_loc, green_slime_init);
+    }
     msuccess("end creating monsters...");
     add_message("Welcome to the game! Press enter to cycle messages.");
     add_message("For help, press ?");

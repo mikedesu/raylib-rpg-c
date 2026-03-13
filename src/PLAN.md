@@ -68,29 +68,29 @@ rg -n "spell|magic|cast" .
 ## Immediate New Feature Development
 
 - [ ] Leveling up
-  - [ ] instead of an orc spawning on floor 2, lets make it spawn a `green_slime`.
-    - [ ] green slimes are not-aggressive and will not attack the player until they are attacked
-  - [ ] create a floor 3
-  - [ ] floor 3 should be larger than floor 2
-  - [ ] floor 3 should have 9 green slimes on it
-  - [ ] each green slime spawned is level 1
-  - [ ] green slimes have racial attribute modifiers like ELF, DWARF, etc.
-  - [ ] killing each slime should reward 1 xp
-    - [ ] green slimes have -2 to strength
-    - [ ] green slimes have -2 to constitution
-    - [ ] green slimes have -2 to dexterity
-    - [ ] green slimes have -2 to charisma
-    - [ ] green slimes have -2 to wisdom
-    - [ ] green slimes have -2 to intelligence
-  - [ ] After reaching 10 experience points (xp), you should level-up
-    - [ ] A level-up window should appear that lists the player's attributes in a selectable grid:
-      - [ ] strength
-      - [ ] dexterity
-      - [ ] constitution
-      - [ ] intelligence
-      - [ ] wisdom
-      - [ ] charisma
-    - [ ] the player gets to select one attribute to permanently increase by 1
+  - [x] instead of an orc spawning on floor 2, lets make it spawn a `green_slime`.
+    - [x] green slimes are not-aggressive and will not attack the player until they are attacked
+  - [x] create a floor 3
+  - [x] floor 3 should be larger than floor 2
+  - [x] floor 3 should have 9 green slimes on it
+  - [x] each green slime spawned is level 1
+  - [x] green slimes have racial attribute modifiers like ELF, DWARF, etc.
+  - [x] killing each slime should reward 1 xp
+    - [x] green slimes have -2 to strength
+    - [x] green slimes have -2 to constitution
+    - [x] green slimes have -2 to dexterity
+    - [x] green slimes have -2 to charisma
+    - [x] green slimes have -2 to wisdom
+    - [x] green slimes have -2 to intelligence
+  - [x] After reaching 10 experience points (xp), you should level-up
+    - [x] A level-up window should appear that lists the player's attributes in a selectable grid:
+      - [x] strength
+      - [x] dexterity
+      - [x] constitution
+      - [x] intelligence
+      - [x] wisdom
+      - [x] charisma
+    - [x] the player gets to select one attribute to permanently increase by 1
     - [ ] i will eventually select a new "level-up" sound effect or music eventually
   - [ ] create a floor 4
   - [ ] floor 4 should be approximately the same size as floor 2
@@ -117,7 +117,7 @@ rg -n "spell|magic|cast" .
     - KEY_A is for "attack"
     - KEY_S is for pickup item
     - etc
-- [ ] Update the help menu text to reflect the new key press(es)
+- [x] Update the help menu text to reflect the new key press(es)
 
 
 ## Current State

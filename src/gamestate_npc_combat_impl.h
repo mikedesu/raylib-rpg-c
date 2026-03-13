@@ -74,10 +74,12 @@ inline int gamestate::get_npc_xp(entityid id) {
 }
 
 inline void gamestate::update_npc_xp(entityid id, entityid target_id) {
+    (void)target_id;
     int old_xp = get_npc_xp(id);
     int reward_xp = 1;
     int new_xp = old_xp + reward_xp;
     ct.set<xp>(id, new_xp);
+    maybe_unlock_level_up(id);
 }
 
 inline void gamestate::provoke_npc(entityid npc_id, entityid source_id) {

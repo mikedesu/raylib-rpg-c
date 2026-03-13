@@ -34,6 +34,26 @@ private:
         return count;
     }
 
+    size_t count_live_npcs_of_race_on_floor(gamestate& g, race_t race_value, int floor) {
+        size_t count = 0;
+        for (entityid id = 1; id < g.next_entityid; id++) {
+            if (g.ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_NPC) {
+                continue;
+            }
+            if (g.ct.get<dead>(id).value_or(true)) {
+                continue;
+            }
+            if (g.ct.get<race>(id).value_or(RACE_NONE) != race_value) {
+                continue;
+            }
+            const vec3 loc = g.ct.get<location>(id).value_or(vec3{-1, -1, -1});
+            if (loc.z == floor) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     entityid find_live_npc_on_floor(gamestate& g, int floor) {
         for (entityid id = 1; id < g.next_entityid; id++) {
             if (g.ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_NPC) {
@@ -122,12 +142,14 @@ public:
         g.logic_init();
 
         TS_ASSERT(g.d.is_initialized);
-        TS_ASSERT_EQUALS(g.d.get_floor_count(), 2U);
+        TS_ASSERT_EQUALS(g.d.get_floor_count(), 3U);
         TS_ASSERT_EQUALS(g.d.current_floor, 0);
         TS_ASSERT_EQUALS(g.d.get_floor(0)->get_width(), 8);
         TS_ASSERT_EQUALS(g.d.get_floor(0)->get_height(), 8);
         TS_ASSERT_EQUALS(g.d.get_floor(1)->get_width(), 16);
         TS_ASSERT_EQUALS(g.d.get_floor(1)->get_height(), 16);
+        TS_ASSERT_EQUALS(g.d.get_floor(2)->get_width(), 24);
+        TS_ASSERT_EQUALS(g.d.get_floor(2)->get_height(), 24);
         TS_ASSERT(vec3_valid(g.d.get_floor(0)->get_upstairs_loc()));
         TS_ASSERT(vec3_valid(g.d.get_floor(0)->get_downstairs_loc()));
         TS_ASSERT(count_entities_of_type(g, ENTITY_DOOR) >= 1U);
@@ -135,10 +157,11 @@ public:
         TS_ASSERT(count_entities_of_type(g, ENTITY_ITEM) >= 2U);
         TS_ASSERT(count_live_npcs_on_floor(g, 0) >= 1U);
         TS_ASSERT(count_live_npcs_on_floor(g, 1) >= 1U);
+        TS_ASSERT(count_live_npcs_on_floor(g, 2) >= 9U);
         TS_ASSERT(g.msg_system.size() >= 2U);
     }
 
-    void testLogicInitPlacesFriendlyNpcOnFloorZeroAndAggressiveOrcOnFloorOne() {
+    void testLogicInitPlacesFriendlyNpcAndGreenSlimesOnLaterFloors() {
         gamestate g;
         g.test = true;
         g.mt.seed(12345);
@@ -151,8 +174,9 @@ public:
         TS_ASSERT_DIFFERS(floor_zero_npc, ENTITYID_INVALID);
         TS_ASSERT_DIFFERS(floor_one_npc, ENTITYID_INVALID);
         TS_ASSERT(!g.ct.get<aggro>(floor_zero_npc).value_or(true));
-        TS_ASSERT_EQUALS(g.ct.get<race>(floor_one_npc).value_or(RACE_NONE), RACE_ORC);
-        TS_ASSERT(g.ct.get<aggro>(floor_one_npc).value_or(false));
+        TS_ASSERT_EQUALS(g.ct.get<race>(floor_one_npc).value_or(RACE_NONE), RACE_GREEN_SLIME);
+        TS_ASSERT(!g.ct.get<aggro>(floor_one_npc).value_or(true));
+        TS_ASSERT_EQUALS(count_live_npcs_of_race_on_floor(g, RACE_GREEN_SLIME, 2), 9U);
     }
 
     void testUpdateNpcsStateSetsFriendlyAndHostileDefaultActions() {

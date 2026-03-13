@@ -187,7 +187,7 @@ public:
         g.restart_game();
 
         TS_ASSERT(g.d.is_initialized);
-        TS_ASSERT_EQUALS(g.d.get_floor_count(), 2U);
+        TS_ASSERT_EQUALS(g.d.get_floor_count(), 3U);
         TS_ASSERT_EQUALS(g.current_scene, SCENE_TITLE);
         TS_ASSERT_EQUALS(g.restart_count, 8U);
         TS_ASSERT(!g.do_restart);
@@ -202,6 +202,64 @@ public:
         TS_ASSERT_EQUALS(g.windowheight, 777);
         TS_ASSERT_DELTA(g.cam2d.offset.x, DEFAULT_TARGET_WIDTH / 4.0f, 0.001f);
         TS_ASSERT_DELTA(g.cam2d.offset.y, DEFAULT_TARGET_HEIGHT / 4.0f, 0.001f);
+    }
+
+    void testHeroOpensLevelUpModalAtTenXpAndCanApplySelection() {
+        gamestate g;
+        g.test = true;
+        g.current_scene = SCENE_GAMEPLAY;
+
+        auto df = g.d.create_floor(BIOME_STONE, 8, 8);
+        df->df_set_all_tiles(TILE_FLOOR_STONE_00);
+        g.d.add_floor(df);
+        g.d.is_initialized = true;
+
+        const entityid hero = g.create_player_at_with(vec3{1, 1, 0}, "hero", g.player_init(10));
+        const entityid slime = g.create_npc_at_with(RACE_GREEN_SLIME, vec3{2, 1, 0}, [](CT&, const entityid) {});
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(slime, ENTITYID_INVALID);
+
+        g.ct.set<xp>(hero, 9);
+        const int old_str = g.ct.get<strength>(hero).value_or(0);
+        const vec2 old_hp = g.ct.get<hp>(hero).value_or(vec2{0, 0});
+
+        g.update_npc_xp(hero, slime);
+
+        TS_ASSERT_EQUALS(g.ct.get<xp>(hero).value_or(0), 10);
+        TS_ASSERT(g.display_level_up_modal);
+        TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_LEVEL_UP);
+
+        inputstate is;
+        inputstate_reset(is);
+        press_key(is, KEY_ENTER);
+        g.handle_input(is);
+
+        TS_ASSERT(!g.display_level_up_modal);
+        TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_PLAYER);
+        TS_ASSERT_EQUALS(g.ct.get<level>(hero).value_or(0), 2);
+        TS_ASSERT_EQUALS(g.ct.get<strength>(hero).value_or(0), old_str + 1);
+        const vec2 new_hp = g.ct.get<hp>(hero).value_or(vec2{0, 0});
+        TS_ASSERT_EQUALS(new_hp.x, old_hp.x);
+        TS_ASSERT(new_hp.y > old_hp.y);
+    }
+
+    void testApplyLevelUpRewardsAddsHitDieWorthOfMaxHp() {
+        gamestate g;
+        auto df = g.d.create_floor(BIOME_STONE, 8, 8);
+        df->df_set_all_tiles(TILE_FLOOR_STONE_00);
+        g.d.add_floor(df);
+        g.d.is_initialized = true;
+
+        const entityid hero = g.create_player_at_with(vec3{1, 1, 0}, "hero", g.player_init(10));
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+
+        g.ct.set<hd>(hero, vec3{1, 1, 0});
+        g.ct.set<hp>(hero, vec2{7, 10});
+
+        g.apply_level_up_rewards(hero);
+
+        TS_ASSERT_EQUALS(g.ct.get<level>(hero).value_or(0), 2);
+        TS_ASSERT(vec2_equal(g.ct.get<hp>(hero).value_or(vec2{0, 0}), vec2{7, 11}));
     }
 
     void testConfirmPromptResolvesYesInputEvenIfControlmodeDrifted() {
