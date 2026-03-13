@@ -18,25 +18,6 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
 
 ## Immediate New Changes To Make
 
-- [x] "mini" damage numbers
-  - [x] damage values now display above any hit entity that has `hp` upon receiving damage
-  - [x] white font color
-  - [x] critical hits are not yet handled but the popup path now supports red for future crit display
-  - [x] camera zoom is now accommodated with zoom-aware world-space sizing so the popups stay readable and aesthetically restrained as zoom changes
-  - [x] popups rise slightly, drift a bit, and fade away for better combat readability without pulling focus too far from the center action
-
-- [x] a "mini" inventory menu
-- [x] a toggle for your preference between a full inventory/chest menu or a mini menu in the options menu, beneath sound, window boxes, and controls
-  - [x] allows you to pull up an inventory without it blocking the whole screen
-  - [x] list-based instead of grid-based
-  - [x] allows you to select and use, or equip, inventory items.
-  - [x] displays next to the player when activated
-  - [x] displays a finite number of items in a "scroll wheel"
-    - [x] if the number of items exceeds a certain amount to begin with but is configurable, say, 10 items, then those items would have to be navigated to thru the scrolling mechanism
-    - [x] if the number of items does not exceed this certain amount, say, 10 items, then all items can safely display and be navigated to for acquisition or otherwise in the same way as you would interact with them thru the chest menu or full inventory menu
-  - [x] mini inventory item preview was enlarged for readability and its footer spacing was corrected so the hint text is no longer eclipsed by the preview border
-  - [x] item detail text for full inventory, chest, and mini inventory/chest now shares one helper so future additions such as durability and other stats can be updated in one place
-
 - [ ] Remove all props from floor 4's creation
 - [ ] Develop a `FLOOR_PRESSURE_PLATE` system where
   - [ ] A heavy object such as a `pushable` or `pullable` must be on the tile that has the pressure plate
