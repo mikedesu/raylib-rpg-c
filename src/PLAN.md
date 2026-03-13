@@ -11,39 +11,17 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
   - controls menu supports profile switching and per-action rebinding
   - face-direction attack is bindable
   - stairs default is now `KEY_F`
-- Next follow-up:
-  - The background color for the "full or laptop keyboard?" window and for the options menu(s) is a dark gray and differs from the default "blue" background colors
-  - begin the deferred options work for sound controls and message box colors
+  - sound controls are now live in the options menu
+  - window box colors are now configurable in the options menu
+  - default window/menu background color is now `Color(0, 0, 255, 128)`
+  - Debug Panel background color now correctly uses `Color(0, 0, 255, 255)`
 
 ## Immediate New Changes To Make
-
-- [x] We need a more flexible keyboard input mapping when playing the main game in `GAMEPLAY SCENE`.
-  - [x] At the moment all of the default keybindings are hard-coded in and the only association with any "ACTION" is through the code itself
-  - [x] We want to begin developing the ability to re-assign or change default keybindings for associated actions
-    - [x] this will be achieved through a number of mechanisms:
-      - [x] when you first begin a "new game", after character creation but before the gameplay scene begins, the player will be asked if they are playing on a laptop keyboard or a full keyboard. 
-        - [x] if they are playing on a full keyboard, then the current "default" keybinds will be used
-        - [x] if they are playing on a laptop keyboard, then an alternative, yet-to-be-decided set of keybinds will be used
-          - [x] at the moment, i am thinking of the original nethack keybindings, which are very right-handed
-          - [x] we can optionally offer a number of pre-defined keybindings that can be rotated through and modified or customized
-        - [x] an options menu that can be accessed in a similar fashion to the "inventory menu"
-          - [ ] this options menu will have a number of configurable items, including:
-            - [ ] sound controls
-              - [ ] master
-              - [ ] music
-              - [ ] sound effects
-            - [ ] message box colors
-              - [ ] foreground
-              - [ ] background
-            - [x] keyboard controls
-              - [x] select pre-defined keybinding
-              - [x] customize individual keys on a per-action basis
-              - [x] "keyboard controls" should be only 1 menu
-
 
 - [ ] "mini" damage numbers
   - [ ] damage values that display above an NPC entity upon receiving damage
   - [ ] white font color
+  - [ ] critical hits are not yet handled but when they are, i want their color to be red
 
 - [ ] a "mini" inventory menu
 - [ ] a toggle for your preference between a full inventory/chest menu or a mini menu in the options menu, beneath sound, window boxes, and controls
@@ -117,6 +95,10 @@ Compact status handoff for the current C++ / raylib dungeon project.
   - Recent added coverage includes dungeon connectivity, bounded combat invariants, renderer-adjacent seam tests, and heavy pathfinding/chase plus combat soak tests.
 
 - open door/open chest input change from KEY_O to KEY_D
+
+- keyboard layouts fully configurable
+- window fg/bg colors fully configurable
+- sound volume fully configurable
 
 ## Current State
 
