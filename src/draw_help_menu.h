@@ -15,6 +15,7 @@ static inline void draw_help_menu(gamestate& g) {
                         "Attack: a\n"
                         "Pull: space\n"
                         "Open door: o\n"
+                        "Interact / examine: e\n"
                         "Use stairs: .\n"
                         "Toggle full light: l\n"
                         "\n"

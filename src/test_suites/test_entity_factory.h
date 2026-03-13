@@ -145,6 +145,7 @@ public:
         TS_ASSERT_EQUALS(g.ct.get<alignment>(id).value_or(ALIGNMENT_NONE), ALIGNMENT_EVIL_CHAOTIC);
         TS_ASSERT(g.ct.get<name>(id).has_value());
         TS_ASSERT(!g.ct.get<name>(id).value_or("").empty());
+        TS_ASSERT_EQUALS(g.ct.get<dialogue_text>(id).value_or(""), "They have nothing to say.");
         TS_ASSERT(!g.ct.get<dead>(id).value_or(true));
         TS_ASSERT(g.ct.get<aggro>(id).value_or(false));
         TS_ASSERT(g.ct.get<update>(id).value_or(false));
@@ -167,6 +168,7 @@ public:
 
         TS_ASSERT_DIFFERS(id, ENTITYID_INVALID);
         TS_ASSERT_EQUALS(g.ct.get<name>(id).value_or(""), "dwarf");
+        TS_ASSERT_EQUALS(g.ct.get<dialogue_text>(id).value_or(""), "They have nothing to say.");
         TS_ASSERT_EQUALS(g.ct.get<alignment>(id).value_or(ALIGNMENT_NONE), ALIGNMENT_GOOD_LAWFUL);
         TS_ASSERT(!g.ct.get<aggro>(id).value_or(true));
     }
@@ -182,5 +184,25 @@ public:
         TS_ASSERT_DIFFERS(id, ENTITYID_INVALID);
         TS_ASSERT_EQUALS(g.ct.get<entitytype>(id).value_or(ENTITY_NONE), ENTITY_PLAYER);
         TS_ASSERT_EQUALS(g.ct.get<alignment>(id).value_or(ALIGNMENT_NONE), ALIGNMENT_GOOD_LAWFUL);
+    }
+
+    void testCreateBoxWithSetsDefaultNameAndDescription() {
+        gamestate g;
+
+        const entityid id = g.create_box_with();
+
+        TS_ASSERT_DIFFERS(id, ENTITYID_INVALID);
+        TS_ASSERT_EQUALS(g.ct.get<name>(id).value_or(""), "box");
+        TS_ASSERT_EQUALS(g.ct.get<description>(id).value_or(""), "A plain wooden box.");
+    }
+
+    void testCreateDoorWithSetsDefaultNameAndDescription() {
+        gamestate g;
+
+        const entityid id = g.create_door_with([](CT&, const entityid) {});
+
+        TS_ASSERT_DIFFERS(id, ENTITYID_INVALID);
+        TS_ASSERT_EQUALS(g.ct.get<name>(id).value_or(""), "door");
+        TS_ASSERT_EQUALS(g.ct.get<description>(id).value_or(""), "A heavy wooden door bound with iron.");
     }
 };

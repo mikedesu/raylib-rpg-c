@@ -585,6 +585,70 @@ inline bool gamestate::try_entity_open_chest(entityid id, vec3 loc) {
     return open_chest_menu(chest_id);
 }
 
+inline bool gamestate::try_entity_interact(entityid id, vec3 loc) {
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
+    tile_t& tile = df->tile_at(loc);
+
+    const entityid npc_id = tile.get_cached_live_npc();
+    if (npc_id != ENTITYID_INVALID && npc_id != hero_id) {
+        const string speaker_name = ct.get<name>(npc_id).value_or("Someone");
+        const string text = ct.get<dialogue_text>(npc_id).value_or("They have nothing to say.");
+        open_interaction_modal(npc_id, speaker_name, text);
+        return true;
+    }
+
+    const entityid prop_id = tile.get_cached_prop();
+    if (prop_id != ENTITYID_INVALID) {
+        const string prop_name = ct.get<name>(prop_id).value_or("Prop");
+        const string text = ct.get<description>(prop_id).value_or("There is nothing notable about it.");
+        open_interaction_modal(prop_id, prop_name, text);
+        return true;
+    }
+
+    const entityid box_id = tile.get_cached_box();
+    if (box_id != ENTITYID_INVALID) {
+        const string box_name = ct.get<name>(box_id).value_or("Box");
+        const string text = ct.get<description>(box_id).value_or("A plain wooden box.");
+        open_interaction_modal(box_id, box_name, text);
+        return true;
+    }
+
+    const entityid chest_id = tile.get_cached_chest();
+    if (chest_id != ENTITYID_INVALID) {
+        const string chest_name = ct.get<name>(chest_id).value_or("Treasure chest");
+        const string text = ct.get<description>(chest_id).value_or("A sturdy wooden treasure chest.");
+        open_interaction_modal(chest_id, chest_name, text);
+        return true;
+    }
+
+    const entityid door_id = tile.get_cached_door();
+    if (door_id != ENTITYID_INVALID) {
+        const string door_name = ct.get<name>(door_id).value_or("Door");
+        const bool is_open = ct.get<door_open>(door_id).value_or(false);
+        const string base_text = ct.get<description>(door_id).value_or("A heavy wooden door bound with iron.");
+        open_interaction_modal(door_id, door_name, TextFormat("%s It is %s.", base_text.c_str(), is_open ? "open" : "closed"));
+        return true;
+    }
+
+    return false;
+}
+
+inline bool gamestate::handle_interact(inputstate& is, bool is_dead) {
+    if (!inputstate_is_pressed(is, KEY_E)) {
+        return false;
+    }
+    if (is_dead) {
+        return add_message("You cannot interact while dead");
+    }
+    vec3 loc = get_loc_facing_player();
+    if (!try_entity_interact(hero_id, loc)) {
+        return add_message("There is nothing to interact with");
+    }
+    flag = GAMESTATE_FLAG_PLAYER_ANIM;
+    return true;
+}
+
 inline bool gamestate::handle_open_door(inputstate& is, bool is_dead) {
     if (inputstate_is_pressed(is, KEY_O)) {
         if (is_dead) {

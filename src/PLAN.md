@@ -6,6 +6,7 @@ Compact handoff for active refactor and test work.
 
 - Interactions with non-aggressive entities
   - [ ] Talk to NPCs
+    - [x] first-pass `KEY_E` interaction opens a centered dialogue modal using one `dialogue_text` statement per NPC
     - [ ] dialog boxes
       - [ ] portray of which character is talking displayed in the message box
       - [ ] can contain multiple lines of text
@@ -13,9 +14,11 @@ Compact handoff for active refactor and test work.
       - [ ] must be centered around 1/4 from the top of the screen
 
   - [ ] Prop Descriptions
+    - [x] first-pass `KEY_E` interaction opens a centered description modal using one text description per prop
     - [ ] Some descriptor / dialog box with information about the prop 
       - [ ] "This is a dirty mop!" etc
   - [ ] Decide on a primary "interact" keypress
+    - [x] first-pass generic interact/examine uses `KEY_E`
     - KEY_O is for "open"
     - KEY_PERIOD is for up/downstairs
     - KEY_A is for "attack"

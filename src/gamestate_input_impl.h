@@ -45,6 +45,38 @@ inline void gamestate::resolve_confirm_prompt(bool confirmed) {
     }
 }
 
+inline void gamestate::open_interaction_modal(entityid id, const string& title, const string& body) {
+    active_interaction_entity_id = id;
+    interaction_title = title;
+    interaction_body = body;
+    display_interaction_modal = true;
+    controlmode_before_confirm = controlmode;
+    controlmode = CONTROLMODE_INTERACTION;
+    frame_dirty = true;
+}
+
+inline void gamestate::close_interaction_modal() {
+    display_interaction_modal = false;
+    active_interaction_entity_id = ENTITYID_INVALID;
+    interaction_title.clear();
+    interaction_body.clear();
+    controlmode = controlmode_before_confirm == CONTROLMODE_INTERACTION ? CONTROLMODE_PLAYER : controlmode_before_confirm;
+    controlmode_before_confirm = CONTROLMODE_PLAYER;
+    frame_dirty = true;
+}
+
+inline void gamestate::handle_input_interaction(inputstate& is) {
+    if (controlmode != CONTROLMODE_INTERACTION || !display_interaction_modal) {
+        return;
+    }
+    if (inputstate_any_pressed(is)) {
+        if (!test && IsAudioDeviceReady()) {
+            PlaySound(sfx[SFX_CONFIRM_01]);
+        }
+        close_interaction_modal();
+    }
+}
+
 inline void gamestate::handle_input_confirm_prompt(inputstate& is) {
     if (controlmode != CONTROLMODE_CONFIRM_PROMPT) {
         controlmode = CONTROLMODE_CONFIRM_PROMPT;
@@ -341,7 +373,9 @@ inline void gamestate::handle_input_gameplay_controlmode_player(inputstate& is) 
         handle_move_down_right(is, is_dead)) {
         return;
     }
-    else if (handle_attack(is, is_dead) || handle_pickup_item(is, is_dead) || handle_traverse_stairs(is, is_dead) || handle_open_door(is, is_dead)) {
+    else if (
+        handle_attack(is, is_dead) || handle_pickup_item(is, is_dead) || handle_traverse_stairs(is, is_dead) || handle_open_door(is, is_dead) ||
+        handle_interact(is, is_dead)) {
         return;
     }
 }
@@ -392,6 +426,10 @@ inline void gamestate::handle_input_gameplay_scene(inputstate& is) {
         handle_input_confirm_prompt(is);
         return;
     }
+    if (controlmode == CONTROLMODE_INTERACTION) {
+        handle_input_interaction(is);
+        return;
+    }
     if (inputstate_is_pressed(is, KEY_B)) {
         if (controlmode == CONTROLMODE_PLAYER) {
             controlmode = CONTROLMODE_CAMERA;
@@ -422,6 +460,9 @@ inline void gamestate::handle_input_gameplay_scene(inputstate& is) {
     }
     else if (controlmode == CONTROLMODE_HELP_MENU) {
         handle_input_help_menu(is);
+    }
+    else if (controlmode == CONTROLMODE_INTERACTION) {
+        handle_input_interaction(is);
     }
 }
 

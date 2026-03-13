@@ -117,6 +117,7 @@ public:
     bool display_action_menu;
     bool display_option_menu;
     bool display_confirm_prompt;
+    bool display_interaction_modal;
     bool do_quit;
     bool dirty_entities;
     bool display_help_menu;
@@ -172,6 +173,9 @@ public:
     option_menu options_menu;
     confirm_action_t confirm_action;
     string confirm_prompt_message;
+    entityid active_interaction_entity_id;
+    string interaction_title;
+    string interaction_body;
 
     void set_seed() {
         srand(time(NULL));
@@ -263,6 +267,7 @@ public:
         display_chest_menu = false;
         display_help_menu = false;
         display_confirm_prompt = false;
+        display_interaction_modal = false;
         do_quit = false;
         cam_changed = false;
         gameover = dirty_entities = false;
@@ -341,6 +346,9 @@ public:
         last_click_screen_pos = Vector2{-1, -1};
         confirm_action = CONFIRM_ACTION_NONE;
         confirm_prompt_message.clear();
+        active_interaction_entity_id = ENTITYID_INVALID;
+        interaction_title.clear();
+        interaction_body.clear();
         msg_system.clear();
         msg_history.clear();
         ct.clear();
@@ -768,6 +776,15 @@ public:
     /** @brief Execute the quit action associated with the active confirmation prompt. */
     void handle_confirm_quit();
 
+    /** @brief Open the current interaction modal for an NPC or prop. */
+    void open_interaction_modal(entityid id, const string& title, const string& body);
+
+    /** @brief Close the current interaction modal and restore previous control. */
+    void close_interaction_modal();
+
+    /** @brief Handle input while an interaction modal is active. */
+    void handle_input_interaction(inputstate& is);
+
     //inl_count_0 + 2bool handle_quit_pressed(const inputstate& is) {
     //    if (inputstate_is_pressed(is, KEY_ESCAPE)) {
     //        do_quit = true;
@@ -950,8 +967,14 @@ public:
     /** @brief Attempt to open a chest entity at the requested location. */
     bool try_entity_open_chest(entityid id, vec3 loc);
 
+    /** @brief Attempt to interact with the front-facing NPC or prop. */
+    bool try_entity_interact(entityid id, vec3 loc);
+
     /** @brief Handle door-opening input for the active actor. */
     bool handle_open_door(inputstate& is, bool is_dead);
+
+    /** @brief Handle NPC/prop interaction input for the active actor. */
+    bool handle_interact(inputstate& is, bool is_dead);
 
     /** @brief Attempt to cast a spell from an entity toward a target tile. */
     void try_entity_cast_spell(entityid id, int tgt_x, int tgt_y);

@@ -307,6 +307,9 @@ inline entityid gamestate::create_npc_with(race_t rt, with_fun npcInitFunction) 
     if (!ct.get<name>(id).has_value()) {
         ct.set<name>(id, race2str(rt));
     }
+    if (!ct.get<dialogue_text>(id).has_value()) {
+        ct.set<dialogue_text>(id, "They have nothing to say.");
+    }
     return id;
 }
 
@@ -424,6 +427,8 @@ inline entityid gamestate::create_box_with() {
     ct.set<update>(id, true);
     ct.set<pushable>(id, true);
     ct.set<pullable>(id, true);
+    ct.set<name>(id, "box");
+    ct.set<description>(id, "A plain wooden box.");
     return id;
 }
 

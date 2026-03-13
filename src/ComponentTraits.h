@@ -345,6 +345,13 @@ struct ComponentTraits<description> {
     using Type = string;
 };
 
+/// @brief Component tag for NPC dialogue text.
+struct dialogue_text { };
+template <>
+struct ComponentTraits<dialogue_text> {
+    using Type = string;
+};
+
 /// @brief Component tag for current durability.
 struct durability { };
 template <>

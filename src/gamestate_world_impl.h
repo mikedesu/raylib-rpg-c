@@ -347,6 +347,12 @@ inline entityid gamestate::create_door_with(with_fun doorInitFunction) {
     entityid id = add_entity();
     ct.set<entitytype>(id, ENTITY_DOOR);
     doorInitFunction(ct, id);
+    if (!ct.get<name>(id).has_value()) {
+        ct.set<name>(id, "door");
+    }
+    if (!ct.get<description>(id).has_value()) {
+        ct.set<description>(id, "A heavy wooden door bound with iron.");
+    }
     return id;
 }
 
@@ -479,6 +485,9 @@ inline entityid gamestate::create_prop_with(proptype_t type, with_fun initFun) {
     ct.set<update>(id, true);
     ct.set<proptype>(id, type);
     initFun(ct, id);
+    if (!ct.get<description>(id).has_value()) {
+        ct.set<description>(id, "There is nothing notable about it.");
+    }
     return id;
 }
 

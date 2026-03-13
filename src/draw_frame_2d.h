@@ -8,6 +8,7 @@
 #include "draw_handle_debug_panel.h"
 #include "draw_help_menu.h"
 #include "draw_hud.h"
+#include "draw_interaction_modal.h"
 #include "draw_inventory_menu.h"
 #include "draw_look_panel.h"
 #include "draw_message_box.h"
@@ -37,6 +38,7 @@ static inline void libdraw_drawframe_2d(gamestate& g, int vision_dist, int light
     draw_look_panel(g);
     draw_message_history(g);
     draw_message_box(g);
+    draw_interaction_modal(g);
 
     if (g.display_inventory_menu) {
         draw_inventory_menu(g);
