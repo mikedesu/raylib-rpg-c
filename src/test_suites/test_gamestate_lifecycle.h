@@ -11,6 +11,12 @@ public:
         is.pressed[idx] |= (1ULL << bit);
     }
 
+    void hold_key(inputstate& is, int key) {
+        const int idx = key / BITS_PER_LONG;
+        const int bit = key % BITS_PER_LONG;
+        is.held[idx] |= (1ULL << bit);
+    }
+
     void add_floor(gamestate& g, int width = 8, int height = 8) {
         auto df = g.d.create_floor(BIOME_STONE, width, height);
         df->df_set_all_tiles(TILE_FLOOR_STONE_00);
@@ -481,7 +487,7 @@ public:
         TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_WINDOW_COLOR_MENU);
 
         inputstate_reset(is);
-        press_key(is, KEY_RIGHT);
+        hold_key(is, KEY_RIGHT);
         g.handle_input_window_color_menu(is);
         TS_ASSERT_EQUALS(g.window_box_bgcolor.r, 1);
 

@@ -666,11 +666,13 @@ inline void gamestate::handle_input_window_color_menu(inputstate& is) {
         reset_window_box_colors();
         return;
     }
-    if (!inputstate_is_pressed(is, KEY_LEFT) && !inputstate_is_pressed(is, KEY_RIGHT)) {
+    const bool adjust_left = inputstate_is_held(is, KEY_LEFT);
+    const bool adjust_right = inputstate_is_held(is, KEY_RIGHT);
+    if (!adjust_left && !adjust_right) {
         return;
     }
 
-    const int dir = inputstate_is_pressed(is, KEY_RIGHT) ? 1 : -1;
+    const int dir = adjust_right ? 1 : -1;
     switch (window_color_menu_selection) {
     case 0: adjust_window_box_bg_channel(0, dir); return;
     case 1: adjust_window_box_bg_channel(1, dir); return;
