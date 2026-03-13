@@ -20,9 +20,11 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
 
 ## Active Backlog
 
-- [x] Interaction polish
-  - [x] tighten interaction/dialog box layout so it is intentionally centered and positioned
-  - [x] improve description/dialog content beyond first-pass placeholder text
+- [ ] Player light radius should NOT render behind closed doors
+  - [ ] if a door is open, light radius can go through and player can see other side...this is OK
+  - [ ] if a door is closed, player should NOT be able to see what is on the other side
+    - [ ] dungeon tile needs to render 'dark' as if no light hits it (if undiscovered / unvisited, black, if discovered, grayed-out)
+    - [ ] entities on the tile should not render or be visible
 
 - [ ] Dungeon / world quality
   - [ ] improve door placement quality beyond the first-pass implementation
@@ -132,6 +134,7 @@ Compact status handoff for the current C++ / raylib dungeon project.
 - sound volume fully configurable
 - mini damage numbers
 - mini inventory display
+- text interaction polish
 
 ## Current State
 
