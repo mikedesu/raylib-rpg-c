@@ -5,19 +5,19 @@ Compact handoff for active refactor and test work.
 ## Immediate New Feature Development
 
 - Interactions with non-aggressive entities
-  - [ ] Talk to NPCs
+  - [x] Talk to NPCs
     - [x] first-pass `KEY_E` interaction opens a centered dialogue modal using one `dialogue_text` statement per NPC
     - [ ] dialog boxes
-      - [ ] portray of which character is talking displayed in the message box
-      - [ ] can contain multiple lines of text
+      - [x] portray of which character is talking displayed in the message box
+      - [x] can contain multiple lines of text
       - [ ] must be centered horizontally
       - [ ] must be centered around 1/4 from the top of the screen
 
-  - [ ] Prop Descriptions
-    - [x] first-pass `KEY_E` interaction opens a centered description modal using one text description per prop
+  - [x] Prop Descriptions
+    - [x] first-pass `KEY_E` interaction opens a centered description modal using one text description per prop, box, chest, and door
     - [ ] Some descriptor / dialog box with information about the prop 
       - [ ] "This is a dirty mop!" etc
-  - [ ] Decide on a primary "interact" keypress
+  - [x] Decide on a primary "interact" keypress
     - [x] first-pass generic interact/examine uses `KEY_E`
     - KEY_O is for "open"
     - KEY_PERIOD is for up/downstairs
@@ -53,6 +53,11 @@ Compact handoff for active refactor and test work.
   - open/closed sprite swapping
   - chest inventory UI with `ENTER` take and `TAB` deposit-mode toggle
   - inventory transfer between hero and chest
+- Non-aggressive interaction modal is now in the active gameplay path:
+  - `KEY_E` interact/examine when facing an entity
+  - NPC dialogue uses one `dialogue_text` string per NPC for now
+  - props, boxes, chests, and doors expose first-pass description text
+  - modal shows the speaker/object name and supports multiline text
 - Doxygen is the active documentation standard; `make docs` works.
 - `hp` component is now a `vec2`.
 - Entities now have `alignment`
@@ -68,7 +73,8 @@ Compact handoff for active refactor and test work.
 - Built a real test suite under `test_suites/` while keeping `make tests` as the single fast runner.
 - Re-enabled first-pass door generation/rendering/interaction and tightened tile-level single-door caching.
 - Tightened prop placement so generated props avoid chokepoints and doorway approaches that can soft-block room ingress.
-- Expanded unit coverage to 57 passing tests across:
+- Added first-pass non-aggressive interaction support for NPCs, props, boxes, chests, and doors via a dedicated modal on `KEY_E`.
+- Expanded unit coverage to 84 passing tests across:
   - gamestate lifecycle
   - dungeon/bootstrap
   - placement
@@ -186,6 +192,8 @@ make clean && make tests && ./tests
   - [x] shield
   - [x] potion
   - [x] prop
+  - [x] box defaults
+  - [x] door defaults
   - [x] orc / monster init shape
 
 - [ ] Inventory/equipment
@@ -202,6 +210,9 @@ make clean && make tests && ./tests
   - [x] dead-body pull behavior via `dead_npc_cache`
   - [x] `loc.z`-sensitive interaction logic
   - [x] `KEY_O` door open/close behavior
+  - [x] `KEY_E` NPC dialogue interaction
+  - [x] `KEY_E` prop/box/chest/door description interaction
+  - [x] interaction modal close/restore-control behavior
   - [x] moving onto a tile containing a freshly killed dead NPC
 
 - [ ] Combat / simulation
