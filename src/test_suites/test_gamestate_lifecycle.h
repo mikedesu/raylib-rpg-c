@@ -447,4 +447,18 @@ public:
         TS_ASSERT(g.ct.get<attacking>(hero).value_or(false));
         TS_ASSERT(!g.player_changing_dir);
     }
+
+    void testDefaultStairsBindingUsesKeyFForBothProfiles() {
+        gamestate g;
+
+        TS_ASSERT_EQUALS(g.get_keybinding_primary(KEYBOARD_PROFILE_FULL, INPUT_ACTION_STAIRS), KEY_F);
+        TS_ASSERT_EQUALS(g.get_keybinding_primary(KEYBOARD_PROFILE_LAPTOP, INPUT_ACTION_STAIRS), KEY_F);
+    }
+
+    void testLaptopDirectionModeDefaultMovesOffKeyF() {
+        gamestate g;
+
+        TS_ASSERT_EQUALS(g.get_keybinding_primary(KEYBOARD_PROFILE_LAPTOP, INPUT_ACTION_DIRECTION_MODE), KEY_G);
+        TS_ASSERT_DIFFERS(g.get_keybinding_primary(KEYBOARD_PROFILE_LAPTOP, INPUT_ACTION_DIRECTION_MODE), KEY_F);
+    }
 };

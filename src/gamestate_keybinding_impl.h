@@ -46,7 +46,7 @@ inline void gamestate::set_default_keybinding(keyboard_profile_t profile, gamepl
         case INPUT_ACTION_FACE_ATTACK: binding = {KEY_APOSTROPHE, -1, -1}; break;
         case INPUT_ACTION_ATTACK: binding = {KEY_A, -1, -1}; break;
         case INPUT_ACTION_PICKUP: binding = {KEY_S, -1, -1}; break;
-        case INPUT_ACTION_STAIRS: binding = {KEY_PERIOD, -1, -1}; break;
+        case INPUT_ACTION_STAIRS: binding = {KEY_F, -1, -1}; break;
         case INPUT_ACTION_OPEN: binding = {KEY_D, -1, -1}; break;
         case INPUT_ACTION_INTERACT: binding = {KEY_E, -1, -1}; break;
         case INPUT_ACTION_INVENTORY: binding = {KEY_I, -1, -1}; break;
@@ -72,7 +72,7 @@ inline void gamestate::set_default_keybinding(keyboard_profile_t profile, gamepl
         case INPUT_ACTION_MOVE_UP_RIGHT: binding = {KEY_U, -1, -1}; break;
         case INPUT_ACTION_MOVE_DOWN_LEFT: binding = {KEY_B, -1, -1}; break;
         case INPUT_ACTION_MOVE_DOWN_RIGHT: binding = {KEY_N, -1, -1}; break;
-        case INPUT_ACTION_DIRECTION_MODE: binding = {KEY_F, -1, -1}; break;
+        case INPUT_ACTION_DIRECTION_MODE: binding = {KEY_G, -1, -1}; break;
         case INPUT_ACTION_FACE_WAIT: binding = {KEY_PERIOD, -1, -1}; break;
         case INPUT_ACTION_FACE_UP: binding = {KEY_K, -1, -1}; break;
         case INPUT_ACTION_FACE_DOWN: binding = {KEY_J, -1, -1}; break;
@@ -85,7 +85,7 @@ inline void gamestate::set_default_keybinding(keyboard_profile_t profile, gamepl
         case INPUT_ACTION_FACE_ATTACK: binding = {KEY_A, -1, -1}; break;
         case INPUT_ACTION_ATTACK: binding = {KEY_A, -1, -1}; break;
         case INPUT_ACTION_PICKUP: binding = {KEY_S, -1, -1}; break;
-        case INPUT_ACTION_STAIRS: binding = {KEY_PERIOD, -1, -1}; break;
+        case INPUT_ACTION_STAIRS: binding = {KEY_F, -1, -1}; break;
         case INPUT_ACTION_OPEN: binding = {KEY_D, -1, -1}; break;
         case INPUT_ACTION_INTERACT: binding = {KEY_E, -1, -1}; break;
         case INPUT_ACTION_INVENTORY: binding = {KEY_I, -1, -1}; break;
