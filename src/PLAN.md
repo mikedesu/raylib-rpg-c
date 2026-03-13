@@ -2,6 +2,29 @@
 
 ## Immediate New Changes To Make
 
+- [ ] We need a more flexible keyboard input mapping when playing the main game in `GAMEPLAY SCENE`.
+  - [ ] At the moment all of the default keybindings are hard-coded in and the only association with any "ACTION" is through the code itself
+  - [ ] We want to begin developing the ability to re-assign or change default keybindings for associated actions
+    - [ ] this will be achieved through a number of mechanisms:
+      - [ ] when you first begin a "new game", after character creation but before the gameplay scene begins, the player will be asked if they are playing on a laptop keyboard or a full keyboard. 
+        - [ ] if they are playing on a full keyboard, then the current "default" keybinds will be used
+        - [ ] if they are playing on a laptop keyboard, then an alternative, yet-to-be-decided set of keybinds will be used
+          - [ ] at the moment, i am thinking of the original nethack keybindings, which are very right-handed
+          - [ ] we can optionally offer a number of pre-defined keybindings that can be rotated through and modified or customized
+        - [ ] an options menu that can be accessed in a similar fashion to the "inventory menu"
+          - [ ] this options menu will have a number of configurable items, including:
+            - [ ] sound controls
+              - [ ] master
+              - [ ] music
+              - [ ] sound effects
+            - [ ] message box colors
+              - [ ] foreground
+              - [ ] background
+            - [ ] keyboard controls
+              - [ ] select pre-defined keybinding
+              - [ ] customize individual keys on a per-action basis
+              - [ ] "keyboard controls" should be only 1 menu
+
 
 ## Critical Note
 
