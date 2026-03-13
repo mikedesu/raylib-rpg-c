@@ -29,7 +29,6 @@ static inline void draw_look_panel(gamestate& g) {
 
     const int font_size = DEFAULT_LOOK_PANEL_FONT_SIZE;
 
-    const Color bgcolor = {0, 0, 255, 128};
     const int pad_w = 10;
     const int pad_h = 10;
 
@@ -46,8 +45,8 @@ static inline void draw_look_panel(gamestate& g) {
 
     Rectangle r = {base_x, base_y, w, h};
 
-    DrawRectanglePro(r, Vector2{0, 0}, 0.0f, bgcolor);
-    DrawRectangleLinesEx(r, 1, WHITE);
+    DrawRectanglePro(r, Vector2{0, 0}, 0.0f, g.window_box_bgcolor);
+    DrawRectangleLinesEx(r, 1, g.window_box_fgcolor);
 
     //int off_y = 0;
     //for (int i = 0; i < texts_size; i++) {
@@ -55,11 +54,11 @@ static inline void draw_look_panel(gamestate& g) {
     //    off_y += font_size + 5;
     //}
 
-    DrawText("Look Panel", r.x + pad_w, r.y + pad_h + (font_size + 5) * 0, font_size, WHITE);
-    DrawText(TextFormat("There are %d things here", entity_count), r.x + pad_w, r.y + pad_h + (font_size + 5) * 1, font_size, WHITE);
-    DrawText(TextFormat("living npc %d", tile.get_cached_live_npc()), r.x + pad_w, r.y + pad_h + (font_size + 5) * 2, font_size, WHITE);
-    DrawText(TextFormat("dead npc %d", tile.get_cached_dead_npc()), r.x + pad_w, r.y + pad_h + (font_size + 5) * 3, font_size, WHITE);
-    DrawText(TextFormat("items %d (%d)", (int)tile.get_item_count(), tile.get_cached_item()), r.x + pad_w, r.y + pad_h + (font_size + 5) * 4, font_size, WHITE);
-    DrawText(TextFormat("door %d", tile.get_cached_door()), r.x + pad_w, r.y + pad_h + (font_size + 5) * 5, font_size, WHITE);
-    DrawText(TextFormat("box %d", tile.get_cached_box()), r.x + pad_w, r.y + pad_h + (font_size + 5) * 6, font_size, WHITE);
+    DrawText("Look Panel", r.x + pad_w, r.y + pad_h + (font_size + 5) * 0, font_size, g.window_box_fgcolor);
+    DrawText(TextFormat("There are %d things here", entity_count), r.x + pad_w, r.y + pad_h + (font_size + 5) * 1, font_size, g.window_box_fgcolor);
+    DrawText(TextFormat("living npc %d", tile.get_cached_live_npc()), r.x + pad_w, r.y + pad_h + (font_size + 5) * 2, font_size, g.window_box_fgcolor);
+    DrawText(TextFormat("dead npc %d", tile.get_cached_dead_npc()), r.x + pad_w, r.y + pad_h + (font_size + 5) * 3, font_size, g.window_box_fgcolor);
+    DrawText(TextFormat("items %d (%d)", (int)tile.get_item_count(), tile.get_cached_item()), r.x + pad_w, r.y + pad_h + (font_size + 5) * 4, font_size, g.window_box_fgcolor);
+    DrawText(TextFormat("door %d", tile.get_cached_door()), r.x + pad_w, r.y + pad_h + (font_size + 5) * 5, font_size, g.window_box_fgcolor);
+    DrawText(TextFormat("box %d", tile.get_cached_box()), r.x + pad_w, r.y + pad_h + (font_size + 5) * 6, font_size, g.window_box_fgcolor);
 }

@@ -14,8 +14,6 @@ static inline void draw_interaction_modal(gamestate& g) {
     constexpr int line_spacing = 6;
     constexpr int padding = DEFAULT_PAD;
     constexpr int min_width = 320;
-    constexpr Color box_color = Color{0, 0, 0xff, 180};
-
     vector<string> lines;
     if (!g.interaction_title.empty()) {
         lines.push_back(g.interaction_title);
@@ -47,20 +45,20 @@ static inline void draw_interaction_modal(gamestate& g) {
     const int box_x = (DEFAULT_TARGET_WIDTH - box_width) / 2;
     const int box_y = DEFAULT_TARGET_HEIGHT / 4 - box_height / 2;
 
-    DrawRectangle(box_x, box_y, box_width, box_height, box_color);
-    DrawRectangleLinesEx(Rectangle{static_cast<float>(box_x), static_cast<float>(box_y), static_cast<float>(box_width), static_cast<float>(box_height)}, 2, WHITE);
+    DrawRectangle(box_x, box_y, box_width, box_height, g.window_box_bgcolor);
+    DrawRectangleLinesEx(Rectangle{static_cast<float>(box_x), static_cast<float>(box_y), static_cast<float>(box_width), static_cast<float>(box_height)}, 2, g.window_box_fgcolor);
 
     int text_y = box_y + padding;
     if (!g.interaction_title.empty()) {
         const int title_width = MeasureText(g.interaction_title.c_str(), title_font_size);
         const int title_x = box_x + (box_width - title_width) / 2;
-        DrawText(g.interaction_title.c_str(), title_x, text_y, title_font_size, WHITE);
+        DrawText(g.interaction_title.c_str(), title_x, text_y, title_font_size, g.window_box_fgcolor);
         text_y += title_font_size + section_gap;
     }
 
     const int body_x = box_x + padding;
     for (size_t i = g.interaction_title.empty() ? 0 : 1; i < lines.size(); i++) {
-        DrawText(lines[i].c_str(), body_x, text_y, body_font_size, WHITE);
+        DrawText(lines[i].c_str(), body_x, text_y, body_font_size, g.window_box_fgcolor);
         text_y += body_font_size + line_spacing;
     }
 }

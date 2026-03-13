@@ -12,7 +12,6 @@ static inline void draw_message_history(gamestate& g) {
     char tmp[1024] = {0};
     const int font_size = DEFAULT_MSG_HISTORY_FONT_SIZE;
     constexpr int max_messages = 30;
-    const Color message_bg = Fade((Color){0, 0, 0xff, 0xff}, 0.5f);
     const int msg_count = g.msg_history.size();
     if (msg_count == 0) {
         // if there are no messages, we don't need to draw anything
@@ -27,8 +26,8 @@ static inline void draw_message_history(gamestate& g) {
     const float x = g.targetwidth - w;
     constexpr float y = 0;
     const Rectangle box = {x, y, w, h};
-    DrawRectangleRec(box, message_bg);
-    DrawRectangleLinesEx(box, 1, WHITE);
+    DrawRectangleRec(box, g.window_box_bgcolor);
+    DrawRectangleLinesEx(box, 1, g.window_box_fgcolor);
 
     // now lets draw each message in the history
     if (msg_count > max_messages) {
@@ -39,7 +38,7 @@ static inline void draw_message_history(gamestate& g) {
             snprintf(tmp, sizeof(tmp), "%s", msg.c_str());
             const float msg_x = box.x + g.pad / 2.0;
             const float msg_y = box.y + g.pad / 2.0 + (outer_count * (font_size + 2));
-            DrawText(tmp, msg_x, msg_y, font_size, WHITE);
+            DrawText(tmp, msg_x, msg_y, font_size, g.window_box_fgcolor);
             outer_count++;
         }
         return;
@@ -50,6 +49,6 @@ static inline void draw_message_history(gamestate& g) {
         snprintf(tmp, sizeof(tmp), "%s", msg.c_str());
         const float msg_x = box.x + g.pad / 2.0;
         const float msg_y = box.y + g.pad / 2.0 + (i * (font_size + 2));
-        DrawText(tmp, msg_x, msg_y, font_size, WHITE);
+        DrawText(tmp, msg_x, msg_y, font_size, g.window_box_fgcolor);
     }
 }

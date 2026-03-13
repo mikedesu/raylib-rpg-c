@@ -2,6 +2,8 @@
 
 ## START HERE
 
+As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSERT=1 -DNPCS_ALL_AT_ONCE -DDEBUG=1 -DMASTER_VOLUME=1.0f " make game` for now...
+
 - Keyboard customization is now live in the gameplay scene.
 - Current shipped state:
   - full-keyboard and laptop profiles exist
@@ -37,6 +39,22 @@
               - [x] select pre-defined keybinding
               - [x] customize individual keys on a per-action basis
               - [x] "keyboard controls" should be only 1 menu
+
+
+- [ ] "mini" damage numbers
+  - [ ] damage values that display above an NPC entity upon receiving damage
+  - [ ] white font color
+
+- [ ] a "mini" inventory menu
+  - [ ] allows you to pull up an inventory without it blocking the whole screen
+  - [ ] list-based instead of grid-based
+  - [ ] allows you to select and use, or equip, inventory items.
+
+- [ ] save game
+  - [ ] a lot of stuff goes here
+- [ ] load game
+  - [ ] a lot of stuff goes here
+
 
 
 ## Critical Note

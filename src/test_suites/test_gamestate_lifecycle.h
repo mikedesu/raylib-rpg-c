@@ -38,6 +38,12 @@ public:
         TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_PLAYER);
         TS_ASSERT_EQUALS(g.confirm_action, CONFIRM_ACTION_NONE);
         TS_ASSERT_EQUALS(g.music_volume, DEFAULT_MUSIC_VOLUME);
+        TS_ASSERT_DELTA(g.sfx_volume, DEFAULT_MASTER_VOLUME, 0.001f);
+        TS_ASSERT_EQUALS(g.window_box_bgcolor.r, 0);
+        TS_ASSERT_EQUALS(g.window_box_bgcolor.g, 0);
+        TS_ASSERT_EQUALS(g.window_box_bgcolor.b, 255);
+        TS_ASSERT_EQUALS(g.window_box_bgcolor.a, 128);
+        TS_ASSERT_EQUALS(g.get_debug_panel_bgcolor().a, 255);
         TS_ASSERT_EQUALS(g.chara_creation.race, RACE_HUMAN);
         TS_ASSERT_EQUALS(g.chara_creation.alignment, ALIGNMENT_NEUTRAL_NEUTRAL);
         TS_ASSERT_DELTA(g.cam2d.zoom, DEFAULT_ZOOM_LEVEL, 0.001f);
@@ -411,6 +417,91 @@ public:
 
         TS_ASSERT(!g.controls_menu_waiting_for_key);
         TS_ASSERT_EQUALS(g.get_keybinding_primary(KEYBOARD_PROFILE_LAPTOP, INPUT_ACTION_ATTACK), KEY_T);
+    }
+
+    void testOptionMenuCanOpenSoundMenuAndAdjustVolumes() {
+        gamestate g;
+        g.test = true;
+        g.current_scene = SCENE_GAMEPLAY;
+        g.display_option_menu = true;
+        g.controlmode = CONTROLMODE_OPTION_MENU;
+
+        inputstate is = {};
+        inputstate_reset(is);
+        press_key(is, KEY_ENTER);
+        g.handle_input_option_menu(is);
+
+        TS_ASSERT(g.display_sound_menu);
+        TS_ASSERT(!g.display_option_menu);
+        TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_SOUND_MENU);
+
+        inputstate_reset(is);
+        press_key(is, KEY_RIGHT);
+        g.handle_input_sound_menu(is);
+        TS_ASSERT_DELTA(master_volume, DEFAULT_MASTER_VOLUME, 0.001f);
+
+        inputstate_reset(is);
+        press_key(is, KEY_DOWN);
+        g.handle_input_sound_menu(is);
+        inputstate_reset(is);
+        press_key(is, KEY_LEFT);
+        g.handle_input_sound_menu(is);
+        TS_ASSERT_DELTA(g.music_volume, DEFAULT_MUSIC_VOLUME - AUDIO_VOLUME_STEP, 0.001f);
+
+        inputstate_reset(is);
+        press_key(is, KEY_DOWN);
+        g.handle_input_sound_menu(is);
+        inputstate_reset(is);
+        press_key(is, KEY_LEFT);
+        g.handle_input_sound_menu(is);
+        TS_ASSERT_DELTA(g.sfx_volume, DEFAULT_MASTER_VOLUME - AUDIO_VOLUME_STEP, 0.001f);
+
+        inputstate_reset(is);
+        press_key(is, KEY_ESCAPE);
+        g.handle_input_sound_menu(is);
+        TS_ASSERT(!g.display_sound_menu);
+        TS_ASSERT(g.display_option_menu);
+        TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_OPTION_MENU);
+    }
+
+    void testOptionMenuCanOpenWindowColorMenuAndResetDefaults() {
+        gamestate g;
+        g.test = true;
+        g.current_scene = SCENE_GAMEPLAY;
+        g.display_option_menu = true;
+        g.controlmode = CONTROLMODE_OPTION_MENU;
+        g.options_menu.incr_selection();
+
+        inputstate is = {};
+        inputstate_reset(is);
+        press_key(is, KEY_ENTER);
+        g.handle_input_option_menu(is);
+
+        TS_ASSERT(g.display_window_color_menu);
+        TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_WINDOW_COLOR_MENU);
+
+        inputstate_reset(is);
+        press_key(is, KEY_RIGHT);
+        g.handle_input_window_color_menu(is);
+        TS_ASSERT_EQUALS(g.window_box_bgcolor.r, 1);
+
+        for (int i = 0; i < 8; i++) {
+            inputstate_reset(is);
+            press_key(is, KEY_DOWN);
+            g.handle_input_window_color_menu(is);
+        }
+        inputstate_reset(is);
+        press_key(is, KEY_ENTER);
+        g.handle_input_window_color_menu(is);
+
+        TS_ASSERT_EQUALS(g.window_box_bgcolor.r, 0);
+        TS_ASSERT_EQUALS(g.window_box_bgcolor.g, 0);
+        TS_ASSERT_EQUALS(g.window_box_bgcolor.b, 255);
+        TS_ASSERT_EQUALS(g.window_box_bgcolor.a, 128);
+        TS_ASSERT_EQUALS(g.window_box_fgcolor.r, 255);
+        TS_ASSERT_EQUALS(g.window_box_fgcolor.g, 255);
+        TS_ASSERT_EQUALS(g.window_box_fgcolor.b, 255);
+        TS_ASSERT_EQUALS(g.window_box_fgcolor.a, 255);
     }
 
     void testFaceDirectionAttackUsesBoundActionInsteadOfHardCodedKey() {

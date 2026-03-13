@@ -11,6 +11,7 @@ static inline void libdraw_load_sfx(gamestate& g) {
             buffer[len - 1] = '\0';
         string fullpath = "audio/sfx/" + string(buffer);
         Sound sound = LoadSound(fullpath.c_str());
+        SetSoundVolume(sound, g.sfx_volume);
         g.sfx.push_back(sound);
     }
     fclose(infile);

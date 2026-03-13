@@ -5,9 +5,6 @@
 
 static inline void draw_debug_panel(gamestate& g) {
     minfo3("draw debug panel");
-    constexpr Color bg = {0, 0, 255, 255};
-    constexpr Color fg = WHITE;
-
     constexpr int fontsize = 20;
 
     constexpr float yp = 10;
@@ -24,8 +21,8 @@ static inline void draw_debug_panel(gamestate& g) {
     const float y = g.targetheight - (h + hp);
     const Rectangle r = {x, y - yp, w + wp, h + hp};
 
-    DrawRectanglePro(r, origin, rotation, bg);
-    DrawRectangleLinesEx(r, thickness, fg);
-    DrawText(g.debugpanel.buffer, x + xp, y, fontsize, fg);
+    DrawRectanglePro(r, origin, rotation, g.get_debug_panel_bgcolor());
+    DrawRectangleLinesEx(r, thickness, g.window_box_fgcolor);
+    DrawText(g.debugpanel.buffer, x + xp, y, fontsize, g.window_box_fgcolor);
     msuccess3("draw debug panel");
 }

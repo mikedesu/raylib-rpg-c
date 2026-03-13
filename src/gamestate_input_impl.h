@@ -572,17 +572,115 @@ inline void gamestate::handle_input_option_menu(inputstate& is) {
     if (inputstate_is_pressed(is, KEY_GRAVE) || inputstate_is_pressed(is, KEY_ESCAPE)) {
         display_option_menu = false;
         controlmode = CONTROLMODE_PLAYER;
+        frame_dirty = true;
     }
     else if (inputstate_is_pressed(is, KEY_UP)) {
         options_menu.decr_selection();
+        frame_dirty = true;
     }
     else if (inputstate_is_pressed(is, KEY_DOWN)) {
         options_menu.incr_selection();
+        frame_dirty = true;
     }
     else if (inputstate_is_pressed(is, KEY_ENTER)) {
-        if (options_menu.get_option(options_menu.get_selection()) == OPTION_CONTROLS) {
+        const option_type selected = options_menu.get_option(options_menu.get_selection());
+        if (selected == OPTION_SOUND) {
+            open_sound_menu();
+        }
+        else if (selected == OPTION_WINDOW_BOXES) {
+            open_window_color_menu();
+        }
+        else if (selected == OPTION_CONTROLS) {
             open_controls_menu();
         }
+    }
+}
+
+inline void gamestate::handle_input_sound_menu(inputstate& is) {
+    if (controlmode != CONTROLMODE_SOUND_MENU || !display_sound_menu) {
+        return;
+    }
+
+    constexpr size_t option_count = 3;
+    if (inputstate_is_pressed(is, KEY_ESCAPE) || inputstate_is_pressed(is, KEY_GRAVE)) {
+        close_sound_menu();
+        return;
+    }
+    if (inputstate_is_pressed(is, KEY_UP)) {
+        sound_menu_selection = sound_menu_selection == 0 ? option_count - 1 : sound_menu_selection - 1;
+        frame_dirty = true;
+        return;
+    }
+    if (inputstate_is_pressed(is, KEY_DOWN)) {
+        sound_menu_selection = (sound_menu_selection + 1) % option_count;
+        frame_dirty = true;
+        return;
+    }
+    if (inputstate_is_pressed(is, KEY_LEFT)) {
+        if (sound_menu_selection == 0) {
+            adjust_master_volume(-1);
+        }
+        else if (sound_menu_selection == 1) {
+            adjust_music_volume(-1);
+        }
+        else if (sound_menu_selection == 2) {
+            adjust_sfx_volume(-1);
+        }
+        return;
+    }
+    if (inputstate_is_pressed(is, KEY_RIGHT)) {
+        if (sound_menu_selection == 0) {
+            adjust_master_volume(1);
+        }
+        else if (sound_menu_selection == 1) {
+            adjust_music_volume(1);
+        }
+        else if (sound_menu_selection == 2) {
+            adjust_sfx_volume(1);
+        }
+        return;
+    }
+}
+
+inline void gamestate::handle_input_window_color_menu(inputstate& is) {
+    if (controlmode != CONTROLMODE_WINDOW_COLOR_MENU || !display_window_color_menu) {
+        return;
+    }
+
+    constexpr size_t option_count = 9;
+    if (inputstate_is_pressed(is, KEY_ESCAPE) || inputstate_is_pressed(is, KEY_GRAVE)) {
+        close_window_color_menu();
+        return;
+    }
+    if (inputstate_is_pressed(is, KEY_UP)) {
+        window_color_menu_selection = window_color_menu_selection == 0 ? option_count - 1 : window_color_menu_selection - 1;
+        frame_dirty = true;
+        return;
+    }
+    if (inputstate_is_pressed(is, KEY_DOWN)) {
+        window_color_menu_selection = (window_color_menu_selection + 1) % option_count;
+        frame_dirty = true;
+        return;
+    }
+    if (inputstate_is_pressed(is, KEY_ENTER) && window_color_menu_selection == option_count - 1) {
+        reset_window_box_colors();
+        return;
+    }
+    if (!inputstate_is_pressed(is, KEY_LEFT) && !inputstate_is_pressed(is, KEY_RIGHT)) {
+        return;
+    }
+
+    const int dir = inputstate_is_pressed(is, KEY_RIGHT) ? 1 : -1;
+    switch (window_color_menu_selection) {
+    case 0: adjust_window_box_bg_channel(0, dir); return;
+    case 1: adjust_window_box_bg_channel(1, dir); return;
+    case 2: adjust_window_box_bg_channel(2, dir); return;
+    case 3: adjust_window_box_bg_channel(3, dir); return;
+    case 4: adjust_window_box_fg_channel(0, dir); return;
+    case 5: adjust_window_box_fg_channel(1, dir); return;
+    case 6: adjust_window_box_fg_channel(2, dir); return;
+    case 7: adjust_window_box_fg_channel(3, dir); return;
+    default: break;
     }
 }
 
@@ -610,6 +708,14 @@ inline void gamestate::handle_input_gameplay_scene(inputstate& is) {
     }
     if (controlmode == CONTROLMODE_INTERACTION) {
         handle_input_interaction(is);
+        return;
+    }
+    if (controlmode == CONTROLMODE_SOUND_MENU) {
+        handle_input_sound_menu(is);
+        return;
+    }
+    if (controlmode == CONTROLMODE_WINDOW_COLOR_MENU) {
+        handle_input_window_color_menu(is);
         return;
     }
     if (controlmode == CONTROLMODE_CONTROLS_MENU) {

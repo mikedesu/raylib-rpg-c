@@ -35,9 +35,6 @@ static inline void draw_hud(gamestate& g) {
     const string n = g.ct.get<name>(g.hero_id).value_or("no-name");
     const vec3 loc = g.ct.get<location>(g.hero_id).value_or(vec3{-1, -1, -1});
     const alignment_t hero_alignment = g.ct.get<alignment>(g.hero_id).value_or(ALIGNMENT_NONE);
-    const Color bg = Fade((Color){0, 0, 0xff, 0xFF}, 0.5f);
-    const Color fg = WHITE;
-
     const std::array<std::string, line_count> lines = {
         n,
         TextFormat("Lvl %d HP %d/%d  Atk: %d  AC: %d", mylevel, myhp, mymaxhp, attack_bonus, ac),
@@ -56,13 +53,13 @@ static inline void draw_hud(gamestate& g) {
     const float box_x = g.targetwidth / 2.0f - (box_w / 2.0f);
     const float box_y = g.targetheight - box_h - g.pad;
 
-    DrawRectangleRec(Rectangle{box_x, box_y, box_w, box_h}, bg);
-    DrawRectangleLinesEx(Rectangle{box_x, box_y, box_w, box_h}, line_thickness, fg);
+    DrawRectangleRec(Rectangle{box_x, box_y, box_w, box_h}, g.window_box_bgcolor);
+    DrawRectangleLinesEx(Rectangle{box_x, box_y, box_w, box_h}, line_thickness, g.window_box_fgcolor);
 
     const int text_x = box_x + inner_pad;
     int text_y = box_y + inner_pad;
     for (const std::string& line : lines) {
-        DrawText(line.c_str(), text_x, text_y, font_size, fg);
+        DrawText(line.c_str(), text_x, text_y, font_size, g.window_box_fgcolor);
         text_y += font_size + line_gap;
     }
 }

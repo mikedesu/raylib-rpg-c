@@ -35,15 +35,15 @@ static inline void draw_level_up_modal(gamestate& g) {
     const int box_x = (DEFAULT_TARGET_WIDTH - box_w) / 2;
     const int box_y = (DEFAULT_TARGET_HEIGHT - box_h) / 2;
 
-    DrawRectangle(box_x, box_y, box_w, box_h, Color{0, 0, 0xff, 210});
-    DrawRectangleLinesEx(Rectangle{static_cast<float>(box_x), static_cast<float>(box_y), static_cast<float>(box_w), static_cast<float>(box_h)}, 2, WHITE);
+    DrawRectangle(box_x, box_y, box_w, box_h, g.window_box_bgcolor);
+    DrawRectangleLinesEx(Rectangle{static_cast<float>(box_x), static_cast<float>(box_y), static_cast<float>(box_w), static_cast<float>(box_h)}, 2, g.window_box_fgcolor);
 
     const char* title = "Level Up";
     const char* subtitle = "Choose one attribute to permanently increase by 1";
     const int title_x = box_x + (box_w - MeasureText(title, title_font_size)) / 2;
     const int subtitle_x = box_x + (box_w - MeasureText(subtitle, body_font_size)) / 2;
-    DrawText(title, title_x, box_y + padding, title_font_size, WHITE);
-    DrawText(subtitle, subtitle_x, box_y + padding + title_font_size + 8, body_font_size, WHITE);
+    DrawText(title, title_x, box_y + padding, title_font_size, g.window_box_fgcolor);
+    DrawText(subtitle, subtitle_x, box_y + padding + title_font_size + 8, body_font_size, g.window_box_fgcolor);
 
     const int grid_x = box_x + padding;
     const int grid_y = box_y + padding + title_font_size + body_font_size + 20;
@@ -55,11 +55,11 @@ static inline void draw_level_up_modal(gamestate& g) {
         const bool selected = static_cast<int>(g.level_up_selection % 6) == i;
         const Color fill = selected ? Color{0x00, 0x88, 0x44, 220} : Color{0x11, 0x11, 0x66, 180};
         DrawRectangle(cell_x, cell_y, cell_w, cell_h, fill);
-        DrawRectangleLinesEx(Rectangle{static_cast<float>(cell_x), static_cast<float>(cell_y), static_cast<float>(cell_w), static_cast<float>(cell_h)}, 2, WHITE);
+        DrawRectangleLinesEx(Rectangle{static_cast<float>(cell_x), static_cast<float>(cell_y), static_cast<float>(cell_w), static_cast<float>(cell_h)}, 2, g.window_box_fgcolor);
 
         const int text_w = MeasureText(labels[i], cell_font_size);
         const int text_x = cell_x + (cell_w - text_w) / 2;
         const int text_y = cell_y + (cell_h - cell_font_size) / 2;
-        DrawText(labels[i], text_x, text_y, cell_font_size, WHITE);
+        DrawText(labels[i], text_x, text_y, cell_font_size, g.window_box_fgcolor);
     }
 }

@@ -10,7 +10,6 @@ static inline void draw_message_box(gamestate& g) {
 
     constexpr int w = DEFAULT_TARGET_WIDTH;
     constexpr int font_size = DEFAULT_MSG_WINDOW_FONT_SIZE;
-    constexpr Color message_bg = Color{0, 0, 0xff, 127};
     constexpr float text_height = font_size;
     constexpr float y = (DEFAULT_TARGET_HEIGHT - text_height) / 2.0 - DEFAULT_PAD;
 
@@ -31,11 +30,11 @@ static inline void draw_message_box(gamestate& g) {
 
     const Rectangle box = {x, y, box_width, box_height};
 
-    DrawRectangleRec(box, message_bg);
+    DrawRectangleRec(box, g.window_box_bgcolor);
 
-    DrawRectangleLinesEx(box, 1, WHITE);
+    DrawRectangleLinesEx(box, 1, g.window_box_fgcolor);
 
     const int text_x = box.x + g.pad;
     const int text_y = box.y + g.pad;
-    DrawText(tmp, text_x, text_y, font_size, WHITE);
+    DrawText(tmp, text_x, text_y, font_size, g.window_box_fgcolor);
 }

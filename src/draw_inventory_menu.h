@@ -25,20 +25,20 @@ static inline void draw_inventory_menu(gamestate& g) {
     float half_width = (menu_box.width - section_gap) / 2.0f;
     float half_height = menu_box.height - title_size.y - g.pad * 2.0f - g.pad;
     // Draw menu background and border
-    DrawRectangleRec(menu_box, Fade(Color{0, 0, 255, 255}, 0.8));
-    DrawRectangleLinesEx(menu_box, 2, WHITE);
+    DrawRectangleRec(menu_box, g.window_box_bgcolor);
+    DrawRectangleLinesEx(menu_box, 2, g.window_box_fgcolor);
     // Draw menu title centered at top
-    DrawText(menu_title, title_x, title_y, font_size, WHITE);
+    DrawText(menu_title, title_x, title_y, font_size, g.window_box_fgcolor);
     // Partition into left/right halves (with gap)
     // Left box: inventory list
     // Right box: item info
     Rectangle left_box = {menu_box.x + g.pad, title_y + title_size.y + g.pad, half_width - g.pad, half_height};
     Rectangle right_box = {left_box.x + half_width + section_gap, left_box.y, half_width - g.pad * 2, half_height};
     // Draw left and right boxes
-    DrawRectangleRec(left_box, (Color){0x22, 0x22, 0x22, 0xff});
-    DrawRectangleLinesEx(left_box, 2, WHITE);
-    DrawRectangleRec(right_box, (Color){0x22, 0x22, 0x22, 0xff});
-    DrawRectangleLinesEx(right_box, 2, WHITE);
+    DrawRectangleRec(left_box, g.window_box_bgcolor);
+    DrawRectangleLinesEx(left_box, 2, g.window_box_fgcolor);
+    DrawRectangleRec(right_box, g.window_box_bgcolor);
+    DrawRectangleLinesEx(right_box, 2, g.window_box_fgcolor);
     auto my_inventory = g.ct.get<inventory>(g.hero_id);
     //if (my_inventory == nullopt)
     //    return;
@@ -76,7 +76,7 @@ static inline void draw_inventory_menu(gamestate& g) {
                         bool cur_wpn_selected = selection_id == cur_wpn_id;
                         bool cur_shield_selected = selection_id == cur_shield_id;
                         if ((cur_wpn_selected && has_wpn) || (cur_shield_selected && has_shield)) 
-                            DrawText("equipped", grid_box2.x, grid_box2.y + grid_box2.height - 10, 10, WHITE);
+                            DrawText("equipped", grid_box2.x, grid_box2.y + grid_box2.height - 10, 10, g.window_box_fgcolor);
                     }
                     it++;
                 }
@@ -109,37 +109,37 @@ static inline void draw_inventory_menu(gamestate& g) {
                     int cur_y = right_box.y + 10;
                     const int y_incr = 20;
 
-                    DrawText(my_name.c_str(), cur_x, cur_y, fontsize, WHITE);
+                    DrawText(my_name.c_str(), cur_x, cur_y, fontsize, g.window_box_fgcolor);
                     cur_y += y_incr;
 
                     if (item_type == ITEM_WEAPON) {
                         const vec3 dmg = g.ct.get<damage>(selection_id).value_or((vec3){-1, -1, -1});
-                        DrawText(TextFormat("Damage: %d-%d", dmg.x, dmg.y), cur_x, cur_y, fontsize, WHITE);
+                        DrawText(TextFormat("Damage: %d-%d", dmg.x, dmg.y), cur_x, cur_y, fontsize, g.window_box_fgcolor);
                         cur_y += y_incr;
 
                         const int dura = g.ct.get<durability>(selection_id).value_or(-1);
                         const int max_dura = g.ct.get<max_durability>(selection_id).value_or(-1);
-                        DrawText(TextFormat("Durability: %d/%d", dura, max_dura), cur_x, cur_y, fontsize, WHITE);
+                        DrawText(TextFormat("Durability: %d/%d", dura, max_dura), cur_x, cur_y, fontsize, g.window_box_fgcolor);
                         cur_y += y_incr;
                     } else if (item_type == ITEM_SHIELD) {
                         const int block = g.ct.get<block_chance>(selection_id).value_or(-1);
 
-                        DrawText(TextFormat("Block chance: %d", block), cur_x, cur_y, fontsize, WHITE);
+                        DrawText(TextFormat("Block chance: %d", block), cur_x, cur_y, fontsize, g.window_box_fgcolor);
                         cur_y += y_incr;
 
                         const int dura = g.ct.get<durability>(selection_id).value_or(-1);
                         const int max_dura = g.ct.get<max_durability>(selection_id).value_or(-1);
-                        DrawText(TextFormat("Durability: %d/%d", dura, max_dura), cur_x, cur_y, fontsize, WHITE);
+                        DrawText(TextFormat("Durability: %d/%d", dura, max_dura), cur_x, cur_y, fontsize, g.window_box_fgcolor);
                         cur_y += y_incr;
 
                     } else if (item_type == ITEM_POTION) {
                         const vec3 heal = g.ct.get<healing>(selection_id).value_or((vec3){-1, -1, -1});
-                        DrawText(TextFormat("Heal amount: %d-%d", heal.x, heal.y), cur_x, cur_y, fontsize, WHITE);
+                        DrawText(TextFormat("Heal amount: %d-%d", heal.x, heal.y), cur_x, cur_y, fontsize, g.window_box_fgcolor);
                         cur_y += y_incr;
                     }
 
                     string my_desc = g.ct.get<description>(selection_id).value_or("no-description");
-                    DrawText(my_desc.c_str(), cur_x, cur_y, fontsize, WHITE);
+                    DrawText(my_desc.c_str(), cur_x, cur_y, fontsize, g.window_box_fgcolor);
                     cur_y += y_incr;
                 }
             }

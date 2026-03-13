@@ -17,6 +17,8 @@
 #include "draw_message_history.h"
 #include "draw_option_menu.h"
 #include "draw_keyboard_profile_prompt.h"
+#include "draw_sound_menu.h"
+#include "draw_window_color_menu.h"
 #include "gamestate.h"
 
 
@@ -58,6 +60,14 @@ static inline void libdraw_drawframe_2d(gamestate& g, int vision_dist, int light
 
     if (g.display_option_menu) {
         draw_option_menu(g);
+    }
+
+    if (g.display_sound_menu) {
+        draw_sound_menu(g);
+    }
+
+    if (g.display_window_color_menu) {
+        draw_window_color_menu(g);
     }
 
     if (g.display_controls_menu) {

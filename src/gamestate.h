@@ -69,8 +69,19 @@ using std::chrono::nanoseconds;
 using std::chrono::system_clock;
 using std::chrono::time_point;
 
+#ifdef CXXTEST_RUNNING
+inline float music_volume = DEFAULT_MUSIC_VOLUME;
+inline float master_volume = DEFAULT_MASTER_VOLUME;
+inline Music music = {};
+#else
 extern float music_volume;
 extern float master_volume;
+extern Music music;
+#endif
+
+constexpr Color DEFAULT_WINDOW_BOX_BGCOLOR = Color{0, 0, 255, 128};
+constexpr Color DEFAULT_WINDOW_BOX_FGCOLOR = Color{255, 255, 255, 255};
+constexpr float AUDIO_VOLUME_STEP = 0.1f;
 
 typedef enum {
     CONFIRM_ACTION_NONE = 0,
@@ -118,6 +129,8 @@ public:
     bool display_chest_menu;
     bool display_action_menu;
     bool display_option_menu;
+    bool display_sound_menu;
+    bool display_window_color_menu;
     bool display_controls_menu;
     bool display_keyboard_profile_prompt;
     bool display_confirm_prompt;
@@ -144,6 +157,8 @@ public:
     unsigned int inventory_menu_selection;
     unsigned int level_up_selection;
     unsigned int gameplay_settings_menu_selection;
+    unsigned int sound_menu_selection;
+    unsigned int window_color_menu_selection;
     unsigned int keyboard_profile_selection;
     unsigned int title_screen_selection;
     unsigned int max_title_screen_selections;
@@ -157,6 +172,7 @@ public:
     size_t action_selection;
     float line_spacing;
     float music_volume;
+    float sfx_volume;
     double last_frame_time;
     double max_frame_time;
     size_t last_frame_times_current;
@@ -172,6 +188,8 @@ public:
     character_creation chara_creation;
     string version;
     Color message_history_bgcolor;
+    Color window_box_bgcolor;
+    Color window_box_fgcolor;
     Vector2 last_click_screen_pos;
     Vector2 inventory_cursor = {0, 0};
     Camera2D cam2d;
@@ -278,6 +296,9 @@ public:
         display_action_menu = false;
         display_inventory_menu = false;
         display_chest_menu = false;
+        display_option_menu = false;
+        display_sound_menu = false;
+        display_window_color_menu = false;
         display_help_menu = false;
         display_controls_menu = false;
         display_keyboard_profile_prompt = false;
@@ -309,6 +330,8 @@ public:
         god_mode = true;
 #endif
         gameplay_settings_menu_selection = 0;
+        sound_menu_selection = 0;
+        window_color_menu_selection = 0;
         keyboard_profile_selection = 0;
         cam2d.target = cam2d.offset = Vector2{0, 0};
         cam2d.zoom = DEFAULT_ZOOM_LEVEL;
@@ -361,6 +384,12 @@ public:
         chara_creation.hitdie = get_racial_hd(RACE_HUMAN);
         current_scene = SCENE_TITLE;
         music_volume = DEFAULT_MUSIC_VOLUME;
+        ::music_volume = DEFAULT_MUSIC_VOLUME;
+        ::master_volume = DEFAULT_MASTER_VOLUME;
+        sfx_volume = DEFAULT_MASTER_VOLUME;
+        window_box_bgcolor = DEFAULT_WINDOW_BOX_BGCOLOR;
+        window_box_fgcolor = DEFAULT_WINDOW_BOX_FGCOLOR;
+        message_history_bgcolor = DEFAULT_WINDOW_BOX_BGCOLOR;
         last_click_screen_pos = Vector2{-1, -1};
         confirm_action = CONFIRM_ACTION_NONE;
         confirm_prompt_message.clear();
@@ -1062,6 +1091,8 @@ public:
 
     /** @brief Handle input while the options menu is active. */
     void handle_input_option_menu(inputstate& is);
+    void handle_input_sound_menu(inputstate& is);
+    void handle_input_window_color_menu(inputstate& is);
 
     /** @brief Handle input while the help menu is active. */
     void handle_input_help_menu(inputstate& is);
@@ -1194,12 +1225,26 @@ public:
     /** @brief Process the current batch of NPC turns for the gameplay tick. */
     void handle_npcs();
 
+    void open_sound_menu();
+    void close_sound_menu();
+    void open_window_color_menu();
+    void close_window_color_menu();
+    void apply_audio_settings();
+    void adjust_master_volume(int dir);
+    void adjust_music_volume(int dir);
+    void adjust_sfx_volume(int dir);
+    void adjust_window_box_bg_channel(size_t channel, int dir);
+    void adjust_window_box_fg_channel(size_t channel, int dir);
+    void reset_window_box_colors();
+    Color get_debug_panel_bgcolor() const;
+
 };
 
 #include "gamestate_lifecycle_impl.h"
 #include "gamestate_scene_impl.h"
 #include "gamestate_inventory_impl.h"
 #include "gamestate_keybinding_impl.h"
+#include "gamestate_options_impl.h"
 #include "gamestate_input_impl.h"
 #include "gamestate_npc_combat_impl.h"
 #include "gamestate_world_impl.h"

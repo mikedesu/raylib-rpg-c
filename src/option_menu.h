@@ -6,8 +6,8 @@
 
 typedef enum {
     OPTION_NONE,
-    OPTION_GAMEPLAY,
     OPTION_SOUND,
+    OPTION_WINDOW_BOXES,
     OPTION_CONTROLS,
 } option_type;
 
@@ -25,7 +25,7 @@ public:
     option_menu() {
         selection = 0;
         options.push_back(OPTION_SOUND);
-        options.push_back(OPTION_GAMEPLAY);
+        options.push_back(OPTION_WINDOW_BOXES);
         options.push_back(OPTION_CONTROLS);
     }
 
@@ -67,9 +67,9 @@ public:
     string get_option_str(option_type t) {
         switch (t) {
         case OPTION_NONE: return "none";
-        case OPTION_GAMEPLAY: return "gameplay";
         case OPTION_CONTROLS: return "controls";
         case OPTION_SOUND: return "sound";
+        case OPTION_WINDOW_BOXES: return "window boxes";
         default: break;
         }
         return "unknown option";

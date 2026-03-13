@@ -59,6 +59,7 @@ static inline void handle_music_stream(gamestate& g) {
 #endif
 
         SetMusicVolume(music, music_volume); // Set initial music volume
+        g.music_volume = music_volume;
         PlayMusicStream(music);
     }
 }
@@ -89,6 +90,7 @@ static inline void libdraw_load_music(gamestate& g) {
 
     SetMasterVolume(master_volume);
     SetMusicVolume(music, music_volume); // Set initial music volume
+    g.music_volume = music_volume;
 
     PlayMusicStream(music);
     minfo2("END load_music");

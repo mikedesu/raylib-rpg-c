@@ -90,17 +90,14 @@ static inline void draw_help_menu(gamestate& g) {
     const int box_x = (DEFAULT_TARGET_WIDTH - box_width) / 2;
     const int box_y = (DEFAULT_TARGET_HEIGHT - box_height) / 2;
 
-    constexpr Color box_color = Color{0, 0, 255, 127};
-    DrawRectangle(box_x, box_y, box_width, box_height, box_color);
+    DrawRectangle(box_x, box_y, box_width, box_height, g.window_box_bgcolor);
 
     const float box_x_f = box_x;
     const float box_y_f = box_y;
     const float box_w_f = box_width;
     const float box_h_f = box_height;
     constexpr int thick = 2;
-    constexpr Color box_outline_color = WHITE;
-
-    DrawRectangleLinesEx({box_x_f, box_y_f, box_w_f, box_h_f}, thick, box_outline_color);
+    DrawRectangleLinesEx({box_x_f, box_y_f, box_w_f, box_h_f}, thick, g.window_box_fgcolor);
 
     const int text_x = box_x + padding;
     int text_y = box_y + padding;
@@ -108,7 +105,7 @@ static inline void draw_help_menu(gamestate& g) {
     while (line_start <= text.size()) {
         const size_t line_end = text.find('\n', line_start);
         const string line = line_end == string::npos ? text.substr(line_start) : text.substr(line_start, line_end - line_start);
-        DrawText(line.c_str(), text_x, text_y, font_size, WHITE);
+        DrawText(line.c_str(), text_x, text_y, font_size, g.window_box_fgcolor);
         text_y += font_size + line_spacing;
         if (line_end == string::npos) {
             break;
