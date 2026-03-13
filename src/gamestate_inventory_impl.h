@@ -340,7 +340,7 @@ inline void gamestate::handle_input_chest(inputstate& is) {
     if (controlmode != CONTROLMODE_CHEST || !display_chest_menu) {
         return;
     }
-    if (inputstate_is_pressed(is, KEY_O) || inputstate_is_pressed(is, KEY_ESCAPE)) {
+    if (inputstate_is_pressed(is, KEY_D) || inputstate_is_pressed(is, KEY_ESCAPE)) {
         close_chest_menu();
         return;
     }

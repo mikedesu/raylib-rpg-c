@@ -650,7 +650,7 @@ inline bool gamestate::handle_interact(inputstate& is, bool is_dead) {
 }
 
 inline bool gamestate::handle_open_door(inputstate& is, bool is_dead) {
-    if (inputstate_is_pressed(is, KEY_O)) {
+    if (inputstate_is_pressed(is, KEY_D)) {
         if (is_dead) {
             return add_message("You cannot open doors while dead");
         }

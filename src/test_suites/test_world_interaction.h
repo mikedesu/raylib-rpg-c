@@ -173,6 +173,31 @@ public:
         TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_CHEST);
     }
 
+    void testHandleOpenDoorUsesKeyDInsteadOfKeyO() {
+        gamestate g;
+        g.sfx.resize(71);
+        add_floor(g);
+
+        const entityid hero = create_hero(g, vec3{1, 1, 0});
+        const entityid door = g.create_door_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(door, ENTITYID_INVALID);
+
+        g.hero_id = hero;
+        g.ct.set<direction>(hero, DIR_RIGHT);
+
+        inputstate is = {};
+        press_key(is, KEY_D);
+        TS_ASSERT(g.handle_open_door(is, false));
+        TS_ASSERT(g.ct.get<door_open>(door).value_or(false));
+
+        g.ct.set<door_open>(door, false);
+        inputstate_reset(is);
+        press_key(is, KEY_O);
+        TS_ASSERT(!g.handle_open_door(is, false));
+        TS_ASSERT(!g.ct.get<door_open>(door).value_or(true));
+    }
+
     void testTryEntityInteractOpensNpcDialogueModal() {
         gamestate g;
         add_floor(g);

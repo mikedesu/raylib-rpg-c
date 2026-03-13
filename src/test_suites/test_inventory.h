@@ -18,6 +18,13 @@ private:
         return g.create_player_at_with(loc, "hero", [](CT&, const entityid) {});
     }
 
+    void press_key(inputstate& is, int key) {
+        inputstate_reset(is);
+        const int idx = key / BITS_PER_LONG;
+        const int bit = key % BITS_PER_LONG;
+        is.pressed[idx] |= (1ULL << bit);
+    }
+
 public:
     void testTryEntityPickupTakesTopItemFromMultiItemTile() {
         gamestate g;
@@ -172,5 +179,29 @@ public:
         g.close_chest_menu();
         TS_ASSERT(!g.display_chest_menu);
         TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_PLAYER);
+    }
+
+    void testChestMenuClosesOnKeyDAndNotKeyO() {
+        gamestate g;
+        g.sfx.resize(71);
+        const vec3 loc = add_initialized_floor(g);
+        const entityid hero = create_hero(g, loc);
+        const entityid chest = g.create_chest_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
+
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(chest, ENTITYID_INVALID);
+        TS_ASSERT(g.open_chest_menu(chest));
+
+        inputstate is = {};
+        press_key(is, KEY_D);
+        g.handle_input_chest(is);
+        TS_ASSERT(!g.display_chest_menu);
+        TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_PLAYER);
+
+        TS_ASSERT(g.open_chest_menu(chest));
+        press_key(is, KEY_O);
+        g.handle_input_chest(is);
+        TS_ASSERT(g.display_chest_menu);
+        TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_CHEST);
     }
 };

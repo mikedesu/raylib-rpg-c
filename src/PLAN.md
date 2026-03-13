@@ -2,7 +2,6 @@
 
 ## Immediate New Changes To Make
 
-- [ ] open door/open chest input change from KEY_O to KEY_D
 
 ## Critical Note
 
@@ -57,6 +56,8 @@ Compact status handoff for the current C++ / raylib dungeon project.
   - Current fast test coverage includes lifecycle, bootstrap, placement, factories, inventory, tile/cache behavior, combat smoke tests, and world interaction.
   - A separate heavy test target now exists for longer deterministic simulations.
   - Recent added coverage includes dungeon connectivity, bounded combat invariants, renderer-adjacent seam tests, and heavy pathfinding/chase plus combat soak tests.
+
+- open door/open chest input change from KEY_O to KEY_D
 
 ## Current State
 

@@ -108,7 +108,7 @@ static inline void draw_chest_menu(gamestate& g) {
     }
     auto inventory = maybe_inventory.value();
     const char* menu_title = g.chest_deposit_mode ? "Treasure Chest - Deposit" : "Treasure Chest";
-    const char* hint_text = g.chest_deposit_mode ? "TAB: chest view  ENTER: deposit  ESC/O: close" : "TAB: hero inventory  ENTER: take  ESC/O: close";
+    const char* hint_text = g.chest_deposit_mode ? "TAB: chest view  ENTER: deposit  ESC/D: close" : "TAB: hero inventory  ENTER: take  ESC/D: close";
     const int section_gap = 8;
     const int font_size = 10;
     const Vector2 title_size = MeasureTextEx(GetFontDefault(), menu_title, font_size, g.line_spacing);
