@@ -2,8 +2,8 @@
 
 #ifndef GAME_INFO_DEFINES
 #define GAME_INFO_DEFINES
-#define GAME_VERSION "v0.0.6.21"
-#define GAME_VERSION_DATE "March 12, 2026"
+#define GAME_VERSION "v0.0.6.22"
+#define GAME_VERSION_DATE "March 13, 2026"
 #define WINDOW_TITLE "@evildojo666 presents: project.rpg"
 #endif
 
