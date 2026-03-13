@@ -5,6 +5,7 @@
 #include "draw_action_menu.h"
 #include "draw_chest_menu.h"
 #include "draw_controls_menu.h"
+#include "draw_damage_numbers.h"
 #include "draw_dungeon_floor.h"
 #include "draw_handle_debug_panel.h"
 #include "draw_help_menu.h"
@@ -37,6 +38,7 @@ static inline void libdraw_drawframe_2d(gamestate& g, int vision_dist, int light
     //const int light_rad = g.ct.get<light_radius>(g.hero_id).value_or(0);
 
     draw_dungeon_floor(g, vision_dist, light_rad);
+    draw_damage_numbers(g);
 
     EndMode2D();
     draw_hud(g);

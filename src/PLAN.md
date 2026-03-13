@@ -19,10 +19,11 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
 ## Immediate New Changes To Make
 
 - [ ] "mini" damage numbers
-  - [ ] damage values that display above an NPC entity upon receiving damage
-  - [ ] white font color
-  - [ ] critical hits are not yet handled but when they are, i want their color to be red
-  - [ ] somehow have to accomodate for the fact that the camera zoom can change and how we choose to deal with this to keep things aesthetically pleasant is an interesting challenge
+  - [x] damage values now display above any hit entity that has `hp` upon receiving damage
+  - [x] white font color
+  - [x] critical hits are not yet handled but the popup path now supports red for future crit display
+  - [x] camera zoom is now accommodated with zoom-aware world-space sizing so the popups stay readable and aesthetically restrained as zoom changes
+  - [x] popups rise slightly, drift a bit, and fade away for better combat readability without pulling focus too far from the center action
 
 - [ ] a "mini" inventory menu
 - [ ] a toggle for your preference between a full inventory/chest menu or a mini menu in the options menu, beneath sound, window boxes, and controls

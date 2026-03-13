@@ -363,4 +363,40 @@ public:
         TS_ASSERT(g.ct.has<dead>(g.hero_id));
         TS_ASSERT(!g.ct.get<dead>(g.hero_id).value_or(true));
     }
+
+    void testProcessAttackResultsAddsDamagePopupForHpTarget() {
+        gamestate g;
+        add_floor(g, 8, 8);
+
+        const entityid attacker = g.create_player_at_with(vec3{1, 1, 0}, "hero", g.player_init(10));
+        const entityid target = g.create_orc_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
+        TS_ASSERT_DIFFERS(attacker, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(target, ENTITYID_INVALID);
+
+        g.mt.seed(7);
+        g.process_attack_results(g.d.get_current_floor()->tile_at(vec3{2, 1, 0}), attacker, target, true);
+
+        TS_ASSERT_EQUALS(g.damage_popups.size(), 1U);
+        TS_ASSERT(g.damage_popups[0].amount >= 1);
+        TS_ASSERT_EQUALS(g.damage_popups[0].floor, 0);
+        TS_ASSERT(g.frame_dirty);
+    }
+
+    void testUpdateDamagePopupsExpiresFinishedEntries() {
+        gamestate g;
+        add_floor(g, 8, 8);
+
+        const entityid target = g.create_orc_at_with(vec3{2, 2, 0}, [](CT&, const entityid) {});
+        TS_ASSERT_DIFFERS(target, ENTITYID_INVALID);
+
+        g.add_damage_popup(target, 3, false);
+        TS_ASSERT_EQUALS(g.damage_popups.size(), 1U);
+
+        g.update_damage_popups(0.35f);
+        TS_ASSERT_EQUALS(g.damage_popups.size(), 1U);
+
+        g.update_damage_popups(0.40f);
+        TS_ASSERT(g.damage_popups.empty());
+        TS_ASSERT(g.frame_dirty);
+    }
 };

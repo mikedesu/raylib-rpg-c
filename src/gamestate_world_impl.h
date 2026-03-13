@@ -75,6 +75,15 @@ inline bool dungeon_prop_is_pushable(proptype_t type) {
     }
 }
 
+inline bool dungeon_prop_is_pullable(proptype_t type) {
+    switch (type) {
+    case PROP_DUNGEON_CANDLE_00:
+        return true;
+    default:
+        return false;
+    }
+}
+
 inline const char* dungeon_prop_name(proptype_t type) {
     switch (type) {
     case PROP_DUNGEON_STATUE_00: return "statue";
@@ -120,6 +129,7 @@ inline with_fun dungeon_prop_init(proptype_t type) {
         ct.set<description>(id, dungeon_prop_description(type));
         ct.set<solid>(id, dungeon_prop_is_solid(type));
         ct.set<pushable>(id, dungeon_prop_is_pushable(type));
+        ct.set<pullable>(id, dungeon_prop_is_pullable(type));
     };
 }
 

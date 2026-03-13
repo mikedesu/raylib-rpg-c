@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../draw_damage_numbers.h"
 #include "../get_txkey_for_tiletype.h"
 #include "../spritegroup.h"
 #include <cxxtest/TestSuite.h>
@@ -107,5 +108,21 @@ public:
         TS_ASSERT_EQUALS(second->get_currentcontext(), 1);
         TS_ASSERT_EQUALS(static_cast<int>(first->get_src().y), 32);
         TS_ASSERT_EQUALS(static_cast<int>(second->get_src().y), 32);
+    }
+
+    void testDamagePopupFontSizeTracksCameraZoomToStayReadable() {
+        gamestate g;
+        damage_popup_t popup = {};
+        popup.lifetime_seconds = 0.7f;
+        popup.age_seconds = 0.0f;
+
+        g.cam2d.zoom = 2.0f;
+        const float zoomed_out_size = damage_popup_font_size_world(g, popup);
+
+        g.cam2d.zoom = 8.0f;
+        const float zoomed_in_size = damage_popup_font_size_world(g, popup);
+
+        TS_ASSERT(zoomed_out_size > zoomed_in_size);
+        TS_ASSERT(zoomed_in_size >= 3.0f);
     }
 };

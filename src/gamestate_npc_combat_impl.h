@@ -136,6 +136,7 @@ inline void gamestate::process_attack_results(tile_t& tile, entityid atk_id, ent
     tgt_hp.x -= dmg;
     add_message_history("%s deals %d damage to %s", atk_name, dmg, tgt_name);
     ct.set<hp>(tgt_id, tgt_hp);
+    add_damage_popup(tgt_id, dmg, false);
     handle_weapon_durability_loss(atk_id, tgt_id);
     if (tgt_hp.x > 0) {
         return;

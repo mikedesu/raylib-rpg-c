@@ -27,6 +27,7 @@
 #include "sfx.h"
 #include "stat_bonus.h"
 #include <array>
+#include <algorithm>
 #include <chrono>
 #include <map>
 #include <queue>
@@ -87,6 +88,18 @@ typedef enum {
     CONFIRM_ACTION_NONE = 0,
     CONFIRM_ACTION_QUIT,
 } confirm_action_t;
+
+struct damage_popup_t {
+    entityid target_id;
+    int amount;
+    bool critical;
+    int floor;
+    Vector2 world_anchor;
+    float age_seconds;
+    float lifetime_seconds;
+    float drift_x;
+    float rise_distance;
+};
 
 /**
  * @brief Central runtime object for gameplay, world state, entities, UI state, and high-level flow.
@@ -207,6 +220,7 @@ public:
     string interaction_title;
     string interaction_body;
     int pending_level_ups;
+    vector<damage_popup_t> damage_popups;
 
     void set_seed() {
         srand(time(NULL));
@@ -397,6 +411,7 @@ public:
         interaction_title.clear();
         interaction_body.clear();
         pending_level_ups = 0;
+        damage_popups.clear();
         keyboard_profile = KEYBOARD_PROFILE_FULL;
         controls_menu_waiting_for_key = false;
         controls_menu_selection = 0;
@@ -1006,6 +1021,12 @@ public:
     /** @brief Flip an NPC into hostile state in response to a violation. */
     void provoke_npc(entityid npc_id, entityid source_id);
 
+    /** @brief Queue a floating damage-number popup at the target entity's current world position. */
+    void add_damage_popup(entityid target_id, int amount, bool critical = false);
+
+    /** @brief Advance and expire active floating damage-number popups. */
+    void update_damage_popups(float dt_seconds);
+
     /** @brief Apply gameplay side effects after resolving an attack attempt. */
     void process_attack_results(tile_t& tile, entityid atk_id, entityid tgt_id, bool atk_successful);
 
@@ -1247,6 +1268,7 @@ public:
 #include "gamestate_options_impl.h"
 #include "gamestate_input_impl.h"
 #include "gamestate_npc_combat_impl.h"
+#include "gamestate_damage_popups_impl.h"
 #include "gamestate_world_impl.h"
 #include "gamestate_world_interaction_impl.h"
 #include "gamestate_entity_factory_impl.h"

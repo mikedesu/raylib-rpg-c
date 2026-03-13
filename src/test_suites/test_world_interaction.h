@@ -118,6 +118,26 @@ public:
         TS_ASSERT_EQUALS(new_tile.get_cached_live_npc(), ENTITYID_INVALID);
     }
 
+    void testTryEntityPullMovesPullableCandleProp() {
+        gamestate g;
+        add_floor(g);
+        const entityid hero = create_hero(g, vec3{2, 2, 0});
+        g.ct.set<direction>(hero, DIR_RIGHT);
+
+        const entityid candle = g.create_prop_at_with(
+            PROP_DUNGEON_CANDLE_00,
+            vec3{3, 2, 0},
+            dungeon_prop_init(PROP_DUNGEON_CANDLE_00));
+
+        TS_ASSERT_DIFFERS(candle, ENTITYID_INVALID);
+        TS_ASSERT(g.ct.get<pullable>(candle).value_or(false));
+
+        TS_ASSERT(g.try_entity_pull(hero));
+        TS_ASSERT(vec3_equal(g.ct.get<location>(hero).value_or(vec3{-1, -1, -1}), vec3{1, 2, 0}));
+        TS_ASSERT(vec3_equal(g.ct.get<location>(candle).value_or(vec3{-1, -1, -1}), vec3{2, 2, 0}));
+        TS_ASSERT_EQUALS(g.d.get_floor(0)->tile_at(vec3{2, 2, 0}).get_cached_prop(), candle);
+    }
+
     void testTryEntityMoveRespectsDoorOnEntityFloorNotCurrentFloor() {
         gamestate g;
         add_floor(g);

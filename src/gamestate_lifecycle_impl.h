@@ -295,6 +295,7 @@ inline void gamestate::tick(inputstate& is) {
     update_npcs_state();
     handle_input(is);
     handle_npcs();
+    update_damage_popups(test ? (1.0f / DEFAULT_TARGET_FPS) : std::max(GetFrameTime(), 1.0f / 240.0f));
 #ifdef DEBUG
     update_debug_panel_buffer(is);
 #endif

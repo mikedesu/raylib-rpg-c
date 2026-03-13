@@ -27,6 +27,13 @@ inline entityid gamestate::tile_has_pullable(int x, int y, int z) {
             return dead_npc_id;
         }
     }
+    entityid prop_id = t.get_cached_prop();
+    if (prop_id != INVALID) {
+        bool is_pullable = ct.get<pullable>(prop_id).value_or(false);
+        if (is_pullable) {
+            return prop_id;
+        }
+    }
     return ENTITYID_INVALID;
 }
 
