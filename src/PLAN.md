@@ -4,15 +4,18 @@ Compact handoff for active refactor and test work.
 
 ## Immediate New Feature Development
 
-
 - Interactions with non-aggressive entities
   - NPCs
     - Talking / dialog boxes
   - PROPS
     - Some descriptor / dialog box with information about the prop 
       - "This is a dirty mop!" etc
-
-
+  - Decide on a primary "interact" keypress
+    - KEY_O is for "open"
+    - KEY_PERIOD is for up/downstairs
+    - KEY_A is for "attack"
+    - KEY_S is for pickup item
+    - etc
 
 ## Current State
 
