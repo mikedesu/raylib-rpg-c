@@ -18,7 +18,7 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
 
 ## Immediate New Changes To Make
 
-- [ ] "mini" damage numbers
+- [x] "mini" damage numbers
   - [x] damage values now display above any hit entity that has `hp` upon receiving damage
   - [x] white font color
   - [x] critical hits are not yet handled but the popup path now supports red for future crit display
@@ -34,6 +34,18 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
   - [ ] displays a finite number of items in a "scroll wheel"
     - [ ] if the number of items exceeds a certain amount to begin with but is configurable, say, 10 items, then those items would have to be navigated to thru the scrolling mechanism
     - [ ] if the number of items does not exceed this certain amount, say, 10 items, then all items can safely display and be navigated to for acquisition or otherwise in the same way as you would interact with them thru the chest menu or full inventory menu
+
+- [ ] Remove all props from floor 4's creation
+- [ ] Develop a `FLOOR_PRESSURE_PLATE` system where
+  - [ ] A heavy object such as a `pushable` or `pullable` must be on the tile that has the pressure plate
+  - [ ] When triggered, can be tied to some state such as a `ENTITY_DOOR` opening and remaining opened so long as the plate is activated
+  - [ ] When a `pullable` or `pushable` or `ENTITY_PLAYER` or `ENTITY_NPC` removes from the tile, then the plate is no longer triggered, so an opened door would close, etc. - some state would revert to its pre-trigger state
+- [ ] Remove the orc spawning on floor 4 for now
+- [ ] In one of the rooms on floor 4, add a new pressure plate tile and connect it to a door
+  - [ ] this door can only open if the pressure plate is activated
+  - [ ] the player can walk on top of the pressure plate and watch the door open
+  - [ ] the player can walk off the pressure plate and watch the door close
+  - [ ] we remove all props so that we can force the player into learning about dragging dead bodies onto pressure plates
 
 - [ ] save game
   - [ ] a lot of stuff goes here
