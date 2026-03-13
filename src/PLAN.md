@@ -1,5 +1,9 @@
 # Project Plan
 
+## Immediate New Changes To Make
+
+- [ ] open door/open chest input change from KEY_O to KEY_D
+
 ## Critical Note
 
 - Do not ever tamper with `texture_ids.h` or `textures.txt`.
