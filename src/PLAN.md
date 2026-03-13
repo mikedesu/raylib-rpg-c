@@ -10,6 +10,7 @@
   - face-direction attack is bindable
   - stairs default is now `KEY_F`
 - Next follow-up:
+  - The background color for the "full or laptop keyboard?" window and for the options menu(s) is a dark gray and differs from the default "blue" background colors
   - begin the deferred options work for sound controls and message box colors
 
 ## Immediate New Changes To Make
