@@ -4,16 +4,35 @@ Compact handoff for active refactor and test work.
 
 ## Immediate New Feature Development
 
-- [x] Game restart 
-  - [x] When the player dies and presses 'R' to restart the game, when playing on desktop (non-web version), the game currently results in the window closing briefly before re-opening.
-    - [x] i believe this is because we literally re-load raylib in order to refresh everything, but i could be wrong
-    - [x] ideally, we do NOT want the window to close when restarting the game, but we do want the next scene to be the title screen. 
-
 - Treasure Chest entities
+  - [ ] Have texture keys 
+    - TX_CHEST_OPEN_00
+    - TX_CHEST_CLOSED_00
   - [ ] Function like an inventory that doesn't belong to an NPC
     - [ ] Is still a real physical entity
+      - ENTITY_CHEST or ENTITY_TREASURE_CHEST is fine
       - [ ] Has a location
       - [ ] Has HP/MaxHP
+      - [ ] Can be pushed
+      - [ ] Can be pulled
+      - [ ] Can be opened
+        - [ ] Upon open, a display similar to "display inventory" will appear.
+          - [ ] On the left hand side is a grid of items inside the chest, if any
+          - [ ] On the right hand side is an information panel containing details about the currently selected item in the chest
+          - [ ] Items cannot be dropped out of the chest
+          - [ ] Items can be taken from the chest by pressing KEY_ENTER when they are selected 
+            - [ ] Currently there is no bound on how many items a player or any entity can have in their inventory
+          - [ ] A key press (undecided) from this display can switch us to our own inventory so that we may deposit an item from our own inventory into the treasure chest
+      - [ ] there may be other as-yet undecided qualities to a chest but this is good for now
+
+- Interactions with non-aggressive entities
+  - NPCs
+    - Talking / dialog boxes
+  - PROPS
+    - Some descriptor / dialog box with information about the prop 
+      - "This is a dirty mop!" etc
+
+
 
 ## Current State
 
@@ -40,6 +59,7 @@ Compact handoff for active refactor and test work.
 - `hp` component is now a `vec2`.
 - Entities now have `alignment`
 - NPCs now have `aggression`
+- Restarting the game after being killed now no longer restarts raylib and closes the window -- instead, it keeps it open and simply returns to the TitleScreen
 
 ## Recent Completed Work
 
