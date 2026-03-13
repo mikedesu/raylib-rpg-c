@@ -69,6 +69,8 @@ inline bool dungeon_prop_is_solid(proptype_t type) {
 inline bool dungeon_prop_is_pushable(proptype_t type) {
     switch (type) {
     case PROP_DUNGEON_STATUE_00:
+    case PROP_DUNGEON_WOODEN_TABLE_00:
+    case PROP_DUNGEON_WOODEN_TABLE_01:
         return true;
     default:
         return false;
@@ -78,6 +80,8 @@ inline bool dungeon_prop_is_pushable(proptype_t type) {
 inline bool dungeon_prop_is_pullable(proptype_t type) {
     switch (type) {
     case PROP_DUNGEON_CANDLE_00:
+    case PROP_DUNGEON_WOODEN_TABLE_00:
+    case PROP_DUNGEON_WOODEN_TABLE_01:
         return true;
     default:
         return false;

@@ -9,6 +9,7 @@ typedef enum {
     OPTION_SOUND,
     OPTION_WINDOW_BOXES,
     OPTION_CONTROLS,
+    OPTION_INVENTORY_MENU,
 } option_type;
 
 using std::string;
@@ -27,6 +28,7 @@ public:
         options.push_back(OPTION_SOUND);
         options.push_back(OPTION_WINDOW_BOXES);
         options.push_back(OPTION_CONTROLS);
+        options.push_back(OPTION_INVENTORY_MENU);
     }
 
 
@@ -70,6 +72,7 @@ public:
         case OPTION_CONTROLS: return "controls";
         case OPTION_SOUND: return "sound";
         case OPTION_WINDOW_BOXES: return "window boxes";
+        case OPTION_INVENTORY_MENU: return "inventory menu";
         default: break;
         }
         return "unknown option";

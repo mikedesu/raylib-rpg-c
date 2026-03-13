@@ -204,4 +204,32 @@ public:
         TS_ASSERT(g.display_chest_menu);
         TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_CHEST);
     }
+
+    void testMiniInventorySelectionScrollsPastVisibleWindow() {
+        gamestate g;
+        g.sfx.resize(71);
+        g.prefer_mini_inventory_menu = true;
+        g.mini_inventory_visible_count = 3;
+        const vec3 loc = add_initialized_floor(g);
+        const entityid hero = create_hero(g, loc);
+        g.hero_id = hero;
+
+        for (int i = 0; i < 5; i++) {
+            const entityid dagger = g.create_weapon_at_with(g.ct, loc, g.dagger_init());
+            TS_ASSERT_DIFFERS(dagger, ENTITYID_INVALID);
+            TS_ASSERT(g.add_to_inventory(hero, dagger));
+        }
+
+        g.display_inventory_menu = true;
+        g.controlmode = CONTROLMODE_INVENTORY;
+        inputstate is = {};
+        for (int i = 0; i < 4; i++) {
+            press_key(is, KEY_DOWN);
+            g.handle_input_inventory(is);
+        }
+
+        TS_ASSERT_EQUALS(g.get_inventory_selection_index(), 4U);
+        TS_ASSERT_EQUALS(g.mini_inventory_scroll_offset, 2U);
+        TS_ASSERT_EQUALS(static_cast<int>(g.inventory_cursor.y), 2);
+    }
 };

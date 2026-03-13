@@ -298,23 +298,39 @@ inline void gamestate::handle_input_inventory(inputstate& is) {
     }
     if (inputstate_is_pressed(is, KEY_LEFT)) {
         PlaySound(sfx[SFX_CONFIRM_01]);
-        if (inventory_cursor.x > 0) {
+        if (use_mini_inventory_menu()) {
+            move_inventory_selection(-1);
+        }
+        else if (inventory_cursor.x > 0) {
             inventory_cursor.x--;
         }
     }
     else if (inputstate_is_pressed(is, KEY_RIGHT)) {
         PlaySound(sfx[SFX_CONFIRM_01]);
-        inventory_cursor.x++;
+        if (use_mini_inventory_menu()) {
+            move_inventory_selection(1);
+        }
+        else {
+            inventory_cursor.x++;
+        }
     }
     else if (inputstate_is_pressed(is, KEY_UP)) {
         PlaySound(sfx[SFX_CONFIRM_01]);
-        if (inventory_cursor.y > 0) {
+        if (use_mini_inventory_menu()) {
+            move_inventory_selection(-1);
+        }
+        else if (inventory_cursor.y > 0) {
             inventory_cursor.y--;
         }
     }
     else if (inputstate_is_pressed(is, KEY_DOWN)) {
         PlaySound(sfx[SFX_CONFIRM_01]);
-        inventory_cursor.y++;
+        if (use_mini_inventory_menu()) {
+            move_inventory_selection(1);
+        }
+        else {
+            inventory_cursor.y++;
+        }
     }
     else if (inputstate_is_pressed(is, KEY_E)) {
         handle_hero_inventory_equip();
@@ -327,6 +343,10 @@ inline void gamestate::handle_input_inventory(inputstate& is) {
         handle_hero_item_use();
         PlaySound(sfx[SFX_CONFIRM_01]);
     }
+    auto maybe_inventory = ct.get<inventory>(hero_id);
+    auto items = maybe_inventory.value_or(make_shared<vector<entityid>>());
+    clamp_inventory_selection(items->size());
+    frame_dirty = true;
 }
 
 inline void gamestate::cycle_messages() {
@@ -449,6 +469,8 @@ inline bool gamestate::handle_display_inventory(inputstate& is) {
     if (is_action_pressed(is, INPUT_ACTION_INVENTORY)) {
         display_inventory_menu = true;
         controlmode = CONTROLMODE_INVENTORY;
+        mini_inventory_scroll_offset = 0;
+        inventory_cursor = Vector2{0, 0};
         frame_dirty = true;
         PlaySound(sfx[SFX_BAG_OPEN]);
         return true;
@@ -592,6 +614,12 @@ inline void gamestate::handle_input_option_menu(inputstate& is) {
         }
         else if (selected == OPTION_CONTROLS) {
             open_controls_menu();
+        }
+        else if (selected == OPTION_INVENTORY_MENU) {
+            prefer_mini_inventory_menu = !prefer_mini_inventory_menu;
+            mini_inventory_scroll_offset = 0;
+            inventory_cursor = Vector2{0, 0};
+            frame_dirty = true;
         }
     }
 }

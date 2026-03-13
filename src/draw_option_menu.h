@@ -9,7 +9,12 @@ static inline void draw_option_menu(gamestate& g) {
     constexpr Vector2 origin = {0, 0};
     float max_w = 0;
     for (size_t i = 0; i < g.options_menu.get_option_count(); i++) {
-        const char* spaced_str = TextFormat("  %s", g.options_menu.get_option_str(g.options_menu.get_option(i)).c_str());
+        const option_type option = g.options_menu.get_option(i);
+        const string option_label =
+            option == OPTION_INVENTORY_MENU
+                ? TextFormat("inventory menu: %s", g.prefer_mini_inventory_menu ? "mini" : "full")
+                : g.options_menu.get_option_str(option);
+        const char* spaced_str = TextFormat("  %s", option_label.c_str());
         const float w = MeasureText(spaced_str, fsize);
         if (w > max_w) {
             max_w = w;
@@ -24,7 +29,10 @@ static inline void draw_option_menu(gamestate& g) {
         constexpr int x0 = x + pa;
         const int y0 = y + pa + fsize * i;
         const option_type otype = g.options_menu.get_option(i);
-        const string ostr = g.options_menu.get_option_str(otype);
+        const string ostr =
+            otype == OPTION_INVENTORY_MENU
+                ? TextFormat("inventory menu: %s", g.prefer_mini_inventory_menu ? "mini" : "full")
+                : g.options_menu.get_option_str(otype);
         const char* cstr = ostr.c_str();
         if (g.options_menu.get_selection() == i) {
             DrawText(TextFormat("> %s", cstr), x0, y0, fsize, YELLOW);

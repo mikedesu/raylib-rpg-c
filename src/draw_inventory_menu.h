@@ -1,5 +1,6 @@
 #pragma once
 
+#include "draw_item_detail_text.h"
 #include "gamestate.h"
 #include "spritegroup.h"
 
@@ -95,52 +96,21 @@ static inline void draw_inventory_menu(gamestate& g) {
             if (index >= 0 && index < unpacked_inventory->size()) {
                 entityid selection_id = unpacked_inventory->at(index);
                 spritegroup* sg = spritegroups[selection_id];
-                itemtype_t item_type = g.ct.get<itemtype>(selection_id).value_or(ITEM_NONE);
 
                 if (sg) {
                     //auto sprite = sg_get_current(sg);
                     auto sprite = sg->get_current();
                     DrawTexturePro(*(sprite->get_texture()), (Rectangle){0, 0, 32, 32}, right_box, (Vector2){0, 0}, 0.0f, WHITE);
 
-                    // new-style component table access
-                    const string my_name = g.ct.get<name>(selection_id).value_or("no-name");
                     const int fontsize = 20;
                     const int cur_x = right_box.x + 10;
                     int cur_y = right_box.y + 10;
                     const int y_incr = 20;
-
-                    DrawText(my_name.c_str(), cur_x, cur_y, fontsize, g.window_box_fgcolor);
-                    cur_y += y_incr;
-
-                    if (item_type == ITEM_WEAPON) {
-                        const vec3 dmg = g.ct.get<damage>(selection_id).value_or((vec3){-1, -1, -1});
-                        DrawText(TextFormat("Damage: %d-%d", dmg.x, dmg.y), cur_x, cur_y, fontsize, g.window_box_fgcolor);
-                        cur_y += y_incr;
-
-                        const int dura = g.ct.get<durability>(selection_id).value_or(-1);
-                        const int max_dura = g.ct.get<max_durability>(selection_id).value_or(-1);
-                        DrawText(TextFormat("Durability: %d/%d", dura, max_dura), cur_x, cur_y, fontsize, g.window_box_fgcolor);
-                        cur_y += y_incr;
-                    } else if (item_type == ITEM_SHIELD) {
-                        const int block = g.ct.get<block_chance>(selection_id).value_or(-1);
-
-                        DrawText(TextFormat("Block chance: %d", block), cur_x, cur_y, fontsize, g.window_box_fgcolor);
-                        cur_y += y_incr;
-
-                        const int dura = g.ct.get<durability>(selection_id).value_or(-1);
-                        const int max_dura = g.ct.get<max_durability>(selection_id).value_or(-1);
-                        DrawText(TextFormat("Durability: %d/%d", dura, max_dura), cur_x, cur_y, fontsize, g.window_box_fgcolor);
-                        cur_y += y_incr;
-
-                    } else if (item_type == ITEM_POTION) {
-                        const vec3 heal = g.ct.get<healing>(selection_id).value_or((vec3){-1, -1, -1});
-                        DrawText(TextFormat("Heal amount: %d-%d", heal.x, heal.y), cur_x, cur_y, fontsize, g.window_box_fgcolor);
+                    const vector<string> lines = build_item_detail_lines(g, selection_id);
+                    for (const string& line : lines) {
+                        DrawText(line.c_str(), cur_x, cur_y, fontsize, g.window_box_fgcolor);
                         cur_y += y_incr;
                     }
-
-                    string my_desc = g.ct.get<description>(selection_id).value_or("no-description");
-                    DrawText(my_desc.c_str(), cur_x, cur_y, fontsize, g.window_box_fgcolor);
-                    cur_y += y_incr;
                 }
             }
         }

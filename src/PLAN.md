@@ -25,15 +25,17 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
   - [x] camera zoom is now accommodated with zoom-aware world-space sizing so the popups stay readable and aesthetically restrained as zoom changes
   - [x] popups rise slightly, drift a bit, and fade away for better combat readability without pulling focus too far from the center action
 
-- [ ] a "mini" inventory menu
-- [ ] a toggle for your preference between a full inventory/chest menu or a mini menu in the options menu, beneath sound, window boxes, and controls
-  - [ ] allows you to pull up an inventory without it blocking the whole screen
-  - [ ] list-based instead of grid-based
-  - [ ] allows you to select and use, or equip, inventory items.
-  - [ ] displays next to the player when activated
-  - [ ] displays a finite number of items in a "scroll wheel"
-    - [ ] if the number of items exceeds a certain amount to begin with but is configurable, say, 10 items, then those items would have to be navigated to thru the scrolling mechanism
-    - [ ] if the number of items does not exceed this certain amount, say, 10 items, then all items can safely display and be navigated to for acquisition or otherwise in the same way as you would interact with them thru the chest menu or full inventory menu
+- [x] a "mini" inventory menu
+- [x] a toggle for your preference between a full inventory/chest menu or a mini menu in the options menu, beneath sound, window boxes, and controls
+  - [x] allows you to pull up an inventory without it blocking the whole screen
+  - [x] list-based instead of grid-based
+  - [x] allows you to select and use, or equip, inventory items.
+  - [x] displays next to the player when activated
+  - [x] displays a finite number of items in a "scroll wheel"
+    - [x] if the number of items exceeds a certain amount to begin with but is configurable, say, 10 items, then those items would have to be navigated to thru the scrolling mechanism
+    - [x] if the number of items does not exceed this certain amount, say, 10 items, then all items can safely display and be navigated to for acquisition or otherwise in the same way as you would interact with them thru the chest menu or full inventory menu
+  - [x] mini inventory item preview was enlarged for readability and its footer spacing was corrected so the hint text is no longer eclipsed by the preview border
+  - [x] item detail text for full inventory, chest, and mini inventory/chest now shares one helper so future additions such as durability and other stats can be updated in one place
 
 - [ ] Remove all props from floor 4's creation
 - [ ] Develop a `FLOOR_PRESSURE_PLATE` system where
@@ -100,6 +102,12 @@ Compact status handoff for the current C++ / raylib dungeon project.
   - A level-up window now appears at `10 xp`, lets the player choose one attribute, and applies a permanent `+1`.
   - Level-up rewards now also add one hit die worth of max HP via reusable hooks.
   - Permanent attribute increases were separated from level-up rewards so future item-based stat gains can reuse the same path.
+  - A mini inventory / chest menu mode now exists with an options-menu toggle between `full` and `mini`.
+  - Mini inventory / chest display is world-adjacent to the player and supports compact scrolling selection plus item preview/details.
+
+- Prop interaction polish
+  - Candle props are now pullable.
+  - Wooden table props are now both pushable and pullable.
 
 - Cleanup and testing
   - Active spellcasting runtime code was removed.
@@ -107,12 +115,15 @@ Compact status handoff for the current C++ / raylib dungeon project.
   - Current fast test coverage includes lifecycle, bootstrap, placement, factories, inventory, tile/cache behavior, combat smoke tests, and world interaction.
   - A separate heavy test target now exists for longer deterministic simulations.
   - Recent added coverage includes dungeon connectivity, bounded combat invariants, renderer-adjacent seam tests, and heavy pathfinding/chase plus combat soak tests.
+  - Recent added coverage now also includes compact inventory selection behavior plus pull/push interactions for newly movable props.
 
 - open door/open chest input change from KEY_O to KEY_D
 
 - keyboard layouts fully configurable
 - window fg/bg colors fully configurable
 - sound volume fully configurable
+- mini damage numbers
+- mini inventory display
 
 ## Current State
 

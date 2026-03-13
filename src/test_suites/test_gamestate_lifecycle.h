@@ -510,6 +510,26 @@ public:
         TS_ASSERT_EQUALS(g.window_box_fgcolor.a, 255);
     }
 
+    void testOptionMenuCanToggleMiniInventoryPreference() {
+        gamestate g;
+        g.test = true;
+        g.current_scene = SCENE_GAMEPLAY;
+        g.display_option_menu = true;
+        g.controlmode = CONTROLMODE_OPTION_MENU;
+        g.options_menu.incr_selection();
+        g.options_menu.incr_selection();
+        g.options_menu.incr_selection();
+
+        inputstate is = {};
+        inputstate_reset(is);
+        press_key(is, KEY_ENTER);
+        g.handle_input_option_menu(is);
+
+        TS_ASSERT(g.prefer_mini_inventory_menu);
+        TS_ASSERT(g.display_option_menu);
+        TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_OPTION_MENU);
+    }
+
     void testFaceDirectionAttackUsesBoundActionInsteadOfHardCodedKey() {
         gamestate g;
         g.test = true;

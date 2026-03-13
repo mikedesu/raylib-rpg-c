@@ -138,6 +138,43 @@ public:
         TS_ASSERT_EQUALS(g.d.get_floor(0)->tile_at(vec3{2, 2, 0}).get_cached_prop(), candle);
     }
 
+    void testTryEntityMovePushesPushableTableProp() {
+        gamestate g;
+        add_floor(g);
+        const entityid hero = create_hero(g, vec3{2, 2, 0});
+        const entityid table = g.create_prop_at_with(
+            PROP_DUNGEON_WOODEN_TABLE_00,
+            vec3{3, 2, 0},
+            dungeon_prop_init(PROP_DUNGEON_WOODEN_TABLE_00));
+
+        TS_ASSERT_DIFFERS(table, ENTITYID_INVALID);
+        TS_ASSERT(g.ct.get<pushable>(table).value_or(false));
+
+        TS_ASSERT(g.try_entity_move(hero, vec3{1, 0, 0}));
+        TS_ASSERT(vec3_equal(g.ct.get<location>(hero).value_or(vec3{-1, -1, -1}), vec3{2, 2, 0}));
+        TS_ASSERT(vec3_equal(g.ct.get<location>(table).value_or(vec3{-1, -1, -1}), vec3{4, 2, 0}));
+        TS_ASSERT_EQUALS(g.d.get_floor(0)->tile_at(vec3{4, 2, 0}).get_cached_prop(), table);
+    }
+
+    void testTryEntityPullMovesPullableTableProp() {
+        gamestate g;
+        add_floor(g);
+        const entityid hero = create_hero(g, vec3{2, 2, 0});
+        g.ct.set<direction>(hero, DIR_RIGHT);
+        const entityid table = g.create_prop_at_with(
+            PROP_DUNGEON_WOODEN_TABLE_01,
+            vec3{3, 2, 0},
+            dungeon_prop_init(PROP_DUNGEON_WOODEN_TABLE_01));
+
+        TS_ASSERT_DIFFERS(table, ENTITYID_INVALID);
+        TS_ASSERT(g.ct.get<pullable>(table).value_or(false));
+
+        TS_ASSERT(g.try_entity_pull(hero));
+        TS_ASSERT(vec3_equal(g.ct.get<location>(hero).value_or(vec3{-1, -1, -1}), vec3{1, 2, 0}));
+        TS_ASSERT(vec3_equal(g.ct.get<location>(table).value_or(vec3{-1, -1, -1}), vec3{2, 2, 0}));
+        TS_ASSERT_EQUALS(g.d.get_floor(0)->tile_at(vec3{2, 2, 0}).get_cached_prop(), table);
+    }
+
     void testTryEntityMoveRespectsDoorOnEntityFloorNotCurrentFloor() {
         gamestate g;
         add_floor(g);

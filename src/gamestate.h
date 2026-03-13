@@ -173,6 +173,8 @@ public:
     unsigned int sound_menu_selection;
     unsigned int window_color_menu_selection;
     unsigned int keyboard_profile_selection;
+    unsigned int mini_inventory_visible_count;
+    unsigned int mini_inventory_scroll_offset;
     unsigned int title_screen_selection;
     unsigned int max_title_screen_selections;
     unsigned int msg_history_max_len_msg;
@@ -211,6 +213,7 @@ public:
     option_menu options_menu;
     keyboard_profile_t keyboard_profile;
     bool controls_menu_waiting_for_key;
+    bool prefer_mini_inventory_menu;
     size_t controls_menu_selection;
     gameplay_input_action_t controls_menu_pending_action;
     std::array<std::array<gameplay_keybinding_t, INPUT_ACTION_COUNT>, KEYBOARD_PROFILE_COUNT> keybindings;
@@ -347,6 +350,8 @@ public:
         sound_menu_selection = 0;
         window_color_menu_selection = 0;
         keyboard_profile_selection = 0;
+        mini_inventory_visible_count = 10;
+        mini_inventory_scroll_offset = 0;
         cam2d.target = cam2d.offset = Vector2{0, 0};
         cam2d.zoom = DEFAULT_ZOOM_LEVEL;
         cam2d.rotation = 0.0;
@@ -413,6 +418,7 @@ public:
         pending_level_ups = 0;
         damage_popups.clear();
         keyboard_profile = KEYBOARD_PROFILE_FULL;
+        prefer_mini_inventory_menu = false;
         controls_menu_waiting_for_key = false;
         controls_menu_selection = 0;
         controls_menu_pending_action = INPUT_ACTION_MOVE_UP;
@@ -774,6 +780,18 @@ public:
 
     /** @brief Equip the currently selected item in the hero inventory UI. */
     void handle_hero_inventory_equip();
+
+    /** @brief Return whether inventory/chest UIs should use the compact list presentation. */
+    bool use_mini_inventory_menu() const;
+
+    /** @brief Return the currently selected inventory/chest item index for the active menu mode. */
+    size_t get_inventory_selection_index() const;
+
+    /** @brief Move the active inventory/chest selection by a signed delta. */
+    void move_inventory_selection(int delta);
+
+    /** @brief Clamp inventory/chest selection state to the current active list size. */
+    void clamp_inventory_selection(size_t item_count);
 
     /** @brief Drop the currently selected item from the hero inventory UI. */
     bool drop_item_from_hero_inventory();

@@ -108,6 +108,12 @@ inline entityid gamestate::tile_has_pushable(int x, int y, int z) {
         return id;
     }
 
+    id = t.get_cached_prop();
+    is_pushable = ct.get<pushable>(id).value_or(false);
+    if (id != ENTITYID_INVALID && is_pushable) {
+        return id;
+    }
+
     return ENTITYID_INVALID;
 }
 

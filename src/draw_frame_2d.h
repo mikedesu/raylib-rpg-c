@@ -13,6 +13,7 @@
 #include "draw_interaction_modal.h"
 #include "draw_inventory_menu.h"
 #include "draw_level_up_modal.h"
+#include "draw_mini_inventory_menu.h"
 #include "draw_look_panel.h"
 #include "draw_message_box.h"
 #include "draw_message_history.h"
@@ -49,11 +50,35 @@ static inline void libdraw_drawframe_2d(gamestate& g, int vision_dist, int light
     draw_level_up_modal(g);
 
     if (g.display_inventory_menu) {
-        draw_inventory_menu(g);
+        if (g.use_mini_inventory_menu()) {
+            auto maybe_inventory = g.ct.get<inventory>(g.hero_id);
+            auto items = maybe_inventory.value_or(nullptr);
+            if (items) {
+                draw_mini_inventory_menu(g, items, "Inventory", "E equip  Enter use  Q drop  Esc close", true);
+            }
+        }
+        else {
+            draw_inventory_menu(g);
+        }
     }
 
     if (g.display_chest_menu) {
-        draw_chest_menu(g);
+        if (g.use_mini_inventory_menu()) {
+            const entityid source_id = g.chest_deposit_mode ? g.hero_id : g.active_chest_id;
+            auto maybe_inventory = g.ct.get<inventory>(source_id);
+            auto items = maybe_inventory.value_or(nullptr);
+            if (items) {
+                draw_mini_inventory_menu(
+                    g,
+                    items,
+                    g.chest_deposit_mode ? "Chest Deposit" : "Chest",
+                    g.chest_deposit_mode ? "Tab chest  Enter deposit  D close" : "Tab hero  Enter take  D close",
+                    g.chest_deposit_mode);
+            }
+        }
+        else {
+            draw_chest_menu(g);
+        }
     }
 
     if (g.display_action_menu) {
