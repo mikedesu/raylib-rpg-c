@@ -85,9 +85,13 @@ Compact status handoff for the current C++ / raylib dungeon project.
 ## Remaining Cleanup
 
 - Spell / magic leftovers
-  - remove or update stale docs / notes that still describe active spellcasting
-  - remove obsolete spell-related texture / config leftovers if they are now dead
-  - do a final grep sweep to confirm no active runtime spell paths remain
+  - active runtime spell paths are removed
+  - dead spell texture assets and generated texture metadata were removed
+  - remaining matches are intentional:
+    - `magic_values.h` as a generic constants header
+    - future-design notes in `MESSAGE.md`
+    - soundtrack filenames such as `dungeon-magic.mp3` / `dungeon-spells.mp3`
+    - archived `.old` snapshot files
 
 ## Test Backlog
 
