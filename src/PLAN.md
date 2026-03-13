@@ -82,6 +82,16 @@ rg -n "spell|magic|cast" .
     - [ ] green slimes have -2 to charisma
     - [ ] green slimes have -2 to wisdom
     - [ ] green slimes have -2 to intelligence
+  - [ ] After reaching 10 experience points (xp), you should level-up
+    - [ ] A level-up window should appear that lists the player's attributes in a selectable grid:
+      - [ ] strength
+      - [ ] dexterity
+      - [ ] constitution
+      - [ ] intelligence
+      - [ ] wisdom
+      - [ ] charisma
+    - [ ] the player gets to select one attribute to permanently increase by 1
+    - [ ] i will eventually select a new "level-up" sound effect or music eventually
   - [ ] create a floor 4
   - [ ] floor 4 should be approximately the same size as floor 2
   - [ ] floor 4 should have 1 orc spawn on it
