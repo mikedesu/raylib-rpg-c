@@ -13,6 +13,7 @@ static inline void draw_help_menu(gamestate& g) {
         "Move Left / Right: %s / %s\n"
         "Move Diagonals: %s %s %s %s\n"
         "Face Mode: %s\n"
+        "Face Attack: %s\n"
         "Camera mode: %s\n"
         "Zoom: %s and %s\n"
         "\n"
@@ -46,6 +47,7 @@ static inline void draw_help_menu(gamestate& g) {
         g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_MOVE_DOWN_LEFT).c_str(),
         g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_MOVE_DOWN_RIGHT).c_str(),
         g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_DIRECTION_MODE).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_FACE_ATTACK).c_str(),
         g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_CAMERA_TOGGLE).c_str(),
         g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_ZOOM_IN).c_str(),
         g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_ZOOM_OUT).c_str(),

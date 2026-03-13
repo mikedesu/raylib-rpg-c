@@ -33,6 +33,7 @@ typedef enum {
     INPUT_ACTION_FACE_UP_RIGHT,
     INPUT_ACTION_FACE_DOWN_LEFT,
     INPUT_ACTION_FACE_DOWN_RIGHT,
+    INPUT_ACTION_FACE_ATTACK,
     INPUT_ACTION_ATTACK,
     INPUT_ACTION_PICKUP,
     INPUT_ACTION_STAIRS,
@@ -86,6 +87,7 @@ static inline const char* gameplay_input_action_label(gameplay_input_action_t ac
     case INPUT_ACTION_FACE_UP_RIGHT: return "Face Up-Right";
     case INPUT_ACTION_FACE_DOWN_LEFT: return "Face Down-Left";
     case INPUT_ACTION_FACE_DOWN_RIGHT: return "Face Down-Right";
+    case INPUT_ACTION_FACE_ATTACK: return "Face Mode Attack";
     case INPUT_ACTION_ATTACK: return "Attack";
     case INPUT_ACTION_PICKUP: return "Pick Up Item";
     case INPUT_ACTION_STAIRS: return "Use Stairs";

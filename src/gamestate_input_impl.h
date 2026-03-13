@@ -425,7 +425,7 @@ inline bool gamestate::handle_change_dir(inputstate& is) {
     else if (is_action_pressed(is, INPUT_ACTION_FACE_DOWN_RIGHT)) {
         change_player_dir(DIR_DOWN_RIGHT);
     }
-    else if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
+    else if (is_action_pressed(is, INPUT_ACTION_FACE_ATTACK)) {
         if (is_dead) {
             return add_message("You cannot attack while dead");
         }

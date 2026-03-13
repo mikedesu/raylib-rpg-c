@@ -412,4 +412,39 @@ public:
         TS_ASSERT(!g.controls_menu_waiting_for_key);
         TS_ASSERT_EQUALS(g.get_keybinding_primary(KEYBOARD_PROFILE_LAPTOP, INPUT_ACTION_ATTACK), KEY_T);
     }
+
+    void testFaceDirectionAttackUsesBoundActionInsteadOfHardCodedKey() {
+        gamestate g;
+        g.test = true;
+        add_floor(g);
+        const entityid hero = g.create_player_at_with(vec3{3, 3, 0}, "hero", g.player_init(10));
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+
+        g.current_scene = SCENE_GAMEPLAY;
+        g.hero_id = hero;
+        g.player_changing_dir = true;
+        g.keyboard_profile = KEYBOARD_PROFILE_FULL;
+
+        inputstate is = {};
+        inputstate_reset(is);
+        press_key(is, KEY_APOSTROPHE);
+        TS_ASSERT(g.handle_change_dir(is));
+        TS_ASSERT(g.ct.get<attacking>(hero).value_or(false));
+        TS_ASSERT(!g.player_changing_dir);
+
+        g.ct.set<attacking>(hero, false);
+        g.player_changing_dir = true;
+        g.set_keybinding_primary(KEYBOARD_PROFILE_FULL, INPUT_ACTION_FACE_ATTACK, KEY_T);
+        inputstate_reset(is);
+        press_key(is, KEY_APOSTROPHE);
+        TS_ASSERT(g.handle_change_dir(is));
+        TS_ASSERT(!g.ct.get<attacking>(hero).value_or(false));
+        TS_ASSERT(g.player_changing_dir);
+
+        inputstate_reset(is);
+        press_key(is, KEY_T);
+        TS_ASSERT(g.handle_change_dir(is));
+        TS_ASSERT(g.ct.get<attacking>(hero).value_or(false));
+        TS_ASSERT(!g.player_changing_dir);
+    }
 };

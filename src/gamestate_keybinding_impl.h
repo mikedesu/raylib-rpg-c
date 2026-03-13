@@ -43,6 +43,7 @@ inline void gamestate::set_default_keybinding(keyboard_profile_t profile, gamepl
         case INPUT_ACTION_FACE_UP_RIGHT: binding = {KEY_E, KEY_KP_9, -1}; break;
         case INPUT_ACTION_FACE_DOWN_LEFT: binding = {KEY_Z, KEY_KP_1, -1}; break;
         case INPUT_ACTION_FACE_DOWN_RIGHT: binding = {KEY_C, KEY_KP_3, -1}; break;
+        case INPUT_ACTION_FACE_ATTACK: binding = {KEY_APOSTROPHE, -1, -1}; break;
         case INPUT_ACTION_ATTACK: binding = {KEY_A, -1, -1}; break;
         case INPUT_ACTION_PICKUP: binding = {KEY_S, -1, -1}; break;
         case INPUT_ACTION_STAIRS: binding = {KEY_PERIOD, -1, -1}; break;
@@ -81,6 +82,7 @@ inline void gamestate::set_default_keybinding(keyboard_profile_t profile, gamepl
         case INPUT_ACTION_FACE_UP_RIGHT: binding = {KEY_U, -1, -1}; break;
         case INPUT_ACTION_FACE_DOWN_LEFT: binding = {KEY_B, -1, -1}; break;
         case INPUT_ACTION_FACE_DOWN_RIGHT: binding = {KEY_N, -1, -1}; break;
+        case INPUT_ACTION_FACE_ATTACK: binding = {KEY_A, -1, -1}; break;
         case INPUT_ACTION_ATTACK: binding = {KEY_A, -1, -1}; break;
         case INPUT_ACTION_PICKUP: binding = {KEY_S, -1, -1}; break;
         case INPUT_ACTION_STAIRS: binding = {KEY_PERIOD, -1, -1}; break;
