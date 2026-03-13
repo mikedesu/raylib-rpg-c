@@ -24,6 +24,8 @@ Compact handoff for active refactor and test work.
     - KEY_A is for "attack"
     - KEY_S is for pickup item
     - etc
+- [ ] Update the help menu text to reflect the new key press(es)
+
 
 ## Current State
 
