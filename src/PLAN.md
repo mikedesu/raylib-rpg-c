@@ -22,6 +22,7 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
   - [ ] damage values that display above an NPC entity upon receiving damage
   - [ ] white font color
   - [ ] critical hits are not yet handled but when they are, i want their color to be red
+  - [ ] somehow have to accomodate for the fact that the camera zoom can change and how we choose to deal with this to keep things aesthetically pleasant is an interesting challenge
 
 - [ ] a "mini" inventory menu
 - [ ] a toggle for your preference between a full inventory/chest menu or a mini menu in the options menu, beneath sound, window boxes, and controls
