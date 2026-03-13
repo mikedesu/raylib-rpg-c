@@ -92,10 +92,10 @@ rg -n "spell|magic|cast" .
       - [x] charisma
     - [x] the player gets to select one attribute to permanently increase by 1
     - [ ] i will eventually select a new "level-up" sound effect or music eventually
-  - [ ] create a floor 4
-  - [ ] floor 4 should be approximately the same size as floor 2
-  - [ ] floor 4 should have 1 orc spawn on it
-  - [ ] the default orc spawns in with a randomly-selected weapon out of the existing weapon types (for now), and a small healing potion
+  - [x] create a floor 4
+  - [x] floor 4 should be approximately the same size as floor 2
+  - [x] floor 4 should have 1 orc spawn on it
+  - [x] the default orc spawns in with a randomly-selected weapon out of the existing weapon types (for now), and a small healing potion
 
 - Interactions with non-aggressive entities
   - [x] Talk to NPCs

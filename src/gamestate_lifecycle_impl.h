@@ -155,9 +155,10 @@ inline void gamestate::logic_init() {
     SetRandomSeed(time(NULL));
     constexpr float parts = 1.0;
     massert(!d.is_initialized, "dungeon is already initialized");
-    create_and_add_df_1(BIOME_STONE, 8, 8, 3, parts);
-    create_and_add_df_1(BIOME_STONE, 16, 16, 3, parts);
-    create_and_add_df_1(BIOME_STONE, 24, 24, 3, parts);
+    create_and_add_df_1(BIOME_STONE, 8, 8, 4, parts);
+    create_and_add_df_1(BIOME_STONE, 16, 16, 4, parts);
+    create_and_add_df_1(BIOME_STONE, 24, 24, 4, parts);
+    create_and_add_df_1(BIOME_STONE, 16, 16, 4, parts);
     const bool stairs_assigned = assign_random_stairs();
     massert(stairs_assigned, "failed to assign dungeon stairs");
     if (!stairs_assigned) {
@@ -185,6 +186,20 @@ inline void gamestate::logic_init() {
         ct.set<level>(id, 1);
         ct.set<xp>(id, 0);
     };
+    auto armed_orc_init = [this](CT& ct, const entityid id) {
+        vector<with_fun> weapon_inits = {
+            dagger_init(),
+            sword_init(),
+            axe_init(),
+        };
+        uniform_int_distribution<int> weapon_dist(0, static_cast<int>(weapon_inits.size()) - 1);
+        const entityid weapon_id = create_weapon_with(weapon_inits[weapon_dist(mt)]);
+        const entityid potion_id = create_potion_with(potion_init(POTION_HP_SMALL));
+        add_to_inventory(id, weapon_id);
+        add_to_inventory(id, potion_id);
+        ct.set<equipped_weapon>(id, weapon_id);
+        ct.set<aggro>(id, true);
+    };
 
     const race_t friendly_race = static_cast<race_t>(GetRandomValue(RACE_NONE + 1, RACE_COUNT - 1));
     const vec3 friendly_loc = d.get_floor(0)->get_random_loc();
@@ -200,6 +215,9 @@ inline void gamestate::logic_init() {
         const vec3 slime_loc = floor_two->get_random_loc();
         create_npc_at_with(RACE_GREEN_SLIME, slime_loc, green_slime_init);
     }
+
+    const vec3 floor_three_orc_loc = d.get_floor(3)->get_random_loc();
+    create_orc_at_with(floor_three_orc_loc, armed_orc_init);
     msuccess("end creating monsters...");
     add_message("Welcome to the game! Press enter to cycle messages.");
     add_message("For help, press ?");

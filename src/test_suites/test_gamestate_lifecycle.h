@@ -187,7 +187,7 @@ public:
         g.restart_game();
 
         TS_ASSERT(g.d.is_initialized);
-        TS_ASSERT_EQUALS(g.d.get_floor_count(), 3U);
+        TS_ASSERT_EQUALS(g.d.get_floor_count(), 4U);
         TS_ASSERT_EQUALS(g.current_scene, SCENE_TITLE);
         TS_ASSERT_EQUALS(g.restart_count, 8U);
         TS_ASSERT(!g.do_restart);
