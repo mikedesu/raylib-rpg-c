@@ -88,6 +88,7 @@ public:
     controlmode_t controlmode_before_confirm;
     debugpanel_t debugpanel;
     entityid hero_id;
+    entityid active_chest_id;
     entityid new_entityid_begin;
     entityid new_entityid_end;
     entityid next_entityid;
@@ -112,6 +113,7 @@ public:
     bool player_changing_dir;
     bool test_guard;
     bool display_inventory_menu;
+    bool display_chest_menu;
     bool display_action_menu;
     bool display_option_menu;
     bool display_confirm_prompt;
@@ -123,6 +125,7 @@ public:
     bool music_volume_changed;
     bool do_restart;
     bool msg_system_is_active;
+    bool chest_deposit_mode;
     int lock;
     int pad;
     unsigned int framecount;
@@ -238,6 +241,7 @@ public:
         windowwidth = -1;
         windowheight = -1;
         hero_id = INVALID;
+        active_chest_id = INVALID;
         entity_turn = 1;
         new_entityid_begin = ENTITYID_INVALID;
         new_entityid_end = ENTITYID_INVALID;
@@ -256,6 +260,7 @@ public:
         gridon = false;
         display_action_menu = false;
         display_inventory_menu = false;
+        display_chest_menu = false;
         display_help_menu = false;
         display_confirm_prompt = false;
         do_quit = false;
@@ -265,6 +270,7 @@ public:
         test_guard = false;
         player_changing_dir = false;
         msg_system_is_active = false;
+        chest_deposit_mode = false;
         music_volume_changed = false;
 #ifndef TEST
         test = false;
@@ -406,6 +412,15 @@ public:
     /** @brief Scan current floors for valid door candidates and place door entities. */
     size_t place_doors();
 
+    /** @brief Create a treasure chest entity and apply additional component initialization. */
+    entityid create_chest_with(with_fun chestInitFunction);
+
+    /** @brief Create and place a treasure chest entity on a floor tile. */
+    entityid create_chest_at_with(vec3 loc, with_fun chestInitFunction);
+
+    /** @brief Place one empty treasure chest on floor `0` if a valid tile exists. */
+    entityid place_first_floor_chest();
+
     /** @brief Create a prop entity of the requested logical type. */
     entityid create_prop_with(proptype_t type, with_fun initFun);
 
@@ -506,6 +521,14 @@ public:
         auto df = d.get_floor(z);
         tile_t& t = df->tile_at((vec3){x, y, z});
         return t.get_cached_box();
+    }
+
+    entityid tile_has_chest(int x, int y, int z) {
+        massert(z >= 0, "floor is out of bounds");
+        massert((size_t)z < d.floors.size(), "floor is out of bounds");
+        auto df = d.get_floor(z);
+        tile_t& t = df->tile_at((vec3){x, y, z});
+        return t.get_cached_chest();
     }
 
     /** @brief Return the pullable entity cached on a tile, if any. */
@@ -715,6 +738,24 @@ public:
     /** @brief Handle input while the inventory UI is active. */
     void handle_input_inventory(inputstate& is);
 
+    /** @brief Transfer one item between two inventory-owning entities. */
+    bool transfer_inventory_item(entityid from_id, entityid to_id, entityid item_id);
+
+    /** @brief Open the active chest UI for the provided chest entity. */
+    bool open_chest_menu(entityid chest_id);
+
+    /** @brief Close the active chest UI and restore player control. */
+    void close_chest_menu();
+
+    /** @brief Toggle between chest contents view and hero deposit view. */
+    void toggle_chest_menu_mode();
+
+    /** @brief Handle confirm/transfer behavior for the active chest UI selection. */
+    void handle_chest_menu_confirm();
+
+    /** @brief Handle input while the chest UI is active. */
+    void handle_input_chest(inputstate& is);
+
     /** @brief Open the yes/no confirmation prompt with a formatted message. */
     void open_confirm_prompt(confirm_action_t action, const char* fmt, ...);
 
@@ -905,6 +946,9 @@ public:
 
     /** @brief Attempt to open a door entity at the requested location. */
     bool try_entity_open_door(entityid id, vec3 loc);
+
+    /** @brief Attempt to open a chest entity at the requested location. */
+    bool try_entity_open_chest(entityid id, vec3 loc);
 
     /** @brief Handle door-opening input for the active actor. */
     bool handle_open_door(inputstate& is, bool is_dead);

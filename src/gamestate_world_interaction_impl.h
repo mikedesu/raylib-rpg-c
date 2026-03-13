@@ -13,6 +13,13 @@ inline entityid gamestate::tile_has_pullable(int x, int y, int z) {
             return box_id;
         }
     }
+    entityid chest_id = t.get_cached_chest();
+    if (chest_id != INVALID) {
+        bool is_pullable = ct.get<pullable>(chest_id).value_or(false);
+        if (is_pullable) {
+            return chest_id;
+        }
+    }
     entityid dead_npc_id = t.get_cached_dead_npc();
     if (dead_npc_id != INVALID) {
         bool is_pullable = ct.get<pullable>(dead_npc_id).value_or(false);
@@ -36,6 +43,12 @@ inline bool gamestate::tile_has_solid(int x, int y, int z) {
     }
 
     id = t.get_cached_box();
+    is_solid = ct.get<solid>(id).value_or(false);
+    if (id != ENTITYID_INVALID && is_solid) {
+        return true;
+    }
+
+    id = t.get_cached_chest();
     is_solid = ct.get<solid>(id).value_or(false);
     if (id != ENTITYID_INVALID && is_solid) {
         return true;
@@ -78,6 +91,12 @@ inline entityid gamestate::tile_has_pushable(int x, int y, int z) {
 
     entityid id = t.get_cached_box();
     bool is_pushable = ct.get<pushable>(id).value_or(false);
+    if (id != ENTITYID_INVALID && is_pushable) {
+        return id;
+    }
+
+    id = t.get_cached_chest();
+    is_pushable = ct.get<pushable>(id).value_or(false);
     if (id != ENTITYID_INVALID && is_pushable) {
         return id;
     }
@@ -541,9 +560,7 @@ inline bool gamestate::try_entity_open_door(entityid id, vec3 loc) {
     if (door_id == ENTITYID_INVALID) {
         return false;
     }
-    shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
-    tile_t& t = df->tile_at(loc);
-    massert(t.get_cached_door() == door_id, "door cache mismatch at (%d, %d, %d)", loc.x, loc.y, loc.z);
+    massert(tile_has_door(loc) == door_id, "door cache mismatch at (%d, %d, %d)", loc.x, loc.y, loc.z);
     optional<bool> maybe_is_open = ct.get<door_open>(door_id);
     massert(maybe_is_open.has_value(), "door %d has no `is_open` component", door_id);
     ct.set<door_open>(door_id, !maybe_is_open.value());
@@ -553,13 +570,30 @@ inline bool gamestate::try_entity_open_door(entityid id, vec3 loc) {
     return true;
 }
 
+inline bool gamestate::try_entity_open_chest(entityid id, vec3 loc) {
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    const entityid chest_id = tile_has_chest(loc.x, loc.y, loc.z);
+    if (chest_id == ENTITYID_INVALID) {
+        return false;
+    }
+    optional<bool> maybe_is_open = ct.get<door_open>(chest_id);
+    massert(maybe_is_open.has_value(), "chest %d has no open state component", chest_id);
+    if (maybe_is_open.value()) {
+        close_chest_menu();
+        return true;
+    }
+    return open_chest_menu(chest_id);
+}
+
 inline bool gamestate::handle_open_door(inputstate& is, bool is_dead) {
     if (inputstate_is_pressed(is, KEY_O)) {
         if (is_dead) {
             return add_message("You cannot open doors while dead");
         }
         vec3 loc = get_loc_facing_player();
-        try_entity_open_door(hero_id, loc);
+        if (!try_entity_open_chest(hero_id, loc)) {
+            try_entity_open_door(hero_id, loc);
+        }
         flag = GAMESTATE_FLAG_PLAYER_ANIM;
         return true;
     }

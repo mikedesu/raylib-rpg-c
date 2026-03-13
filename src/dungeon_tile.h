@@ -33,6 +33,7 @@ private:
     entityid cached_live_npc;
     entityid cached_prop;
     entityid cached_box;
+    entityid cached_chest;
     entityid cached_door;
     dead_npc_cache dead_npcs;
     item_cache items;
@@ -48,6 +49,7 @@ public:
         count += cached_live_npc != INVALID ? 1 : 0;
         count += cached_prop != INVALID ? 1 : 0;
         count += cached_box != INVALID ? 1 : 0;
+        count += cached_chest != INVALID ? 1 : 0;
         count += cached_door != INVALID ? 1 : 0;
 
         count += dead_npcs.get_count();
@@ -70,6 +72,14 @@ public:
 
     entityid get_cached_box() {
         return cached_box;
+    }
+
+    void set_cached_chest(entityid id) {
+        cached_chest = id;
+    }
+
+    entityid get_cached_chest() {
+        return cached_chest;
     }
 
     void set_cached_door(entityid id) {
@@ -181,6 +191,7 @@ public:
         dead_npcs = dead_npc_cache(); // Reset cache
         items = item_cache();
         cached_box = ENTITYID_INVALID;
+        cached_chest = ENTITYID_INVALID;
         cached_door = ENTITYID_INVALID;
     }
 
@@ -234,6 +245,13 @@ public:
         else if (type == ENTITY_BOX) {
             cached_box = id;
         }
+        else if (type == ENTITY_CHEST) {
+            if (cached_chest != INVALID) {
+                merror("tile_add: chest cache already occupied");
+                return INVALID;
+            }
+            cached_chest = id;
+        }
         else if (type == ENTITY_DOOR) {
             if (cached_door != INVALID) {
                 merror("tile_add: door cache already occupied");
@@ -269,6 +287,10 @@ public:
         }
         else if (id == cached_box) {
             cached_box = INVALID;
+            return id;
+        }
+        else if (id == cached_chest) {
+            cached_chest = INVALID;
             return id;
         }
         else if (id == cached_door) {

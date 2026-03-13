@@ -7,6 +7,7 @@
 #include "proptype.h"
 #include "spell.h"
 #include "tx_keys_boxes.h"
+#include "tx_keys_chests.h"
 #include "tx_keys_doors.h"
 #include "tx_keys_monsters.h"
 #include "tx_keys_npcs.h"
@@ -101,6 +102,11 @@ static inline void create_box_sg_byid(gamestate& g, entityid id) {
     create_sg(g, id, TX_WOODEN_BOX_KEYS, TX_WOODEN_BOX_COUNT);
 }
 
+static inline void create_chest_sg_byid(gamestate& g, entityid id) {
+    massert(id != ENTITYID_INVALID, "entityid is invalid");
+    create_sg(g, id, TX_TREASURE_CHEST_KEYS, TX_TREASURE_CHEST_COUNT);
+}
+
 static inline void create_potion_sg_byid(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     switch (g.ct.get<potiontype>(id).value_or(POTION_NONE)) {
@@ -188,6 +194,7 @@ static inline void create_sg_byid(gamestate& g, entityid id) {
     case ENTITY_NPC: create_npc_sg_byid(g, id); break;
     case ENTITY_DOOR: create_door_sg_byid(g, id); break;
     case ENTITY_BOX: create_box_sg_byid(g, id); break;
+    case ENTITY_CHEST: create_chest_sg_byid(g, id); break;
     case ENTITY_ITEM: create_item_sg_byid(g, id); break;
     case ENTITY_SPELL: create_spell_sg_byid(g, id); break;
     case ENTITY_PROP: create_prop_sg_byid(g, id); break;

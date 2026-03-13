@@ -141,4 +141,36 @@ public:
         TS_ASSERT_EQUALS(hp_value.y, 10);
         TS_ASSERT(g.msg_history.size() >= 2U);
     }
+
+    void testChestTransferMovesItemsBetweenHeroAndChestInventories() {
+        gamestate g;
+        g.sfx.resize(71);
+        const vec3 loc = add_initialized_floor(g);
+        const entityid hero = create_hero(g, loc);
+        const entityid chest = g.create_chest_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
+        const entityid dagger = g.create_weapon_at_with(g.ct, loc, g.dagger_init());
+
+        TS_ASSERT_DIFFERS(chest, ENTITYID_INVALID);
+        TS_ASSERT(g.add_to_inventory(hero, dagger));
+        TS_ASSERT(g.transfer_inventory_item(hero, chest, dagger));
+        TS_ASSERT(!g.is_in_inventory(hero, dagger));
+        TS_ASSERT(g.is_in_inventory(chest, dagger));
+
+        TS_ASSERT(g.open_chest_menu(chest));
+        TS_ASSERT(g.display_chest_menu);
+        g.toggle_chest_menu_mode();
+        TS_ASSERT(g.chest_deposit_mode);
+
+        g.toggle_chest_menu_mode();
+        TS_ASSERT(!g.chest_deposit_mode);
+        g.handle_chest_menu_confirm();
+
+        TS_ASSERT(g.is_in_inventory(hero, dagger));
+        TS_ASSERT(!g.is_in_inventory(chest, dagger));
+        TS_ASSERT(g.display_chest_menu);
+
+        g.close_chest_menu();
+        TS_ASSERT(!g.display_chest_menu);
+        TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_PLAYER);
+    }
 };

@@ -3,6 +3,7 @@
 
 #include "camera_lock_on.h"
 #include "draw_action_menu.h"
+#include "draw_chest_menu.h"
 #include "draw_dungeon_floor.h"
 #include "draw_handle_debug_panel.h"
 #include "draw_help_menu.h"
@@ -39,6 +40,10 @@ static inline void libdraw_drawframe_2d(gamestate& g, int vision_dist, int light
 
     if (g.display_inventory_menu) {
         draw_inventory_menu(g);
+    }
+
+    if (g.display_chest_menu) {
+        draw_chest_menu(g);
     }
 
     if (g.display_action_menu) {

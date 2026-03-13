@@ -127,6 +127,7 @@ public:
         tile.set_cached_live_npc(50);
         tile.set_cached_item(60);
         tile.set_cached_box(70);
+        tile.set_cached_chest(75);
         tile.set_cached_prop(80);
         tile.set_cached_door(90);
         tile.set_dirty_entities(false);
@@ -139,6 +140,7 @@ public:
         TS_ASSERT_EQUALS(tile.get_cached_live_npc(), ENTITYID_INVALID);
         TS_ASSERT_EQUALS(tile.get_cached_item(), ENTITYID_INVALID);
         TS_ASSERT_EQUALS(tile.get_cached_box(), ENTITYID_INVALID);
+        TS_ASSERT_EQUALS(tile.get_cached_chest(), ENTITYID_INVALID);
         TS_ASSERT_EQUALS(tile.get_cached_prop(), ENTITYID_INVALID);
         TS_ASSERT_EQUALS(tile.get_cached_door(), ENTITYID_INVALID);
         TS_ASSERT_EQUALS(tile.entity_count(), 0U);
@@ -162,8 +164,9 @@ public:
         TS_ASSERT_EQUALS(tile.tile_add(4, ENTITY_ITEM), 4);
         TS_ASSERT_EQUALS(tile.tile_add(5, ENTITY_PROP), 5);
         TS_ASSERT_EQUALS(tile.tile_add(6, ENTITY_BOX), 6);
-        TS_ASSERT_EQUALS(tile.tile_add(7, ENTITY_DOOR), 7);
-        TS_ASSERT(tile.add_dead_npc(8));
+        TS_ASSERT_EQUALS(tile.tile_add(7, ENTITY_CHEST), 7);
+        TS_ASSERT_EQUALS(tile.tile_add(8, ENTITY_DOOR), 8);
+        TS_ASSERT(tile.add_dead_npc(9));
 
         TS_ASSERT_EQUALS(tile.get_cached_live_npc(), 2);
         TS_ASSERT_EQUALS(tile.get_cached_item(), 4);
@@ -171,13 +174,14 @@ public:
         TS_ASSERT_EQUALS(tile.get_cached_item_at(1), 4);
         TS_ASSERT_EQUALS(tile.get_cached_prop(), 5);
         TS_ASSERT_EQUALS(tile.get_cached_box(), 6);
-        TS_ASSERT_EQUALS(tile.get_cached_door(), 7);
-        TS_ASSERT_EQUALS(tile.get_cached_dead_npc(), 8);
+        TS_ASSERT_EQUALS(tile.get_cached_chest(), 7);
+        TS_ASSERT_EQUALS(tile.get_cached_door(), 8);
+        TS_ASSERT_EQUALS(tile.get_cached_dead_npc(), 9);
         TS_ASSERT_EQUALS(tile.get_item_count(), 2U);
         TS_ASSERT_EQUALS(tile.get_dead_npc_count(), 1U);
-        TS_ASSERT_EQUALS(tile.entity_count(), 7U);
+        TS_ASSERT_EQUALS(tile.entity_count(), 8U);
 
-        TS_ASSERT_EQUALS(tile.tile_remove(8), 8);
+        TS_ASSERT_EQUALS(tile.tile_remove(9), 9);
         TS_ASSERT_EQUALS(tile.get_dead_npc_count(), 0U);
         TS_ASSERT_EQUALS(tile.tile_remove(3), 3);
         TS_ASSERT_EQUALS(tile.get_item_count(), 1U);
@@ -185,6 +189,7 @@ public:
         TS_ASSERT_EQUALS(tile.tile_remove(5), 5);
         TS_ASSERT_EQUALS(tile.tile_remove(6), 6);
         TS_ASSERT_EQUALS(tile.tile_remove(7), 7);
+        TS_ASSERT_EQUALS(tile.tile_remove(8), 8);
         TS_ASSERT_EQUALS(tile.tile_remove(2), 2);
         TS_ASSERT_EQUALS(tile.entity_count(), 1U);
         TS_ASSERT_EQUALS(tile.tile_remove(4), 4);
@@ -222,6 +227,7 @@ public:
         TS_ASSERT_EQUALS(tile.tile_add(21, ENTITY_ITEM), 21);
         TS_ASSERT_EQUALS(tile.tile_add(30, ENTITY_PROP), 30);
         TS_ASSERT_EQUALS(tile.tile_add(40, ENTITY_BOX), 40);
+        TS_ASSERT_EQUALS(tile.tile_add(45, ENTITY_CHEST), 45);
         TS_ASSERT_EQUALS(tile.tile_add(50, ENTITY_DOOR), 50);
         TS_ASSERT(tile.add_dead_npc(60));
 
@@ -231,11 +237,12 @@ public:
         TS_ASSERT_EQUALS(tile.get_cached_item(), 21);
         TS_ASSERT_EQUALS(tile.get_cached_prop(), 30);
         TS_ASSERT_EQUALS(tile.get_cached_box(), 40);
+        TS_ASSERT_EQUALS(tile.get_cached_chest(), 45);
         TS_ASSERT_EQUALS(tile.get_cached_door(), 50);
         TS_ASSERT_EQUALS(tile.get_cached_dead_npc(), 60);
         TS_ASSERT_EQUALS(tile.get_item_count(), 2U);
         TS_ASSERT_EQUALS(tile.get_dead_npc_count(), 1U);
-        TS_ASSERT_EQUALS(tile.entity_count(), 7U);
+        TS_ASSERT_EQUALS(tile.entity_count(), 8U);
     }
 
     void testTileMixedOccupancyRemovalPreservesRemainingCaches() {
@@ -246,11 +253,13 @@ public:
         TS_ASSERT_EQUALS(tile.tile_add(21, ENTITY_ITEM), 21);
         TS_ASSERT_EQUALS(tile.tile_add(30, ENTITY_PROP), 30);
         TS_ASSERT_EQUALS(tile.tile_add(40, ENTITY_BOX), 40);
+        TS_ASSERT_EQUALS(tile.tile_add(45, ENTITY_CHEST), 45);
         TS_ASSERT_EQUALS(tile.tile_add(50, ENTITY_DOOR), 50);
         TS_ASSERT(tile.add_dead_npc(60));
 
         TS_ASSERT_EQUALS(tile.tile_remove(50), 50);
         TS_ASSERT_EQUALS(tile.tile_remove(40), 40);
+        TS_ASSERT_EQUALS(tile.tile_remove(45), 45);
         TS_ASSERT_EQUALS(tile.tile_remove(60), 60);
         TS_ASSERT_EQUALS(tile.tile_remove(21), 21);
 
@@ -259,6 +268,7 @@ public:
         TS_ASSERT_EQUALS(tile.get_cached_item(), 20);
         TS_ASSERT_EQUALS(tile.get_cached_prop(), 30);
         TS_ASSERT_EQUALS(tile.get_cached_box(), ENTITYID_INVALID);
+        TS_ASSERT_EQUALS(tile.get_cached_chest(), ENTITYID_INVALID);
         TS_ASSERT_EQUALS(tile.get_cached_door(), ENTITYID_INVALID);
         TS_ASSERT_EQUALS(tile.get_cached_dead_npc(), ENTITYID_INVALID);
         TS_ASSERT_EQUALS(tile.get_item_count(), 1U);

@@ -111,6 +111,28 @@ public:
         TS_ASSERT_EQUALS(tile.get_cached_prop(), id);
     }
 
+    void testCreateChestAtWithSetsExpectedChestComponents() {
+        gamestate g;
+        const vec3 loc = add_initialized_floor(g);
+
+        const entityid id = g.create_chest_at_with(loc, [](CT&, const entityid) {});
+
+        TS_ASSERT_DIFFERS(id, ENTITYID_INVALID);
+        TS_ASSERT_EQUALS(g.ct.get<entitytype>(id).value_or(ENTITY_NONE), ENTITY_CHEST);
+        TS_ASSERT_EQUALS(g.ct.get<name>(id).value_or(""), "treasure chest");
+        TS_ASSERT_EQUALS(g.ct.get<description>(id).value_or(""), "A sturdy wooden treasure chest.");
+        TS_ASSERT(g.ct.get<pushable>(id).value_or(false));
+        TS_ASSERT(g.ct.get<pullable>(id).value_or(false));
+        TS_ASSERT(g.ct.get<solid>(id).value_or(false));
+        TS_ASSERT(!g.ct.get<door_open>(id).value_or(true));
+        TS_ASSERT(g.ct.get<inventory>(id).has_value());
+        TS_ASSERT_EQUALS(g.ct.get<inventory>(id).value()->size(), 0U);
+        TS_ASSERT(vec3_equal(g.ct.get<location>(id).value_or(vec3{-1, -1, -1}), loc));
+
+        tile_t& tile = g.d.get_floor(0)->tile_at(loc);
+        TS_ASSERT_EQUALS(tile.get_cached_chest(), id);
+    }
+
     void testCreateOrcAtWithSetsExpectedNpcComponents() {
         gamestate g;
         const vec3 loc = add_initialized_floor(g);

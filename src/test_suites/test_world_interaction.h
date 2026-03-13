@@ -145,6 +145,27 @@ public:
         TS_ASSERT(g.ct.get<door_open>(door).value_or(false));
     }
 
+    void testTryEntityOpenChestUsesChestLocationFloorAndOpensMenu() {
+        gamestate g;
+        g.sfx.resize(71);
+        add_floor(g);
+        add_floor(g);
+        g.d.current_floor = 0;
+
+        const entityid hero = create_hero(g, vec3{1, 1, 0});
+        const entityid chest = g.create_chest_at_with(vec3{2, 1, 1}, [](CT&, const entityid) {});
+
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(chest, ENTITYID_INVALID);
+        TS_ASSERT(!g.ct.get<door_open>(chest).value_or(true));
+
+        TS_ASSERT(g.try_entity_open_chest(hero, vec3{2, 1, 1}));
+        TS_ASSERT(g.ct.get<door_open>(chest).value_or(false));
+        TS_ASSERT_EQUALS(g.active_chest_id, chest);
+        TS_ASSERT(g.display_chest_menu);
+        TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_CHEST);
+    }
+
     void testUpdatePlayerTilesExploredRevealsClosedDoorTileButNotBeyond() {
         gamestate g;
         add_floor(g);

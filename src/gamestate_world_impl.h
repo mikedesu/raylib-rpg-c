@@ -399,6 +399,79 @@ inline size_t gamestate::place_doors() {
     return placed_doors;
 }
 
+inline entityid gamestate::create_chest_with(with_fun chestInitFunction) {
+    entityid id = add_entity();
+    ct.set<entitytype>(id, ENTITY_CHEST);
+    ct.set<spritemove>(id, (Rectangle){0, 0, 0, 0});
+    ct.set<update>(id, true);
+    ct.set<pushable>(id, true);
+    ct.set<pullable>(id, true);
+    ct.set<solid>(id, true);
+    ct.set<door_open>(id, false);
+    ct.set<hp>(id, vec2{10, 10});
+    ct.set<inventory>(id, make_shared<vector<entityid>>());
+    chestInitFunction(ct, id);
+    if (!ct.get<name>(id).has_value()) {
+        ct.set<name>(id, "treasure chest");
+    }
+    if (!ct.get<description>(id).has_value()) {
+        ct.set<description>(id, "A sturdy wooden treasure chest.");
+    }
+    return id;
+}
+
+inline entityid gamestate::create_chest_at_with(vec3 loc, with_fun chestInitFunction) {
+    shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
+    tile_t& tile = df->tile_at(loc);
+    if (!tile_is_walkable(tile.get_type())) {
+        return ENTITYID_INVALID;
+    }
+    if (tile.get_type() == TILE_UPSTAIRS || tile.get_type() == TILE_DOWNSTAIRS) {
+        return ENTITYID_INVALID;
+    }
+    if (tile.entity_count() > 0) {
+        return ENTITYID_INVALID;
+    }
+    entityid id = create_chest_with(chestInitFunction);
+    if (id == ENTITYID_INVALID) {
+        return ENTITYID_INVALID;
+    }
+    if (df->df_add_at(id, ENTITY_CHEST, loc) == ENTITYID_INVALID) {
+        return ENTITYID_INVALID;
+    }
+    ct.set<location>(id, loc);
+    return id;
+}
+
+inline entityid gamestate::place_first_floor_chest() {
+    if (d.floors.empty()) {
+        return ENTITYID_INVALID;
+    }
+    shared_ptr<dungeon_floor> df = d.get_floor(0);
+    vector<vec3> candidates;
+    for (int x = 0; x < df->get_width(); x++) {
+        for (int y = 0; y < df->get_height(); y++) {
+            vec3 loc{x, y, 0};
+            tile_t& tile = df->tile_at(loc);
+            if (!tile_is_walkable(tile.get_type())) {
+                continue;
+            }
+            if (tile.get_type() == TILE_UPSTAIRS || tile.get_type() == TILE_DOWNSTAIRS) {
+                continue;
+            }
+            if (tile.entity_count() > 0) {
+                continue;
+            }
+            candidates.push_back(loc);
+        }
+    }
+    if (candidates.empty()) {
+        return ENTITYID_INVALID;
+    }
+    std::shuffle(candidates.begin(), candidates.end(), mt);
+    return create_chest_at_with(candidates.front(), [](CT&, const entityid) {});
+}
+
 inline entityid gamestate::create_prop_with(proptype_t type, with_fun initFun) {
     entityid id = add_entity();
     ct.set<entitytype>(id, ENTITY_PROP);

@@ -1,6 +1,7 @@
 #pragma once
 #include "libgame_defines.h"
 #include "tx_keys_boxes.h"
+#include "tx_keys_chests.h"
 #include "tx_keys_monsters.h"
 #include "tx_keys_npcs.h"
 #include "tx_keys_potions.h"

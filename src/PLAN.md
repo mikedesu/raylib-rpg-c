@@ -4,32 +4,6 @@ Compact handoff for active refactor and test work.
 
 ## Immediate New Feature Development
 
-- Treasure Chest entities
-  - [ ] Have texture keys 
-    - TX_CHEST_OPEN_00
-    - TX_CHEST_CLOSED_00
-  - [ ] Function like an inventory that doesn't belong to an NPC
-    - [ ] Is still a real physical entity
-      - ENTITY_CHEST or ENTITY_TREASURE_CHEST is fine
-      - [ ] Has a location
-      - [ ] Has HP/MaxHP
-      - [ ] Can be pushed
-      - [ ] Can be pulled
-      - [ ] Can be opened with KEY_O like a door
-        - [ ] Upon open, the sprite context should change from TX_CHEST_CLOSED_00 to TX_CHEST_OPEN_00, and a display similar to "display inventory" will appear.
-          - [ ] On the left hand side is a grid of items inside the chest, if any
-          - [ ] On the right hand side is an information panel containing details about the currently selected item in the chest
-          - [ ] Items cannot be dropped out of the chest
-          - [ ] Items can be taken from the chest by pressing KEY_ENTER when they are selected 
-            - [ ] Currently there is no bound on how many items a player or any entity can have in their inventory
-          - [ ] A key press (undecided) from this display can switch us to our own inventory so that we may deposit an item from our own inventory into the treasure chest
-      - [ ] there may be other as-yet undecided qualities to a chest but this is good for now
-- [ ] once Treasure Chest and its associated functions/methods are implemented, we want to create a new, empty treasure chest on the 1st floor.
-  - [ ] it should NOT occupy an upstairs or downstairs tile
-  - [ ] it should not overlap with any other entity
-  - [ ] if we need to, we need to update `dungeon_tile` to accomodate a treasure chest's entity id
-  - [ ] draw_dungeon_floor should accomodate the new entitytype
-
 
 - Interactions with non-aggressive entities
   - NPCs
@@ -61,11 +35,19 @@ Compact handoff for active refactor and test work.
   - rendering
   - `KEY_O` open/close interaction
   - closed-door tile discovery without revealing tiles beyond the door
+- Treasure chests are now in the active gameplay path:
+  - dedicated `ENTITY_CHEST` tile caching and rendering
+  - first-floor placement during gameplay bootstrap
+  - `KEY_O` open/close interaction when facing the chest
+  - open/closed sprite swapping
+  - chest inventory UI with `ENTER` take and `TAB` deposit-mode toggle
+  - inventory transfer between hero and chest
 - Doxygen is the active documentation standard; `make docs` works.
 - `hp` component is now a `vec2`.
 - Entities now have `alignment`
 - NPCs now have `aggression`
 - Restarting the game after being killed now no longer restarts raylib and closes the window -- instead, it keeps it open and simply returns to the TitleScreen
+- Treasure Chest entities now exist and are handled
 
 ## Recent Completed Work
 

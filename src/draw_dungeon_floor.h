@@ -107,6 +107,12 @@ draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type_0, int vision_dist
                     draw_sprite_and_shadow(g, box_id);
                 }
             }
+            else if (type_0 == ENTITY_CHEST) {
+                entityid chest_id = tile.get_cached_chest();
+                if (chest_id != INVALID && extra_check(g, chest_id)) {
+                    draw_sprite_and_shadow(g, chest_id);
+                }
+            }
             else if (type_0 == ENTITY_PROP) {
                 entityid prop_id = tile.get_cached_prop();
                 if (prop_id != INVALID && extra_check(g, prop_id)) {
@@ -166,6 +172,7 @@ static inline bool draw_dungeon_floor(gamestate& g, int vision_dist, int light_r
 
     draw_dungeon_floor_entitytype(g, ENTITY_DOOR, vision_dist, light_rad, mydefault);
     draw_dungeon_floor_entitytype(g, ENTITY_PROP, vision_dist, light_rad, mydefault);
+    draw_dungeon_floor_entitytype(g, ENTITY_CHEST, vision_dist, light_rad, mydefault);
     libdraw_draw_player_target_box(g);
     //draw_dungeon_floor_entitytype(g, ENTITY_SPELL, vision_dist, light_rad, mydefault);
     // Tiles can now cache multiple items, but the floor renderer still draws only the top item as

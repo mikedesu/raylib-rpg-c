@@ -235,3 +235,137 @@ inline void gamestate::handle_hero_item_use() {
         handle_hero_potion_use(item_id);
     }
 }
+
+inline bool gamestate::transfer_inventory_item(entityid from_id, entityid to_id, entityid item_id) {
+    if (from_id == ENTITYID_INVALID || to_id == ENTITYID_INVALID || item_id == ENTITYID_INVALID) {
+        return false;
+    }
+    if (!is_in_inventory(from_id, item_id)) {
+        return false;
+    }
+    if (!remove_from_inventory(from_id, item_id)) {
+        return false;
+    }
+    if (!add_to_inventory(to_id, item_id)) {
+        add_to_inventory(from_id, item_id);
+        return false;
+    }
+    if (from_id == hero_id) {
+        if (item_id == ct.get<equipped_weapon>(hero_id).value_or(ENTITYID_INVALID)) {
+            ct.set<equipped_weapon>(hero_id, ENTITYID_INVALID);
+        }
+        if (item_id == ct.get<equipped_shield>(hero_id).value_or(ENTITYID_INVALID)) {
+            ct.set<equipped_shield>(hero_id, ENTITYID_INVALID);
+        }
+    }
+    return true;
+}
+
+inline bool gamestate::open_chest_menu(entityid chest_id) {
+    if (chest_id == ENTITYID_INVALID || ct.get<entitytype>(chest_id).value_or(ENTITY_NONE) != ENTITY_CHEST) {
+        return false;
+    }
+    ct.set<door_open>(chest_id, true);
+    ct.set<update>(chest_id, true);
+    active_chest_id = chest_id;
+    display_chest_menu = true;
+    display_inventory_menu = false;
+    chest_deposit_mode = false;
+    inventory_cursor = Vector2{0, 0};
+    controlmode = CONTROLMODE_CHEST;
+    frame_dirty = true;
+    if (IsAudioDeviceReady() && sfx.size() > SFX_CHEST_OPEN) {
+        PlaySound(sfx.at(SFX_CHEST_OPEN));
+    }
+    return true;
+}
+
+inline void gamestate::close_chest_menu() {
+    if (active_chest_id != ENTITYID_INVALID) {
+        ct.set<door_open>(active_chest_id, false);
+        ct.set<update>(active_chest_id, true);
+    }
+    display_chest_menu = false;
+    chest_deposit_mode = false;
+    active_chest_id = ENTITYID_INVALID;
+    controlmode = CONTROLMODE_PLAYER;
+    frame_dirty = true;
+}
+
+inline void gamestate::toggle_chest_menu_mode() {
+    if (!display_chest_menu || active_chest_id == ENTITYID_INVALID) {
+        return;
+    }
+    chest_deposit_mode = !chest_deposit_mode;
+    inventory_cursor = Vector2{0, 0};
+    frame_dirty = true;
+}
+
+inline void gamestate::handle_chest_menu_confirm() {
+    if (!display_chest_menu || active_chest_id == ENTITYID_INVALID) {
+        return;
+    }
+    entityid source_id = chest_deposit_mode ? hero_id : active_chest_id;
+    entityid target_id = chest_deposit_mode ? active_chest_id : hero_id;
+    auto maybe_inventory = ct.get<inventory>(source_id);
+    if (!maybe_inventory.has_value()) {
+        return;
+    }
+    auto items = maybe_inventory.value();
+    size_t index = static_cast<size_t>(inventory_cursor.y) * 7 + static_cast<size_t>(inventory_cursor.x);
+    if (index >= items->size()) {
+        return;
+    }
+    entityid item_id = items->at(index);
+    if (transfer_inventory_item(source_id, target_id, item_id)) {
+        frame_dirty = true;
+        if (IsAudioDeviceReady() && sfx.size() > SFX_CONFIRM_01) {
+            PlaySound(sfx.at(SFX_CONFIRM_01));
+        }
+        auto updated_inventory = ct.get<inventory>(source_id).value_or(make_shared<vector<entityid>>());
+        if (updated_inventory->empty()) {
+            inventory_cursor = Vector2{0, 0};
+            return;
+        }
+        const size_t max_index = updated_inventory->size() - 1;
+        const size_t current_index = static_cast<size_t>(inventory_cursor.y) * 7 + static_cast<size_t>(inventory_cursor.x);
+        if (current_index > max_index) {
+            inventory_cursor.x = static_cast<float>(max_index % 7);
+            inventory_cursor.y = static_cast<float>(max_index / 7);
+        }
+    }
+}
+
+inline void gamestate::handle_input_chest(inputstate& is) {
+    if (controlmode != CONTROLMODE_CHEST || !display_chest_menu) {
+        return;
+    }
+    if (inputstate_is_pressed(is, KEY_O) || inputstate_is_pressed(is, KEY_ESCAPE)) {
+        close_chest_menu();
+        return;
+    }
+    if (inputstate_is_pressed(is, KEY_TAB)) {
+        toggle_chest_menu_mode();
+        return;
+    }
+    if (inputstate_is_pressed(is, KEY_LEFT)) {
+        if (inventory_cursor.x > 0) {
+            inventory_cursor.x--;
+        }
+    }
+    else if (inputstate_is_pressed(is, KEY_RIGHT)) {
+        inventory_cursor.x++;
+    }
+    else if (inputstate_is_pressed(is, KEY_UP)) {
+        if (inventory_cursor.y > 0) {
+            inventory_cursor.y--;
+        }
+    }
+    else if (inputstate_is_pressed(is, KEY_DOWN)) {
+        inventory_cursor.y++;
+    }
+    else if (inputstate_is_pressed(is, KEY_ENTER)) {
+        handle_chest_menu_confirm();
+    }
+    frame_dirty = true;
+}

@@ -123,7 +123,7 @@ static inline void libdraw_update_sprite_ptr(gamestate& g, entityid id, spritegr
         libdraw_set_sg_is_damaged(g, id, sg);
     }
 
-    if (type == ENTITY_DOOR) {
+    if (type == ENTITY_DOOR || type == ENTITY_CHEST) {
         auto maybe_door_open = g.ct.get<door_open>(id);
         if (maybe_door_open.has_value()) {
             sg->set_current(maybe_door_open.value() ? 1 : 0);

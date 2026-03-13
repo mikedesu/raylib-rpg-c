@@ -411,6 +411,9 @@ inline void gamestate::handle_input_gameplay_scene(inputstate& is) {
     else if (controlmode == CONTROLMODE_INVENTORY) {
         handle_input_inventory(is);
     }
+    else if (controlmode == CONTROLMODE_CHEST) {
+        handle_input_chest(is);
+    }
     else if (controlmode == CONTROLMODE_ACTION_MENU) {
         handle_input_action_menu(is);
     }
