@@ -219,7 +219,7 @@ inline bool gamestate::try_entity_move(entityid id, vec3 v) {
 }
 
 inline bool gamestate::handle_move_up(inputstate& is, bool is_dead) {
-    if (inputstate_is_pressed(is, KEY_UP) || inputstate_is_pressed(is, KEY_KP_8)) {
+    if (is_action_pressed(is, INPUT_ACTION_MOVE_UP)) {
         if (is_dead) {
             return add_message("You cannot move while dead");
         }
@@ -231,7 +231,7 @@ inline bool gamestate::handle_move_up(inputstate& is, bool is_dead) {
 }
 
 inline bool gamestate::handle_move_down(inputstate& is, bool is_dead) {
-    if (inputstate_is_pressed(is, KEY_DOWN) || inputstate_is_pressed(is, KEY_KP_2)) {
+    if (is_action_pressed(is, INPUT_ACTION_MOVE_DOWN)) {
         if (is_dead) {
             return add_message("You cannot move while dead");
         }
@@ -243,7 +243,7 @@ inline bool gamestate::handle_move_down(inputstate& is, bool is_dead) {
 }
 
 inline bool gamestate::handle_move_left(inputstate& is, bool is_dead) {
-    if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_KP_4)) {
+    if (is_action_pressed(is, INPUT_ACTION_MOVE_LEFT)) {
         if (is_dead) {
             return add_message("You cannot move while dead");
         }
@@ -255,7 +255,7 @@ inline bool gamestate::handle_move_left(inputstate& is, bool is_dead) {
 }
 
 inline bool gamestate::handle_move_right(inputstate& is, bool is_dead) {
-    if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_KP_6)) {
+    if (is_action_pressed(is, INPUT_ACTION_MOVE_RIGHT)) {
         if (is_dead) {
             return add_message("You cannot move while dead");
         }
@@ -267,7 +267,7 @@ inline bool gamestate::handle_move_right(inputstate& is, bool is_dead) {
 }
 
 inline bool gamestate::handle_move_up_left(inputstate& is, bool is_dead) {
-    if (inputstate_is_pressed(is, KEY_KP_7)) {
+    if (is_action_pressed(is, INPUT_ACTION_MOVE_UP_LEFT)) {
         if (is_dead) {
             return add_message("You cannot move while dead");
         }
@@ -279,7 +279,7 @@ inline bool gamestate::handle_move_up_left(inputstate& is, bool is_dead) {
 }
 
 inline bool gamestate::handle_move_up_right(inputstate& is, bool is_dead) {
-    if (inputstate_is_pressed(is, KEY_KP_9)) {
+    if (is_action_pressed(is, INPUT_ACTION_MOVE_UP_RIGHT)) {
         if (is_dead) {
             add_message("You cannot move while dead");
             return true;
@@ -292,7 +292,7 @@ inline bool gamestate::handle_move_up_right(inputstate& is, bool is_dead) {
 }
 
 inline bool gamestate::handle_move_down_left(inputstate& is, bool is_dead) {
-    if (inputstate_is_pressed(is, KEY_KP_1)) {
+    if (is_action_pressed(is, INPUT_ACTION_MOVE_DOWN_LEFT)) {
         if (is_dead) {
             return add_message("You cannot move while dead");
         }
@@ -304,7 +304,7 @@ inline bool gamestate::handle_move_down_left(inputstate& is, bool is_dead) {
 }
 
 inline bool gamestate::handle_move_down_right(inputstate& is, bool is_dead) {
-    if (inputstate_is_pressed(is, KEY_KP_3)) {
+    if (is_action_pressed(is, INPUT_ACTION_MOVE_DOWN_RIGHT)) {
         if (is_dead) {
             return add_message("You cannot move while dead");
         }
@@ -488,7 +488,7 @@ inline bool gamestate::try_entity_pickup(entityid id) {
 }
 
 inline bool gamestate::handle_pickup_item(inputstate& is, bool is_dead) {
-    if (!inputstate_is_pressed(is, KEY_S)) {
+    if (!is_action_pressed(is, INPUT_ACTION_PICKUP)) {
         return false;
     }
     if (is_dead) {
@@ -544,7 +544,7 @@ inline bool gamestate::try_entity_stairs(entityid id) {
 }
 
 inline bool gamestate::handle_traverse_stairs(inputstate& is, bool is_dead) {
-    if (inputstate_is_pressed(is, KEY_PERIOD)) {
+    if (is_action_pressed(is, INPUT_ACTION_STAIRS)) {
         if (is_dead) {
             return add_message("You cannot traverse stairs while dead");
         }
@@ -635,7 +635,7 @@ inline bool gamestate::try_entity_interact(entityid id, vec3 loc) {
 }
 
 inline bool gamestate::handle_interact(inputstate& is, bool is_dead) {
-    if (!inputstate_is_pressed(is, KEY_E)) {
+    if (!is_action_pressed(is, INPUT_ACTION_INTERACT)) {
         return false;
     }
     if (is_dead) {
@@ -650,7 +650,7 @@ inline bool gamestate::handle_interact(inputstate& is, bool is_dead) {
 }
 
 inline bool gamestate::handle_open_door(inputstate& is, bool is_dead) {
-    if (inputstate_is_pressed(is, KEY_D)) {
+    if (is_action_pressed(is, INPUT_ACTION_OPEN)) {
         if (is_dead) {
             return add_message("You cannot open doors while dead");
         }

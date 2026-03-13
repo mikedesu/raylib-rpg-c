@@ -4,33 +4,61 @@
 #include "libgame_defines.h"
 
 static inline void draw_help_menu(gamestate& g) {
-    const string text = "Help Menu\n"
-                        "\n"
-                        "Move: numpad 1-9, no 5\n"
-                        "Face / wait: numpad 5\n"
-                        "Camera mode: b\n"
-                        "Zoom: - and =\n"
-                        "\n"
-                        "Pick up item: s\n"
-                        "Attack: a\n"
-                        "Pull: space\n"
-                        "Open door / chest: d\n"
-                        "Interact / examine: e\n"
-                        "Use stairs: .\n"
-                        "Toggle full light: l\n"
-                        "Level-up select: arrows + enter\n"
-                        "\n"
-                        "Inventory: i\n"
-                        "Inventory equip/use: e or enter\n"
-                        "Inventory drop: q\n"
-                        "Inventory close: esc or i\n"
-                        "\n"
-                        "Options: `\n"
-                        "Open this help menu: ?\n"
-                        "Debug panel: p\n"
-                        "Quit prompt: esc\n"
-                        "\n"
-                        "@evildojo666";
+    const string text = TextFormat(
+        "Help Menu\n"
+        "\n"
+        "Profile: %s\n"
+        "Move Up: %s\n"
+        "Move Down: %s\n"
+        "Move Left / Right: %s / %s\n"
+        "Move Diagonals: %s %s %s %s\n"
+        "Face Mode: %s\n"
+        "Camera mode: %s\n"
+        "Zoom: %s and %s\n"
+        "\n"
+        "Pick up item: %s\n"
+        "Attack: %s\n"
+        "Pull: %s\n"
+        "Open door / chest: %s\n"
+        "Interact / examine: %s\n"
+        "Use stairs: %s\n"
+        "Toggle full light: %s\n"
+        "Level-up select: arrows + enter\n"
+        "\n"
+        "Inventory: %s\n"
+        "Inventory equip/use: e or enter\n"
+        "Inventory drop: q\n"
+        "Inventory close: esc or inventory key\n"
+        "\n"
+        "Options: %s\n"
+        "Open this help menu: %s\n"
+        "Debug panel: p\n"
+        "Quit prompt: esc\n"
+        "\n"
+        "@evildojo666",
+        keyboard_profile_label(g.keyboard_profile),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_MOVE_UP).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_MOVE_DOWN).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_MOVE_LEFT).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_MOVE_RIGHT).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_MOVE_UP_LEFT).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_MOVE_UP_RIGHT).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_MOVE_DOWN_LEFT).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_MOVE_DOWN_RIGHT).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_DIRECTION_MODE).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_CAMERA_TOGGLE).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_ZOOM_IN).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_ZOOM_OUT).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_PICKUP).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_ATTACK).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_PULL).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_OPEN).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_INTERACT).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_STAIRS).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_TOGGLE_FULL_LIGHT).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_INVENTORY).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_OPTIONS).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_HELP).c_str());
 
     constexpr int font_size = 20;
     constexpr int line_spacing = 4;

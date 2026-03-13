@@ -106,6 +106,7 @@ inline void gamestate::handle_input_character_creation_scene(inputstate& is) {
         massert(hero_id != ENTITYID_INVALID, "heroid is invalid");
         make_all_npcs_target_player();
         current_scene = SCENE_GAMEPLAY;
+        open_keyboard_profile_prompt();
         changed = true;
     }
     else if (inputstate_is_pressed(is, KEY_SPACE)) {

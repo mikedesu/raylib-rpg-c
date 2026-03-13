@@ -4,6 +4,7 @@
 #include "camera_lock_on.h"
 #include "draw_action_menu.h"
 #include "draw_chest_menu.h"
+#include "draw_controls_menu.h"
 #include "draw_dungeon_floor.h"
 #include "draw_handle_debug_panel.h"
 #include "draw_help_menu.h"
@@ -15,6 +16,7 @@
 #include "draw_message_box.h"
 #include "draw_message_history.h"
 #include "draw_option_menu.h"
+#include "draw_keyboard_profile_prompt.h"
 #include "gamestate.h"
 
 
@@ -58,9 +60,15 @@ static inline void libdraw_drawframe_2d(gamestate& g, int vision_dist, int light
         draw_option_menu(g);
     }
 
+    if (g.display_controls_menu) {
+        draw_controls_menu(g);
+    }
+
     if (g.display_help_menu) {
         draw_help_menu(g);
     }
+
+    draw_keyboard_profile_prompt(g);
     //else if (g.display_gameplay_settings_menu) {
     //    draw_gameplay_settings_menu(g);
     //}

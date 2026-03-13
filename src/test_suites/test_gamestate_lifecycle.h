@@ -11,6 +11,13 @@ public:
         is.pressed[idx] |= (1ULL << bit);
     }
 
+    void add_floor(gamestate& g, int width = 8, int height = 8) {
+        auto df = g.d.create_floor(BIOME_STONE, width, height);
+        df->df_set_all_tiles(TILE_FLOOR_STONE_00);
+        g.d.add_floor(df);
+        g.d.is_initialized = true;
+    }
+
     void testGamestateEmpty() {
     }
 
@@ -323,5 +330,86 @@ public:
         TS_ASSERT_EQUALS(g.chara_creation.name.size(), 16U);
         TS_ASSERT(!g.try_append_character_creation_char('b'));
         TS_ASSERT_EQUALS(g.chara_creation.name, "aaaaaaaaaaaaaaaa");
+    }
+
+    void testCharacterCreationTransitionsIntoKeyboardProfilePrompt() {
+        gamestate g;
+        g.test = true;
+        g.sfx.resize(71);
+        add_floor(g);
+        g.current_scene = SCENE_CHARACTER_CREATION;
+
+        inputstate is = {};
+        inputstate_reset(is);
+        press_key(is, KEY_ENTER);
+
+        g.handle_input_character_creation_scene(is);
+
+        TS_ASSERT_EQUALS(g.current_scene, SCENE_GAMEPLAY);
+        TS_ASSERT(g.display_keyboard_profile_prompt);
+        TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_KEYBOARD_PROFILE);
+        TS_ASSERT_DIFFERS(g.hero_id, ENTITYID_INVALID);
+    }
+
+    void testKeyboardProfilePromptCanSelectLaptopProfile() {
+        gamestate g;
+        g.test = true;
+        g.current_scene = SCENE_GAMEPLAY;
+        g.open_keyboard_profile_prompt();
+
+        inputstate is = {};
+        inputstate_reset(is);
+        press_key(is, KEY_RIGHT);
+        g.handle_input_keyboard_profile_prompt(is);
+        TS_ASSERT_EQUALS(g.keyboard_profile_selection, static_cast<unsigned int>(KEYBOARD_PROFILE_LAPTOP));
+
+        inputstate_reset(is);
+        press_key(is, KEY_ENTER);
+        g.handle_input_keyboard_profile_prompt(is);
+
+        TS_ASSERT_EQUALS(g.keyboard_profile, KEYBOARD_PROFILE_LAPTOP);
+        TS_ASSERT(!g.display_keyboard_profile_prompt);
+        TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_PLAYER);
+    }
+
+    void testLaptopProfileUsesHjklMovementKeys() {
+        gamestate g;
+        g.test = true;
+        add_floor(g);
+        const entityid hero = g.create_player_at_with(vec3{3, 3, 0}, "hero", g.player_init(10));
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+
+        g.current_scene = SCENE_GAMEPLAY;
+        g.hero_id = hero;
+        g.keyboard_profile = KEYBOARD_PROFILE_LAPTOP;
+
+        inputstate is = {};
+        inputstate_reset(is);
+        press_key(is, KEY_H);
+
+        TS_ASSERT(g.handle_move_left(is, false));
+        TS_ASSERT(vec3_equal(g.ct.get<location>(hero).value_or(vec3{-1, -1, -1}), vec3{2, 3, 0}));
+    }
+
+    void testControlsMenuCanRebindAttackKeyForCurrentProfile() {
+        gamestate g;
+        g.test = true;
+        g.current_scene = SCENE_GAMEPLAY;
+        g.keyboard_profile = KEYBOARD_PROFILE_LAPTOP;
+        g.open_controls_menu();
+        g.controls_menu_selection = INPUT_ACTION_ATTACK + 2;
+
+        inputstate is = {};
+        inputstate_reset(is);
+        press_key(is, KEY_ENTER);
+        g.handle_input_controls_menu(is);
+        TS_ASSERT(g.controls_menu_waiting_for_key);
+
+        inputstate_reset(is);
+        press_key(is, KEY_T);
+        g.handle_input_controls_menu(is);
+
+        TS_ASSERT(!g.controls_menu_waiting_for_key);
+        TS_ASSERT_EQUALS(g.get_keybinding_primary(KEYBOARD_PROFILE_LAPTOP, INPUT_ACTION_ATTACK), KEY_T);
     }
 };

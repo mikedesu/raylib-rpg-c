@@ -13,6 +13,7 @@
 #include "controlmode.h"
 #include "debugpanel.h"
 #include "dungeon.h"
+#include "gameplay_keybindings.h"
 #include "gamestate_flag.h"
 #include "get_racial_hd.h"
 #include "get_racial_modifiers.h"
@@ -25,6 +26,7 @@
 #include "scene.h"
 #include "sfx.h"
 #include "stat_bonus.h"
+#include <array>
 #include <chrono>
 #include <map>
 #include <queue>
@@ -116,6 +118,8 @@ public:
     bool display_chest_menu;
     bool display_action_menu;
     bool display_option_menu;
+    bool display_controls_menu;
+    bool display_keyboard_profile_prompt;
     bool display_confirm_prompt;
     bool display_interaction_modal;
     bool display_level_up_modal;
@@ -140,6 +144,7 @@ public:
     unsigned int inventory_menu_selection;
     unsigned int level_up_selection;
     unsigned int gameplay_settings_menu_selection;
+    unsigned int keyboard_profile_selection;
     unsigned int title_screen_selection;
     unsigned int max_title_screen_selections;
     unsigned int msg_history_max_len_msg;
@@ -173,6 +178,11 @@ public:
     Font font;
     ComponentTable ct;
     option_menu options_menu;
+    keyboard_profile_t keyboard_profile;
+    bool controls_menu_waiting_for_key;
+    size_t controls_menu_selection;
+    gameplay_input_action_t controls_menu_pending_action;
+    std::array<std::array<gameplay_keybinding_t, INPUT_ACTION_COUNT>, KEYBOARD_PROFILE_COUNT> keybindings;
     confirm_action_t confirm_action;
     string confirm_prompt_message;
     entityid active_interaction_entity_id;
@@ -269,6 +279,8 @@ public:
         display_inventory_menu = false;
         display_chest_menu = false;
         display_help_menu = false;
+        display_controls_menu = false;
+        display_keyboard_profile_prompt = false;
         display_confirm_prompt = false;
         display_interaction_modal = false;
         display_level_up_modal = false;
@@ -297,6 +309,7 @@ public:
         god_mode = true;
 #endif
         gameplay_settings_menu_selection = 0;
+        keyboard_profile_selection = 0;
         cam2d.target = cam2d.offset = Vector2{0, 0};
         cam2d.zoom = DEFAULT_ZOOM_LEVEL;
         cam2d.rotation = 0.0;
@@ -355,6 +368,11 @@ public:
         interaction_title.clear();
         interaction_body.clear();
         pending_level_ups = 0;
+        keyboard_profile = KEYBOARD_PROFILE_FULL;
+        controls_menu_waiting_for_key = false;
+        controls_menu_selection = 0;
+        controls_menu_pending_action = INPUT_ACTION_MOVE_UP;
+        reset_default_keybindings();
         msg_system.clear();
         msg_history.clear();
         ct.clear();
@@ -729,6 +747,48 @@ public:
     /** @brief Handle free-camera movement input. */
     void handle_camera_move(inputstate& is);
 
+    /** @brief Return whether the active profile maps the requested gameplay action to a pressed key. */
+    bool is_action_pressed(const inputstate& is, gameplay_input_action_t action) const;
+
+    /** @brief Return whether the active profile maps the requested gameplay action to a held key. */
+    bool is_action_held(const inputstate& is, gameplay_input_action_t action) const;
+
+    /** @brief Restore one profile/action pair to its built-in defaults. */
+    void set_default_keybinding(keyboard_profile_t profile, gameplay_input_action_t action);
+
+    /** @brief Restore all gameplay profiles to their built-in defaults. */
+    void reset_default_keybindings();
+
+    /** @brief Restore one keyboard profile to its built-in defaults. */
+    void reset_profile_keybindings(keyboard_profile_t profile);
+
+    /** @brief Replace the primary key for one action within one profile. */
+    void set_keybinding_primary(keyboard_profile_t profile, gameplay_input_action_t action, int key);
+
+    /** @brief Read the primary key assigned to one action in one profile. */
+    int get_keybinding_primary(keyboard_profile_t profile, gameplay_input_action_t action) const;
+
+    /** @brief Build a display string for one action's active keybinding. */
+    string get_keybinding_label(keyboard_profile_t profile, gameplay_input_action_t action) const;
+
+    /** @brief Open the mandatory profile-selection prompt shown after character creation. */
+    void open_keyboard_profile_prompt();
+
+    /** @brief Apply the currently highlighted profile prompt selection. */
+    void apply_keyboard_profile_selection();
+
+    /** @brief Handle input while the keyboard-profile prompt is active. */
+    void handle_input_keyboard_profile_prompt(inputstate& is);
+
+    /** @brief Open the controls menu for rebinding gameplay actions. */
+    void open_controls_menu();
+
+    /** @brief Close the controls menu and restore direct player control. */
+    void close_controls_menu();
+
+    /** @brief Handle input while the controls menu is active. */
+    void handle_input_controls_menu(inputstate& is);
+
     /** @brief Apply hero-facing potion usage behavior for the selected item. */
     void handle_hero_potion_use(entityid id);
 
@@ -944,8 +1004,7 @@ public:
     attack_result_t try_entity_attack(entityid id, int x, int y);
 
     bool handle_attack(inputstate& is, bool is_dead) {
-        //if (inputstate_is_pressed(is, KEY_APOSTROPHE)) {
-        if (inputstate_is_pressed(is, KEY_A)) {
+        if (is_action_pressed(is, INPUT_ACTION_ATTACK)) {
             if (is_dead) {
                 return add_message("You cannot attack while dead");
             }
@@ -1140,6 +1199,7 @@ public:
 #include "gamestate_lifecycle_impl.h"
 #include "gamestate_scene_impl.h"
 #include "gamestate_inventory_impl.h"
+#include "gamestate_keybinding_impl.h"
 #include "gamestate_input_impl.h"
 #include "gamestate_npc_combat_impl.h"
 #include "gamestate_world_impl.h"
