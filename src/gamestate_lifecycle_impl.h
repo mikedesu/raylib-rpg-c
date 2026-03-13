@@ -64,6 +64,11 @@ inline bool gamestate::update_player_tiles_explored() {
         return false;
     }
     vec3 hero_loc = maybe_loc.value();
+    for (int y = 0; y < df->get_height(); y++) {
+        for (int x = 0; x < df->get_width(); x++) {
+            df->tile_at(vec3{x, y, hero_loc.z}).set_visible(false);
+        }
+    }
     int light_radius0 = ct.get<light_radius>(hero_id).value_or(1);
     int min_x = std::max(0, hero_loc.x - light_radius0);
     int max_x = std::min(df->get_width() - 1, hero_loc.x + light_radius0);

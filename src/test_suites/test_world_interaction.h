@@ -395,6 +395,33 @@ public:
         TS_ASSERT(!beyond_tile.get_explored());
     }
 
+    void testUpdatePlayerTilesExploredClearsVisibilityBeyondClosedDoorAfterClosing() {
+        gamestate g;
+        add_floor(g);
+        g.current_scene = SCENE_GAMEPLAY;
+
+        const entityid hero = create_hero(g, vec3{1, 1, 0});
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+        g.hero_id = hero;
+        g.ct.set<light_radius>(hero, 4);
+
+        const entityid door = g.create_door_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
+        TS_ASSERT_DIFFERS(door, ENTITYID_INVALID);
+
+        g.ct.set<door_open>(door, true);
+        TS_ASSERT(g.update_player_tiles_explored());
+
+        tile_t& beyond_tile = g.d.get_floor(0)->tile_at(vec3{3, 1, 0});
+        TS_ASSERT(beyond_tile.get_visible());
+        TS_ASSERT(beyond_tile.get_explored());
+
+        g.ct.set<door_open>(door, false);
+        TS_ASSERT(g.update_player_tiles_explored());
+
+        TS_ASSERT(!beyond_tile.get_visible());
+        TS_ASSERT(beyond_tile.get_explored());
+    }
+
     void testCanMoveOntoTileContainingFreshlyKilledDeadNpc() {
         gamestate g;
         g.test = true;

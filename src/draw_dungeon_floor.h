@@ -29,7 +29,7 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, int x, int y, int z, in
     if (tile.get_type() == TILE_NONE) {
         return true;
     }
-    if (!full_light && (!tile.get_visible() || !tile.get_explored())) {
+    if (!full_light && !tile.get_explored()) {
         return true;
     }
     // Get tile texture
@@ -37,7 +37,8 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, int x, int y, int z, in
     massert(txkey >= 0, "txkey is invalid");
     Texture2D* texture = &txinfo[txkey].texture;
     massert(texture->id > 0, "texture->id is <= 0");
-    const unsigned char a = full_light ? 255 : distance > light_dist ? 102 : 255;
+    const bool tile_visible = full_light || tile.get_visible();
+    const unsigned char a = tile_visible ? 255 : 102;
     const Color draw_color = Color{255, 255, 255, a};
     DrawTexturePro(*texture, src, dest, Vector2{0, 0}, 0, draw_color);
     return true;
