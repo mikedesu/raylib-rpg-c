@@ -1,5 +1,15 @@
 # Project Plan
 
+## Critical Note
+
+- Do not ever tamper with `texture_ids.h` or `textures.txt`.
+- `generate_texture_files.py` regenerates both files and they are used at game load to map each spritesheet/filepath to:
+  - generated texture id
+  - number of rows / contexts
+  - number of columns / frames per context
+- Spell texture entries may appear again in those generated files in the future when the script is rerun.
+- Do not remove spell entries from those generated files in the future, even if active spell gameplay is currently absent.
+
 Compact status handoff for the current C++ / raylib dungeon project.
 
 ## Done So Far
