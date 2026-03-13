@@ -46,9 +46,14 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
   - [ ] white font color
 
 - [ ] a "mini" inventory menu
+- [ ] a toggle for your preference between a full inventory/chest menu or a mini menu in the options menu, beneath sound, window boxes, and controls
   - [ ] allows you to pull up an inventory without it blocking the whole screen
   - [ ] list-based instead of grid-based
   - [ ] allows you to select and use, or equip, inventory items.
+  - [ ] displays next to the player when activated
+  - [ ] displays a finite number of items in a "scroll wheel"
+    - [ ] if the number of items exceeds a certain amount to begin with but is configurable, say, 10 items, then those items would have to be navigated to thru the scrolling mechanism
+    - [ ] if the number of items does not exceed this certain amount, say, 10 items, then all items can safely display and be navigated to for acquisition or otherwise in the same way as you would interact with them thru the chest menu or full inventory menu
 
 - [ ] save game
   - [ ] a lot of stuff goes here
