@@ -52,20 +52,40 @@ rg -n "spell|magic|cast" .
 ```
 
   - [ ] Known current touchpoints to retire
-    - [ ] `spell.h`
-    - [ ] `tx_keys_spells.h`
-    - [ ] `create_sg_byid.h`
-    - [ ] `libdraw_update_sprites.h`
-    - [ ] `gamestate_world_interaction_impl.h`
-    - [ ] `gamestate_entity_factory_impl.h`
-    - [ ] `gamestate_lifecycle_impl.h`
-    - [ ] `gamestate.h`
-    - [ ] `entitytype.h`
-    - [ ] `event_type.h`
-    - [ ] `ComponentTraits.h`
-    - [ ] `test_suites/test_utility_helpers.h`
+    - [x] `spell.h`
+    - [x] `tx_keys_spells.h`
+    - [x] `create_sg_byid.h`
+    - [x] `libdraw_update_sprites.h`
+    - [x] `gamestate_world_interaction_impl.h`
+    - [x] `gamestate_entity_factory_impl.h`
+    - [x] `gamestate_lifecycle_impl.h`
+    - [x] `gamestate.h`
+    - [x] `entitytype.h`
+    - [x] `event_type.h`
+    - [x] `ComponentTraits.h`
+    - [x] `test_suites/test_utility_helpers.h`
 
 ## Immediate New Feature Development
+
+- [ ] Leveling up
+  - [ ] instead of an orc spawning on floor 2, lets make it spawn a `green_slime`.
+    - [ ] green slimes are not-aggressive and will not attack the player until they are attacked
+  - [ ] create a floor 3
+  - [ ] floor 3 should be larger than floor 2
+  - [ ] floor 3 should have 9 green slimes on it
+  - [ ] each green slime spawned is level 1
+  - [ ] green slimes have racial attribute modifiers like ELF, DWARF, etc.
+  - [ ] killing each slime should reward 1 xp
+    - [ ] green slimes have -2 to strength
+    - [ ] green slimes have -2 to constitution
+    - [ ] green slimes have -2 to dexterity
+    - [ ] green slimes have -2 to charisma
+    - [ ] green slimes have -2 to wisdom
+    - [ ] green slimes have -2 to intelligence
+  - [ ] create a floor 4
+  - [ ] floor 4 should be approximately the same size as floor 2
+  - [ ] floor 4 should have 1 orc spawn on it
+  - [ ] the default orc spawns in with a randomly-selected weapon out of the existing weapon types (for now), and a small healing potion
 
 - Interactions with non-aggressive entities
   - [x] Talk to NPCs
@@ -129,6 +149,8 @@ rg -n "spell|magic|cast" .
 - NPCs now have `aggression`
 - Restarting the game after being killed now no longer restarts raylib and closes the window -- instead, it keeps it open and simply returns to the TitleScreen
 - Treasure Chest entities now exist and are handled
+- `dungeon_floor::get_random_loc()` now excludes occupied chest/player tiles so gameplay spawn selection matches its "empty placement tile" contract
+- Player creation now retries on a fresh valid tile if the initially requested spawn location has become invalid
 
 ## Recent Completed Work
 
@@ -139,6 +161,8 @@ rg -n "spell|magic|cast" .
 - Re-enabled first-pass door generation/rendering/interaction and tightened tile-level single-door caching.
 - Tightened prop placement so generated props avoid chokepoints and doorway approaches that can soft-block room ingress.
 - Added first-pass non-aggressive interaction support for NPCs, props, boxes, chests, and doors via a dedicated modal on `KEY_E`.
+- Removed active spellcasting runtime code, spell entities, spell ECS state, spell rendering hooks, and spell-specific utility/test coverage.
+- Fixed gameplay-start player spawn selection so occupied chest tiles are no longer considered valid random spawn locations.
 - Expanded unit coverage to 84 passing tests across:
   - gamestate lifecycle
   - dungeon/bootstrap
@@ -158,6 +182,7 @@ rg -n "spell|magic|cast" .
   - prop placement could soft-block room ingress by placing solid props on chokepoints or immediate doorway approaches
   - `tile_t` could accept a second `ENTITY_DOOR` cache entry on the same tile
   - lethal combat left the killed NPC in the tile's live-NPC cache while also adding it to the dead-body cache, which blocked movement onto corpse tiles until the live cache entry was cleared
+  - `dungeon_floor::get_random_loc()` could return an occupied chest tile, which made gameplay player creation assert in `create_player_at_with()`
 
 ## Verification
 
@@ -248,6 +273,7 @@ make clean && make tests && ./tests
   - [x] deterministic positive door placement
   - [x] `place_props()` zero-on-empty
   - [x] deterministic positive prop placement
+  - [x] `get_random_loc()` skips chest-occupied spawn tiles
   - [x] closed door tile is discoverable while sight beyond the door stays blocked
   - [x] tile cache rejects a second door on the same tile
   - [x] richer mixed occupancy behavior: boxes/props/doors/items/live NPCs/dead NPCs/player
