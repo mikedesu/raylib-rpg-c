@@ -4,6 +4,8 @@
 
 As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSERT=1 -DNPCS_ALL_AT_ONCE -DDEBUG=1 -DMASTER_VOLUME=1.0f " make game` for now...
 
+**Do not ever tamper with `texture_ids.h` or `textures.txt`!**
+
 - Keyboard customization is now live in the gameplay scene.
 - Current shipped state:
   - full-keyboard and laptop profiles exist
@@ -15,6 +17,32 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
   - window box colors are now configurable in the options menu
   - default window/menu background color is now `Color(0, 0, 255, 128)`
   - Debug Panel background color now correctly uses `Color(0, 0, 255, 255)`
+
+## Active Backlog
+
+- [ ] Interaction polish
+  - [ ] tighten interaction/dialog box layout so it is intentionally centered and positioned
+  - [ ] improve description/dialog content beyond first-pass placeholder text
+
+- [ ] Dungeon / world quality
+  - [ ] improve door placement quality beyond the first-pass implementation
+  - [ ] keep tightening prop placement so it cannot create broader layout soft-locks
+  - [ ] consider smarter spawn-selection rules and better dungeon interconnection / loops
+
+- [ ] Renderer / architecture
+  - [ ] continue top-down `libdraw` cleanup
+  - [ ] reduce remaining global-state coupling in rendering
+  - [ ] eventually move away from implementation headers toward real `.cpp` files
+
+- [ ] Documentation
+  - [ ] continue Doxygen coverage on remaining core headers
+
+- [ ] Leveling / progression
+  - [ ] choose a proper level-up sound or music cue
+  - [ ] decide what future non-player (or player) level-up rules should be beyond HP gain
+  - [ ] add future progression systems such as skills / feats when ready
+
+
 
 ## Immediate New Changes To Make
 
@@ -34,7 +62,6 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
   - [ ] a lot of stuff goes here
 - [ ] load game
   - [ ] a lot of stuff goes here
-
 
 
 ## Critical Note
@@ -123,29 +150,6 @@ Compact status handoff for the current C++ / raylib dungeon project.
   - `make clean && make tests_heavy && ./tests_heavy`
   - `make clean && make game`
 
-## Active Backlog
-
-- Leveling / progression
-  - choose a proper level-up sound or music cue
-  - decide what future non-player (or player) level-up rules should be beyond HP gain
-  - add future progression systems such as skills / feats when ready
-
-- Interaction polish
-  - tighten interaction/dialog box layout so it is intentionally centered and positioned
-  - improve description/dialog content beyond first-pass placeholder text
-
-- Dungeon / world quality
-  - improve door placement quality beyond the first-pass implementation
-  - keep tightening prop placement so it cannot create broader layout soft-locks
-  - consider smarter spawn-selection rules and better dungeon interconnection / loops
-
-- Renderer / architecture
-  - continue top-down `libdraw` cleanup
-  - reduce remaining global-state coupling in rendering
-  - eventually move away from implementation headers toward real `.cpp` files
-
-- Documentation
-  - continue Doxygen coverage on remaining core headers
 
 ## Remaining Cleanup
 
