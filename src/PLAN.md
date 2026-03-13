@@ -1,5 +1,17 @@
 # Project Plan
 
+## START HERE
+
+- Keyboard customization is now live in the gameplay scene.
+- Current shipped state:
+  - full-keyboard and laptop profiles exist
+  - post-character-creation keyboard profile prompt exists
+  - controls menu supports profile switching and per-action rebinding
+  - face-direction attack is bindable
+  - stairs default is now `KEY_F`
+- Next follow-up:
+  - begin the deferred options work for sound controls and message box colors
+
 ## Immediate New Changes To Make
 
 - [x] We need a more flexible keyboard input mapping when playing the main game in `GAMEPLAY SCENE`.
