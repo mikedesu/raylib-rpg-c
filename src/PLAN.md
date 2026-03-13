@@ -15,8 +15,8 @@ Compact handoff for active refactor and test work.
       - [ ] Has HP/MaxHP
       - [ ] Can be pushed
       - [ ] Can be pulled
-      - [ ] Can be opened
-        - [ ] Upon open, a display similar to "display inventory" will appear.
+      - [ ] Can be opened with KEY_O like a door
+        - [ ] Upon open, the sprite context should change from TX_CHEST_CLOSED_00 to TX_CHEST_OPEN_00, and a display similar to "display inventory" will appear.
           - [ ] On the left hand side is a grid of items inside the chest, if any
           - [ ] On the right hand side is an information panel containing details about the currently selected item in the chest
           - [ ] Items cannot be dropped out of the chest
@@ -24,6 +24,12 @@ Compact handoff for active refactor and test work.
             - [ ] Currently there is no bound on how many items a player or any entity can have in their inventory
           - [ ] A key press (undecided) from this display can switch us to our own inventory so that we may deposit an item from our own inventory into the treasure chest
       - [ ] there may be other as-yet undecided qualities to a chest but this is good for now
+- [ ] once Treasure Chest and its associated functions/methods are implemented, we want to create a new, empty treasure chest on the 1st floor.
+  - [ ] it should NOT occupy an upstairs or downstairs tile
+  - [ ] it should not overlap with any other entity
+  - [ ] if we need to, we need to update `dungeon_tile` to accomodate a treasure chest's entity id
+  - [ ] draw_dungeon_floor should accomodate the new entitytype
+
 
 - Interactions with non-aggressive entities
   - NPCs
