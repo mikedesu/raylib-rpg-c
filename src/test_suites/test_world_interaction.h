@@ -41,7 +41,7 @@ public:
         const vec3 hero_loc{1, 1, 0};
         const entityid hero = create_hero(g, hero_loc);
 
-        const entityid prop_id = g.create_prop_at_with(PROP_DUNGEON_STATUE_00, vec3{2, 1, 0}, dungeon_prop_init(PROP_DUNGEON_STATUE_00));
+        const entityid prop_id = g.create_prop_at_with(PROP_DUNGEON_WOODEN_BARREL_OPEN_TOP_EMPTY, vec3{2, 1, 0}, dungeon_prop_init(PROP_DUNGEON_WOODEN_BARREL_OPEN_TOP_EMPTY));
         TS_ASSERT_DIFFERS(prop_id, ENTITYID_INVALID);
         TS_ASSERT(!g.try_entity_move(hero, vec3{1, 0, 0}));
         TS_ASSERT(vec3_equal(g.ct.get<location>(hero).value_or(vec3{-1, -1, -1}), hero_loc));
@@ -308,7 +308,7 @@ public:
         TS_ASSERT(g.display_interaction_modal);
         TS_ASSERT_EQUALS(g.active_interaction_entity_id, box);
         TS_ASSERT_EQUALS(g.interaction_title, "box");
-        TS_ASSERT_EQUALS(g.interaction_body, "A plain wooden box.");
+        TS_ASSERT_EQUALS(g.interaction_body, "A plain wooden box with rough handles cut into the sides for hauling.");
     }
 
     void testTryEntityInteractOpensChestDescriptionModal() {
@@ -324,7 +324,12 @@ public:
         TS_ASSERT(g.display_interaction_modal);
         TS_ASSERT_EQUALS(g.active_interaction_entity_id, chest);
         TS_ASSERT_EQUALS(g.interaction_title, "treasure chest");
-        TS_ASSERT_EQUALS(g.interaction_body, "A sturdy wooden treasure chest.");
+        TS_ASSERT_EQUALS(g.interaction_body, "A stout treasure chest reinforced with iron bands and built to survive rough handling. The lid stands closed.");
+
+        g.close_interaction_modal();
+        g.ct.set<door_open>(chest, true);
+        TS_ASSERT(g.try_entity_interact(hero, vec3{2, 1, 0}));
+        TS_ASSERT_EQUALS(g.interaction_body, "A stout treasure chest reinforced with iron bands and built to survive rough handling. The lid stands open.");
     }
 
     void testTryEntityInteractOpensDoorDescriptionModal() {
@@ -340,12 +345,12 @@ public:
         TS_ASSERT(g.display_interaction_modal);
         TS_ASSERT_EQUALS(g.active_interaction_entity_id, door);
         TS_ASSERT_EQUALS(g.interaction_title, "door");
-        TS_ASSERT_EQUALS(g.interaction_body, "A heavy wooden door bound with iron. It is closed.");
+        TS_ASSERT_EQUALS(g.interaction_body, "A heavy wooden door bound with iron straps and swollen from the dungeon damp. The door stands closed.");
 
         g.close_interaction_modal();
         g.ct.set<door_open>(door, true);
         TS_ASSERT(g.try_entity_interact(hero, vec3{2, 1, 0}));
-        TS_ASSERT_EQUALS(g.interaction_body, "A heavy wooden door bound with iron. It is open.");
+        TS_ASSERT_EQUALS(g.interaction_body, "A heavy wooden door bound with iron straps and swollen from the dungeon damp. The door stands open.");
     }
 
     void testHandleInputInteractionClosesModalAndRestoresPlayerControl() {

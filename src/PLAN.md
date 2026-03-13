@@ -20,9 +20,9 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
 
 ## Active Backlog
 
-- [ ] Interaction polish
-  - [ ] tighten interaction/dialog box layout so it is intentionally centered and positioned
-  - [ ] improve description/dialog content beyond first-pass placeholder text
+- [x] Interaction polish
+  - [x] tighten interaction/dialog box layout so it is intentionally centered and positioned
+  - [x] improve description/dialog content beyond first-pass placeholder text
 
 - [ ] Dungeon / world quality
   - [ ] improve door placement quality beyond the first-pass implementation

@@ -111,19 +111,19 @@ inline const char* dungeon_prop_name(proptype_t type) {
 
 inline const char* dungeon_prop_description(proptype_t type) {
     switch (type) {
-    case PROP_DUNGEON_STATUE_00: return "A heavy carved statue.";
-    case PROP_DUNGEON_TORCH_00: return "A wall torch repurposed as floor clutter.";
-    case PROP_DUNGEON_CANDLE_00: return "A small candle.";
-    case PROP_DUNGEON_JAR_00: return "A ceramic jar.";
-    case PROP_DUNGEON_PLATE_00: return "A dusty plate.";
-    case PROP_DUNGEON_WOODEN_BARREL_OPEN_TOP_EMPTY: return "An empty wooden barrel.";
-    case PROP_DUNGEON_WOODEN_BARREL_OPEN_TOP_WATER: return "A wooden barrel filled with water.";
-    case PROP_DUNGEON_WOODEN_CHAIR_00: return "A wooden chair.";
+    case PROP_DUNGEON_STATUE_00: return "A heavy carved statue worn smooth by years of damp air and passing hands.";
+    case PROP_DUNGEON_TORCH_00: return "A soot-blackened torch stand dragged from the wall and left among the rubble.";
+    case PROP_DUNGEON_CANDLE_00: return "A stubby candle with wax pooled around its base.";
+    case PROP_DUNGEON_JAR_00: return "A ceramic jar with a chipped lip and a dusting of old clay inside.";
+    case PROP_DUNGEON_PLATE_00: return "A dusty plate left behind by some long-finished meal.";
+    case PROP_DUNGEON_WOODEN_BARREL_OPEN_TOP_EMPTY: return "An open-topped barrel that smells faintly of stale ale.";
+    case PROP_DUNGEON_WOODEN_BARREL_OPEN_TOP_WATER: return "An open-topped barrel filled with still water dark enough to hide the bottom.";
+    case PROP_DUNGEON_WOODEN_CHAIR_00: return "A wooden chair with scraped legs and a backrest polished by use.";
     case PROP_DUNGEON_WOODEN_TABLE_00:
     case PROP_DUNGEON_WOODEN_TABLE_01:
-        return "A sturdy wooden table.";
+        return "A sturdy wooden table scarred by cuts, heat marks, and years of hard use.";
     default:
-        return "A dungeon prop.";
+        return "A bit of dungeon clutter left to rot in the dark.";
     }
 }
 
@@ -365,7 +365,7 @@ inline entityid gamestate::create_door_with(with_fun doorInitFunction) {
         ct.set<name>(id, "door");
     }
     if (!ct.get<description>(id).has_value()) {
-        ct.set<description>(id, "A heavy wooden door bound with iron.");
+        ct.set<description>(id, "A heavy wooden door bound with iron straps and swollen from the dungeon damp.");
     }
     return id;
 }
@@ -435,7 +435,7 @@ inline entityid gamestate::create_chest_with(with_fun chestInitFunction) {
         ct.set<name>(id, "treasure chest");
     }
     if (!ct.get<description>(id).has_value()) {
-        ct.set<description>(id, "A sturdy wooden treasure chest.");
+        ct.set<description>(id, "A stout treasure chest reinforced with iron bands and built to survive rough handling.");
     }
     return id;
 }
@@ -500,7 +500,7 @@ inline entityid gamestate::create_prop_with(proptype_t type, with_fun initFun) {
     ct.set<proptype>(id, type);
     initFun(ct, id);
     if (!ct.get<description>(id).has_value()) {
-        ct.set<description>(id, "There is nothing notable about it.");
+        ct.set<description>(id, "A neglected dungeon furnishing that has outlasted whoever left it here.");
     }
     return id;
 }

@@ -308,7 +308,7 @@ inline entityid gamestate::create_npc_with(race_t rt, with_fun npcInitFunction) 
         ct.set<name>(id, race2str(rt));
     }
     if (!ct.get<dialogue_text>(id).has_value()) {
-        ct.set<dialogue_text>(id, "They have nothing to say.");
+        ct.set<dialogue_text>(id, "They give you a guarded look but say nothing.");
     }
     return id;
 }
@@ -437,7 +437,7 @@ inline entityid gamestate::create_box_with() {
     ct.set<pushable>(id, true);
     ct.set<pullable>(id, true);
     ct.set<name>(id, "box");
-    ct.set<description>(id, "A plain wooden box.");
+    ct.set<description>(id, "A plain wooden box with rough handles cut into the sides for hauling.");
     return id;
 }
 

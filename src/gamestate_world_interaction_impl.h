@@ -1,5 +1,17 @@
 #pragma once
 
+static inline string interaction_state_sentence(const char* noun, bool is_open) {
+    return TextFormat("The %s stands %s.", noun, is_open ? "open" : "closed");
+}
+
+static inline string interaction_chest_text(const string& base_text, bool is_open) {
+    return TextFormat("%s %s", base_text.c_str(), interaction_state_sentence("lid", is_open).c_str());
+}
+
+static inline string interaction_door_text(const string& base_text, bool is_open) {
+    return TextFormat("%s %s", base_text.c_str(), interaction_state_sentence("door", is_open).c_str());
+}
+
 inline entityid gamestate::tile_has_pullable(int x, int y, int z) {
     minfo("tile_has_pullable(%d, %d, %d)", x, y, z);
     massert(z >= 0, "floor is out of bounds");
@@ -630,7 +642,9 @@ inline bool gamestate::try_entity_interact(entityid id, vec3 loc) {
     const entityid chest_id = tile.get_cached_chest();
     if (chest_id != ENTITYID_INVALID) {
         const string chest_name = ct.get<name>(chest_id).value_or("Treasure chest");
-        const string text = ct.get<description>(chest_id).value_or("A sturdy wooden treasure chest.");
+        const bool is_open = ct.get<door_open>(chest_id).value_or(false);
+        const string base_text = ct.get<description>(chest_id).value_or("A stout treasure chest reinforced with iron bands and built to survive rough handling.");
+        const string text = interaction_chest_text(base_text, is_open);
         open_interaction_modal(chest_id, chest_name, text);
         return true;
     }
@@ -639,8 +653,8 @@ inline bool gamestate::try_entity_interact(entityid id, vec3 loc) {
     if (door_id != ENTITYID_INVALID) {
         const string door_name = ct.get<name>(door_id).value_or("Door");
         const bool is_open = ct.get<door_open>(door_id).value_or(false);
-        const string base_text = ct.get<description>(door_id).value_or("A heavy wooden door bound with iron.");
-        open_interaction_modal(door_id, door_name, TextFormat("%s It is %s.", base_text.c_str(), is_open ? "open" : "closed"));
+        const string base_text = ct.get<description>(door_id).value_or("A heavy wooden door bound with iron straps and swollen from the dungeon damp.");
+        open_interaction_modal(door_id, door_name, interaction_door_text(base_text, is_open));
         return true;
     }
 

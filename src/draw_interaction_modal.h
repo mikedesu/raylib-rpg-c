@@ -13,7 +13,7 @@ static inline void draw_interaction_modal(gamestate& g) {
     constexpr int body_font_size = DEFAULT_MSG_WINDOW_FONT_SIZE;
     constexpr int line_spacing = 6;
     constexpr int padding = DEFAULT_PAD;
-    constexpr int min_width = 320;
+    constexpr int min_width = 360;
     vector<string> lines;
     if (!g.interaction_title.empty()) {
         lines.push_back(g.interaction_title);
@@ -43,7 +43,7 @@ static inline void draw_interaction_modal(gamestate& g) {
     const int section_gap = (!g.interaction_title.empty() && body_lines > 0) ? line_spacing + 4 : 0;
     const int box_height = padding * 2 + title_height + body_height + section_gap;
     const int box_x = (DEFAULT_TARGET_WIDTH - box_width) / 2;
-    const int box_y = DEFAULT_TARGET_HEIGHT / 4 - box_height / 2;
+    const int box_y = (DEFAULT_TARGET_HEIGHT - box_height) / 2;
 
     DrawRectangle(box_x, box_y, box_width, box_height, g.window_box_bgcolor);
     DrawRectangleLinesEx(Rectangle{static_cast<float>(box_x), static_cast<float>(box_y), static_cast<float>(box_width), static_cast<float>(box_height)}, 2, g.window_box_fgcolor);

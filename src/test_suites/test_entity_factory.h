@@ -101,7 +101,7 @@ public:
         TS_ASSERT_EQUALS(g.ct.get<entitytype>(id).value_or(ENTITY_NONE), ENTITY_PROP);
         TS_ASSERT_EQUALS(g.ct.get<proptype>(id).value_or(PROP_NONE), PROP_DUNGEON_STATUE_00);
         TS_ASSERT_EQUALS(g.ct.get<name>(id).value_or(""), "statue");
-        TS_ASSERT_EQUALS(g.ct.get<description>(id).value_or(""), "A heavy carved statue.");
+        TS_ASSERT_EQUALS(g.ct.get<description>(id).value_or(""), "A heavy carved statue worn smooth by years of damp air and passing hands.");
         TS_ASSERT(g.ct.get<solid>(id).value_or(false));
         TS_ASSERT(g.ct.get<pushable>(id).value_or(false));
         TS_ASSERT(g.ct.get<update>(id).value_or(false));
@@ -120,7 +120,7 @@ public:
         TS_ASSERT_DIFFERS(id, ENTITYID_INVALID);
         TS_ASSERT_EQUALS(g.ct.get<entitytype>(id).value_or(ENTITY_NONE), ENTITY_CHEST);
         TS_ASSERT_EQUALS(g.ct.get<name>(id).value_or(""), "treasure chest");
-        TS_ASSERT_EQUALS(g.ct.get<description>(id).value_or(""), "A sturdy wooden treasure chest.");
+        TS_ASSERT_EQUALS(g.ct.get<description>(id).value_or(""), "A stout treasure chest reinforced with iron bands and built to survive rough handling.");
         TS_ASSERT(g.ct.get<pushable>(id).value_or(false));
         TS_ASSERT(g.ct.get<pullable>(id).value_or(false));
         TS_ASSERT(g.ct.get<solid>(id).value_or(false));
@@ -145,7 +145,7 @@ public:
         TS_ASSERT_EQUALS(g.ct.get<alignment>(id).value_or(ALIGNMENT_NONE), ALIGNMENT_EVIL_CHAOTIC);
         TS_ASSERT(g.ct.get<name>(id).has_value());
         TS_ASSERT(!g.ct.get<name>(id).value_or("").empty());
-        TS_ASSERT_EQUALS(g.ct.get<dialogue_text>(id).value_or(""), "They have nothing to say.");
+        TS_ASSERT_EQUALS(g.ct.get<dialogue_text>(id).value_or(""), "They give you a guarded look but say nothing.");
         TS_ASSERT(!g.ct.get<dead>(id).value_or(true));
         TS_ASSERT(g.ct.get<aggro>(id).value_or(false));
         TS_ASSERT(g.ct.get<update>(id).value_or(false));
@@ -168,7 +168,7 @@ public:
 
         TS_ASSERT_DIFFERS(id, ENTITYID_INVALID);
         TS_ASSERT_EQUALS(g.ct.get<name>(id).value_or(""), "dwarf");
-        TS_ASSERT_EQUALS(g.ct.get<dialogue_text>(id).value_or(""), "They have nothing to say.");
+        TS_ASSERT_EQUALS(g.ct.get<dialogue_text>(id).value_or(""), "They give you a guarded look but say nothing.");
         TS_ASSERT_EQUALS(g.ct.get<alignment>(id).value_or(ALIGNMENT_NONE), ALIGNMENT_GOOD_LAWFUL);
         TS_ASSERT(!g.ct.get<aggro>(id).value_or(true));
     }
@@ -224,7 +224,7 @@ public:
 
         TS_ASSERT_DIFFERS(id, ENTITYID_INVALID);
         TS_ASSERT_EQUALS(g.ct.get<name>(id).value_or(""), "box");
-        TS_ASSERT_EQUALS(g.ct.get<description>(id).value_or(""), "A plain wooden box.");
+        TS_ASSERT_EQUALS(g.ct.get<description>(id).value_or(""), "A plain wooden box with rough handles cut into the sides for hauling.");
     }
 
     void testCreateDoorWithSetsDefaultNameAndDescription() {
@@ -234,6 +234,6 @@ public:
 
         TS_ASSERT_DIFFERS(id, ENTITYID_INVALID);
         TS_ASSERT_EQUALS(g.ct.get<name>(id).value_or(""), "door");
-        TS_ASSERT_EQUALS(g.ct.get<description>(id).value_or(""), "A heavy wooden door bound with iron.");
+        TS_ASSERT_EQUALS(g.ct.get<description>(id).value_or(""), "A heavy wooden door bound with iron straps and swollen from the dungeon damp.");
     }
 };
