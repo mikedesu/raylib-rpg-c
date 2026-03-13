@@ -51,6 +51,8 @@ Compact status handoff for the current C++ / raylib dungeon project.
   - Active spellcasting runtime code was removed.
   - A real fast unit-test suite now lives under `test_suites/`.
   - Current fast test coverage includes lifecycle, bootstrap, placement, factories, inventory, tile/cache behavior, combat smoke tests, and world interaction.
+  - A separate heavy test target now exists for longer deterministic simulations.
+  - Recent added coverage includes dungeon connectivity, bounded combat invariants, renderer-adjacent seam tests, and heavy pathfinding/chase plus combat soak tests.
 
 ## Current State
 
@@ -66,6 +68,7 @@ Compact status handoff for the current C++ / raylib dungeon project.
 
 - Known recent verification baseline
   - `make clean && make tests && ./tests`
+  - `make clean && make tests_heavy && ./tests_heavy`
   - `make clean && make game`
 
 ## Active Backlog
@@ -105,10 +108,14 @@ Compact status handoff for the current C++ / raylib dungeon project.
 
 ## Test Backlog
 
-- Add longer bounded combat simulations with stable invariants.
-- Add stronger path/connectivity assertions for generated floors.
-- Add more renderer-adjacent deterministic seam tests where practical.
-- Decide whether heavy simulation tests should live in a separate target from `make tests`.
+- [x] Add longer bounded combat simulations with stable invariants.
+  - Added a deterministic bounded melee duel test covering death/tile-cache/xp invariants.
+- [x] Add stronger path/connectivity assertions for generated floors.
+  - Added deterministic connectivity tests asserting each generated floor is a single connected walkable region and that compact-map stairs remain reachable.
+- [x] Add more renderer-adjacent deterministic seam tests where practical.
+  - Added deterministic seam tests for tile-to-texture mapping and sprite/spritegroup animation/context transitions.
+- [x] Decide whether heavy simulation tests should live in a separate target from `make tests`.
+  - Added a separate `tests_heavy` target that includes the fast suite plus long-running combat and pathfinding/chase simulation coverage.
 
 ## Notes
 

@@ -269,6 +269,68 @@ public:
         TS_ASSERT_EQUALS(g.ct.get<target_id>(friendly).value_or(ENTITYID_INVALID), hero);
     }
 
+    void testBoundedMeleeDuelEndsWithConsistentDeathState() {
+        gamestate g;
+        g.mt.seed(24680);
+        add_floor(g, 8, 8);
+
+        const entityid hero = g.create_player_at_with(vec3{1, 1, 0}, "hero", g.player_init(12));
+        const entityid orc = g.create_orc_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
+
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(orc, ENTITYID_INVALID);
+
+        const entityid hero_weapon = g.create_weapon_with(g.sword_init());
+        const entityid orc_weapon = g.create_weapon_with(g.sword_init());
+        TS_ASSERT_DIFFERS(hero_weapon, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(orc_weapon, ENTITYID_INVALID);
+
+        g.add_to_inventory(hero, hero_weapon);
+        g.add_to_inventory(orc, orc_weapon);
+        g.ct.set<equipped_weapon>(hero, hero_weapon);
+        g.ct.set<equipped_weapon>(orc, orc_weapon);
+
+        g.ct.set<strength>(hero, 18);
+        g.ct.set<dexterity>(hero, 18);
+        g.ct.set<hp>(hero, vec2{12, 12});
+        g.ct.set<strength>(orc, 18);
+        g.ct.set<dexterity>(orc, 18);
+        g.ct.set<hp>(orc, vec2{12, 12});
+
+        bool duel_finished = false;
+        for (int round = 0; round < 16 && !duel_finished; ++round) {
+            if (!g.ct.get<dead>(hero).value_or(true) && !g.ct.get<dead>(orc).value_or(true)) {
+                tile_t& orc_tile = g.d.get_floor(0)->tile_at(vec3{2, 1, 0});
+                g.process_attack_entity(orc_tile, hero, orc);
+            }
+            if (!g.ct.get<dead>(hero).value_or(true) && !g.ct.get<dead>(orc).value_or(true)) {
+                tile_t& hero_tile = g.d.get_floor(0)->tile_at(vec3{1, 1, 0});
+                g.process_attack_entity(hero_tile, orc, hero);
+            }
+            duel_finished = g.ct.get<dead>(hero).value_or(false) || g.ct.get<dead>(orc).value_or(false);
+        }
+
+        TS_ASSERT(duel_finished);
+        TS_ASSERT_DIFFERS(g.ct.get<dead>(hero).value_or(false), g.ct.get<dead>(orc).value_or(false));
+
+        const vec2 hero_hp = g.ct.get<hp>(hero).value_or(vec2{-1, -1});
+        const vec2 orc_hp = g.ct.get<hp>(orc).value_or(vec2{-1, -1});
+        TS_ASSERT(hero_hp.x <= hero_hp.y);
+        TS_ASSERT(orc_hp.x <= orc_hp.y);
+
+        tile_t& hero_tile = g.d.get_floor(0)->tile_at(vec3{1, 1, 0});
+        tile_t& orc_tile = g.d.get_floor(0)->tile_at(vec3{2, 1, 0});
+        if (g.ct.get<dead>(orc).value_or(false)) {
+            TS_ASSERT_EQUALS(hero_tile.get_dead_npc_count(), 0U);
+            TS_ASSERT_EQUALS(orc_tile.get_dead_npc_count(), 1U);
+            TS_ASSERT_EQUALS(g.ct.get<xp>(hero).value_or(0), 1);
+        } else {
+            TS_ASSERT_EQUALS(hero_tile.get_dead_npc_count(), 1U);
+            TS_ASSERT_EQUALS(orc_tile.get_dead_npc_count(), 0U);
+            TS_ASSERT_EQUALS(g.ct.get<xp>(orc).value_or(0), 0);
+        }
+    }
+
     void testTickInTestModeAdvancesTicksAndTurnsWithHeroPresent() {
         gamestate g;
         g.test = true;

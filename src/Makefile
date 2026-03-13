@@ -40,7 +40,7 @@ WEB_OPTIONS = -DPLATFORM_WEB -DWEB -DSPAWN_MONSTERS -DNPCS_ALL_AT_ONCE -DSTART_M
 
 
 # Phony targets
-.PHONY: all clean docs docs-clean
+.PHONY: all clean docs docs-clean tests tests_heavy
 
 # Targets
 all: game index.html tests
@@ -63,20 +63,42 @@ index.html: main.cpp
 tests: tests.cpp
 	g++ -o tests tests.cpp -lraylib $(CXXFLAGS) $(CFLAGS)
 
-TEST_HEADERS = unit_test.h \
+tests_heavy: tests_heavy.cpp
+	g++ -o tests_heavy tests_heavy.cpp -lraylib $(CXXFLAGS) $(CFLAGS)
+
+FAST_TEST_HEADERS = unit_test.h \
 	test_suites/test_gamestate_lifecycle.h \
 	test_suites/test_combat_bootstrap.h \
 	test_suites/test_dungeon_bootstrap.h \
 	test_suites/test_entity_factory.h \
 	test_suites/test_entity_placement.h \
 	test_suites/test_inventory.h \
+	test_suites/test_renderer_seams.h \
 	test_suites/test_tile_cache.h \
 	test_suites/test_component_table.h \
 	test_suites/test_utility_helpers.h \
 	test_suites/test_world_interaction.h
 
-tests.cpp: $(TEST_HEADERS)
-	cxxtestgen --error-printer -o tests.cpp $(TEST_HEADERS)
+HEAVY_TEST_HEADERS = unit_test_heavy.h \
+	unit_test.h \
+	test_suites/test_gamestate_lifecycle.h \
+	test_suites/test_combat_bootstrap.h \
+	test_suites/test_dungeon_bootstrap.h \
+	test_suites/test_entity_factory.h \
+	test_suites/test_entity_placement.h \
+	test_suites/test_heavy_simulation.h \
+	test_suites/test_inventory.h \
+	test_suites/test_renderer_seams.h \
+	test_suites/test_tile_cache.h \
+	test_suites/test_component_table.h \
+	test_suites/test_utility_helpers.h \
+	test_suites/test_world_interaction.h
+
+tests.cpp: $(FAST_TEST_HEADERS)
+	cxxtestgen --error-printer -o tests.cpp $(FAST_TEST_HEADERS)
+
+tests_heavy.cpp: $(HEAVY_TEST_HEADERS)
+	cxxtestgen --error-printer -o tests_heavy.cpp $(HEAVY_TEST_HEADERS)
 
 # Documentation
 docs:
@@ -87,4 +109,4 @@ docs-clean:
 
 
 clean:
-	rm -rfv game *.o *.gch time.txt index.html index.js index.wasm index.data test tests.cpp tests
+	rm -rfv game *.o *.gch time.txt index.html index.js index.wasm index.data test tests.cpp tests tests_heavy.cpp tests_heavy

@@ -1,0 +1,702 @@
+/* Generated file, do not edit */
+
+#ifndef CXXTEST_RUNNING
+#define CXXTEST_RUNNING
+#endif
+
+#define _CXXTEST_HAVE_STD
+#include <cxxtest/TestListener.h>
+#include <cxxtest/TestTracker.h>
+#include <cxxtest/TestRunner.h>
+#include <cxxtest/RealDescriptions.h>
+#include <cxxtest/TestMain.h>
+#include <cxxtest/ErrorPrinter.h>
+
+int main( int argc, char *argv[] ) {
+ int status;
+    CxxTest::ErrorPrinter tmp;
+    CxxTest::RealWorldDescription::_worldName = "cxxtest";
+    status = CxxTest::Main< CxxTest::ErrorPrinter >( tmp, argc, argv );
+    return status;
+}
+bool suite_GamestateLifecycleTestSuite_init = false;
+#include "test_suites/test_gamestate_lifecycle.h"
+
+static GamestateLifecycleTestSuite suite_GamestateLifecycleTestSuite;
+
+static CxxTest::List Tests_GamestateLifecycleTestSuite = { 0, 0 };
+CxxTest::StaticSuiteDescription suiteDescription_GamestateLifecycleTestSuite( "test_suites/test_gamestate_lifecycle.h", 6, "GamestateLifecycleTestSuite", suite_GamestateLifecycleTestSuite, Tests_GamestateLifecycleTestSuite );
+
+static class TestDescription_suite_GamestateLifecycleTestSuite_testGamestateEmpty : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_GamestateLifecycleTestSuite_testGamestateEmpty() : CxxTest::RealTestDescription( Tests_GamestateLifecycleTestSuite, suiteDescription_GamestateLifecycleTestSuite, 14, "testGamestateEmpty" ) {}
+ void runTest() { suite_GamestateLifecycleTestSuite.testGamestateEmpty(); }
+} testDescription_suite_GamestateLifecycleTestSuite_testGamestateEmpty;
+
+static class TestDescription_suite_GamestateLifecycleTestSuite_testGamestateDefaults : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_GamestateLifecycleTestSuite_testGamestateDefaults() : CxxTest::RealTestDescription( Tests_GamestateLifecycleTestSuite, suiteDescription_GamestateLifecycleTestSuite, 17, "testGamestateDefaults" ) {}
+ void runTest() { suite_GamestateLifecycleTestSuite.testGamestateDefaults(); }
+} testDescription_suite_GamestateLifecycleTestSuite_testGamestateDefaults;
+
+static class TestDescription_suite_GamestateLifecycleTestSuite_testGamestateAddEntityTracksDirtyRange : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_GamestateLifecycleTestSuite_testGamestateAddEntityTracksDirtyRange() : CxxTest::RealTestDescription( Tests_GamestateLifecycleTestSuite, suiteDescription_GamestateLifecycleTestSuite, 49, "testGamestateAddEntityTracksDirtyRange" ) {}
+ void runTest() { suite_GamestateLifecycleTestSuite.testGamestateAddEntityTracksDirtyRange(); }
+} testDescription_suite_GamestateLifecycleTestSuite_testGamestateAddEntityTracksDirtyRange;
+
+static class TestDescription_suite_GamestateLifecycleTestSuite_testGamestateSetHeroIdAndReset : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_GamestateLifecycleTestSuite_testGamestateSetHeroIdAndReset() : CxxTest::RealTestDescription( Tests_GamestateLifecycleTestSuite, suiteDescription_GamestateLifecycleTestSuite, 65, "testGamestateSetHeroIdAndReset" ) {}
+ void runTest() { suite_GamestateLifecycleTestSuite.testGamestateSetHeroIdAndReset(); }
+} testDescription_suite_GamestateLifecycleTestSuite_testGamestateSetHeroIdAndReset;
+
+static class TestDescription_suite_GamestateLifecycleTestSuite_testGamestateMessageQueuesAndReset : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_GamestateLifecycleTestSuite_testGamestateMessageQueuesAndReset() : CxxTest::RealTestDescription( Tests_GamestateLifecycleTestSuite, suiteDescription_GamestateLifecycleTestSuite, 85, "testGamestateMessageQueuesAndReset" ) {}
+ void runTest() { suite_GamestateLifecycleTestSuite.testGamestateMessageQueuesAndReset(); }
+} testDescription_suite_GamestateLifecycleTestSuite_testGamestateMessageQueuesAndReset;
+
+static class TestDescription_suite_GamestateLifecycleTestSuite_testGamestateResetRestoresCameraAndUiState : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_GamestateLifecycleTestSuite_testGamestateResetRestoresCameraAndUiState() : CxxTest::RealTestDescription( Tests_GamestateLifecycleTestSuite, suiteDescription_GamestateLifecycleTestSuite, 104, "testGamestateResetRestoresCameraAndUiState" ) {}
+ void runTest() { suite_GamestateLifecycleTestSuite.testGamestateResetRestoresCameraAndUiState(); }
+} testDescription_suite_GamestateLifecycleTestSuite_testGamestateResetRestoresCameraAndUiState;
+
+static class TestDescription_suite_GamestateLifecycleTestSuite_testGamestateMusicDefaultsAndResetBehavior : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_GamestateLifecycleTestSuite_testGamestateMusicDefaultsAndResetBehavior() : CxxTest::RealTestDescription( Tests_GamestateLifecycleTestSuite, suiteDescription_GamestateLifecycleTestSuite, 144, "testGamestateMusicDefaultsAndResetBehavior" ) {}
+ void runTest() { suite_GamestateLifecycleTestSuite.testGamestateMusicDefaultsAndResetBehavior(); }
+} testDescription_suite_GamestateLifecycleTestSuite_testGamestateMusicDefaultsAndResetBehavior;
+
+static class TestDescription_suite_GamestateLifecycleTestSuite_testRestartGameReinitializesGameplayWithoutLeavingTitleScene : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_GamestateLifecycleTestSuite_testRestartGameReinitializesGameplayWithoutLeavingTitleScene() : CxxTest::RealTestDescription( Tests_GamestateLifecycleTestSuite, suiteDescription_GamestateLifecycleTestSuite, 170, "testRestartGameReinitializesGameplayWithoutLeavingTitleScene" ) {}
+ void runTest() { suite_GamestateLifecycleTestSuite.testRestartGameReinitializesGameplayWithoutLeavingTitleScene(); }
+} testDescription_suite_GamestateLifecycleTestSuite_testRestartGameReinitializesGameplayWithoutLeavingTitleScene;
+
+static class TestDescription_suite_GamestateLifecycleTestSuite_testHeroOpensLevelUpModalAtTenXpAndCanApplySelection : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_GamestateLifecycleTestSuite_testHeroOpensLevelUpModalAtTenXpAndCanApplySelection() : CxxTest::RealTestDescription( Tests_GamestateLifecycleTestSuite, suiteDescription_GamestateLifecycleTestSuite, 207, "testHeroOpensLevelUpModalAtTenXpAndCanApplySelection" ) {}
+ void runTest() { suite_GamestateLifecycleTestSuite.testHeroOpensLevelUpModalAtTenXpAndCanApplySelection(); }
+} testDescription_suite_GamestateLifecycleTestSuite_testHeroOpensLevelUpModalAtTenXpAndCanApplySelection;
+
+static class TestDescription_suite_GamestateLifecycleTestSuite_testApplyLevelUpRewardsAddsHitDieWorthOfMaxHp : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_GamestateLifecycleTestSuite_testApplyLevelUpRewardsAddsHitDieWorthOfMaxHp() : CxxTest::RealTestDescription( Tests_GamestateLifecycleTestSuite, suiteDescription_GamestateLifecycleTestSuite, 246, "testApplyLevelUpRewardsAddsHitDieWorthOfMaxHp" ) {}
+ void runTest() { suite_GamestateLifecycleTestSuite.testApplyLevelUpRewardsAddsHitDieWorthOfMaxHp(); }
+} testDescription_suite_GamestateLifecycleTestSuite_testApplyLevelUpRewardsAddsHitDieWorthOfMaxHp;
+
+static class TestDescription_suite_GamestateLifecycleTestSuite_testConfirmPromptResolvesYesInputEvenIfControlmodeDrifted : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_GamestateLifecycleTestSuite_testConfirmPromptResolvesYesInputEvenIfControlmodeDrifted() : CxxTest::RealTestDescription( Tests_GamestateLifecycleTestSuite, suiteDescription_GamestateLifecycleTestSuite, 265, "testConfirmPromptResolvesYesInputEvenIfControlmodeDrifted" ) {}
+ void runTest() { suite_GamestateLifecycleTestSuite.testConfirmPromptResolvesYesInputEvenIfControlmodeDrifted(); }
+} testDescription_suite_GamestateLifecycleTestSuite_testConfirmPromptResolvesYesInputEvenIfControlmodeDrifted;
+
+static class TestDescription_suite_GamestateLifecycleTestSuite_testConfirmPromptResolvesNoInput : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_GamestateLifecycleTestSuite_testConfirmPromptResolvesNoInput() : CxxTest::RealTestDescription( Tests_GamestateLifecycleTestSuite, suiteDescription_GamestateLifecycleTestSuite, 283, "testConfirmPromptResolvesNoInput" ) {}
+ void runTest() { suite_GamestateLifecycleTestSuite.testConfirmPromptResolvesNoInput(); }
+} testDescription_suite_GamestateLifecycleTestSuite_testConfirmPromptResolvesNoInput;
+
+static class TestDescription_suite_GamestateLifecycleTestSuite_testCharacterCreationNameHelpersAppendAndBackspace : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_GamestateLifecycleTestSuite_testCharacterCreationNameHelpersAppendAndBackspace() : CxxTest::RealTestDescription( Tests_GamestateLifecycleTestSuite, suiteDescription_GamestateLifecycleTestSuite, 301, "testCharacterCreationNameHelpersAppendAndBackspace" ) {}
+ void runTest() { suite_GamestateLifecycleTestSuite.testCharacterCreationNameHelpersAppendAndBackspace(); }
+} testDescription_suite_GamestateLifecycleTestSuite_testCharacterCreationNameHelpersAppendAndBackspace;
+
+static class TestDescription_suite_GamestateLifecycleTestSuite_testCharacterCreationNameHelpersRejectControlCharsAndLengthOverflow : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_GamestateLifecycleTestSuite_testCharacterCreationNameHelpersRejectControlCharsAndLengthOverflow() : CxxTest::RealTestDescription( Tests_GamestateLifecycleTestSuite, suiteDescription_GamestateLifecycleTestSuite, 313, "testCharacterCreationNameHelpersRejectControlCharsAndLengthOverflow" ) {}
+ void runTest() { suite_GamestateLifecycleTestSuite.testCharacterCreationNameHelpersRejectControlCharsAndLengthOverflow(); }
+} testDescription_suite_GamestateLifecycleTestSuite_testCharacterCreationNameHelpersRejectControlCharsAndLengthOverflow;
+
+#include "test_suites/test_combat_bootstrap.h"
+
+static CombatBootstrapTestSuite suite_CombatBootstrapTestSuite;
+
+static CxxTest::List Tests_CombatBootstrapTestSuite = { 0, 0 };
+CxxTest::StaticSuiteDescription suiteDescription_CombatBootstrapTestSuite( "test_suites/test_combat_bootstrap.h", 8, "CombatBootstrapTestSuite", suite_CombatBootstrapTestSuite, Tests_CombatBootstrapTestSuite );
+
+static class TestDescription_suite_CombatBootstrapTestSuite_testCreateMultipleOrcsProducesUniqueIdsAndNpcState : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_CombatBootstrapTestSuite_testCreateMultipleOrcsProducesUniqueIdsAndNpcState() : CxxTest::RealTestDescription( Tests_CombatBootstrapTestSuite, suiteDescription_CombatBootstrapTestSuite, 81, "testCreateMultipleOrcsProducesUniqueIdsAndNpcState" ) {}
+ void runTest() { suite_CombatBootstrapTestSuite.testCreateMultipleOrcsProducesUniqueIdsAndNpcState(); }
+} testDescription_suite_CombatBootstrapTestSuite_testCreateMultipleOrcsProducesUniqueIdsAndNpcState;
+
+static class TestDescription_suite_CombatBootstrapTestSuite_testCreateOrcRejectsOccupiedTile : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_CombatBootstrapTestSuite_testCreateOrcRejectsOccupiedTile() : CxxTest::RealTestDescription( Tests_CombatBootstrapTestSuite, suiteDescription_CombatBootstrapTestSuite, 100, "testCreateOrcRejectsOccupiedTile" ) {}
+ void runTest() { suite_CombatBootstrapTestSuite.testCreateOrcRejectsOccupiedTile(); }
+} testDescription_suite_CombatBootstrapTestSuite_testCreateOrcRejectsOccupiedTile;
+
+static class TestDescription_suite_CombatBootstrapTestSuite_testCreateOrcStopsAtWalkableTileCapacityWithoutLeakingIds : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_CombatBootstrapTestSuite_testCreateOrcStopsAtWalkableTileCapacityWithoutLeakingIds() : CxxTest::RealTestDescription( Tests_CombatBootstrapTestSuite, suiteDescription_CombatBootstrapTestSuite, 113, "testCreateOrcStopsAtWalkableTileCapacityWithoutLeakingIds" ) {}
+ void runTest() { suite_CombatBootstrapTestSuite.testCreateOrcStopsAtWalkableTileCapacityWithoutLeakingIds(); }
+} testDescription_suite_CombatBootstrapTestSuite_testCreateOrcStopsAtWalkableTileCapacityWithoutLeakingIds;
+
+static class TestDescription_suite_CombatBootstrapTestSuite_testLogicInitBuildsGameplayBootstrap : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_CombatBootstrapTestSuite_testLogicInitBuildsGameplayBootstrap() : CxxTest::RealTestDescription( Tests_CombatBootstrapTestSuite, suiteDescription_CombatBootstrapTestSuite, 137, "testLogicInitBuildsGameplayBootstrap" ) {}
+ void runTest() { suite_CombatBootstrapTestSuite.testLogicInitBuildsGameplayBootstrap(); }
+} testDescription_suite_CombatBootstrapTestSuite_testLogicInitBuildsGameplayBootstrap;
+
+static class TestDescription_suite_CombatBootstrapTestSuite_testLogicInitPlacesFriendlyNpcGreenSlimesAndArmedOrc : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_CombatBootstrapTestSuite_testLogicInitPlacesFriendlyNpcGreenSlimesAndArmedOrc() : CxxTest::RealTestDescription( Tests_CombatBootstrapTestSuite, suiteDescription_CombatBootstrapTestSuite, 167, "testLogicInitPlacesFriendlyNpcGreenSlimesAndArmedOrc" ) {}
+ void runTest() { suite_CombatBootstrapTestSuite.testLogicInitPlacesFriendlyNpcGreenSlimesAndArmedOrc(); }
+} testDescription_suite_CombatBootstrapTestSuite_testLogicInitPlacesFriendlyNpcGreenSlimesAndArmedOrc;
+
+static class TestDescription_suite_CombatBootstrapTestSuite_testUpdateNpcsStateSetsFriendlyAndHostileDefaultActions : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_CombatBootstrapTestSuite_testUpdateNpcsStateSetsFriendlyAndHostileDefaultActions() : CxxTest::RealTestDescription( Tests_CombatBootstrapTestSuite, suiteDescription_CombatBootstrapTestSuite, 203, "testUpdateNpcsStateSetsFriendlyAndHostileDefaultActions" ) {}
+ void runTest() { suite_CombatBootstrapTestSuite.testUpdateNpcsStateSetsFriendlyAndHostileDefaultActions(); }
+} testDescription_suite_CombatBootstrapTestSuite_testUpdateNpcsStateSetsFriendlyAndHostileDefaultActions;
+
+static class TestDescription_suite_CombatBootstrapTestSuite_testProvokeNpcTurnsFriendlyNpcHostile : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_CombatBootstrapTestSuite_testProvokeNpcTurnsFriendlyNpcHostile() : CxxTest::RealTestDescription( Tests_CombatBootstrapTestSuite, suiteDescription_CombatBootstrapTestSuite, 235, "testProvokeNpcTurnsFriendlyNpcHostile" ) {}
+ void runTest() { suite_CombatBootstrapTestSuite.testProvokeNpcTurnsFriendlyNpcHostile(); }
+} testDescription_suite_CombatBootstrapTestSuite_testProvokeNpcTurnsFriendlyNpcHostile;
+
+static class TestDescription_suite_CombatBootstrapTestSuite_testAttackingFriendlyNpcSetsAggro : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_CombatBootstrapTestSuite_testAttackingFriendlyNpcSetsAggro() : CxxTest::RealTestDescription( Tests_CombatBootstrapTestSuite, suiteDescription_CombatBootstrapTestSuite, 254, "testAttackingFriendlyNpcSetsAggro" ) {}
+ void runTest() { suite_CombatBootstrapTestSuite.testAttackingFriendlyNpcSetsAggro(); }
+} testDescription_suite_CombatBootstrapTestSuite_testAttackingFriendlyNpcSetsAggro;
+
+static class TestDescription_suite_CombatBootstrapTestSuite_testBoundedMeleeDuelEndsWithConsistentDeathState : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_CombatBootstrapTestSuite_testBoundedMeleeDuelEndsWithConsistentDeathState() : CxxTest::RealTestDescription( Tests_CombatBootstrapTestSuite, suiteDescription_CombatBootstrapTestSuite, 272, "testBoundedMeleeDuelEndsWithConsistentDeathState" ) {}
+ void runTest() { suite_CombatBootstrapTestSuite.testBoundedMeleeDuelEndsWithConsistentDeathState(); }
+} testDescription_suite_CombatBootstrapTestSuite_testBoundedMeleeDuelEndsWithConsistentDeathState;
+
+static class TestDescription_suite_CombatBootstrapTestSuite_testTickInTestModeAdvancesTicksAndTurnsWithHeroPresent : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_CombatBootstrapTestSuite_testTickInTestModeAdvancesTicksAndTurnsWithHeroPresent() : CxxTest::RealTestDescription( Tests_CombatBootstrapTestSuite, suiteDescription_CombatBootstrapTestSuite, 334, "testTickInTestModeAdvancesTicksAndTurnsWithHeroPresent" ) {}
+ void runTest() { suite_CombatBootstrapTestSuite.testTickInTestModeAdvancesTicksAndTurnsWithHeroPresent(); }
+} testDescription_suite_CombatBootstrapTestSuite_testTickInTestModeAdvancesTicksAndTurnsWithHeroPresent;
+
+#include "test_suites/test_dungeon_bootstrap.h"
+
+static DungeonBootstrapTestSuite suite_DungeonBootstrapTestSuite;
+
+static CxxTest::List Tests_DungeonBootstrapTestSuite = { 0, 0 };
+CxxTest::StaticSuiteDescription suiteDescription_DungeonBootstrapTestSuite( "test_suites/test_dungeon_bootstrap.h", 9, "DungeonBootstrapTestSuite", suite_DungeonBootstrapTestSuite, Tests_DungeonBootstrapTestSuite );
+
+static class TestDescription_suite_DungeonBootstrapTestSuite_testGamestateInitDungeonCreatesRequestedFloors : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_DungeonBootstrapTestSuite_testGamestateInitDungeonCreatesRequestedFloors() : CxxTest::RealTestDescription( Tests_DungeonBootstrapTestSuite, suiteDescription_DungeonBootstrapTestSuite, 65, "testGamestateInitDungeonCreatesRequestedFloors" ) {}
+ void runTest() { suite_DungeonBootstrapTestSuite.testGamestateInitDungeonCreatesRequestedFloors(); }
+} testDescription_suite_DungeonBootstrapTestSuite_testGamestateInitDungeonCreatesRequestedFloors;
+
+static class TestDescription_suite_DungeonBootstrapTestSuite_testGamestateInitDungeonDoesNotReinitializeExistingDungeon : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_DungeonBootstrapTestSuite_testGamestateInitDungeonDoesNotReinitializeExistingDungeon() : CxxTest::RealTestDescription( Tests_DungeonBootstrapTestSuite, suiteDescription_DungeonBootstrapTestSuite, 83, "testGamestateInitDungeonDoesNotReinitializeExistingDungeon" ) {}
+ void runTest() { suite_DungeonBootstrapTestSuite.testGamestateInitDungeonDoesNotReinitializeExistingDungeon(); }
+} testDescription_suite_DungeonBootstrapTestSuite_testGamestateInitDungeonDoesNotReinitializeExistingDungeon;
+
+static class TestDescription_suite_DungeonBootstrapTestSuite_testGamestateInitDungeonAssignsDistinctValidStairsPerFloor : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_DungeonBootstrapTestSuite_testGamestateInitDungeonAssignsDistinctValidStairsPerFloor() : CxxTest::RealTestDescription( Tests_DungeonBootstrapTestSuite, suiteDescription_DungeonBootstrapTestSuite, 99, "testGamestateInitDungeonAssignsDistinctValidStairsPerFloor" ) {}
+ void runTest() { suite_DungeonBootstrapTestSuite.testGamestateInitDungeonAssignsDistinctValidStairsPerFloor(); }
+} testDescription_suite_DungeonBootstrapTestSuite_testGamestateInitDungeonAssignsDistinctValidStairsPerFloor;
+
+static class TestDescription_suite_DungeonBootstrapTestSuite_testGamestateInitDungeonCompactMapHasValidSpawnableLocation : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_DungeonBootstrapTestSuite_testGamestateInitDungeonCompactMapHasValidSpawnableLocation() : CxxTest::RealTestDescription( Tests_DungeonBootstrapTestSuite, suiteDescription_DungeonBootstrapTestSuite, 123, "testGamestateInitDungeonCompactMapHasValidSpawnableLocation" ) {}
+ void runTest() { suite_DungeonBootstrapTestSuite.testGamestateInitDungeonCompactMapHasValidSpawnableLocation(); }
+} testDescription_suite_DungeonBootstrapTestSuite_testGamestateInitDungeonCompactMapHasValidSpawnableLocation;
+
+static class TestDescription_suite_DungeonBootstrapTestSuite_testGamestateInitDungeonMakesEachFloorSingleConnectedWalkableRegion : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_DungeonBootstrapTestSuite_testGamestateInitDungeonMakesEachFloorSingleConnectedWalkableRegion() : CxxTest::RealTestDescription( Tests_DungeonBootstrapTestSuite, suiteDescription_DungeonBootstrapTestSuite, 145, "testGamestateInitDungeonMakesEachFloorSingleConnectedWalkableRegion" ) {}
+ void runTest() { suite_DungeonBootstrapTestSuite.testGamestateInitDungeonMakesEachFloorSingleConnectedWalkableRegion(); }
+} testDescription_suite_DungeonBootstrapTestSuite_testGamestateInitDungeonMakesEachFloorSingleConnectedWalkableRegion;
+
+static class TestDescription_suite_DungeonBootstrapTestSuite_testGamestateInitDungeonCompactFloorsKeepStairsConnected : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_DungeonBootstrapTestSuite_testGamestateInitDungeonCompactFloorsKeepStairsConnected() : CxxTest::RealTestDescription( Tests_DungeonBootstrapTestSuite, suiteDescription_DungeonBootstrapTestSuite, 164, "testGamestateInitDungeonCompactFloorsKeepStairsConnected" ) {}
+ void runTest() { suite_DungeonBootstrapTestSuite.testGamestateInitDungeonCompactFloorsKeepStairsConnected(); }
+} testDescription_suite_DungeonBootstrapTestSuite_testGamestateInitDungeonCompactFloorsKeepStairsConnected;
+
+#include "test_suites/test_entity_factory.h"
+
+static EntityFactoryTestSuite suite_EntityFactoryTestSuite;
+
+static CxxTest::List Tests_EntityFactoryTestSuite = { 0, 0 };
+CxxTest::StaticSuiteDescription suiteDescription_EntityFactoryTestSuite( "test_suites/test_entity_factory.h", 6, "EntityFactoryTestSuite", suite_EntityFactoryTestSuite, Tests_EntityFactoryTestSuite );
+
+static class TestDescription_suite_EntityFactoryTestSuite_testAlignmentToStrReturnsExpectedNames : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_EntityFactoryTestSuite_testAlignmentToStrReturnsExpectedNames() : CxxTest::RealTestDescription( Tests_EntityFactoryTestSuite, suiteDescription_EntityFactoryTestSuite, 17, "testAlignmentToStrReturnsExpectedNames" ) {}
+ void runTest() { suite_EntityFactoryTestSuite.testAlignmentToStrReturnsExpectedNames(); }
+} testDescription_suite_EntityFactoryTestSuite_testAlignmentToStrReturnsExpectedNames;
+
+static class TestDescription_suite_EntityFactoryTestSuite_testCreateWeaponAtWithSetsExpectedWeaponComponents : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_EntityFactoryTestSuite_testCreateWeaponAtWithSetsExpectedWeaponComponents() : CxxTest::RealTestDescription( Tests_EntityFactoryTestSuite, suiteDescription_EntityFactoryTestSuite, 23, "testCreateWeaponAtWithSetsExpectedWeaponComponents" ) {}
+ void runTest() { suite_EntityFactoryTestSuite.testCreateWeaponAtWithSetsExpectedWeaponComponents(); }
+} testDescription_suite_EntityFactoryTestSuite_testCreateWeaponAtWithSetsExpectedWeaponComponents;
+
+static class TestDescription_suite_EntityFactoryTestSuite_testCreateShieldAtWithSetsExpectedShieldComponents : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_EntityFactoryTestSuite_testCreateShieldAtWithSetsExpectedShieldComponents() : CxxTest::RealTestDescription( Tests_EntityFactoryTestSuite, suiteDescription_EntityFactoryTestSuite, 49, "testCreateShieldAtWithSetsExpectedShieldComponents" ) {}
+ void runTest() { suite_EntityFactoryTestSuite.testCreateShieldAtWithSetsExpectedShieldComponents(); }
+} testDescription_suite_EntityFactoryTestSuite_testCreateShieldAtWithSetsExpectedShieldComponents;
+
+static class TestDescription_suite_EntityFactoryTestSuite_testCreatePotionAtWithSetsExpectedPotionComponents : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_EntityFactoryTestSuite_testCreatePotionAtWithSetsExpectedPotionComponents() : CxxTest::RealTestDescription( Tests_EntityFactoryTestSuite, suiteDescription_EntityFactoryTestSuite, 69, "testCreatePotionAtWithSetsExpectedPotionComponents" ) {}
+ void runTest() { suite_EntityFactoryTestSuite.testCreatePotionAtWithSetsExpectedPotionComponents(); }
+} testDescription_suite_EntityFactoryTestSuite_testCreatePotionAtWithSetsExpectedPotionComponents;
+
+static class TestDescription_suite_EntityFactoryTestSuite_testCreatePropAtWithSetsExpectedPropComponents : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_EntityFactoryTestSuite_testCreatePropAtWithSetsExpectedPropComponents() : CxxTest::RealTestDescription( Tests_EntityFactoryTestSuite, suiteDescription_EntityFactoryTestSuite, 94, "testCreatePropAtWithSetsExpectedPropComponents" ) {}
+ void runTest() { suite_EntityFactoryTestSuite.testCreatePropAtWithSetsExpectedPropComponents(); }
+} testDescription_suite_EntityFactoryTestSuite_testCreatePropAtWithSetsExpectedPropComponents;
+
+static class TestDescription_suite_EntityFactoryTestSuite_testCreateChestAtWithSetsExpectedChestComponents : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_EntityFactoryTestSuite_testCreateChestAtWithSetsExpectedChestComponents() : CxxTest::RealTestDescription( Tests_EntityFactoryTestSuite, suiteDescription_EntityFactoryTestSuite, 114, "testCreateChestAtWithSetsExpectedChestComponents" ) {}
+ void runTest() { suite_EntityFactoryTestSuite.testCreateChestAtWithSetsExpectedChestComponents(); }
+} testDescription_suite_EntityFactoryTestSuite_testCreateChestAtWithSetsExpectedChestComponents;
+
+static class TestDescription_suite_EntityFactoryTestSuite_testCreateOrcAtWithSetsExpectedNpcComponents : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_EntityFactoryTestSuite_testCreateOrcAtWithSetsExpectedNpcComponents() : CxxTest::RealTestDescription( Tests_EntityFactoryTestSuite, suiteDescription_EntityFactoryTestSuite, 136, "testCreateOrcAtWithSetsExpectedNpcComponents" ) {}
+ void runTest() { suite_EntityFactoryTestSuite.testCreateOrcAtWithSetsExpectedNpcComponents(); }
+} testDescription_suite_EntityFactoryTestSuite_testCreateOrcAtWithSetsExpectedNpcComponents;
+
+static class TestDescription_suite_EntityFactoryTestSuite_testCreateNpcAtWithUsesRaceDefaultsForNameAlignmentAndAggro : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_EntityFactoryTestSuite_testCreateNpcAtWithUsesRaceDefaultsForNameAlignmentAndAggro() : CxxTest::RealTestDescription( Tests_EntityFactoryTestSuite, suiteDescription_EntityFactoryTestSuite, 163, "testCreateNpcAtWithUsesRaceDefaultsForNameAlignmentAndAggro" ) {}
+ void runTest() { suite_EntityFactoryTestSuite.testCreateNpcAtWithUsesRaceDefaultsForNameAlignmentAndAggro(); }
+} testDescription_suite_EntityFactoryTestSuite_testCreateNpcAtWithUsesRaceDefaultsForNameAlignmentAndAggro;
+
+static class TestDescription_suite_EntityFactoryTestSuite_testCreateGreenSlimeUsesPassiveDefaultsAndRacialModifiers : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_EntityFactoryTestSuite_testCreateGreenSlimeUsesPassiveDefaultsAndRacialModifiers() : CxxTest::RealTestDescription( Tests_EntityFactoryTestSuite, suiteDescription_EntityFactoryTestSuite, 176, "testCreateGreenSlimeUsesPassiveDefaultsAndRacialModifiers" ) {}
+ void runTest() { suite_EntityFactoryTestSuite.testCreateGreenSlimeUsesPassiveDefaultsAndRacialModifiers(); }
+} testDescription_suite_EntityFactoryTestSuite_testCreateGreenSlimeUsesPassiveDefaultsAndRacialModifiers;
+
+static class TestDescription_suite_EntityFactoryTestSuite_testCreatePlayerAtWithUsesCharacterCreationAlignment : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_EntityFactoryTestSuite_testCreatePlayerAtWithUsesCharacterCreationAlignment() : CxxTest::RealTestDescription( Tests_EntityFactoryTestSuite, suiteDescription_EntityFactoryTestSuite, 194, "testCreatePlayerAtWithUsesCharacterCreationAlignment" ) {}
+ void runTest() { suite_EntityFactoryTestSuite.testCreatePlayerAtWithUsesCharacterCreationAlignment(); }
+} testDescription_suite_EntityFactoryTestSuite_testCreatePlayerAtWithUsesCharacterCreationAlignment;
+
+static class TestDescription_suite_EntityFactoryTestSuite_testApplyPermanentAttributeIncreaseCanBeUsedOutsideLevelUp : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_EntityFactoryTestSuite_testApplyPermanentAttributeIncreaseCanBeUsedOutsideLevelUp() : CxxTest::RealTestDescription( Tests_EntityFactoryTestSuite, suiteDescription_EntityFactoryTestSuite, 207, "testApplyPermanentAttributeIncreaseCanBeUsedOutsideLevelUp" ) {}
+ void runTest() { suite_EntityFactoryTestSuite.testApplyPermanentAttributeIncreaseCanBeUsedOutsideLevelUp(); }
+} testDescription_suite_EntityFactoryTestSuite_testApplyPermanentAttributeIncreaseCanBeUsedOutsideLevelUp;
+
+static class TestDescription_suite_EntityFactoryTestSuite_testCreateBoxWithSetsDefaultNameAndDescription : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_EntityFactoryTestSuite_testCreateBoxWithSetsDefaultNameAndDescription() : CxxTest::RealTestDescription( Tests_EntityFactoryTestSuite, suiteDescription_EntityFactoryTestSuite, 220, "testCreateBoxWithSetsDefaultNameAndDescription" ) {}
+ void runTest() { suite_EntityFactoryTestSuite.testCreateBoxWithSetsDefaultNameAndDescription(); }
+} testDescription_suite_EntityFactoryTestSuite_testCreateBoxWithSetsDefaultNameAndDescription;
+
+static class TestDescription_suite_EntityFactoryTestSuite_testCreateDoorWithSetsDefaultNameAndDescription : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_EntityFactoryTestSuite_testCreateDoorWithSetsDefaultNameAndDescription() : CxxTest::RealTestDescription( Tests_EntityFactoryTestSuite, suiteDescription_EntityFactoryTestSuite, 230, "testCreateDoorWithSetsDefaultNameAndDescription" ) {}
+ void runTest() { suite_EntityFactoryTestSuite.testCreateDoorWithSetsDefaultNameAndDescription(); }
+} testDescription_suite_EntityFactoryTestSuite_testCreateDoorWithSetsDefaultNameAndDescription;
+
+#include "test_suites/test_entity_placement.h"
+
+static EntityPlacementTestSuite suite_EntityPlacementTestSuite;
+
+static CxxTest::List Tests_EntityPlacementTestSuite = { 0, 0 };
+CxxTest::StaticSuiteDescription suiteDescription_EntityPlacementTestSuite( "test_suites/test_entity_placement.h", 6, "EntityPlacementTestSuite", suite_EntityPlacementTestSuite, Tests_EntityPlacementTestSuite );
+
+static class TestDescription_suite_EntityPlacementTestSuite_testPlaceDoorsReturnsZeroOnEmptyDungeon : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_EntityPlacementTestSuite_testPlaceDoorsReturnsZeroOnEmptyDungeon() : CxxTest::RealTestDescription( Tests_EntityPlacementTestSuite, suiteDescription_EntityPlacementTestSuite, 40, "testPlaceDoorsReturnsZeroOnEmptyDungeon" ) {}
+ void runTest() { suite_EntityPlacementTestSuite.testPlaceDoorsReturnsZeroOnEmptyDungeon(); }
+} testDescription_suite_EntityPlacementTestSuite_testPlaceDoorsReturnsZeroOnEmptyDungeon;
+
+static class TestDescription_suite_EntityPlacementTestSuite_testPlaceDoorsCreatesDoorEntitiesWithTileAndComponentState : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_EntityPlacementTestSuite_testPlaceDoorsCreatesDoorEntitiesWithTileAndComponentState() : CxxTest::RealTestDescription( Tests_EntityPlacementTestSuite, suiteDescription_EntityPlacementTestSuite, 46, "testPlaceDoorsCreatesDoorEntitiesWithTileAndComponentState" ) {}
+ void runTest() { suite_EntityPlacementTestSuite.testPlaceDoorsCreatesDoorEntitiesWithTileAndComponentState(); }
+} testDescription_suite_EntityPlacementTestSuite_testPlaceDoorsCreatesDoorEntitiesWithTileAndComponentState;
+
+static class TestDescription_suite_EntityPlacementTestSuite_testPlacePropsReturnsZeroOnEmptyDungeon : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_EntityPlacementTestSuite_testPlacePropsReturnsZeroOnEmptyDungeon() : CxxTest::RealTestDescription( Tests_EntityPlacementTestSuite, suiteDescription_EntityPlacementTestSuite, 91, "testPlacePropsReturnsZeroOnEmptyDungeon" ) {}
+ void runTest() { suite_EntityPlacementTestSuite.testPlacePropsReturnsZeroOnEmptyDungeon(); }
+} testDescription_suite_EntityPlacementTestSuite_testPlacePropsReturnsZeroOnEmptyDungeon;
+
+static class TestDescription_suite_EntityPlacementTestSuite_testPlacePropsCreatesPropEntitiesWithTileAndComponentState : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_EntityPlacementTestSuite_testPlacePropsCreatesPropEntitiesWithTileAndComponentState() : CxxTest::RealTestDescription( Tests_EntityPlacementTestSuite, suiteDescription_EntityPlacementTestSuite, 97, "testPlacePropsCreatesPropEntitiesWithTileAndComponentState" ) {}
+ void runTest() { suite_EntityPlacementTestSuite.testPlacePropsCreatesPropEntitiesWithTileAndComponentState(); }
+} testDescription_suite_EntityPlacementTestSuite_testPlacePropsCreatesPropEntitiesWithTileAndComponentState;
+
+static class TestDescription_suite_EntityPlacementTestSuite_testPlacePropsSkipsChokepointAndDoorApproachLayouts : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_EntityPlacementTestSuite_testPlacePropsSkipsChokepointAndDoorApproachLayouts() : CxxTest::RealTestDescription( Tests_EntityPlacementTestSuite, suiteDescription_EntityPlacementTestSuite, 135, "testPlacePropsSkipsChokepointAndDoorApproachLayouts" ) {}
+ void runTest() { suite_EntityPlacementTestSuite.testPlacePropsSkipsChokepointAndDoorApproachLayouts(); }
+} testDescription_suite_EntityPlacementTestSuite_testPlacePropsSkipsChokepointAndDoorApproachLayouts;
+
+static class TestDescription_suite_EntityPlacementTestSuite_testGetRandomLocSkipsOccupiedChestTile : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_EntityPlacementTestSuite_testGetRandomLocSkipsOccupiedChestTile() : CxxTest::RealTestDescription( Tests_EntityPlacementTestSuite, suiteDescription_EntityPlacementTestSuite, 144, "testGetRandomLocSkipsOccupiedChestTile" ) {}
+ void runTest() { suite_EntityPlacementTestSuite.testGetRandomLocSkipsOccupiedChestTile(); }
+} testDescription_suite_EntityPlacementTestSuite_testGetRandomLocSkipsOccupiedChestTile;
+
+#include "test_suites/test_heavy_simulation.h"
+
+static HeavySimulationTestSuite suite_HeavySimulationTestSuite;
+
+static CxxTest::List Tests_HeavySimulationTestSuite = { 0, 0 };
+CxxTest::StaticSuiteDescription suiteDescription_HeavySimulationTestSuite( "test_suites/test_heavy_simulation.h", 7, "HeavySimulationTestSuite", suite_HeavySimulationTestSuite, Tests_HeavySimulationTestSuite );
+
+static class TestDescription_suite_HeavySimulationTestSuite_testPathfindingSoakMovesHostileOrcThroughSingleGapTowardHero : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_HeavySimulationTestSuite_testPathfindingSoakMovesHostileOrcThroughSingleGapTowardHero() : CxxTest::RealTestDescription( Tests_HeavySimulationTestSuite, suiteDescription_HeavySimulationTestSuite, 66, "testPathfindingSoakMovesHostileOrcThroughSingleGapTowardHero" ) {}
+ void runTest() { suite_HeavySimulationTestSuite.testPathfindingSoakMovesHostileOrcThroughSingleGapTowardHero(); }
+} testDescription_suite_HeavySimulationTestSuite_testPathfindingSoakMovesHostileOrcThroughSingleGapTowardHero;
+
+static class TestDescription_suite_HeavySimulationTestSuite_testTickHeavySimulationResolvesAdjacentOrcFightWithoutBreakingTileState : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_HeavySimulationTestSuite_testTickHeavySimulationResolvesAdjacentOrcFightWithoutBreakingTileState() : CxxTest::RealTestDescription( Tests_HeavySimulationTestSuite, suiteDescription_HeavySimulationTestSuite, 128, "testTickHeavySimulationResolvesAdjacentOrcFightWithoutBreakingTileState" ) {}
+ void runTest() { suite_HeavySimulationTestSuite.testTickHeavySimulationResolvesAdjacentOrcFightWithoutBreakingTileState(); }
+} testDescription_suite_HeavySimulationTestSuite_testTickHeavySimulationResolvesAdjacentOrcFightWithoutBreakingTileState;
+
+#include "test_suites/test_inventory.h"
+
+static InventoryTestSuite suite_InventoryTestSuite;
+
+static CxxTest::List Tests_InventoryTestSuite = { 0, 0 };
+CxxTest::StaticSuiteDescription suiteDescription_InventoryTestSuite( "test_suites/test_inventory.h", 7, "InventoryTestSuite", suite_InventoryTestSuite, Tests_InventoryTestSuite );
+
+static class TestDescription_suite_InventoryTestSuite_testTryEntityPickupTakesTopItemFromMultiItemTile : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_InventoryTestSuite_testTryEntityPickupTakesTopItemFromMultiItemTile() : CxxTest::RealTestDescription( Tests_InventoryTestSuite, suiteDescription_InventoryTestSuite, 22, "testTryEntityPickupTakesTopItemFromMultiItemTile" ) {}
+ void runTest() { suite_InventoryTestSuite.testTryEntityPickupTakesTopItemFromMultiItemTile(); }
+} testDescription_suite_InventoryTestSuite_testTryEntityPickupTakesTopItemFromMultiItemTile;
+
+static class TestDescription_suite_InventoryTestSuite_testAddAndRemoveInventoryBookkeeping : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_InventoryTestSuite_testAddAndRemoveInventoryBookkeeping() : CxxTest::RealTestDescription( Tests_InventoryTestSuite, suiteDescription_InventoryTestSuite, 46, "testAddAndRemoveInventoryBookkeeping" ) {}
+ void runTest() { suite_InventoryTestSuite.testAddAndRemoveInventoryBookkeeping(); }
+} testDescription_suite_InventoryTestSuite_testAddAndRemoveInventoryBookkeeping;
+
+static class TestDescription_suite_InventoryTestSuite_testEquipAndUnequipWeaponFlow : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_InventoryTestSuite_testEquipAndUnequipWeaponFlow() : CxxTest::RealTestDescription( Tests_InventoryTestSuite, suiteDescription_InventoryTestSuite, 65, "testEquipAndUnequipWeaponFlow" ) {}
+ void runTest() { suite_InventoryTestSuite.testEquipAndUnequipWeaponFlow(); }
+} testDescription_suite_InventoryTestSuite_testEquipAndUnequipWeaponFlow;
+
+static class TestDescription_suite_InventoryTestSuite_testEquipAndUnequipShieldFlow : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_InventoryTestSuite_testEquipAndUnequipShieldFlow() : CxxTest::RealTestDescription( Tests_InventoryTestSuite, suiteDescription_InventoryTestSuite, 86, "testEquipAndUnequipShieldFlow" ) {}
+ void runTest() { suite_InventoryTestSuite.testEquipAndUnequipShieldFlow(); }
+} testDescription_suite_InventoryTestSuite_testEquipAndUnequipShieldFlow;
+
+static class TestDescription_suite_InventoryTestSuite_testDropItemFromHeroInventoryClearsEquipmentAndPlacesItemOnTile : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_InventoryTestSuite_testDropItemFromHeroInventoryClearsEquipmentAndPlacesItemOnTile() : CxxTest::RealTestDescription( Tests_InventoryTestSuite, suiteDescription_InventoryTestSuite, 107, "testDropItemFromHeroInventoryClearsEquipmentAndPlacesItemOnTile" ) {}
+ void runTest() { suite_InventoryTestSuite.testDropItemFromHeroInventoryClearsEquipmentAndPlacesItemOnTile(); }
+} testDescription_suite_InventoryTestSuite_testDropItemFromHeroInventoryClearsEquipmentAndPlacesItemOnTile;
+
+static class TestDescription_suite_InventoryTestSuite_testUsePotionConsumesPotionAndUpdatesHp : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_InventoryTestSuite_testUsePotionConsumesPotionAndUpdatesHp() : CxxTest::RealTestDescription( Tests_InventoryTestSuite, suiteDescription_InventoryTestSuite, 125, "testUsePotionConsumesPotionAndUpdatesHp" ) {}
+ void runTest() { suite_InventoryTestSuite.testUsePotionConsumesPotionAndUpdatesHp(); }
+} testDescription_suite_InventoryTestSuite_testUsePotionConsumesPotionAndUpdatesHp;
+
+static class TestDescription_suite_InventoryTestSuite_testChestTransferMovesItemsBetweenHeroAndChestInventories : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_InventoryTestSuite_testChestTransferMovesItemsBetweenHeroAndChestInventories() : CxxTest::RealTestDescription( Tests_InventoryTestSuite, suiteDescription_InventoryTestSuite, 145, "testChestTransferMovesItemsBetweenHeroAndChestInventories" ) {}
+ void runTest() { suite_InventoryTestSuite.testChestTransferMovesItemsBetweenHeroAndChestInventories(); }
+} testDescription_suite_InventoryTestSuite_testChestTransferMovesItemsBetweenHeroAndChestInventories;
+
+#include "test_suites/test_renderer_seams.h"
+
+static RendererSeamsTestSuite suite_RendererSeamsTestSuite;
+
+static CxxTest::List Tests_RendererSeamsTestSuite = { 0, 0 };
+CxxTest::StaticSuiteDescription suiteDescription_RendererSeamsTestSuite( "test_suites/test_renderer_seams.h", 7, "RendererSeamsTestSuite", suite_RendererSeamsTestSuite, Tests_RendererSeamsTestSuite );
+
+static class TestDescription_suite_RendererSeamsTestSuite_testGetTxkeyForRepresentativeTileTypes : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_RendererSeamsTestSuite_testGetTxkeyForRepresentativeTileTypes() : CxxTest::RealTestDescription( Tests_RendererSeamsTestSuite, suiteDescription_RendererSeamsTestSuite, 17, "testGetTxkeyForRepresentativeTileTypes" ) {}
+ void runTest() { suite_RendererSeamsTestSuite.testGetTxkeyForRepresentativeTileTypes(); }
+} testDescription_suite_RendererSeamsTestSuite_testGetTxkeyForRepresentativeTileTypes;
+
+static class TestDescription_suite_RendererSeamsTestSuite_testSpriteIncrFrameLoopsWhenAnimating : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_RendererSeamsTestSuite_testSpriteIncrFrameLoopsWhenAnimating() : CxxTest::RealTestDescription( Tests_RendererSeamsTestSuite, suiteDescription_RendererSeamsTestSuite, 26, "testSpriteIncrFrameLoopsWhenAnimating" ) {}
+ void runTest() { suite_RendererSeamsTestSuite.testSpriteIncrFrameLoopsWhenAnimating(); }
+} testDescription_suite_RendererSeamsTestSuite_testSpriteIncrFrameLoopsWhenAnimating;
+
+static class TestDescription_suite_RendererSeamsTestSuite_testSpriteStopOnLastFrameHaltsAnimation : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_RendererSeamsTestSuite_testSpriteStopOnLastFrameHaltsAnimation() : CxxTest::RealTestDescription( Tests_RendererSeamsTestSuite, suiteDescription_RendererSeamsTestSuite, 49, "testSpriteStopOnLastFrameHaltsAnimation" ) {}
+ void runTest() { suite_RendererSeamsTestSuite.testSpriteStopOnLastFrameHaltsAnimation(); }
+} testDescription_suite_RendererSeamsTestSuite_testSpriteStopOnLastFrameHaltsAnimation;
+
+static class TestDescription_suite_RendererSeamsTestSuite_testSpriteSetContextResetsFrameOnlyWhileAnimating : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_RendererSeamsTestSuite_testSpriteSetContextResetsFrameOnlyWhileAnimating() : CxxTest::RealTestDescription( Tests_RendererSeamsTestSuite, suiteDescription_RendererSeamsTestSuite, 68, "testSpriteSetContextResetsFrameOnlyWhileAnimating" ) {}
+ void runTest() { suite_RendererSeamsTestSuite.testSpriteSetContextResetsFrameOnlyWhileAnimating(); }
+} testDescription_suite_RendererSeamsTestSuite_testSpriteSetContextResetsFrameOnlyWhileAnimating;
+
+static class TestDescription_suite_RendererSeamsTestSuite_testSpritegroupSetCurrentAndContextsDriveContainedSprites : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_RendererSeamsTestSuite_testSpritegroupSetCurrentAndContextsDriveContainedSprites() : CxxTest::RealTestDescription( Tests_RendererSeamsTestSuite, suiteDescription_RendererSeamsTestSuite, 90, "testSpritegroupSetCurrentAndContextsDriveContainedSprites" ) {}
+ void runTest() { suite_RendererSeamsTestSuite.testSpritegroupSetCurrentAndContextsDriveContainedSprites(); }
+} testDescription_suite_RendererSeamsTestSuite_testSpritegroupSetCurrentAndContextsDriveContainedSprites;
+
+#include "test_suites/test_tile_cache.h"
+
+static TileCacheTestSuite suite_TileCacheTestSuite;
+
+static CxxTest::List Tests_TileCacheTestSuite = { 0, 0 };
+CxxTest::StaticSuiteDescription suiteDescription_TileCacheTestSuite( "test_suites/test_tile_cache.h", 8, "TileCacheTestSuite", suite_TileCacheTestSuite, Tests_TileCacheTestSuite );
+
+static class TestDescription_suite_TileCacheTestSuite_testDeadNpcCacheBasic : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_TileCacheTestSuite_testDeadNpcCacheBasic() : CxxTest::RealTestDescription( Tests_TileCacheTestSuite, suiteDescription_TileCacheTestSuite, 10, "testDeadNpcCacheBasic" ) {}
+ void runTest() { suite_TileCacheTestSuite.testDeadNpcCacheBasic(); }
+} testDescription_suite_TileCacheTestSuite_testDeadNpcCacheBasic;
+
+static class TestDescription_suite_TileCacheTestSuite_testDeadNpcCacheBoundaries : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_TileCacheTestSuite_testDeadNpcCacheBoundaries() : CxxTest::RealTestDescription( Tests_TileCacheTestSuite, suiteDescription_TileCacheTestSuite, 23, "testDeadNpcCacheBoundaries" ) {}
+ void runTest() { suite_TileCacheTestSuite.testDeadNpcCacheBoundaries(); }
+} testDescription_suite_TileCacheTestSuite_testDeadNpcCacheBoundaries;
+
+static class TestDescription_suite_TileCacheTestSuite_testDeadNpcCacheRemove : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_TileCacheTestSuite_testDeadNpcCacheRemove() : CxxTest::RealTestDescription( Tests_TileCacheTestSuite, suiteDescription_TileCacheTestSuite, 41, "testDeadNpcCacheRemove" ) {}
+ void runTest() { suite_TileCacheTestSuite.testDeadNpcCacheRemove(); }
+} testDescription_suite_TileCacheTestSuite_testDeadNpcCacheRemove;
+
+static class TestDescription_suite_TileCacheTestSuite_testDeadNpcCacheTopAndPop : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_TileCacheTestSuite_testDeadNpcCacheTopAndPop() : CxxTest::RealTestDescription( Tests_TileCacheTestSuite, suiteDescription_TileCacheTestSuite, 56, "testDeadNpcCacheTopAndPop" ) {}
+ void runTest() { suite_TileCacheTestSuite.testDeadNpcCacheTopAndPop(); }
+} testDescription_suite_TileCacheTestSuite_testDeadNpcCacheTopAndPop;
+
+static class TestDescription_suite_TileCacheTestSuite_testItemCacheBasic : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_TileCacheTestSuite_testItemCacheBasic() : CxxTest::RealTestDescription( Tests_TileCacheTestSuite, suiteDescription_TileCacheTestSuite, 73, "testItemCacheBasic" ) {}
+ void runTest() { suite_TileCacheTestSuite.testItemCacheBasic(); }
+} testDescription_suite_TileCacheTestSuite_testItemCacheBasic;
+
+static class TestDescription_suite_TileCacheTestSuite_testItemCacheCapacityAndRemove : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_TileCacheTestSuite_testItemCacheCapacityAndRemove() : CxxTest::RealTestDescription( Tests_TileCacheTestSuite, suiteDescription_TileCacheTestSuite, 93, "testItemCacheCapacityAndRemove" ) {}
+ void runTest() { suite_TileCacheTestSuite.testItemCacheCapacityAndRemove(); }
+} testDescription_suite_TileCacheTestSuite_testItemCacheCapacityAndRemove;
+
+static class TestDescription_suite_TileCacheTestSuite_testTileInitAndCacheReset : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_TileCacheTestSuite_testTileInitAndCacheReset() : CxxTest::RealTestDescription( Tests_TileCacheTestSuite, suiteDescription_TileCacheTestSuite, 111, "testTileInitAndCacheReset" ) {}
+ void runTest() { suite_TileCacheTestSuite.testTileInitAndCacheReset(); }
+} testDescription_suite_TileCacheTestSuite_testTileInitAndCacheReset;
+
+static class TestDescription_suite_TileCacheTestSuite_testTileAddAndRemoveAcrossEntityKinds : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_TileCacheTestSuite_testTileAddAndRemoveAcrossEntityKinds() : CxxTest::RealTestDescription( Tests_TileCacheTestSuite, suiteDescription_TileCacheTestSuite, 150, "testTileAddAndRemoveAcrossEntityKinds" ) {}
+ void runTest() { suite_TileCacheTestSuite.testTileAddAndRemoveAcrossEntityKinds(); }
+} testDescription_suite_TileCacheTestSuite_testTileAddAndRemoveAcrossEntityKinds;
+
+static class TestDescription_suite_TileCacheTestSuite_testTileItemCacheLimit : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_TileCacheTestSuite_testTileItemCacheLimit() : CxxTest::RealTestDescription( Tests_TileCacheTestSuite, suiteDescription_TileCacheTestSuite, 200, "testTileItemCacheLimit" ) {}
+ void runTest() { suite_TileCacheTestSuite.testTileItemCacheLimit(); }
+} testDescription_suite_TileCacheTestSuite_testTileItemCacheLimit;
+
+static class TestDescription_suite_TileCacheTestSuite_testTileRejectsSecondDoorCacheEntry : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_TileCacheTestSuite_testTileRejectsSecondDoorCacheEntry() : CxxTest::RealTestDescription( Tests_TileCacheTestSuite, suiteDescription_TileCacheTestSuite, 213, "testTileRejectsSecondDoorCacheEntry" ) {}
+ void runTest() { suite_TileCacheTestSuite.testTileRejectsSecondDoorCacheEntry(); }
+} testDescription_suite_TileCacheTestSuite_testTileRejectsSecondDoorCacheEntry;
+
+static class TestDescription_suite_TileCacheTestSuite_testTileSupportsMixedOccupancyAcrossSupportedCacheKinds : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_TileCacheTestSuite_testTileSupportsMixedOccupancyAcrossSupportedCacheKinds() : CxxTest::RealTestDescription( Tests_TileCacheTestSuite, suiteDescription_TileCacheTestSuite, 222, "testTileSupportsMixedOccupancyAcrossSupportedCacheKinds" ) {}
+ void runTest() { suite_TileCacheTestSuite.testTileSupportsMixedOccupancyAcrossSupportedCacheKinds(); }
+} testDescription_suite_TileCacheTestSuite_testTileSupportsMixedOccupancyAcrossSupportedCacheKinds;
+
+static class TestDescription_suite_TileCacheTestSuite_testTileMixedOccupancyRemovalPreservesRemainingCaches : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_TileCacheTestSuite_testTileMixedOccupancyRemovalPreservesRemainingCaches() : CxxTest::RealTestDescription( Tests_TileCacheTestSuite, suiteDescription_TileCacheTestSuite, 248, "testTileMixedOccupancyRemovalPreservesRemainingCaches" ) {}
+ void runTest() { suite_TileCacheTestSuite.testTileMixedOccupancyRemovalPreservesRemainingCaches(); }
+} testDescription_suite_TileCacheTestSuite_testTileMixedOccupancyRemovalPreservesRemainingCaches;
+
+static class TestDescription_suite_TileCacheTestSuite_testTileTypeHelpers : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_TileCacheTestSuite_testTileTypeHelpers() : CxxTest::RealTestDescription( Tests_TileCacheTestSuite, suiteDescription_TileCacheTestSuite, 279, "testTileTypeHelpers" ) {}
+ void runTest() { suite_TileCacheTestSuite.testTileTypeHelpers(); }
+} testDescription_suite_TileCacheTestSuite_testTileTypeHelpers;
+
+#include "test_suites/test_component_table.h"
+
+static ComponentTableTestSuite suite_ComponentTableTestSuite;
+
+static CxxTest::List Tests_ComponentTableTestSuite = { 0, 0 };
+CxxTest::StaticSuiteDescription suiteDescription_ComponentTableTestSuite( "test_suites/test_component_table.h", 12, "ComponentTableTestSuite", suite_ComponentTableTestSuite, Tests_ComponentTableTestSuite );
+
+static class TestDescription_suite_ComponentTableTestSuite_testComponentTableStoresIndependentTypes : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_ComponentTableTestSuite_testComponentTableStoresIndependentTypes() : CxxTest::RealTestDescription( Tests_ComponentTableTestSuite, suiteDescription_ComponentTableTestSuite, 14, "testComponentTableStoresIndependentTypes" ) {}
+ void runTest() { suite_ComponentTableTestSuite.testComponentTableStoresIndependentTypes(); }
+} testDescription_suite_ComponentTableTestSuite_testComponentTableStoresIndependentTypes;
+
+static class TestDescription_suite_ComponentTableTestSuite_testComponentTableRemoveAndClear : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_ComponentTableTestSuite_testComponentTableRemoveAndClear() : CxxTest::RealTestDescription( Tests_ComponentTableTestSuite, suiteDescription_ComponentTableTestSuite, 38, "testComponentTableRemoveAndClear" ) {}
+ void runTest() { suite_ComponentTableTestSuite.testComponentTableRemoveAndClear(); }
+} testDescription_suite_ComponentTableTestSuite_testComponentTableRemoveAndClear;
+
+static class TestDescription_suite_ComponentTableTestSuite_testComponentTableSetOverwritesExistingValue : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_ComponentTableTestSuite_testComponentTableSetOverwritesExistingValue() : CxxTest::RealTestDescription( Tests_ComponentTableTestSuite, suiteDescription_ComponentTableTestSuite, 59, "testComponentTableSetOverwritesExistingValue" ) {}
+ void runTest() { suite_ComponentTableTestSuite.testComponentTableSetOverwritesExistingValue(); }
+} testDescription_suite_ComponentTableTestSuite_testComponentTableSetOverwritesExistingValue;
+
+static class TestDescription_suite_ComponentTableTestSuite_testComponentTableHighChurnInsertRemoveAcrossKinds : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_ComponentTableTestSuite_testComponentTableHighChurnInsertRemoveAcrossKinds() : CxxTest::RealTestDescription( Tests_ComponentTableTestSuite, suiteDescription_ComponentTableTestSuite, 80, "testComponentTableHighChurnInsertRemoveAcrossKinds" ) {}
+ void runTest() { suite_ComponentTableTestSuite.testComponentTableHighChurnInsertRemoveAcrossKinds(); }
+} testDescription_suite_ComponentTableTestSuite_testComponentTableHighChurnInsertRemoveAcrossKinds;
+
+#include "test_suites/test_utility_helpers.h"
+
+static UtilityHelpersTestSuite suite_UtilityHelpersTestSuite;
+
+static CxxTest::List Tests_UtilityHelpersTestSuite = { 0, 0 };
+CxxTest::StaticSuiteDescription suiteDescription_UtilityHelpersTestSuite( "test_suites/test_utility_helpers.h", 7, "UtilityHelpersTestSuite", suite_UtilityHelpersTestSuite, Tests_UtilityHelpersTestSuite );
+
+static class TestDescription_suite_UtilityHelpersTestSuite_testVec3Helpers : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_UtilityHelpersTestSuite_testVec3Helpers() : CxxTest::RealTestDescription( Tests_UtilityHelpersTestSuite, suiteDescription_UtilityHelpersTestSuite, 9, "testVec3Helpers" ) {}
+ void runTest() { suite_UtilityHelpersTestSuite.testVec3Helpers(); }
+} testDescription_suite_UtilityHelpersTestSuite_testVec3Helpers;
+
+static class TestDescription_suite_UtilityHelpersTestSuite_testEntityTypeToString : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_UtilityHelpersTestSuite_testEntityTypeToString() : CxxTest::RealTestDescription( Tests_UtilityHelpersTestSuite, suiteDescription_UtilityHelpersTestSuite, 26, "testEntityTypeToString" ) {}
+ void runTest() { suite_UtilityHelpersTestSuite.testEntityTypeToString(); }
+} testDescription_suite_UtilityHelpersTestSuite_testEntityTypeToString;
+
+#include "test_suites/test_world_interaction.h"
+
+static WorldInteractionTestSuite suite_WorldInteractionTestSuite;
+
+static CxxTest::List Tests_WorldInteractionTestSuite = { 0, 0 };
+CxxTest::StaticSuiteDescription suiteDescription_WorldInteractionTestSuite( "test_suites/test_world_interaction.h", 6, "WorldInteractionTestSuite", suite_WorldInteractionTestSuite, Tests_WorldInteractionTestSuite );
+
+static class TestDescription_suite_WorldInteractionTestSuite_testTryEntityMoveBlockedByWall : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_WorldInteractionTestSuite_testTryEntityMoveBlockedByWall() : CxxTest::RealTestDescription( Tests_WorldInteractionTestSuite, suiteDescription_WorldInteractionTestSuite, 27, "testTryEntityMoveBlockedByWall" ) {}
+ void runTest() { suite_WorldInteractionTestSuite.testTryEntityMoveBlockedByWall(); }
+} testDescription_suite_WorldInteractionTestSuite_testTryEntityMoveBlockedByWall;
+
+static class TestDescription_suite_WorldInteractionTestSuite_testTryEntityMoveBlockedBySolidPropAndClosedDoor : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_WorldInteractionTestSuite_testTryEntityMoveBlockedBySolidPropAndClosedDoor() : CxxTest::RealTestDescription( Tests_WorldInteractionTestSuite, suiteDescription_WorldInteractionTestSuite, 38, "testTryEntityMoveBlockedBySolidPropAndClosedDoor" ) {}
+ void runTest() { suite_WorldInteractionTestSuite.testTryEntityMoveBlockedBySolidPropAndClosedDoor(); }
+} testDescription_suite_WorldInteractionTestSuite_testTryEntityMoveBlockedBySolidPropAndClosedDoor;
+
+static class TestDescription_suite_WorldInteractionTestSuite_testCreateDoorAtWithRejectsOccupiedTile : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_WorldInteractionTestSuite_testCreateDoorAtWithRejectsOccupiedTile() : CxxTest::RealTestDescription( Tests_WorldInteractionTestSuite, suiteDescription_WorldInteractionTestSuite, 59, "testCreateDoorAtWithRejectsOccupiedTile" ) {}
+ void runTest() { suite_WorldInteractionTestSuite.testCreateDoorAtWithRejectsOccupiedTile(); }
+} testDescription_suite_WorldInteractionTestSuite_testCreateDoorAtWithRejectsOccupiedTile;
+
+static class TestDescription_suite_WorldInteractionTestSuite_testTryEntityMovePushesBox : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_WorldInteractionTestSuite_testTryEntityMovePushesBox() : CxxTest::RealTestDescription( Tests_WorldInteractionTestSuite, suiteDescription_WorldInteractionTestSuite, 69, "testTryEntityMovePushesBox" ) {}
+ void runTest() { suite_WorldInteractionTestSuite.testTryEntityMovePushesBox(); }
+} testDescription_suite_WorldInteractionTestSuite_testTryEntityMovePushesBox;
+
+static class TestDescription_suite_WorldInteractionTestSuite_testTryEntityPullMovesHeroAndBoxBackward : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_WorldInteractionTestSuite_testTryEntityPullMovesHeroAndBoxBackward() : CxxTest::RealTestDescription( Tests_WorldInteractionTestSuite, suiteDescription_WorldInteractionTestSuite, 82, "testTryEntityPullMovesHeroAndBoxBackward" ) {}
+ void runTest() { suite_WorldInteractionTestSuite.testTryEntityPullMovesHeroAndBoxBackward(); }
+} testDescription_suite_WorldInteractionTestSuite_testTryEntityPullMovesHeroAndBoxBackward;
+
+static class TestDescription_suite_WorldInteractionTestSuite_testTryEntityPullDeadNpcKeepsDeadNpcCachePath : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_WorldInteractionTestSuite_testTryEntityPullDeadNpcKeepsDeadNpcCachePath() : CxxTest::RealTestDescription( Tests_WorldInteractionTestSuite, suiteDescription_WorldInteractionTestSuite, 96, "testTryEntityPullDeadNpcKeepsDeadNpcCachePath" ) {}
+ void runTest() { suite_WorldInteractionTestSuite.testTryEntityPullDeadNpcKeepsDeadNpcCachePath(); }
+} testDescription_suite_WorldInteractionTestSuite_testTryEntityPullDeadNpcKeepsDeadNpcCachePath;
+
+static class TestDescription_suite_WorldInteractionTestSuite_testTryEntityMoveRespectsDoorOnEntityFloorNotCurrentFloor : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_WorldInteractionTestSuite_testTryEntityMoveRespectsDoorOnEntityFloorNotCurrentFloor() : CxxTest::RealTestDescription( Tests_WorldInteractionTestSuite, suiteDescription_WorldInteractionTestSuite, 121, "testTryEntityMoveRespectsDoorOnEntityFloorNotCurrentFloor" ) {}
+ void runTest() { suite_WorldInteractionTestSuite.testTryEntityMoveRespectsDoorOnEntityFloorNotCurrentFloor(); }
+} testDescription_suite_WorldInteractionTestSuite_testTryEntityMoveRespectsDoorOnEntityFloorNotCurrentFloor;
+
+static class TestDescription_suite_WorldInteractionTestSuite_testTryEntityOpenDoorUsesDoorLocationFloor : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_WorldInteractionTestSuite_testTryEntityOpenDoorUsesDoorLocationFloor() : CxxTest::RealTestDescription( Tests_WorldInteractionTestSuite, suiteDescription_WorldInteractionTestSuite, 138, "testTryEntityOpenDoorUsesDoorLocationFloor" ) {}
+ void runTest() { suite_WorldInteractionTestSuite.testTryEntityOpenDoorUsesDoorLocationFloor(); }
+} testDescription_suite_WorldInteractionTestSuite_testTryEntityOpenDoorUsesDoorLocationFloor;
+
+static class TestDescription_suite_WorldInteractionTestSuite_testTryEntityOpenChestUsesChestLocationFloorAndOpensMenu : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_WorldInteractionTestSuite_testTryEntityOpenChestUsesChestLocationFloorAndOpensMenu() : CxxTest::RealTestDescription( Tests_WorldInteractionTestSuite, suiteDescription_WorldInteractionTestSuite, 155, "testTryEntityOpenChestUsesChestLocationFloorAndOpensMenu" ) {}
+ void runTest() { suite_WorldInteractionTestSuite.testTryEntityOpenChestUsesChestLocationFloorAndOpensMenu(); }
+} testDescription_suite_WorldInteractionTestSuite_testTryEntityOpenChestUsesChestLocationFloorAndOpensMenu;
+
+static class TestDescription_suite_WorldInteractionTestSuite_testTryEntityInteractOpensNpcDialogueModal : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_WorldInteractionTestSuite_testTryEntityInteractOpensNpcDialogueModal() : CxxTest::RealTestDescription( Tests_WorldInteractionTestSuite, suiteDescription_WorldInteractionTestSuite, 176, "testTryEntityInteractOpensNpcDialogueModal" ) {}
+ void runTest() { suite_WorldInteractionTestSuite.testTryEntityInteractOpensNpcDialogueModal(); }
+} testDescription_suite_WorldInteractionTestSuite_testTryEntityInteractOpensNpcDialogueModal;
+
+static class TestDescription_suite_WorldInteractionTestSuite_testTryEntityInteractOpensPropDescriptionModal : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_WorldInteractionTestSuite_testTryEntityInteractOpensPropDescriptionModal() : CxxTest::RealTestDescription( Tests_WorldInteractionTestSuite, suiteDescription_WorldInteractionTestSuite, 196, "testTryEntityInteractOpensPropDescriptionModal" ) {}
+ void runTest() { suite_WorldInteractionTestSuite.testTryEntityInteractOpensPropDescriptionModal(); }
+} testDescription_suite_WorldInteractionTestSuite_testTryEntityInteractOpensPropDescriptionModal;
+
+static class TestDescription_suite_WorldInteractionTestSuite_testTryEntityInteractOpensBoxDescriptionModal : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_WorldInteractionTestSuite_testTryEntityInteractOpensBoxDescriptionModal() : CxxTest::RealTestDescription( Tests_WorldInteractionTestSuite, suiteDescription_WorldInteractionTestSuite, 216, "testTryEntityInteractOpensBoxDescriptionModal" ) {}
+ void runTest() { suite_WorldInteractionTestSuite.testTryEntityInteractOpensBoxDescriptionModal(); }
+} testDescription_suite_WorldInteractionTestSuite_testTryEntityInteractOpensBoxDescriptionModal;
+
+static class TestDescription_suite_WorldInteractionTestSuite_testTryEntityInteractOpensChestDescriptionModal : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_WorldInteractionTestSuite_testTryEntityInteractOpensChestDescriptionModal() : CxxTest::RealTestDescription( Tests_WorldInteractionTestSuite, suiteDescription_WorldInteractionTestSuite, 232, "testTryEntityInteractOpensChestDescriptionModal" ) {}
+ void runTest() { suite_WorldInteractionTestSuite.testTryEntityInteractOpensChestDescriptionModal(); }
+} testDescription_suite_WorldInteractionTestSuite_testTryEntityInteractOpensChestDescriptionModal;
+
+static class TestDescription_suite_WorldInteractionTestSuite_testTryEntityInteractOpensDoorDescriptionModal : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_WorldInteractionTestSuite_testTryEntityInteractOpensDoorDescriptionModal() : CxxTest::RealTestDescription( Tests_WorldInteractionTestSuite, suiteDescription_WorldInteractionTestSuite, 248, "testTryEntityInteractOpensDoorDescriptionModal" ) {}
+ void runTest() { suite_WorldInteractionTestSuite.testTryEntityInteractOpensDoorDescriptionModal(); }
+} testDescription_suite_WorldInteractionTestSuite_testTryEntityInteractOpensDoorDescriptionModal;
+
+static class TestDescription_suite_WorldInteractionTestSuite_testHandleInputInteractionClosesModalAndRestoresPlayerControl : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_WorldInteractionTestSuite_testHandleInputInteractionClosesModalAndRestoresPlayerControl() : CxxTest::RealTestDescription( Tests_WorldInteractionTestSuite, suiteDescription_WorldInteractionTestSuite, 269, "testHandleInputInteractionClosesModalAndRestoresPlayerControl" ) {}
+ void runTest() { suite_WorldInteractionTestSuite.testHandleInputInteractionClosesModalAndRestoresPlayerControl(); }
+} testDescription_suite_WorldInteractionTestSuite_testHandleInputInteractionClosesModalAndRestoresPlayerControl;
+
+static class TestDescription_suite_WorldInteractionTestSuite_testUpdatePlayerTilesExploredRevealsClosedDoorTileButNotBeyond : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_WorldInteractionTestSuite_testUpdatePlayerTilesExploredRevealsClosedDoorTileButNotBeyond() : CxxTest::RealTestDescription( Tests_WorldInteractionTestSuite, suiteDescription_WorldInteractionTestSuite, 287, "testUpdatePlayerTilesExploredRevealsClosedDoorTileButNotBeyond" ) {}
+ void runTest() { suite_WorldInteractionTestSuite.testUpdatePlayerTilesExploredRevealsClosedDoorTileButNotBeyond(); }
+} testDescription_suite_WorldInteractionTestSuite_testUpdatePlayerTilesExploredRevealsClosedDoorTileButNotBeyond;
+
+static class TestDescription_suite_WorldInteractionTestSuite_testCanMoveOntoTileContainingFreshlyKilledDeadNpc : public CxxTest::RealTestDescription {
+public:
+ TestDescription_suite_WorldInteractionTestSuite_testCanMoveOntoTileContainingFreshlyKilledDeadNpc() : CxxTest::RealTestDescription( Tests_WorldInteractionTestSuite, suiteDescription_WorldInteractionTestSuite, 311, "testCanMoveOntoTileContainingFreshlyKilledDeadNpc" ) {}
+ void runTest() { suite_WorldInteractionTestSuite.testCanMoveOntoTileContainingFreshlyKilledDeadNpc(); }
+} testDescription_suite_WorldInteractionTestSuite_testCanMoveOntoTileContainingFreshlyKilledDeadNpc;
+
+#include <cxxtest/Root.cpp>
+const char* CxxTest::RealWorldDescription::_worldName = "cxxtest";
