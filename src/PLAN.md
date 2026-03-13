@@ -2,6 +2,14 @@
 
 Compact handoff for active refactor and test work.
 
+## Immediate Old Code Cleanup
+
+- [ ] Remove ALL references to spells, magic-use, etc
+  - [ ] This will return eventually, but to consolidate the existing codebase, I want to purge magic immediately
+  - [ ] All code involving spell casting or magic i.e. `ENTITY_SPELL` etc shall be removed
+  - [ ] Any unit tests involving spell casting or magic shall also be removed
+  - [ ] Verify all magic and spell casting references are removed
+
 ## Immediate New Feature Development
 
 - Interactions with non-aggressive entities
