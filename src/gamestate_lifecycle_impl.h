@@ -1,3 +1,7 @@
+/** @file gamestate_lifecycle_impl.h
+ *  @brief Core gameplay lifecycle, visibility, and tick helpers implemented on `gamestate`.
+ */
+
 #pragma once
 
 inline void gamestate::update_tile(tile_t& tile) {

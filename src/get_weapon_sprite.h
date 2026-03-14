@@ -1,3 +1,7 @@
+/** @file get_weapon_sprite.h
+ *  @brief Equipped-weapon sprite lookup helpers.
+ */
+
 #pragma once
 
 #include "gamestate.h"
@@ -7,6 +11,7 @@
 
 extern unordered_map<entityid, spritegroup*> spritegroups;
 
+/** @brief Return the equipped weapon's front-layer sprite for the entity's current animation. */
 static inline shared_ptr<sprite> get_weapon_front_sprite(gamestate& g, entityid id, spritegroup* sg) {
     //massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is -1");
@@ -30,7 +35,7 @@ static inline shared_ptr<sprite> get_weapon_front_sprite(gamestate& g, entityid 
     return retval;
 }
 
-
+/** @brief Return the equipped weapon's back-layer sprite for the entity's current animation. */
 static inline shared_ptr<sprite> get_weapon_back_sprite(gamestate& g, entityid id, spritegroup* sg) {
     //massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is -1");

@@ -1,7 +1,12 @@
+/** @file get_racial_modifiers.h
+ *  @brief Racial attribute modifier lookup helper.
+ */
+
 #pragma once
 
 #include "race.h"
 
+/** @brief Return the racial modifier for a race/stat-index pair. */
 static inline int get_racial_modifiers(race_t r, int stat) {
     switch (r) {
     case RACE_HUMAN:

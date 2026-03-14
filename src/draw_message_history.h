@@ -1,3 +1,7 @@
+/** @file draw_message_history.h
+ *  @brief Message-history panel drawing helper.
+ */
+
 #pragma once
 
 
@@ -7,7 +11,7 @@
 
 using std::min;
 
-
+/** @brief Draw the recent message history panel in the screen corner. */
 static inline void draw_message_history(gamestate& g) {
     char tmp[1024] = {0};
     const int font_size = DEFAULT_MSG_HISTORY_FONT_SIZE;

@@ -1,3 +1,7 @@
+/** @file massert.h
+ *  @brief Debug assertion macro with formatted error output and platform breakpoints.
+ */
+
 #pragma once
 #include <stdio.h>
 #include <stdlib.h>

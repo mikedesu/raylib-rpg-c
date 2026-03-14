@@ -1,3 +1,7 @@
+/** @file gamestate_options_impl.h
+ *  @brief Audio and window-color options helpers implemented on `gamestate`.
+ */
+
 #pragma once
 
 #include <algorithm>

@@ -1,9 +1,14 @@
+/** @file draw_interaction_modal.h
+ *  @brief NPC/prop interaction modal drawing helper.
+ */
+
 #pragma once
 
 #include "gamestate.h"
 #include "libgame_defines.h"
 #include <algorithm>
 
+/** @brief Draw the active interaction modal title and body text. */
 static inline void draw_interaction_modal(gamestate& g) {
     if (!g.display_interaction_modal || g.interaction_body.empty()) {
         return;

@@ -1,3 +1,7 @@
+/** @file gamestate_inventory_impl.h
+ *  @brief Inventory/chest management helpers implemented on `gamestate`.
+ */
+
 #pragma once
 
 inline bool gamestate::use_mini_inventory_menu() const {

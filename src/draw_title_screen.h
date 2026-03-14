@@ -1,3 +1,7 @@
+/** @file draw_title_screen.h
+ *  @brief Title-screen and main-menu drawing helper.
+ */
+
 #pragma once
 
 #include "gamestate.h"
@@ -7,6 +11,7 @@
 
 extern textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
+/** @brief Draw the title screen and optionally its menu selection list. */
 static inline void draw_title_screen(gamestate& g, bool show_menu) {
     constexpr int sm_font_size = 20;
     constexpr int font_size = 80;

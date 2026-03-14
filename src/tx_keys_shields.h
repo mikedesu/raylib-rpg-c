@@ -1,3 +1,7 @@
+/** @file tx_keys_shields.h
+ *  @brief Texture-key arrays for shield items and guard animations.
+ */
+
 #pragma once
 #include "texture_ids.h"
 // Shields

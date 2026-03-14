@@ -1,3 +1,7 @@
+/** @file gameplay_keybindings.h
+ *  @brief Keyboard profiles, gameplay input actions, and key-label helpers.
+ */
+
 #pragma once
 
 #include <array>
@@ -8,12 +12,14 @@
 using std::array;
 using std::string;
 
+/// @brief Built-in keyboard layouts offered by the controls UI.
 typedef enum {
     KEYBOARD_PROFILE_FULL = 0,
     KEYBOARD_PROFILE_LAPTOP,
     KEYBOARD_PROFILE_COUNT
 } keyboard_profile_t;
 
+/// @brief Bindable gameplay actions exposed through the controls system.
 typedef enum {
     INPUT_ACTION_MOVE_UP = 0,
     INPUT_ACTION_MOVE_DOWN,
@@ -51,9 +57,12 @@ typedef enum {
     INPUT_ACTION_COUNT
 } gameplay_input_action_t;
 
+/// @brief Number of key slots stored for each bindable gameplay action.
 static constexpr int GAMEPLAY_KEYBINDING_SLOTS = 3;
+/// @brief Fixed-size binding record storing primary and alternate keys for one action.
 using gameplay_keybinding_t = array<int, GAMEPLAY_KEYBINDING_SLOTS>;
 
+/** @brief Return the user-facing label for a keyboard profile. */
 static inline const char* keyboard_profile_label(keyboard_profile_t profile) {
     switch (profile) {
     case KEYBOARD_PROFILE_FULL:
@@ -67,6 +76,7 @@ static inline const char* keyboard_profile_label(keyboard_profile_t profile) {
     return "Unknown";
 }
 
+/** @brief Return the user-facing label for a bindable gameplay action. */
 static inline const char* gameplay_input_action_label(gameplay_input_action_t action) {
     switch (action) {
     case INPUT_ACTION_MOVE_UP: return "Move Up";
@@ -109,6 +119,7 @@ static inline const char* gameplay_input_action_label(gameplay_input_action_t ac
     return "Unknown Action";
 }
 
+/** @brief Convert a Raylib key code into a compact UI display string. */
 static inline string gameplay_key_name(int key) {
     switch (key) {
     case -1: return "Unbound";

@@ -1,3 +1,7 @@
+/** @file libdraw_lifecycle.h
+ *  @brief Renderer/window initialization and shutdown helpers.
+ */
+
 #pragma once
 
 #include "libdraw_context.h"
@@ -8,6 +12,7 @@
 #include "unload_textures.h"
 #include <cstdio>
 
+/** @brief Create and configure the renderer's off-screen render targets. */
 static inline void libdraw_init_render_targets(gamestate& g) {
     g.windowwidth = DEFAULT_WIN_WIDTH;
     g.windowheight = DEFAULT_WIN_HEIGHT;
@@ -31,6 +36,7 @@ static inline void libdraw_init_render_targets(gamestate& g) {
     target_dest = Rectangle{0, 0, DEFAULT_TARGET_WIDTH * 1.0f, DEFAULT_TARGET_HEIGHT * 1.0f};
 }
 
+/** @brief Load textures, shaders, audio, and initial scene textures for rendering. */
 static inline void libdraw_init_resources(gamestate& g) {
     load_textures(txinfo);
     load_shaders();
@@ -49,6 +55,7 @@ static inline void libdraw_init_resources(gamestate& g) {
     libdraw_load_sfx(g);
 }
 
+/** @brief Apply remaining renderer defaults after the OS window has been created. */
 static inline void libdraw_init_rest(gamestate& g) {
     SetExitKey(KEY_ESCAPE);
     SetTargetFPS(60);
@@ -85,6 +92,7 @@ static inline bool libdraw_windowshouldclose(gamestate& g) {
     return g.do_quit;
 }
 
+/** @brief Release renderer-owned resources without closing the OS window. */
 static inline void libdraw_close_partial() {
     UnloadMusicStream(music);
     CloseAudioDevice();

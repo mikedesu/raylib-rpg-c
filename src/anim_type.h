@@ -1,6 +1,10 @@
+/** @file anim_type.h
+ *  @brief High-level animation-type identifiers.
+ */
+
 #pragma once
 
-
+/// @brief Broad animation categories used by sprite and action systems.
 typedef enum anim_type_t {
 
     ANIM_TYPE_NONE = 0,

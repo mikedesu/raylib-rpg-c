@@ -1,3 +1,7 @@
+/** @file libdraw_frame_stats.h
+ *  @brief Debug-only frame timing helpers for renderer instrumentation.
+ */
+
 #pragma once
 
 #include "gamestate.h"

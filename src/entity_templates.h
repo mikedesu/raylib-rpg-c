@@ -1,3 +1,7 @@
+/** @file entity_templates.h
+ *  @brief Test/demo entity template initialization helpers.
+ */
+
 #pragma once
 
 #include "ComponentTraits.h"

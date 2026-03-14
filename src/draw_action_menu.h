@@ -1,10 +1,14 @@
+/** @file draw_action_menu.h
+ *  @brief Gameplay action-menu drawing helper.
+ */
+
 #pragma once
 
 
 #include "gamestate.h"
 #include "libgame_defines.h"
 
-
+/** @brief Draw the compact action menu for direct gameplay commands. */
 static inline void draw_action_menu(gamestate& g) {
     constexpr int fontsize = 10;
     constexpr int hp = 20;

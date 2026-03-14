@@ -1,8 +1,13 @@
+/** @file draw_weapon_sprite.h
+ *  @brief Equipped-weapon draw helpers for front/back render layers.
+ */
+
 #pragma once
 #include "gamestate.h"
 #include "get_weapon_sprite.h"
 #include "spritegroup.h"
 
+/** @brief Draw the equipped weapon sprite behind the entity when applicable. */
 static inline void draw_weapon_sprite_back(gamestate& g, entityid id, spritegroup* sg) {
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(sg, "spritegroup is NULL");
@@ -10,6 +15,7 @@ static inline void draw_weapon_sprite_back(gamestate& g, entityid id, spritegrou
     if (weapon_back_s) DrawTexturePro(*weapon_back_s->get_texture(), weapon_back_s->get_src(), sg->dest, (Vector2){0, 0}, 0, WHITE);
 }
 
+/** @brief Draw the equipped weapon sprite in front of the entity when applicable. */
 static inline void draw_weapon_sprite_front(gamestate& g, entityid id, spritegroup* sg) {
     massert(id != ENTITYID_INVALID, "id is invalid");
     massert(sg, "spritegroup is NULL");

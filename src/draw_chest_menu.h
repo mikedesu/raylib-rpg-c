@@ -1,3 +1,7 @@
+/** @file draw_chest_menu.h
+ *  @brief Chest/inventory transfer menu drawing helpers.
+ */
+
 #pragma once
 
 #include "draw_item_detail_text.h"
@@ -6,6 +10,7 @@
 
 extern unordered_map<entityid, spritegroup*> spritegroups;
 
+/** @brief Draw the right-side detail panel for the selected chest item. */
 static inline void draw_item_detail_panel(gamestate& g, const Rectangle& right_box, entityid selection_id) {
     spritegroup* sg = spritegroups[selection_id];
     if (!sg) {
@@ -26,6 +31,7 @@ static inline void draw_item_detail_panel(gamestate& g, const Rectangle& right_b
     }
 }
 
+/** @brief Draw the left-side grid of item sprites for an inventory view. */
 static inline void draw_inventory_grid(gamestate& g, shared_ptr<vector<entityid>> inventory, const Rectangle& left_box, bool show_equipped_labels) {
     float x = left_box.x + 2;
     float y = left_box.y + 2;
@@ -70,6 +76,7 @@ static inline void draw_inventory_grid(gamestate& g, shared_ptr<vector<entityid>
     }
 }
 
+/** @brief Draw the full chest transfer menu and selected-item detail view. */
 static inline void draw_chest_menu(gamestate& g) {
     if (!g.display_chest_menu || g.active_chest_id == ENTITYID_INVALID) {
         return;

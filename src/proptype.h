@@ -1,5 +1,10 @@
+/** @file proptype.h
+ *  @brief Prop subtype identifiers used for dungeon decoration entities.
+ */
+
 #pragma once
 
+/// @brief Supported prop variants that may be spawned into dungeon rooms.
 typedef enum
 {
     PROP_NONE,

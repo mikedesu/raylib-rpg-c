@@ -1,3 +1,7 @@
+/** @file tx_keys_rings.h
+ *  @brief Texture-key arrays for ring items.
+ */
+
 #pragma once
 #include "libgame_defines.h"
 

@@ -1,3 +1,7 @@
+/** @file mprint.h
+ *  @brief Debug logging macros for multiple verbosity levels.
+ */
+
 #pragma once
 #include <cstdio>
 // Single-line macros that clang-format won't break
@@ -37,4 +41,3 @@
 #define merror3(...) ((void)0)
 #define msuccess3(...) ((void)0)
 #endif
-

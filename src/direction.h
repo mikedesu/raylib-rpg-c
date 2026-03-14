@@ -1,7 +1,12 @@
+/** @file direction.h
+ *  @brief Direction enums and helpers for movement and facing vectors.
+ */
+
 #pragma once
 
 #include "vec3.h"
 
+/// @brief Cardinal and diagonal movement/facing directions used by gameplay logic.
 typedef enum direction_t {
     DIR_NONE,
     DIR_UP,
@@ -16,7 +21,7 @@ typedef enum direction_t {
     DIR_COUNT
 } direction_t;
 
-
+/** @brief Return the opposite of the provided direction, or `DIR_UNKNOWN`. */
 constexpr static inline direction_t get_opposite_dir(direction_t dir) {
     switch (dir) {
     case DIR_UP: return DIR_DOWN;
@@ -32,7 +37,7 @@ constexpr static inline direction_t get_opposite_dir(direction_t dir) {
     return DIR_UNKNOWN;
 }
 
-
+/** @brief Return the x-axis delta associated with a direction. */
 constexpr static inline int get_x_from_dir(direction_t dir) {
     switch (dir) {
     case DIR_UP_LEFT:
@@ -49,6 +54,7 @@ constexpr static inline int get_x_from_dir(direction_t dir) {
     }
 }
 
+/** @brief Return the y-axis delta associated with a direction. */
 constexpr static inline int get_y_from_dir(direction_t dir) {
     switch (dir) {
     case DIR_UP:
@@ -65,6 +71,7 @@ constexpr static inline int get_y_from_dir(direction_t dir) {
     }
 }
 
+/** @brief Convert a direction into a unit-ish `vec3` tile delta. */
 constexpr static inline vec3 get_loc_from_dir(direction_t dir) {
     vec3 loc = {0, 0, 0};
     switch (dir) {
@@ -83,7 +90,7 @@ constexpr static inline vec3 get_loc_from_dir(direction_t dir) {
     return loc;
 }
 
-
+/** @brief Convert an `(x, y)` delta pair into a direction enum. */
 constexpr static inline const direction_t get_dir_from_xy(int x, int y) {
     if (x == 0 && y == 0)
         return DIR_NONE;
@@ -107,10 +114,12 @@ constexpr static inline const direction_t get_dir_from_xy(int x, int y) {
     return DIR_UNKNOWN;
 }
 
+/** @brief Convert a `vec3` tile delta into a direction enum using its x/y axes. */
 constexpr static inline direction_t get_dir_from_loc(vec3 loc) {
     return get_dir_from_xy(loc.x, loc.y);
 }
 
+/** @brief Return a lowercase string label for a direction enum. */
 constexpr static inline const char* get_dir_as_string(direction_t dir) {
     switch (dir) {
     case DIR_UP: return "up";

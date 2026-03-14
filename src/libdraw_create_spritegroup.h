@@ -1,3 +1,7 @@
+/** @file libdraw_create_spritegroup.h
+ *  @brief Helpers for creating renderer spritegroups from texture-key arrays.
+ */
+
 #pragma once
 
 #include "dungeon_floor.h"
@@ -10,6 +14,12 @@
 extern textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 extern unordered_map<entityid, spritegroup*> spritegroups;
 
+/**
+ * @brief Create and register a spritegroup for an entity.
+ *
+ * The spritegroup is initialized from the provided texture keys and snapped to
+ * the entity location when a location component exists.
+ */
 static inline bool create_spritegroup(gamestate& g, entityid id, int* keys, int num_keys, int offset_x, int offset_y) {
     minfo("BEGIN create_spritegroup");
     massert(txinfo, "txinfo is null");
@@ -108,6 +118,7 @@ static inline bool create_spritegroup(gamestate& g, entityid id, int* keys, int 
     return true;
 }
 
+/** @brief Create a spritegroup using the project's default sprite offsets. */
 static inline bool create_sg(gamestate& g, entityid id, int* keys, int num_keys) {
     return create_spritegroup(g, id, keys, num_keys, -12, -12);
 }

@@ -1,5 +1,10 @@
+/** @file arrow.h
+ *  @brief Arrow subtype identifiers.
+ */
+
 #pragma once
 
+/// @brief Supported arrow/ammunition variants.
 typedef enum arrowtype_t
 {
     ARROW_NONE,

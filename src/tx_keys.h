@@ -1,3 +1,7 @@
+/** @file tx_keys.h
+ *  @brief Aggregate include for spritegroup texture-key arrays by asset category.
+ */
+
 #pragma once
 #include "libgame_defines.h"
 #include "tx_keys_boxes.h"

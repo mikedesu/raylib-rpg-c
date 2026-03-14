@@ -1,3 +1,7 @@
+/** @file gamestate_damage_popups_impl.h
+ *  @brief Damage-popup lifecycle helpers implemented on `gamestate`.
+ */
+
 #pragma once
 
 inline void gamestate::add_damage_popup(entityid target_id, int amount, bool critical) {

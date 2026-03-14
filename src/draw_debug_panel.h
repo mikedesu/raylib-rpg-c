@@ -1,8 +1,13 @@
+/** @file draw_debug_panel.h
+ *  @brief Debug overlay panel drawing helper.
+ */
+
 #pragma once
 
 #include "gamestate.h"
 #include "libgame_defines.h"
 
+/** @brief Draw the on-screen debug panel using the current buffer contents. */
 static inline void draw_debug_panel(gamestate& g) {
     minfo3("draw debug panel");
     constexpr int fontsize = 20;

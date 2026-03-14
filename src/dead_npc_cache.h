@@ -1,18 +1,29 @@
+/** @file dead_npc_cache.h
+ *  @brief Small rolling cache of dead NPC entity ids for tile occupancy.
+ */
+
 #pragma once
 
 #include "entityid.h"
 #include <cstddef>
 
 #ifndef DEAD_NPC_CACHE_SIZE
+/// @brief Maximum number of dead NPC ids retained in one tile cache.
 #define DEAD_NPC_CACHE_SIZE 8
 #endif
 
+/**
+ * @brief Fixed-size cache of dead NPC ids associated with a tile.
+ *
+ * When full, newly added ids evict the oldest cached entry.
+ */
 class dead_npc_cache {
 private:
     size_t count;
     entityid ids[DEAD_NPC_CACHE_SIZE];
 
 public:
+    /** @brief Construct an empty dead-NPC cache. */
     dead_npc_cache() {
         count = 0;
         for (int i = 0; i < DEAD_NPC_CACHE_SIZE; i++) {
@@ -20,13 +31,16 @@ public:
         }
     }
 
+    /** @brief Destroy the cache object. */
     ~dead_npc_cache() {
     }
 
+    /** @brief Return the number of cached dead NPC ids. */
     size_t get_count() {
         return count;
     }
 
+    /** @brief Append a dead NPC id, evicting the oldest id if the cache is full. */
     void add_id(entityid id) {
         if (count < DEAD_NPC_CACHE_SIZE) {
             ids[count++] = id;
@@ -40,6 +54,7 @@ public:
         }
     }
 
+    /** @brief Return the index of an id in the cache, or `-1` when absent. */
     int contains(entityid id) {
         for (int i = 0; i < count; i++) {
             if (ids[i] == id) {
@@ -49,6 +64,7 @@ public:
         return -1;
     }
 
+    /** @brief Remove an id from the cache if present. */
     bool remove_id(entityid id) {
         int i = contains(id);
         if (i != -1) {
@@ -62,6 +78,7 @@ public:
         return false;
     }
 
+    /** @brief Return the most recently cached dead NPC id, or `INVALID`. */
     entityid top() {
         if (count == 0) {
             return INVALID;
@@ -69,6 +86,7 @@ public:
         return ids[count - 1];
     }
 
+    /** @brief Remove and return the most recently cached dead NPC id, or `INVALID`. */
     entityid pop() {
         if (count == 0) {
             return INVALID;

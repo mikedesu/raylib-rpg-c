@@ -1,3 +1,7 @@
+/** @file camera_lock_on.h
+ *  @brief Helper for snapping the gameplay camera to the hero spritegroup.
+ */
+
 #pragma once
 
 #include "gamestate.h"
@@ -5,6 +9,7 @@
 
 extern unordered_map<entityid, spritegroup*> spritegroups;
 
+/** @brief Update the camera target to follow the hero when lock-on is enabled. */
 static inline bool camera_lock_on(gamestate& g) {
     if (!g.cam_lockon) {
         return false;

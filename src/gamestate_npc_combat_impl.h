@@ -1,3 +1,7 @@
+/** @file gamestate_npc_combat_impl.h
+ *  @brief Combat, NPC behavior, and pathing helpers implemented on `gamestate`.
+ */
+
 #pragma once
 
 inline int gamestate::compute_armor_class(entityid id) {

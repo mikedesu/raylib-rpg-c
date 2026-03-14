@@ -1,3 +1,7 @@
+/** @file libdraw_player_target_box.h
+ *  @brief Helper for drawing the player's current target/facing tile highlight.
+ */
+
 #pragma once
 
 #include "gamestate.h"
@@ -6,7 +10,7 @@
 
 extern unordered_map<int, Shader> shaders;
 
-
+/** @brief Draw the highlighted tile box in front of the player actor. */
 static inline bool libdraw_draw_player_target_box(gamestate& g) {
     //massert(g, "gamestate is NULL");
     entityid id = g.hero_id;

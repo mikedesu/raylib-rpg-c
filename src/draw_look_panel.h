@@ -1,8 +1,13 @@
+/** @file draw_look_panel.h
+ *  @brief Tile-inspection panel drawing helper.
+ */
+
 #pragma once
 
 #include "gamestate.h"
 #include "libgame_defines.h"
 
+/** @brief Draw the local-tile inspection panel for the hero's current tile. */
 static inline void draw_look_panel(gamestate& g) {
     //To make this useful, we need to construct strings telling us info about the tile
 

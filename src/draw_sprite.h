@@ -1,4 +1,8 @@
 
+/** @file draw_sprite.h
+ *  @brief Composite entity/equipment sprite drawing helper.
+ */
+
 #pragma once
 
 #include "draw_entity_sprite.h"
@@ -9,6 +13,7 @@
 
 extern unordered_map<entityid, spritegroup*> spritegroups;
 
+/** @brief Draw an entity sprite together with any equipped shield and weapon layers. */
 static inline void draw_sprite_and_shadow(gamestate& g, entityid id) {
     //massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");

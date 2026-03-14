@@ -1,5 +1,10 @@
+/** @file damagetype.h
+ *  @brief Damage-type identifiers for combat calculations.
+ */
+
 #pragma once
 
+/// @brief Supported high-level damage categories.
 typedef enum {
     DAMAGE_NONE,
     DAMAGE_CUTTING,

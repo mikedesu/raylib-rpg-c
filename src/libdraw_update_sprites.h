@@ -1,3 +1,7 @@
+/** @file libdraw_update_sprites.h
+ *  @brief Pre/post-frame spritegroup and animation update helpers.
+ */
+
 #pragma once
 
 #include "ComponentTraits.h"
@@ -9,7 +13,7 @@
 #include "update_sprite.h"
 #include <raylib.h>
 
-
+/** @brief Run pre-draw sprite and dirty-entity updates for the current frame. */
 static inline void libdraw_update_sprites_pre(gamestate& g) {
     minfo2("BEGIN update sprites pre");
     handle_music_stream(g);
@@ -22,9 +26,7 @@ static inline void libdraw_update_sprites_pre(gamestate& g) {
     msuccess2("END update sprites pre");
 }
 
-
-
-
+/** @brief Run post-draw animation advancement and gamestate-flag handling. */
 static inline void libdraw_update_sprites_post(gamestate& g) {
     if (g.current_scene != SCENE_GAMEPLAY) {
         g.frame_dirty = false;

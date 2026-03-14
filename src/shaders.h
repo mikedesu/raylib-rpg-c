@@ -1,3 +1,7 @@
+/** @file shaders.h
+ *  @brief Shader loading and teardown helpers.
+ */
+
 #pragma once
 
 #include <raylib.h>
@@ -7,7 +11,7 @@ using std::unordered_map;
 
 extern unordered_map<int, Shader> shaders;
 
-
+/** @brief Load the project's runtime shaders into the shared shader map. */
 static inline void load_shaders() {
 #ifdef WEB
     shaders[1] = LoadShader(0, "shaders/web/green-glow.frag");
@@ -23,7 +27,7 @@ static inline void load_shaders() {
     //shader_tile_glow = LoadShader(0, "psychedelic_ripple.frag");
 }
 
-
+/** @brief Unload the shaders currently stored in the shared shader map. */
 static inline void unload_shaders() {
     UnloadShader(shaders[1]);
 

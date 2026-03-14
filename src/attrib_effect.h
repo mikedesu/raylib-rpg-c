@@ -1,3 +1,7 @@
+/** @file attrib_effect.h
+ *  @brief Attribute-affecting effect payload definitions.
+ */
+
 #pragma once
 
 #include "roll.h"
@@ -10,6 +14,7 @@
 //    ATTRIB_EFFECT_COUNT
 //} attrib_effect_type;
 
+/// @brief Stat-targeted rolled effect payload used by consumables or rewards.
 typedef struct attrib_effect_t {
     //attrib_effect_type_t type;
     stats_slot stat;

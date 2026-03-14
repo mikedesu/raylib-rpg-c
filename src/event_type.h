@@ -1,5 +1,10 @@
+/** @file event_type.h
+ *  @brief Event categories for animation, combat, and inventory actions.
+ */
+
 #pragma once
 
+/// @brief High-level event types that can describe gameplay actions.
 typedef enum {
     EVENT_NONE, // No event
     EVENT_MOVE, // Walking to a new tile

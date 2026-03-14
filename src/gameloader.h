@@ -1,3 +1,7 @@
+/** @file gameloader.h
+ *  @brief High-level game bootstrap and main-loop entry helpers.
+ */
+
 #pragma once
 #include "gamestate.h"
 #include "inputstate.h"
@@ -12,6 +16,7 @@ shared_ptr<gamestate> g = gamestateinitptr();
 
 
 #ifndef WEB
+/** @brief Run the native desktop game bootstrap and main loop. */
 static inline void gamerun() {
     shared_ptr<inputstate> is = make_shared<inputstate>();
     shared_ptr<gamestate> g = gamestateinitptr();
@@ -39,6 +44,7 @@ static inline void gamerun() {
     gamestate_free(g);
 }
 #else
+/** @brief Run the web build bootstrap and hand control to Emscripten's main loop. */
 void gamerun() {
     shared_ptr<inputstate> is = make_shared<inputstate>();
     shared_ptr<gamestate> g = gamestateinitptr();

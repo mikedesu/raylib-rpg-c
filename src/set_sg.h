@@ -1,3 +1,7 @@
+/** @file set_sg.h
+ *  @brief Helpers for switching spritegroups into state-driven animations.
+ */
+
 #pragma once
 
 #include "gamestate.h"
@@ -7,6 +11,7 @@
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
 
+/** @brief Switch an entity spritegroup into its successful-block animation state. */
 static inline void libdraw_set_sg_block_success(gamestate& g, entityid id, spritegroup* const sg) {
     minfo("set sg block success");
     massert(id != ENTITYID_INVALID, "entity id is -1");
@@ -30,9 +35,7 @@ static inline void libdraw_set_sg_block_success(gamestate& g, entityid id, sprit
     g.ct.set<block_success>(id, false);
 }
 
-
-
-
+/** @brief Switch an entity spritegroup into its damage-react animation state. */
 static inline void libdraw_set_sg_is_damaged(gamestate& g, entityid id, spritegroup* const sg) {
     massert(id != ENTITYID_INVALID, "entity id is -1");
     massert(sg, "spritegroup is NULL");
@@ -42,9 +45,7 @@ static inline void libdraw_set_sg_is_damaged(gamestate& g, entityid id, spritegr
     sg->set_current(anim_index);
 }
 
-
-
-
+/** @brief Switch an entity spritegroup into its death animation state when dead. */
 static inline void libdraw_set_sg_is_dead(gamestate& g, entityid id, spritegroup* const sg) {
     massert(id != ENTITYID_INVALID, "entity id is -1");
     massert(sg, "spritegroup is NULL");
@@ -79,9 +80,7 @@ static inline void libdraw_set_sg_is_dead(gamestate& g, entityid id, spritegroup
     sg->set_stop_on_last_frame(true);
 }
 
-
-
-
+/** @brief Switch an entity spritegroup into its attack animation state. */
 static inline void libdraw_set_sg_is_attacking(gamestate& g, entityid id, spritegroup* const sg) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     massert(sg, "spritegroup is NULL");

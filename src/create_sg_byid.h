@@ -1,3 +1,7 @@
+/** @file create_sg_byid.h
+ *  @brief Spritegroup-factory helpers keyed by entity runtime type and subtype.
+ */
+
 #pragma once
 
 #include "entitytype.h"
@@ -15,6 +19,7 @@
 #include "tx_keys_shields.h"
 #include "tx_keys_weapons.h"
 
+/** @brief Create an NPC spritegroup using the entity's race-specific texture keys. */
 static inline void create_npc_sg_byid(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
 
@@ -87,6 +92,7 @@ static inline void create_npc_sg_byid(gamestate& g, entityid id) {
     create_sg(g, id, keys, key_count);
 }
 
+/** @brief Create a door spritegroup using the default door texture keys. */
 static inline void create_door_sg_byid(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     minfo("create_door_sg_byid: %d", id);
@@ -94,17 +100,20 @@ static inline void create_door_sg_byid(gamestate& g, entityid id) {
     create_sg(g, id, TX_WOODEN_DOOR_KEYS, TX_WOODEN_DOOR_COUNT);
 }
 
+/** @brief Create a box spritegroup using the default box texture keys. */
 static inline void create_box_sg_byid(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     //create_spritegroup(g, id, TX_WOODEN_BOX_KEYS, TX_WOODEN_BOX_COUNT, -12, -12);
     create_sg(g, id, TX_WOODEN_BOX_KEYS, TX_WOODEN_BOX_COUNT);
 }
 
+/** @brief Create a chest spritegroup using the default chest texture keys. */
 static inline void create_chest_sg_byid(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     create_sg(g, id, TX_TREASURE_CHEST_KEYS, TX_TREASURE_CHEST_COUNT);
 }
 
+/** @brief Create a potion spritegroup based on the item's potion subtype. */
 static inline void create_potion_sg_byid(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     switch (g.ct.get<potiontype>(id).value_or(POTION_NONE)) {
@@ -119,6 +128,7 @@ static inline void create_potion_sg_byid(gamestate& g, entityid id) {
     }
 }
 
+/** @brief Create a weapon spritegroup based on the item's weapon subtype. */
 static inline void create_weapon_sg_byid(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     switch (g.ct.get<weapontype>(id).value_or(WEAPON_NONE)) {
@@ -133,6 +143,7 @@ static inline void create_weapon_sg_byid(gamestate& g, entityid id) {
     }
 }
 
+/** @brief Create a shield spritegroup based on the item's shield subtype. */
 static inline void create_shield_sg_byid(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     switch (g.ct.get<shieldtype>(id).value_or(SHIELD_NONE)) {
@@ -143,6 +154,7 @@ static inline void create_shield_sg_byid(gamestate& g, entityid id) {
     }
 }
 
+/** @brief Create an item spritegroup based on the item's broad item type. */
 static inline void create_item_sg_byid(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     switch (g.ct.get<itemtype>(id).value_or(ITEM_NONE)) {
@@ -153,6 +165,7 @@ static inline void create_item_sg_byid(gamestate& g, entityid id) {
     }
 }
 
+/** @brief Create a prop spritegroup based on the entity's prop subtype. */
 static inline void create_prop_sg_byid(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     switch (g.ct.get<proptype>(id).value_or(PROP_NONE)) {
@@ -177,6 +190,7 @@ static inline void create_prop_sg_byid(gamestate& g, entityid id) {
     }
 }
 
+/** @brief Dispatch spritegroup creation for an entity using its entity type. */
 static inline void create_sg_byid(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     switch (g.ct.get<entitytype>(id).value_or(ENTITY_NONE)) {

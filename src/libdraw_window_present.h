@@ -1,3 +1,7 @@
+/** @file libdraw_window_present.h
+ *  @brief Dirty-scene refresh and final window-presentation helpers.
+ */
+
 #pragma once
 
 #include "libdraw_context.h"

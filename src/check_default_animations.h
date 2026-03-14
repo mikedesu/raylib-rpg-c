@@ -1,3 +1,7 @@
+/** @file check_default_animations.h
+ *  @brief Archived commented-out helper for validating default sprite animations.
+ */
+
 //#pragma once
 //
 //#include "gamestate.h"

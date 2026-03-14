@@ -1,7 +1,12 @@
+/** @file load_sfx.h
+ *  @brief Sound-effect loading helper.
+ */
+
 #pragma once
 
 #include "gamestate.h"
 
+/** @brief Load sound effects listed in `sfx.txt` into the active game state. */
 static inline void libdraw_load_sfx(gamestate& g) {
     FILE* infile = fopen("sfx.txt", "r");
     char buffer[128];

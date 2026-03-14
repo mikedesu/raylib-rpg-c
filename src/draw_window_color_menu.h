@@ -1,8 +1,13 @@
+/** @file draw_window_color_menu.h
+ *  @brief Window-box color configuration menu drawing helper.
+ */
+
 #pragma once
 
 #include "gamestate.h"
 #include "libgame_defines.h"
 
+/** @brief Draw the window-box color configuration menu and preview swatch. */
 static inline void draw_window_color_menu(gamestate& g) {
     if (!g.display_window_color_menu) {
         return;

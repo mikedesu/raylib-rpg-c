@@ -1,3 +1,7 @@
+/** @file gamestate_world_impl.h
+ *  @brief Dungeon/world generation and placement helpers implemented on `gamestate`.
+ */
+
 #pragma once
 
 namespace {

@@ -1,3 +1,7 @@
+/** @file load_music.h
+ *  @brief Background music loading and stream-rotation helpers.
+ */
+
 #pragma once
 
 #include "gamestate.h"
@@ -8,7 +12,7 @@ extern Music music;
 extern float music_volume;
 extern float master_volume;
 
-
+/** @brief Load one random music track from the configured music path list. */
 static inline void load_random_music(gamestate& g) {
     minfo2("BEGIN load_random_music");
     // load the music stream from the selected path
@@ -22,7 +26,7 @@ static inline void load_random_music(gamestate& g) {
     minfo2("END load_random_music");
 }
 
-
+/** @brief Advance the active music stream and rotate tracks when playback ends. */
 static inline void handle_music_stream(gamestate& g) {
     UpdateMusicStream(music);
     // handle load next music track
@@ -64,7 +68,7 @@ static inline void handle_music_stream(gamestate& g) {
     }
 }
 
-
+/** @brief Initialize music playback, master volume, and starting track state. */
 static inline void libdraw_load_music(gamestate& g) {
     minfo2("BEGIN load_music");
     load_random_music(g);

@@ -1,3 +1,7 @@
+/** @file libdraw_update_shield_for_entity.h
+ *  @brief Helper for syncing equipped-shield animation with an entity spritegroup.
+ */
+
 #pragma once
 #include "gamestate.h"
 #include "spritegroup.h"
@@ -5,6 +9,7 @@
 
 extern unordered_map<entityid, spritegroup*> spritegroups;
 
+/** @brief Update an equipped shield spritegroup to match the owner's current context. */
 static inline void update_shield_for_entity(gamestate& g, entityid id, spritegroup* sg) {
     minfo("update shield for entity %d", id);
     massert(id != ENTITYID_INVALID, "entity id is -1");

@@ -1,3 +1,7 @@
+/** @file draw_frame_2d.h
+ *  @brief Main gameplay-scene 2D composition helper.
+ */
+
 #pragma once
 
 
@@ -23,7 +27,7 @@
 #include "draw_window_color_menu.h"
 #include "gamestate.h"
 
-
+/** @brief Draw the gameplay world plus all active gameplay UI overlays. */
 static inline void libdraw_drawframe_2d(gamestate& g, int vision_dist, int light_rad) {
     //BeginShaderMode(shader_color_noise);
     //float time = (float)GetTime(); // Current time in seconds

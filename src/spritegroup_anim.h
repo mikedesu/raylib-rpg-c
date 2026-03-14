@@ -1,5 +1,10 @@
+/** @file spritegroup_anim.h
+ *  @brief Spritegroup animation-slot constants for entities and equipment.
+ */
+
 #pragma once
 
+/// @brief Shared animation-slot index for generic NPC idle animations.
 #define SG_ANIM_NPC_IDLE 0
 #define SG_ANIM_NPC_WALK 2
 #define SG_ANIM_NPC_ATTACK 4

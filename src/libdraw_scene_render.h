@@ -1,3 +1,7 @@
+/** @file libdraw_scene_render.h
+ *  @brief Scene-to-texture render dispatch helpers.
+ */
+
 #pragma once
 
 #include "libdraw_context.h"

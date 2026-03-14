@@ -1,4 +1,9 @@
+/** @file sfx.h
+ *  @brief Integer sound-effect identifiers used to index loaded SFX assets.
+ */
+
 #pragma once
+/// @brief Sound-effect id for the first loaded alchemy-lab clip.
 #define SFX_01_ALCHEMY_LAB 0
 #define SFX_02_ALCHEMY_GLASS_HANDLING_1 1
 #define SFX_03_ALCHEMY_GLASS_HANDLING_2 2

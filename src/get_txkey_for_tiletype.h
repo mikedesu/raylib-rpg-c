@@ -1,3 +1,7 @@
+/** @file get_txkey_for_tiletype.h
+ *  @brief Mapping helper from tile type enums to generated texture ids.
+ */
+
 #pragma once
 
 #include "dungeon_tile_type.h"
@@ -5,6 +9,7 @@
 #include "massert.h"
 #include "texture_ids.h"
 
+/** @brief Return the generated texture id that should be used for a tile type. */
 static inline int get_txkey_for_tiletype(tiletype_t type) {
     massert(type >= TILE_NONE, "tile type is less than none somehow?");
     massert(type < TILE_COUNT, "tile type is greater than count somehow?");

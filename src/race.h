@@ -1,3 +1,7 @@
+/** @file race.h
+ *  @brief Race identifiers and string conversion helpers.
+ */
+
 #pragma once
 
 #include "massert.h"
@@ -8,6 +12,7 @@
 using std::string;
 using std::unordered_map;
 
+/// @brief Supported player and NPC races used by factories and gameplay logic.
 typedef enum
 {
     RACE_NONE = 0,
@@ -27,9 +32,7 @@ typedef enum
     RACE_COUNT
 } race_t;
 
-
-
-
+/// @brief Mapping from race enum values to lowercase display/debug names.
 const unordered_map<race_t, string> rn = {{RACE_NONE, "race_none"},
                                           {RACE_COUNT, "race_count"},
                                           {RACE_HUMAN, "human"},
@@ -46,16 +49,14 @@ const unordered_map<race_t, string> rn = {{RACE_NONE, "race_none"},
                                           {RACE_SKELETON, "skeleton"},
                                           {RACE_RAT, "rat"}};
 
-
-
-
+/** @brief Convert a race enum into its configured string label. */
 const static inline string race2str(const race_t r) {
     massert(r >= RACE_NONE && r < RACE_COUNT, "Invalid race name");
     massert(rn.find(r) != rn.end(), "race doesn't exist in map!: %d", r);
     return rn.at(r);
 }
 
-
+/** @brief Convert a configured race string into a race enum, or `RACE_NONE`. */
 const static inline race_t str2race(const string str) {
     for (auto i : rn)
         if (str == i.second)

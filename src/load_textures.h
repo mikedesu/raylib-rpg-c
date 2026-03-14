@@ -1,9 +1,14 @@
+/** @file load_textures.h
+ *  @brief Texture metadata parsing and texture loading helpers.
+ */
+
 #pragma once
 
 #include "massert.h"
 #include "mprint.h"
 #include "textureinfo.h"
 
+/** @brief Load one texture and record its spritesheet metadata in the texture table. */
 static inline bool load_texture(textureinfo* txinfo, int txkey, int ctxs, int frames, bool do_dither, char* path) {
     massert(txinfo != NULL, "txinfo is NULL");
     massert(path, "path is NULL");
@@ -28,6 +33,7 @@ static inline bool load_texture(textureinfo* txinfo, int txkey, int ctxs, int fr
     return true;
 }
 
+/** @brief Load all textures declared in `textures.txt` into the texture table. */
 static inline bool load_textures(textureinfo* txinfo) {
     massert(txinfo != NULL, "txinfo is NULL");
     const char* textures_file = "textures.txt";

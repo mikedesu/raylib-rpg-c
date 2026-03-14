@@ -1,3 +1,7 @@
+/** @file update_sprite.h
+ *  @brief Per-entity spritegroup update helpers for context, movement, and animation state.
+ */
+
 #pragma once
 #include "ComponentTraits.h"
 #include "entitytype.h"
@@ -9,7 +13,7 @@
 
 extern unordered_map<entityid, spritegroup*> spritegroups;
 
-
+/** @brief Update a spritegroup's directional context row from an entity direction. */
 static inline void libdraw_update_sprite_context_ptr(gamestate& g, spritegroup* group, direction_t dir) {
     massert(group != NULL, "group is NULL");
     int old_ctx = group->sprites2->at(group->current)->get_currentcontext();
@@ -42,9 +46,7 @@ static inline void libdraw_update_sprite_context_ptr(gamestate& g, spritegroup* 
     group->setcontexts(ctx);
 }
 
-
-
-
+/** @brief Copy pending sprite movement into the spritegroup and choose walk anims. */
 static inline void libdraw_update_sprite_position(gamestate& g, entityid id, spritegroup* sg) {
     massert(sg, "spritegroup is NULL");
     massert(id != ENTITYID_INVALID, "entityid is invalid");
@@ -75,9 +77,7 @@ static inline void libdraw_update_sprite_position(gamestate& g, entityid id, spr
     }
 }
 
-
-
-
+/** @brief Apply all pending renderer-facing state updates to one spritegroup. */
 static inline void libdraw_update_sprite_ptr(gamestate& g, entityid id, spritegroup* sg) {
     minfo3("Begin update sprite ptr: %d", id);
     massert(id != ENTITYID_INVALID, "entityid is invalid");
@@ -134,9 +134,7 @@ static inline void libdraw_update_sprite_ptr(gamestate& g, entityid id, spritegr
     sg->snap_dest(loc.x, loc.y);
 }
 
-
-
-
+/** @brief Update one entity's spritegroup when it exists in the renderer cache. */
 static inline void libdraw_update_sprite_pre(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
     if (spritegroups.find(id) != spritegroups.end()) {

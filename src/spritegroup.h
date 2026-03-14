@@ -1,3 +1,7 @@
+/** @file spritegroup.h
+ *  @brief Grouped animation state for one entity's renderable sprites.
+ */
+
 #pragma once
 
 #include "entityid.h"
@@ -14,6 +18,12 @@ using std::shared_ptr;
 using std::unordered_map;
 using std::vector;
 
+/**
+ * @brief Collection of sprites and movement state used to draw one entity.
+ *
+ * The group tracks the active animation index, screen destination, interpolation
+ * offset, and visibility for a single entity's renderer-facing representation.
+ */
 class spritegroup {
 public:
     int size;
@@ -30,6 +40,7 @@ public:
     float move_rate;
     bool visible;
 
+    /** @brief Construct an empty spritegroup with the requested sprite capacity. */
     spritegroup(int cap) {
         massert(cap > 0, "cap must be greater than 0, got %d", cap);
         current = 0;
@@ -47,6 +58,7 @@ public:
         visible = true;
     }
 
+    /** @brief Destroy the owned sprite list container. */
     ~spritegroup() {
         if (sprites2) {
             sprites2->clear();
@@ -55,18 +67,22 @@ public:
         }
     }
 
+    /** @brief Return the sprite at `index`. */
     shared_ptr<sprite> get(int index) {
         return sprites2->at(index);
     }
 
+    /** @brief Return the number of sprites currently stored in the group. */
     size_t count() {
         return sprites2->size();
     }
 
+    /** @brief Return the sprite for the currently selected animation. */
     shared_ptr<sprite> get_current() {
         return sprites2->at(current);
     }
 
+    /** @brief Append a sprite to the group. */
     void add(shared_ptr<sprite> s) {
         massert(s, "s is null");
         massert(size < capacity, "size %d is >= capacity %d", size, capacity);
@@ -78,7 +94,7 @@ public:
         size++;
     }
 
-    // each sprite has a 'context' that corresponds to different directions
+    /** @brief Apply the same context row to every sprite in the group. */
     void setcontexts(int context) {
         for (int i = 0; i < size; i++) {
             auto s = sprites2->at(i);
@@ -89,16 +105,22 @@ public:
         }
     }
 
+    /** @brief Configure whether the active sprite should stop on its last frame. */
     void set_stop_on_last_frame(bool do_stop) {
         auto s = get_current();
         massert(s, "sprite is NULL");
         s->set_stop_on_last_frame(do_stop);
     }
 
+    /** @brief Set the animation index the group should return to after transient anims. */
     void set_default_anim(int anim) {
         default_anim = anim;
     }
 
+    /**
+     * @brief Snap the destination rectangle to a tile position if not already moving.
+     * @return `true` when the snap succeeded, otherwise `false`.
+     */
     bool snap_dest(int x, int y) {
         if (move.x != 0 || move.y != 0)
             return false;
@@ -107,6 +129,10 @@ public:
         return true;
     }
 
+    /**
+     * @brief Change the active animation sprite and reset its frame state.
+     * @return `true` after switching to the requested animation index.
+     */
     bool set_current(int index) {
         minfo2("spritegroup set current");
         massert(index >= 0, "index is negative: %d, %d", index, size);
@@ -118,6 +144,10 @@ public:
         return true;
     }
 
+    /**
+     * @brief Advance interpolated movement toward the destination rectangle.
+     * @return `true` while movement was still in progress this call.
+     */
     bool update_dest() {
         bool retval = false;
         if (move.x > 0) {

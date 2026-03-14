@@ -1,3 +1,9 @@
+/** @file is_loc_path_blocked.h
+ *  @brief Line-of-path obstruction helper for dungeon-space checks.
+ */
+
+#pragma once
+
 #include "calculate_linear_path.h"
 #include "gamestate.h"
 #include "vec3.h"
@@ -5,6 +11,11 @@
 
 using std::vector;
 
+/**
+ * @brief Return whether the path from `loc` to `hero_loc` is blocked by geometry or entities.
+ *
+ * Closed doors, walls, boxes, and living NPCs count as blockers.
+ */
 static inline bool is_loc_path_blocked(gamestate& g, shared_ptr<dungeon_floor> df, vec3 loc, vec3 hero_loc) {
     vector<vec3> path = calculate_path_with_thickness(loc, hero_loc);
     bool blocked = false;

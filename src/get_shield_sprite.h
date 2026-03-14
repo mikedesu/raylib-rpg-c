@@ -1,3 +1,7 @@
+/** @file get_shield_sprite.h
+ *  @brief Equipped-shield sprite lookup helpers.
+ */
+
 #pragma once
 
 #include "gamestate.h"
@@ -7,6 +11,7 @@
 
 extern unordered_map<entityid, spritegroup*> spritegroups;
 
+/** @brief Return the equipped shield's front-layer sprite for the entity's current animation. */
 static inline shared_ptr<sprite> get_shield_front_sprite(gamestate& g, entityid id, spritegroup* sg) {
     massert(id != ENTITYID_INVALID, "id is -1");
     massert(sg, "spritegroup is NULL");
@@ -28,7 +33,7 @@ static inline shared_ptr<sprite> get_shield_front_sprite(gamestate& g, entityid 
     return w_sg->get( SG_ANIM_BUCKLER_SUCCESS_FRONT);
 }
 
-
+/** @brief Return the equipped shield's back-layer sprite for the entity's current animation. */
 static inline shared_ptr<sprite> get_shield_back_sprite(gamestate& g, entityid id, spritegroup* sg) {
     //massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is -1");

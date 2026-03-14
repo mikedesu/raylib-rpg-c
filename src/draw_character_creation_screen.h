@@ -1,3 +1,7 @@
+/** @file draw_character_creation_screen.h
+ *  @brief Character-creation scene drawing helper.
+ */
+
 #pragma once
 
 #include "gamestate.h"
@@ -10,7 +14,7 @@
 
 extern textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
-
+/** @brief Draw the character-creation UI, stats, instructions, and race preview. */
 static inline void draw_character_creation_screen(gamestate& g) {
     minfo3("draw character creation scene");
 

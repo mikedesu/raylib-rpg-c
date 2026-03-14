@@ -1,5 +1,10 @@
+/** @file actionresults.h
+ *  @brief Detailed action outcome codes used by gameplay commands.
+ */
+
 #pragma once
 
+/// @brief Detailed result codes for movement, combat, pickup, and wait actions.
 typedef enum {
     AR_MOVE_SUCCESS = 1,
     AR_MOVE_FAIL_BLOCKED_BY_ENTITY = 2,

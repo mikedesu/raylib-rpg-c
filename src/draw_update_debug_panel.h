@@ -1,3 +1,7 @@
+/** @file draw_update_debug_panel.h
+ *  @brief Helper for rebuilding the debug panel text buffer.
+ */
+
 #pragma once
 
 #include "gamestate.h"
@@ -5,6 +9,7 @@
 
 extern unordered_map<entityid, spritegroup*> spritegroups;
 
+/** @brief Append the current debug text payload into the debug panel buffer. */
 static inline void update_debug_panel(gamestate& g) {
     minfo3("update debug panel");
     // concat a string onto the end of the debug panel message

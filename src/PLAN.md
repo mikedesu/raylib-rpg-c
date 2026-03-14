@@ -31,7 +31,9 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
   - [ ] eventually move away from implementation headers toward real `.cpp` files
 
 - [ ] Documentation
-  - [ ] continue Doxygen coverage on remaining core headers
+  - [x] continue Doxygen coverage on remaining core headers
+    - Completed a broad Doxygen/documentation sweep across the current non-generated header set, including core runtime, renderer, UI, world, helper, and test aggregate headers.
+    - `texture_ids.h` was intentionally left untouched per project rules.
 
 - [ ] Leveling / progression
   - [ ] choose a proper level-up sound or music cue
@@ -120,6 +122,7 @@ Compact status handoff for the current C++ / raylib dungeon project.
   - A separate heavy test target now exists for longer deterministic simulations.
   - Recent added coverage includes dungeon connectivity, bounded combat invariants, renderer-adjacent seam tests, and heavy pathfinding/chase plus combat soak tests.
   - Recent added coverage now also includes compact inventory selection behavior plus pull/push interactions for newly movable props.
+  - Core header documentation was brought up to date across the current non-generated header set with Doxygen file/type/helper coverage.
 
 - open door/open chest input change from KEY_O to KEY_D
 

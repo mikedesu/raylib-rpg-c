@@ -1,3 +1,7 @@
+/** @file draw_inventory_menu.h
+ *  @brief Full inventory menu drawing helper.
+ */
+
 #pragma once
 
 #include "draw_item_detail_text.h"
@@ -6,6 +10,7 @@
 
 extern unordered_map<entityid, spritegroup*> spritegroups;
 
+/** @brief Draw the full inventory grid and selected-item detail panel. */
 static inline void draw_inventory_menu(gamestate& g) {
     if (!g.display_inventory_menu) return;
     const char* menu_title = "Inventory Menu";

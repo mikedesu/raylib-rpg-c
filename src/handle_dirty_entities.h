@@ -1,9 +1,14 @@
+/** @file handle_dirty_entities.h
+ *  @brief Helpers for creating spritegroups for newly dirtied entities.
+ */
+
 #pragma once
 
 #include "create_sg_byid.h"
 #include "gamestate.h"
 #include "update_sprite.h"
 
+/** @brief Create/update spritegroups for newly added or dirtied entities. */
 static inline void libdraw_handle_dirty_entities(gamestate& g) {
     if (!g.dirty_entities)
         return;

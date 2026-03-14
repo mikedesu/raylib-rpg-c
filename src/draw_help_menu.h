@@ -1,8 +1,13 @@
+/** @file draw_help_menu.h
+ *  @brief Help/controls reference modal drawing helper.
+ */
+
 #pragma once
 
 #include "gamestate.h"
 #include "libgame_defines.h"
 
+/** @brief Draw the full help modal using the active keyboard profile labels. */
 static inline void draw_help_menu(gamestate& g) {
     const string text = TextFormat(
         "Help Menu\n"

@@ -1,3 +1,7 @@
+/** @file orc_names.h
+ *  @brief Small random-name helper for orc NPC generation.
+ */
+
 #pragma once
 
 #include <raylib.h>
@@ -5,7 +9,7 @@
 
 using std::string;
 
-
+/** @brief Return one random orc-flavored display name. */
 static inline string get_random_orc_name() {
     const int r = GetRandomValue(0, 4);
     switch (r) {

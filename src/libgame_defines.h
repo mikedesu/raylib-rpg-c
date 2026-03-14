@@ -1,3 +1,7 @@
+/** @file libgame_defines.h
+ *  @brief Shared compile-time constants for versioning, windowing, UI, and gameplay defaults.
+ */
+
 #pragma once
 
 #ifndef GAME_INFO_DEFINES

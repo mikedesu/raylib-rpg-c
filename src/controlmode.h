@@ -1,5 +1,10 @@
+/** @file controlmode.h
+ *  @brief Input-routing modes for gameplay and UI substates.
+ */
+
 #pragma once
 
+/// @brief Active control context used to dispatch input within a scene.
 typedef enum {
     CONTROLMODE_CAMERA = 0,
     CONTROLMODE_PLAYER,

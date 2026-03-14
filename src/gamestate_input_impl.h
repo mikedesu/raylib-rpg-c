@@ -1,3 +1,7 @@
+/** @file gamestate_input_impl.h
+ *  @brief Input-handling, modal, and level-up helpers implemented on `gamestate`.
+ */
+
 #pragma once
 
 inline void gamestate::open_confirm_prompt(confirm_action_t action, const char* fmt, ...) {

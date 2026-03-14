@@ -1,3 +1,7 @@
+/** @file tx_keys_monsters.h
+ *  @brief Texture-key arrays for monster spritegroups.
+ */
+
 #pragma once
 
 #include "libgame_defines.h"

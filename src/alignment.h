@@ -1,7 +1,12 @@
+/** @file alignment.h
+ *  @brief Alignment identifiers and cycling/string helpers.
+ */
+
 #pragma once
 
 #include <string>
 
+/// @brief Moral and ethical alignment values used by characters and NPCs.
 typedef enum {
     ALIGNMENT_NONE = 0,
     ALIGNMENT_GOOD_LAWFUL,
@@ -16,6 +21,7 @@ typedef enum {
     ALIGNMENT_COUNT,
 } alignment_t;
 
+/** @brief Convert an alignment enum into a user-facing string. */
 static inline std::string alignment_to_str(alignment_t alignment) {
     switch (alignment) {
     case ALIGNMENT_NONE: return "none";
@@ -34,6 +40,7 @@ static inline std::string alignment_to_str(alignment_t alignment) {
     return "invalid alignment";
 }
 
+/** @brief Return the next selectable non-none alignment, wrapping at the end. */
 static inline alignment_t alignment_next(alignment_t alignment) {
     if (alignment < ALIGNMENT_GOOD_LAWFUL || alignment >= ALIGNMENT_EVIL_CHAOTIC) {
         return ALIGNMENT_GOOD_LAWFUL;
@@ -41,6 +48,7 @@ static inline alignment_t alignment_next(alignment_t alignment) {
     return static_cast<alignment_t>(alignment + 1);
 }
 
+/** @brief Return the previous selectable non-none alignment, wrapping at the start. */
 static inline alignment_t alignment_prev(alignment_t alignment) {
     if (alignment <= ALIGNMENT_GOOD_LAWFUL || alignment >= ALIGNMENT_COUNT) {
         return ALIGNMENT_EVIL_CHAOTIC;

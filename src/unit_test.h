@@ -1,3 +1,7 @@
+/** @file unit_test.h
+ *  @brief Aggregate include for the fast unit-test suite.
+ */
+
 #pragma once
 
 #include "test_suites/test_component_table.h"

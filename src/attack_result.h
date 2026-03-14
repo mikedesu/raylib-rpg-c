@@ -1,5 +1,10 @@
+/** @file attack_result.h
+ *  @brief Outcome categories for resolved attack attempts.
+ */
+
 #pragma once
 
+/// @brief Coarse result categories returned from attack resolution.
 typedef enum
 {
     ATTACK_RESULT_NONE,

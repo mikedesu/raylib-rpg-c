@@ -1,3 +1,7 @@
+/** @file gamestate_scene_impl.h
+ *  @brief Scene-specific input and character-creation helpers implemented on `gamestate`.
+ */
+
 #pragma once
 
 inline void gamestate::handle_input_title_scene(inputstate& is) {

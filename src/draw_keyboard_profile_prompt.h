@@ -1,8 +1,13 @@
+/** @file draw_keyboard_profile_prompt.h
+ *  @brief Mandatory keyboard-profile prompt drawing helper.
+ */
+
 #pragma once
 
 #include "gamestate.h"
 #include "libgame_defines.h"
 
+/** @brief Draw the post-character-creation keyboard profile selection prompt. */
 static inline void draw_keyboard_profile_prompt(gamestate& g) {
     if (!g.display_keyboard_profile_prompt) {
         return;

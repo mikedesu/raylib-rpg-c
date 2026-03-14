@@ -1,10 +1,14 @@
+/** @file dungeon_tile_type.h
+ *  @brief Dungeon tile identifiers and tile-category helper functions.
+ */
+
 #pragma once
 
 
 #include <stdbool.h>
 #include <string>
 
-
+/// @brief Enumerated dungeon tile variants used by floor geometry and rendering.
 typedef enum {
     TILE_NONE,
     TILE_UPSTAIRS,
@@ -92,7 +96,7 @@ typedef enum {
     TILE_COUNT
 } tiletype_t;
 
-
+/** @brief Convert a tile type into a coarse string label for debugging. */
 static inline std::string tiletype2str(const tiletype_t type) {
     if (type == TILE_NONE)
         return "TileNone";
@@ -107,17 +111,17 @@ static inline std::string tiletype2str(const tiletype_t type) {
     return "TileError";
 }
 
-
+/** @brief Return whether a tile type is the explicit `TILE_NONE` sentinel. */
 constexpr static inline bool tiletype_is_none(const tiletype_t type) {
     return type == TILE_NONE;
 }
 
-
+/** @brief Return whether a tile type is not the explicit `TILE_NONE` sentinel. */
 constexpr static inline bool tile_is_not_none(const tiletype_t type) {
     return type != TILE_NONE;
 }
 
-
+/** @brief Return whether a tile type is one of the wall tiles. */
 constexpr static inline bool tiletype_is_wall(const tiletype_t type) {
     switch (type) {
     case TILE_STONE_WALL_00: return true;
@@ -127,17 +131,17 @@ constexpr static inline bool tiletype_is_wall(const tiletype_t type) {
     return false;
 }
 
-
+/** @brief Return whether a tile may be walked on by gameplay actors. */
 constexpr static inline bool tile_is_walkable(const tiletype_t type) {
     return !tiletype_is_wall(type) && type != TILE_UNKNOWN && type != TILE_NONE && type != TILE_COUNT;
 }
 
-
+/** @brief Return whether a tile type is valid for upstairs placement. */
 constexpr static inline bool tile_is_possible_upstairs(const tiletype_t type) {
     return tile_is_walkable(type) && type != TILE_DOWNSTAIRS && type != TILE_COUNT;
 }
 
-
+/** @brief Return whether a tile type is valid for downstairs placement. */
 constexpr static inline bool tile_is_possible_downstairs(const tiletype_t type) {
     return tile_is_walkable(type) && type != TILE_UPSTAIRS && type != TILE_COUNT;
 }

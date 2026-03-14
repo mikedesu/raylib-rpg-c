@@ -1,5 +1,10 @@
+/** @file biome.h
+ *  @brief Biome identifiers used when creating dungeon floors.
+ */
+
 #pragma once
 
+/// @brief Available biome styles for generated floors.
 typedef enum
 {
     BIOME_NONE = 0,

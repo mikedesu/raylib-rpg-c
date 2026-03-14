@@ -1,3 +1,7 @@
+/** @file gamestate_keybinding_impl.h
+ *  @brief Keybinding/profile management helpers implemented on `gamestate`.
+ */
+
 #pragma once
 
 inline bool gamestate::is_action_pressed(const inputstate& is, gameplay_input_action_t action) const {

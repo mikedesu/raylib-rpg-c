@@ -1,3 +1,7 @@
+/** @file libdraw_frame.h
+ *  @brief Top-level per-frame renderer entry point.
+ */
+
 #pragma once
 
 #include "libdraw_frame_stats.h"

@@ -1,3 +1,7 @@
+/** @file calculate_linear_path.h
+ *  @brief Straight-line path helper with extra diagonal thickness sampling.
+ */
+
 #pragma once
 
 #include "vec3.h"
@@ -9,6 +13,12 @@ using std::abs;
 using std::sort;
 using std::vector;
 
+/**
+ * @brief Compute a thickened straight-line path between two dungeon locations.
+ *
+ * The returned path excludes the start tile and may include adjacent tiles to
+ * better approximate diagonal line checks.
+ */
 static inline vector<vec3> calculate_path_with_thickness(vec3 start, vec3 end) {
     vector<vec3> path;
     int x1 = start.x;

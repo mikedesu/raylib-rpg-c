@@ -1,8 +1,13 @@
+/** @file draw_option_menu.h
+ *  @brief Top-level gameplay options menu drawing helper.
+ */
+
 #pragma once
 
 #include "gamestate.h"
 #include "libgame_defines.h"
 
+/** @brief Draw the gameplay options menu and active selection. */
 static inline void draw_option_menu(gamestate& g) {
     constexpr float x = 10, y = 10, p = 20, pa = 10, rotation = 0;
     constexpr int fsize = 10, thickness = 1;

@@ -1,3 +1,7 @@
+/** @file tx_keys_weapons.h
+ *  @brief Texture-key arrays for weapon items and attack animations.
+ */
+
 #pragma once
 #include "texture_ids.h"
 

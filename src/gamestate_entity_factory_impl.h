@@ -1,3 +1,7 @@
+/** @file gamestate_entity_factory_impl.h
+ *  @brief Entity/item/NPC factory helpers implemented on `gamestate`.
+ */
+
 #pragma once
 
 inline entityid gamestate::create_weapon_with(with_fun weaponInitFunction) {

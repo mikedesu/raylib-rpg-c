@@ -1,3 +1,7 @@
+/** @file libdraw_to_texture.h
+ *  @brief Helpers that render scenes and overlays into off-screen textures.
+ */
+
 #pragma once
 
 #include "draw_character_creation_screen.h"
@@ -7,12 +11,14 @@
 #include "draw_title_screen.h"
 #include "libdraw_context.h"
 
+/** @brief Render the HUD overlay into its dedicated off-screen texture. */
 static inline void draw_hud_to_texture(gamestate& g) {
     BeginTextureMode(hud_target_texture);
     draw_hud(g);
     EndTextureMode();
 }
 
+/** @brief Render the character-creation scene into its dedicated off-screen texture. */
 static inline void draw_char_creation_to_texture(gamestate& g) {
     minfo3("draw char creation to texture");
     BeginTextureMode(char_creation_target_texture);
@@ -22,6 +28,7 @@ static inline void draw_char_creation_to_texture(gamestate& g) {
     msuccess3("draw char creation to texture");
 }
 
+/** @brief Render the title or main-menu scene into its dedicated off-screen texture. */
 static inline void draw_title_screen_to_texture(gamestate& g, bool show_menu) {
     BeginTextureMode(title_target_texture);
     draw_title_screen(g, show_menu);
@@ -29,6 +36,7 @@ static inline void draw_title_screen_to_texture(gamestate& g, bool show_menu) {
     EndTextureMode();
 }
 
+/** @brief Render the gameplay world scene into its dedicated off-screen texture. */
 static inline void libdraw_drawframe_2d_to_texture(gamestate& g, int vision_dist, int light_rad) {
     BeginTextureMode(main_game_target_texture);
 

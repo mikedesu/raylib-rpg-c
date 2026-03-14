@@ -1,9 +1,14 @@
+/** @file draw_level_up_modal.h
+ *  @brief Level-up attribute-selection modal drawing helper.
+ */
+
 #pragma once
 
 #include "gamestate.h"
 #include "libgame_defines.h"
 #include <array>
 
+/** @brief Draw the level-up modal and currently highlighted attribute choice. */
 static inline void draw_level_up_modal(gamestate& g) {
     if (!g.display_level_up_modal) {
         return;

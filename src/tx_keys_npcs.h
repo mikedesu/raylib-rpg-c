@@ -1,3 +1,7 @@
+/** @file tx_keys_npcs.h
+ *  @brief Texture-key arrays for humanoid NPC/player spritegroups.
+ */
+
 #pragma once
 #include "libgame_defines.h"
 #include "texture_ids.h"

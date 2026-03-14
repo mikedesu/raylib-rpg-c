@@ -1,6 +1,10 @@
+/** @file rarity.h
+ *  @brief Item rarity identifiers.
+ */
+
 #pragma once
 
-
+/// @brief Supported rarity tiers for generated items or rewards.
 typedef enum
 {
     RARITY_NONE,

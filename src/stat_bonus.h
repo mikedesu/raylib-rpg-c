@@ -1,6 +1,10 @@
+/** @file stat_bonus.h
+ *  @brief Attribute-score bonus helper used by gameplay calculations.
+ */
+
 #pragma once
 
-
+/** @brief Return the modifier associated with an attribute score. */
 constexpr static inline const int get_stat_bonus(int v) {
     if (v == 0 || v == 1)
         return -5;

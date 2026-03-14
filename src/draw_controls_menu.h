@@ -1,8 +1,13 @@
+/** @file draw_controls_menu.h
+ *  @brief Controls/keybinding menu drawing helper.
+ */
+
 #pragma once
 
 #include "gamestate.h"
 #include "libgame_defines.h"
 
+/** @brief Draw the keyboard-controls menu and current binding selection. */
 static inline void draw_controls_menu(gamestate& g) {
     if (!g.display_controls_menu) {
         return;

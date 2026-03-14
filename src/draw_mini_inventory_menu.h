@@ -1,3 +1,7 @@
+/** @file draw_mini_inventory_menu.h
+ *  @brief Compact world-adjacent inventory/chest panel drawing helpers.
+ */
+
 #pragma once
 
 #include "draw_item_detail_text.h"
@@ -7,6 +11,7 @@
 
 extern unordered_map<entityid, spritegroup*> spritegroups;
 
+/** @brief Compute the on-screen panel rectangle near the hero for the mini inventory UI. */
 static inline Rectangle mini_inventory_panel_for_hero(gamestate& g, float width, float height) {
     const vec3 hero_loc = g.ct.get<location>(g.hero_id).value_or(vec3{0, 0, 0});
     const Vector2 hero_screen = GetWorldToScreen2D(
@@ -21,6 +26,7 @@ static inline Rectangle mini_inventory_panel_for_hero(gamestate& g, float width,
     return Rectangle{x, y, width, height};
 }
 
+/** @brief Draw the compact inventory/chest panel with preview and scrolling list. */
 static inline void draw_mini_inventory_menu(gamestate& g, shared_ptr<vector<entityid>> inventory, const char* title, const char* hint, bool show_equipped) {
     const float width = 260.0f;
     const float row_h = 18.0f;

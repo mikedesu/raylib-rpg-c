@@ -1,12 +1,18 @@
+/** @file debugpanel.h
+ *  @brief Debug overlay layout and text-buffer storage definitions.
+ */
+
 #pragma once
 
 #include <raylib.h>
 
 //#define DEBUGPANELBUFSIZE 256
+/// @brief Maximum size of the debug-panel text buffer.
 #define DEBUGPANELBUFSIZE 496
 // game begins black-screening at 497, not sure why
 //#define DEBUGPANELBUFSIZE 497
 
+/// @brief Runtime configuration and text storage for the on-screen debug panel.
 typedef struct debugpanel {
     int x;
     int y;

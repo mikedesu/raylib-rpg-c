@@ -1,3 +1,7 @@
+/** @file unit_test_old.h
+ *  @brief Archived legacy CxxTest suite retained as a reference source.
+ */
+
 #include "ComponentTraits.h"
 #include "entityid.h"
 #include "entitytype.h"

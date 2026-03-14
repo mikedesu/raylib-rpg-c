@@ -1,3 +1,7 @@
+/** @file gamestate_world_interaction_impl.h
+ *  @brief Movement, interaction, pickup, stairs, and world-physics helpers on `gamestate`.
+ */
+
 #pragma once
 
 static inline string interaction_state_sentence(const char* noun, bool is_open) {

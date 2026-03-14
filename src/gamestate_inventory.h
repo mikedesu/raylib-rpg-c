@@ -1,3 +1,7 @@
+/** @file gamestate_inventory.h
+ *  @brief Legacy placeholder header for historical inventory helpers.
+ */
+
 #pragma once
 
 //#include "gamestate.h"

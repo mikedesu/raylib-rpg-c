@@ -1,9 +1,13 @@
+/** @file tx_keys_props.h
+ *  @brief Texture-key arrays for prop entities.
+ */
+
 #pragma once
 
 #include "libgame_defines.h"
 #include "texture_ids.h"
 
-
+/// @brief Texture-key arrays for individual prop variants used by prop spritegroups.
 #define TX_PROP_DUNGEON_BANNER_00_COUNT 1
 static int TX_PROP_DUNGEON_BANNER_00_KEYS[TX_PROP_DUNGEON_BANNER_00_COUNT] = {TX_PROP_BANNER_00};
 

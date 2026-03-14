@@ -1,7 +1,12 @@
+/** @file get_npc_dead.h
+ *  @brief Convenience accessor for an NPC's dead/alive state.
+ */
+
 #pragma once
 
 #include "gamestate.h"
 
+/** @brief Return whether the addressed NPC is currently marked dead. */
 static inline bool get_npc_dead(gamestate& g, entityid id) {
     //g.ct.set<dead>(id, true);
     //const vec3 loc = g.ct.get<location>(id).value_or((vec3){-1, -1, -1});

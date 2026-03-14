@@ -1,5 +1,10 @@
+/** @file elemental.h
+ *  @brief Elemental affinity identifiers.
+ */
+
 #pragma once
 
+/// @brief Supported elemental categories for future or partial gameplay systems.
 typedef enum elemental_t
 {
     ELEMENTAL_NONE,

@@ -1,8 +1,13 @@
+/** @file draw_item_detail_text.h
+ *  @brief Helper for building item-detail text lines for UI panels.
+ */
+
 #pragma once
 
 #include "gamestate.h"
 #include <vector>
 
+/** @brief Build the display lines for an item's detail/preview panel. */
 static inline vector<string> build_item_detail_lines(gamestate& g, entityid selection_id) {
     vector<string> lines;
     const itemtype_t item_type = g.ct.get<itemtype>(selection_id).value_or(ITEM_NONE);

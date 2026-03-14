@@ -1,5 +1,10 @@
+/** @file potion.h
+ *  @brief Potion subtype identifiers.
+ */
+
 #pragma once
 
+/// @brief Supported potion variants used by inventory and consumption logic.
 typedef enum
 {
     POTION_NONE,

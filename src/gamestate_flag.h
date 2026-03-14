@@ -1,5 +1,10 @@
+/** @file gamestate_flag.h
+ *  @brief High-level gameplay update phases used by the main loop.
+ */
+
 #pragma once
 
+/// @brief Coarse state-machine phases for player input, animation, and NPC turns.
 typedef enum
 {
     GAMESTATE_FLAG_NONE = 0,

@@ -1,5 +1,10 @@
+/** @file scene.h
+ *  @brief High-level scene identifiers for top-level game flow.
+ */
+
 #pragma once
 
+/// @brief Primary scenes that the game loop can present.
 typedef enum {
     SCENE_COMPANY = 0,
     SCENE_TITLE,

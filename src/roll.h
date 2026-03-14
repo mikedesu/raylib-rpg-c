@@ -1,9 +1,14 @@
+/** @file roll.h
+ *  @brief Dice-roll helpers using `vec3` as `(count, sides, modifier)`.
+ */
+
 #pragma once
 
 #include "massert.h"
 #include "vec3.h"
 #include <stdlib.h>
 
+/** @brief Roll `r.x` dice with `r.y` sides and add `r.z` as a modifier. */
 constexpr static inline int do_roll(vec3 r) {
     massert(r.x > 0, "n is negative");
     massert(r.y > 0, "sides is negative");
@@ -16,6 +21,7 @@ constexpr static inline int do_roll(vec3 r) {
     return total + r.z;
 }
 
+/** @brief Roll the provided dice expression three times and return the highest total. */
 constexpr static inline int do_roll_best_of_3(vec3 r) {
     massert(r.x > 0, "n is negative");
     massert(r.y > 0, "sides is negative");

@@ -1,5 +1,10 @@
+/** @file weapon.h
+ *  @brief Weapon subtype identifiers used by item entities and combat logic.
+ */
+
 #pragma once
 
+/// @brief Supported weapon subtypes for equipment and combat calculations.
 typedef enum {
     WEAPON_NONE,
     WEAPON_DAGGER,

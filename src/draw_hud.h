@@ -1,3 +1,7 @@
+/** @file draw_hud.h
+ *  @brief Player HUD drawing helper.
+ */
+
 #pragma once
 
 #include "ComponentTraits.h"
@@ -10,7 +14,7 @@
 
 using std::max;
 
-
+/** @brief Draw the bottom HUD panel with player stats and status summary. */
 static inline void draw_hud(gamestate& g) {
     constexpr int font_size = DEFAULT_HUD_FONT_SIZE;
     constexpr int line_thickness = 2;

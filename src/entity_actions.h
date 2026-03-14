@@ -1,5 +1,10 @@
+/** @file entity_actions.h
+ *  @brief Default NPC behavior action identifiers.
+ */
+
 #pragma once
 
+/// @brief High-level default actions that can drive NPC behavior each turn.
 typedef enum entity_default_action_t {
     ENTITY_DEFAULT_ACTION_NONE = 1,
     ENTITY_DEFAULT_ACTION_RANDOM_MOVE,

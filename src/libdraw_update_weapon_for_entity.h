@@ -1,3 +1,7 @@
+/** @file libdraw_update_weapon_for_entity.h
+ *  @brief Helper for syncing equipped-weapon animation with an entity spritegroup.
+ */
+
 #pragma once
 
 #include "gamestate.h"
@@ -7,6 +11,7 @@
 
 extern unordered_map<entityid, spritegroup*> spritegroups;
 
+/** @brief Update an equipped weapon spritegroup to match the owner's current context. */
 static inline void update_weapon_for_entity(gamestate& g, entityid id, spritegroup* sg) {
     massert(id != ENTITYID_INVALID, "entity id is -1");
     massert(sg, "spritegroup is NULL");

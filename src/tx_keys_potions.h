@@ -1,3 +1,7 @@
+/** @file tx_keys_potions.h
+ *  @brief Texture-key arrays for potion items.
+ */
+
 #pragma once
 #include "libgame_defines.h"
 #include "texture_ids.h"

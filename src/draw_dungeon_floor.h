@@ -1,3 +1,7 @@
+/** @file draw_dungeon_floor.h
+ *  @brief Dungeon-floor tile and entity rendering helpers.
+ */
+
 #pragma once
 
 #include "draw_sprite.h"
@@ -8,10 +12,12 @@
 
 extern textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
+/** @brief Return the Manhattan distance between two dungeon locations. */
 constexpr static inline int manhattan_distance(vec3 a, vec3 b) {
     return abs(a.x - b.x) + abs(a.y - b.y);
 }
 
+/** @brief Draw one dungeon floor tile using its cached visibility and texture id. */
 static inline bool draw_dungeon_floor_tile(gamestate& g, int x, int y, int z, int light_dist, vec3 hero_loc, int distance) {
     massert(z >= 0 && static_cast<size_t>(z) < g.d.get_floor_count(), "z is oob");
     // Calculate drawing position
@@ -44,6 +50,7 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, int x, int y, int z, in
     return true;
 }
 
+/** @brief Draw one entity category across the current floor subject to visibility checks. */
 static inline void
 draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type_0, int vision_dist, int light_rad, function<bool(gamestate&, entityid)> extra_check) {
     auto df = g.d.get_current_floor();
@@ -136,6 +143,7 @@ draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type_0, int vision_dist
     }
 }
 
+/** @brief Draw the current floor's tiles plus entities in renderer layering order. */
 static inline bool draw_dungeon_floor(gamestate& g, int vision_dist, int light_rad) {
     shared_ptr<dungeon_floor> df = g.d.get_current_floor();
     const int z = g.d.current_floor;
