@@ -380,8 +380,31 @@ public:
         g.handle_input_keyboard_profile_prompt(is);
 
         TS_ASSERT_EQUALS(g.keyboard_profile, KEYBOARD_PROFILE_LAPTOP);
+        TS_ASSERT(g.keyboard_profile_confirmed);
         TS_ASSERT(!g.display_keyboard_profile_prompt);
         TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_PLAYER);
+    }
+
+    void testCharacterCreationSkipsKeyboardPromptAfterProfileAlreadyConfirmed() {
+        gamestate g;
+        g.test = true;
+        g.sfx.resize(71);
+        add_floor(g);
+        g.current_scene = SCENE_CHARACTER_CREATION;
+        g.keyboard_profile = KEYBOARD_PROFILE_LAPTOP;
+        g.keyboard_profile_confirmed = true;
+
+        inputstate is = {};
+        inputstate_reset(is);
+        press_key(is, KEY_ENTER);
+
+        g.handle_input_character_creation_scene(is);
+
+        TS_ASSERT_EQUALS(g.current_scene, SCENE_GAMEPLAY);
+        TS_ASSERT(!g.display_keyboard_profile_prompt);
+        TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_PLAYER);
+        TS_ASSERT_EQUALS(g.keyboard_profile, KEYBOARD_PROFILE_LAPTOP);
+        TS_ASSERT_DIFFERS(g.hero_id, ENTITYID_INVALID);
     }
 
     void testLaptopProfileUsesHjklMovementKeys() {
@@ -577,5 +600,22 @@ public:
 
         TS_ASSERT_EQUALS(g.get_keybinding_primary(KEYBOARD_PROFILE_LAPTOP, INPUT_ACTION_DIRECTION_MODE), KEY_G);
         TS_ASSERT_DIFFERS(g.get_keybinding_primary(KEYBOARD_PROFILE_LAPTOP, INPUT_ACTION_DIRECTION_MODE), KEY_F);
+    }
+
+    void testRestartGamePreservesConfirmedKeyboardProfileChoice() {
+        gamestate g;
+        g.test = true;
+        g.mt.seed(12345);
+        g.keyboard_profile = KEYBOARD_PROFILE_LAPTOP;
+        g.keyboard_profile_confirmed = true;
+
+        g.logic_init();
+        g.current_scene = SCENE_GAMEPLAY;
+
+        g.restart_game();
+
+        TS_ASSERT_EQUALS(g.current_scene, SCENE_TITLE);
+        TS_ASSERT_EQUALS(g.keyboard_profile, KEYBOARD_PROFILE_LAPTOP);
+        TS_ASSERT(g.keyboard_profile_confirmed);
     }
 };

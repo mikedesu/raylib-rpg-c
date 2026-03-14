@@ -8,7 +8,7 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
 
 ## Top 5 Next Things
 
-- [ ] Remove all props from floor 4's creation so the pressure-plate tutorial setup is controlled and readable.
+- [x] Remove all props from floor 4's creation so the pressure-plate tutorial setup is controlled and readable.
 - [ ] Implement the core `FLOOR_PRESSURE_PLATE` system with live activate/deactivate behavior tied to world state changes.
 - [ ] Add the floor 4 tutorial room with a pressure plate wired to a door that opens while occupied and closes when vacated.
 - [ ] Remove the orc spawning on floor 4 for now so the tutorial flow is not disrupted.
@@ -52,7 +52,8 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
 
 ## Immediate New Changes To Make
 
-- [ ] Remove all props from floor 4's creation
+- [x] Remove all props from floor 4's creation
+  - Floor 4 prop spawning is now skipped in `place_props()` so the tutorial floor stays clean for pressure-plate setup.
 - [ ] Develop a `FLOOR_PRESSURE_PLATE` system where
   - [ ] A heavy object such as a `pushable` or `pullable` must be on the tile that has the pressure plate
   - [ ] When triggered, can be tied to some state such as a `ENTITY_DOOR` opening and remaining opened so long as the plate is activated

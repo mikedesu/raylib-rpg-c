@@ -154,6 +154,7 @@ inline void gamestate::open_keyboard_profile_prompt() {
 
 inline void gamestate::apply_keyboard_profile_selection() {
     keyboard_profile = static_cast<keyboard_profile_t>(keyboard_profile_selection % KEYBOARD_PROFILE_COUNT);
+    keyboard_profile_confirmed = true;
     display_keyboard_profile_prompt = false;
     controlmode = CONTROLMODE_PLAYER;
     frame_dirty = true;

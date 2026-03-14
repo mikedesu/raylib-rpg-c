@@ -533,6 +533,9 @@ inline entityid gamestate::create_prop_at_with(proptype_t type, vec3 loc, with_f
 inline int gamestate::place_props() {
     int placed_props = 0;
     for (int z = 0; z < (int)d.floors.size(); z++) {
+        if (z == 3) {
+            continue;
+        }
         shared_ptr<dungeon_floor> df = d.get_floor(z);
         vector<vec3> candidates;
         for (int x = 0; x < df->get_width(); x++) {

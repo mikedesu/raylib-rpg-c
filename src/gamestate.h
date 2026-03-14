@@ -211,7 +211,8 @@ public:
     Font font;
     ComponentTable ct;
     option_menu options_menu;
-    keyboard_profile_t keyboard_profile;
+    keyboard_profile_t keyboard_profile = KEYBOARD_PROFILE_FULL;
+    bool keyboard_profile_confirmed = false;
     bool controls_menu_waiting_for_key;
     bool prefer_mini_inventory_menu;
     size_t controls_menu_selection;
@@ -417,7 +418,6 @@ public:
         interaction_body.clear();
         pending_level_ups = 0;
         damage_popups.clear();
-        keyboard_profile = KEYBOARD_PROFILE_FULL;
         prefer_mini_inventory_menu = false;
         controls_menu_waiting_for_key = false;
         controls_menu_selection = 0;

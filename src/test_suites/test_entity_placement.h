@@ -141,6 +141,32 @@ public:
         TS_ASSERT_EQUALS(count_entities_of_type(g, ENTITY_PROP), 0U);
     }
 
+    void testPlacePropsSkipsFourthFloorTutorialLevel() {
+        gamestate g;
+        add_simple_floor(g, 6, 6);
+        add_simple_floor(g, 6, 6);
+        add_simple_floor(g, 6, 6);
+        add_simple_floor(g, 6, 6);
+
+        const int placed = g.place_props();
+        TS_ASSERT(placed > 0);
+
+        size_t tutorial_floor_props = 0;
+        for (entityid id = 1; id < g.next_entityid; id++) {
+            if (g.ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_PROP) {
+                continue;
+            }
+
+            const vec3 loc = g.ct.get<location>(id).value_or(vec3{-1, -1, -1});
+            TS_ASSERT(vec3_valid(loc));
+            if (loc.z == 3) {
+                tutorial_floor_props++;
+            }
+        }
+
+        TS_ASSERT_EQUALS(tutorial_floor_props, 0U);
+    }
+
     void testGetRandomLocSkipsOccupiedChestTile() {
         gamestate g;
         add_simple_floor(g, 4, 4);
