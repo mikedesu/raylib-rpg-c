@@ -6,6 +6,14 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
 
 **Do not ever tamper with `texture_ids.h` or `textures.txt`!**
 
+## Top 5 Next Things
+
+- [ ] Remove all props from floor 4's creation so the pressure-plate tutorial setup is controlled and readable.
+- [ ] Implement the core `FLOOR_PRESSURE_PLATE` system with live activate/deactivate behavior tied to world state changes.
+- [ ] Add the floor 4 tutorial room with a pressure plate wired to a door that opens while occupied and closes when vacated.
+- [ ] Remove the orc spawning on floor 4 for now so the tutorial flow is not disrupted.
+- [ ] Continue top-down `libdraw` cleanup and reduce remaining rendering global-state coupling.
+
 - Keyboard customization is now live in the gameplay scene.
 - Current shipped state:
   - full-keyboard and laptop profiles exist
