@@ -136,6 +136,7 @@ constexpr static inline bool tile_is_walkable(const tiletype_t type) {
     return !tiletype_is_wall(type) && type != TILE_UNKNOWN && type != TILE_NONE && type != TILE_COUNT;
 }
 
+
 /** @brief Return whether a tile type is valid for upstairs placement. */
 constexpr static inline bool tile_is_possible_upstairs(const tiletype_t type) {
     return tile_is_walkable(type) && type != TILE_DOWNSTAIRS && type != TILE_COUNT;

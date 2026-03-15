@@ -26,6 +26,7 @@
 #include "scene.h"
 #include "sfx.h"
 #include "stat_bonus.h"
+#include "texture_ids.h"
 #include <array>
 #include <algorithm>
 #include <chrono>
@@ -99,6 +100,15 @@ struct damage_popup_t {
     float lifetime_seconds;
     float drift_x;
     float rise_distance;
+};
+
+struct floor_pressure_plate_t {
+    vec3 loc;
+    entityid linked_door_id;
+    bool active;
+    bool destroyed;
+    int txkey_up;
+    int txkey_down;
 };
 
 /**
@@ -225,6 +235,7 @@ public:
     string interaction_body;
     int pending_level_ups;
     vector<damage_popup_t> damage_popups;
+    vector<floor_pressure_plate_t> floor_pressure_plates;
 
     void set_seed() {
         srand(time(NULL));
@@ -418,6 +429,7 @@ public:
         interaction_body.clear();
         pending_level_ups = 0;
         damage_popups.clear();
+        floor_pressure_plates.clear();
         prefer_mini_inventory_menu = false;
         controls_menu_waiting_for_key = false;
         controls_menu_selection = 0;
@@ -511,6 +523,15 @@ public:
 
     /** @brief Populate generated floors with props after layout generation completes. */
     int place_props();
+
+    /** @brief Register a floor pressure plate that controls a specific door. */
+    bool create_floor_pressure_plate(vec3 loc, entityid linked_door_id);
+
+    /** @brief Destroy a floor pressure plate and sever any linked event connection. */
+    bool destroy_floor_pressure_plate(vec3 loc);
+
+    /** @brief Create the floor-4 tutorial pressure-plate setup around the arrival room. */
+    bool setup_floor_four_pressure_plate_tutorial();
 
     /** @brief Create a weapon item entity and apply weapon-specific initialization. */
     entityid create_weapon_with(with_fun weaponInitFunction);
@@ -1091,6 +1112,21 @@ public:
 
     /** @brief Attempt to pull an adjacent pullable entity with the acting entity. */
     bool try_entity_pull(entityid id);
+
+    /** @brief Return whether the requested tile currently has an entity activating a pressure plate. */
+    bool tile_has_pressure_plate_occupant(vec3 loc);
+
+    /** @brief Recompute all pressure plates on one floor and apply linked door states. */
+    void update_pressure_plates_for_floor(int z);
+
+    /** @brief Recompute every registered pressure plate in the dungeon. */
+    void refresh_pressure_plates();
+
+    /** @brief Return whether a door is controlled by a pressure plate. */
+    bool door_is_pressure_plate_controlled(entityid door_id) const;
+
+    /** @brief Return the pressure plate registered at a location, if one exists. */
+    floor_pressure_plate_t* get_floor_pressure_plate(vec3 loc);
 
     /** @brief Attempt to pick up the top item at the acting entity's location. */
     bool try_entity_pickup(entityid id);

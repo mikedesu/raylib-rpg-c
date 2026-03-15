@@ -209,6 +209,86 @@ public:
         TS_ASSERT(g.ct.get<door_open>(door).value_or(false));
     }
 
+    void testPressurePlateOpensAndClosesLinkedDoorWhenPlayerMovesOnAndOff() {
+        gamestate g;
+        add_floor(g);
+
+        const entityid hero = create_hero(g, vec3{1, 1, 0});
+        const entityid door = g.create_door_at_with(vec3{4, 1, 0}, [](CT&, const entityid) {});
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(door, ENTITYID_INVALID);
+        TS_ASSERT(g.create_floor_pressure_plate(vec3{2, 1, 0}, door));
+
+        floor_pressure_plate_t* plate = g.get_floor_pressure_plate(vec3{2, 1, 0});
+        TS_ASSERT(plate != nullptr);
+        TS_ASSERT(!plate->active);
+        TS_ASSERT_EQUALS(plate->txkey_up, TX_SWITCHES_PRESSURE_PLATE_UP_00);
+        TS_ASSERT_EQUALS(plate->txkey_down, TX_SWITCHES_PRESSURE_PLATE_DOWN_00);
+        TS_ASSERT(g.try_entity_move(hero, vec3{1, 0, 0}));
+        TS_ASSERT(g.ct.get<door_open>(door).value_or(false));
+        TS_ASSERT(plate->active);
+
+        TS_ASSERT(g.try_entity_move(hero, vec3{1, 0, 0}));
+        TS_ASSERT(!g.ct.get<door_open>(door).value_or(true));
+        TS_ASSERT(!plate->active);
+    }
+
+    void testPressurePlateOpensAndClosesLinkedDoorForPushableObject() {
+        gamestate g;
+        add_floor(g);
+
+        const entityid door = g.create_door_at_with(vec3{4, 1, 0}, [](CT&, const entityid) {});
+        const entityid box = g.create_box_at_with(vec3{1, 1, 0});
+        TS_ASSERT_DIFFERS(door, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(box, ENTITYID_INVALID);
+        TS_ASSERT(g.create_floor_pressure_plate(vec3{2, 1, 0}, door));
+        floor_pressure_plate_t* plate = g.get_floor_pressure_plate(vec3{2, 1, 0});
+        TS_ASSERT(plate != nullptr);
+
+        TS_ASSERT(g.try_entity_move(box, vec3{1, 0, 0}));
+        TS_ASSERT(g.ct.get<door_open>(door).value_or(false));
+        TS_ASSERT(plate->active);
+
+        TS_ASSERT(g.try_entity_move(box, vec3{1, 0, 0}));
+        TS_ASSERT(!g.ct.get<door_open>(door).value_or(true));
+        TS_ASSERT(!plate->active);
+    }
+
+    void testPressurePlateControlledDoorCannotBeOpenedManually() {
+        gamestate g;
+        add_floor(g);
+
+        const entityid hero = create_hero(g, vec3{1, 1, 0});
+        const entityid door = g.create_door_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(door, ENTITYID_INVALID);
+        TS_ASSERT(g.create_floor_pressure_plate(vec3{3, 1, 0}, door));
+
+        TS_ASSERT(!g.try_entity_open_door(hero, vec3{2, 1, 0}));
+        TS_ASSERT(!g.ct.get<door_open>(door).value_or(true));
+    }
+
+    void testDestroyPressurePlateSeversLinkAndClosesDoor() {
+        gamestate g;
+        add_floor(g);
+
+        const entityid hero = create_hero(g, vec3{1, 1, 0});
+        const entityid door = g.create_door_at_with(vec3{4, 1, 0}, [](CT&, const entityid) {});
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(door, ENTITYID_INVALID);
+        TS_ASSERT(g.create_floor_pressure_plate(vec3{2, 1, 0}, door));
+        TS_ASSERT(g.try_entity_move(hero, vec3{1, 0, 0}));
+        TS_ASSERT(g.ct.get<door_open>(door).value_or(false));
+
+        TS_ASSERT(g.destroy_floor_pressure_plate(vec3{2, 1, 0}));
+        floor_pressure_plate_t* plate = g.get_floor_pressure_plate(vec3{2, 1, 0});
+        TS_ASSERT(plate != nullptr);
+        TS_ASSERT(plate->destroyed);
+        TS_ASSERT_EQUALS(plate->linked_door_id, ENTITYID_INVALID);
+        TS_ASSERT(!g.ct.get<door_open>(door).value_or(true));
+        TS_ASSERT(!g.door_is_pressure_plate_controlled(door));
+    }
+
     void testTryEntityOpenChestUsesChestLocationFloorAndOpensMenu() {
         gamestate g;
         g.sfx.resize(71);

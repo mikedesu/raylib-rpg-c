@@ -162,6 +162,85 @@ inline bool gamestate::check_hearing(entityid id, vec3 loc) {
     return dist <= hearing;
 }
 
+inline bool gamestate::tile_has_pressure_plate_occupant(vec3 loc) {
+    if (vec3_invalid(loc) || loc.z < 0 || static_cast<size_t>(loc.z) >= d.floors.size()) {
+        return false;
+    }
+
+    tile_t& tile = d.get_floor(static_cast<size_t>(loc.z))->tile_at(loc);
+    if (tile.get_cached_player_present()) {
+        return true;
+    }
+    if (tile.get_cached_live_npc() != ENTITYID_INVALID || tile.get_dead_npc_count() > 0) {
+        return true;
+    }
+
+    const entityid box_id = tile.get_cached_box();
+    if (box_id != ENTITYID_INVALID && (ct.get<pushable>(box_id).value_or(false) || ct.get<pullable>(box_id).value_or(false))) {
+        return true;
+    }
+
+    const entityid chest_id = tile.get_cached_chest();
+    if (chest_id != ENTITYID_INVALID && (ct.get<pushable>(chest_id).value_or(false) || ct.get<pullable>(chest_id).value_or(false))) {
+        return true;
+    }
+
+    const entityid prop_id = tile.get_cached_prop();
+    if (prop_id != ENTITYID_INVALID && (ct.get<pushable>(prop_id).value_or(false) || ct.get<pullable>(prop_id).value_or(false))) {
+        return true;
+    }
+
+    return false;
+}
+
+inline bool gamestate::door_is_pressure_plate_controlled(entityid door_id) const {
+    if (door_id == ENTITYID_INVALID) {
+        return false;
+    }
+    for (const floor_pressure_plate_t& plate : floor_pressure_plates) {
+        if (!plate.destroyed && plate.linked_door_id == door_id) {
+            return true;
+        }
+    }
+    return false;
+}
+
+inline floor_pressure_plate_t* gamestate::get_floor_pressure_plate(vec3 loc) {
+    for (floor_pressure_plate_t& plate : floor_pressure_plates) {
+        if (vec3_equal(plate.loc, loc)) {
+            return &plate;
+        }
+    }
+    return nullptr;
+}
+
+inline void gamestate::update_pressure_plates_for_floor(int z) {
+    for (floor_pressure_plate_t& plate : floor_pressure_plates) {
+        if (plate.loc.z != z || plate.destroyed) {
+            continue;
+        }
+
+        const bool active = tile_has_pressure_plate_occupant(plate.loc);
+        if (plate.linked_door_id != ENTITYID_INVALID && ct.get<entitytype>(plate.linked_door_id).value_or(ENTITY_NONE) == ENTITY_DOOR) {
+            ct.set<door_open>(plate.linked_door_id, active);
+            ct.set<update>(plate.linked_door_id, true);
+        }
+        else {
+            plate.linked_door_id = ENTITYID_INVALID;
+        }
+
+        plate.active = active;
+    }
+
+    frame_dirty = true;
+}
+
+inline void gamestate::refresh_pressure_plates() {
+    for (size_t z = 0; z < d.floors.size(); z++) {
+        update_pressure_plates_for_floor(static_cast<int>(z));
+    }
+}
+
 inline bool gamestate::try_entity_move(entityid id, vec3 v) {
     massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
     minfo2("entity %d is trying to move: (%d,%d,%d)", id, v.x, v.y, v.z);
@@ -243,6 +322,7 @@ inline bool gamestate::try_entity_move(entityid id, vec3 v) {
         }
     }
     ct.set<steps_taken>(id, ct.get<steps_taken>(id).value_or(0) + 1);
+    update_pressure_plates_for_floor(loc.z);
     msuccess2("npc %d moved to (%d,%d,%d)", id, aloc.x, aloc.y, aloc.z);
     return true;
 }
@@ -547,6 +627,7 @@ inline bool gamestate::try_entity_stairs(entityid id) {
             vec3 uloc = df2->get_downstairs_loc();
             df2->df_add_at(hero_id, ENTITY_PLAYER, uloc);
             ct.set<location>(hero_id, uloc);
+            refresh_pressure_plates();
             flag = GAMESTATE_FLAG_PLAYER_ANIM;
             PlaySound(sfx.at(SFX_STEP_STONE_1));
             return true;
@@ -561,6 +642,7 @@ inline bool gamestate::try_entity_stairs(entityid id) {
             vec3 uloc = df2->get_upstairs_loc();
             df2->df_add_at(hero_id, ENTITY_PLAYER, uloc);
             ct.set<location>(hero_id, uloc);
+            refresh_pressure_plates();
             flag = GAMESTATE_FLAG_PLAYER_ANIM;
             PlaySound(sfx.at(SFX_STEP_STONE_1));
             return true;
@@ -590,6 +672,9 @@ inline bool gamestate::try_entity_open_door(entityid id, vec3 loc) {
         return false;
     }
     massert(tile_has_door(loc) == door_id, "door cache mismatch at (%d, %d, %d)", loc.x, loc.y, loc.z);
+    if (door_is_pressure_plate_controlled(door_id)) {
+        return false;
+    }
     optional<bool> maybe_is_open = ct.get<door_open>(door_id);
     massert(maybe_is_open.has_value(), "door %d has no `is_open` component", door_id);
     ct.set<door_open>(door_id, !maybe_is_open.value());

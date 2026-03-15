@@ -178,6 +178,7 @@ inline void gamestate::logic_init() {
     d.is_initialized = true;
 
     massert(d.floors.size() > 0, "dungeon.floors.size is 0");
+    setup_floor_four_pressure_plate_tutorial();
     place_doors();
     place_props();
     place_first_floor_chest();

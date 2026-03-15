@@ -618,4 +618,21 @@ public:
         TS_ASSERT_EQUALS(g.keyboard_profile, KEYBOARD_PROFILE_LAPTOP);
         TS_ASSERT(g.keyboard_profile_confirmed);
     }
+
+    void testLogicInitAddsFloorFourPressurePlateTutorialSetup() {
+        gamestate g;
+        g.test = true;
+        g.mt.seed(12345);
+
+        g.logic_init();
+
+        TS_ASSERT_EQUALS(g.d.get_floor_count(), 4U);
+        TS_ASSERT_EQUALS(g.floor_pressure_plates.size(), 1U);
+        TS_ASSERT_EQUALS(g.floor_pressure_plates.front().loc.z, 3);
+        TS_ASSERT(!g.floor_pressure_plates.front().destroyed);
+        TS_ASSERT_EQUALS(g.floor_pressure_plates.front().txkey_up, TX_SWITCHES_PRESSURE_PLATE_UP_00);
+        TS_ASSERT_EQUALS(g.floor_pressure_plates.front().txkey_down, TX_SWITCHES_PRESSURE_PLATE_DOWN_00);
+        TS_ASSERT_DIFFERS(g.floor_pressure_plates.front().linked_door_id, ENTITYID_INVALID);
+        TS_ASSERT_EQUALS(g.ct.get<entitytype>(g.floor_pressure_plates.front().linked_door_id).value_or(ENTITY_NONE), ENTITY_DOOR);
+    }
 };

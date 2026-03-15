@@ -9,8 +9,8 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
 ## Top 5 Next Things
 
 - [x] Remove all props from floor 4's creation so the pressure-plate tutorial setup is controlled and readable.
-- [ ] Implement the core `FLOOR_PRESSURE_PLATE` system with live activate/deactivate behavior tied to world state changes.
-- [ ] Add the floor 4 tutorial room with a pressure plate wired to a door that opens while occupied and closes when vacated.
+- [x] Implement the core `FLOOR_PRESSURE_PLATE` system with live activate/deactivate behavior tied to world state changes.
+- [x] Add the floor 4 tutorial room with a pressure plate wired to a door that opens while occupied and closes when vacated.
 - [ ] Remove the orc spawning on floor 4 for now so the tutorial flow is not disrupted.
 - [ ] Continue top-down `libdraw` cleanup and reduce remaining rendering global-state coupling.
 
@@ -37,6 +37,13 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
   - [ ] continue top-down `libdraw` cleanup
   - [ ] reduce remaining global-state coupling in rendering
   - [ ] eventually move away from implementation headers toward real `.cpp` files
+  - [ ] evaluate migrating direct `try_entity_*` gameplay mutations toward an event-queue / action-resolution pipeline
+    - Current candidates include `try_entity_attack`, `try_entity_move`, push/pull handling, door/chest toggles, pressure-plate updates, and other world-state mutations that presently happen inline.
+    - Estimated work: medium-to-large refactor because it would cut across input handling, NPC turns, combat resolution, movement, animation timing, message generation, and tests.
+    - Main benefit: deterministic ordered resolution for chained effects, so one action can fan out into queued follow-up events without burying rules in nested direct calls.
+    - Main gameplay payoff: much better orchestration for cascading systems such as pressure plates, traps, forced movement, on-hit reactions, death triggers, scripted room logic, and future multi-step interactions.
+    - Main engineering payoff: easier debugging/logging/replay of world-state transitions, clearer separation between intent and resolution, and lower risk of fragile ordering bugs.
+    - Likely migration path: introduce a narrow event queue for one domain first, such as movement plus world triggers, then expand to combat and other interaction systems after the pattern is stable.
 
 - [ ] Documentation
   - [x] continue Doxygen coverage on remaining core headers
@@ -54,16 +61,17 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
 
 - [x] Remove all props from floor 4's creation
   - Floor 4 prop spawning is now skipped in `place_props()` so the tutorial floor stays clean for pressure-plate setup.
-- [ ] Develop a `FLOOR_PRESSURE_PLATE` system where
-  - [ ] A heavy object such as a `pushable` or `pullable` must be on the tile that has the pressure plate
-  - [ ] When triggered, can be tied to some state such as a `ENTITY_DOOR` opening and remaining opened so long as the plate is activated
-  - [ ] When a `pullable` or `pushable` or `ENTITY_PLAYER` or `ENTITY_NPC` removes from the tile, then the plate is no longer triggered, so an opened door would close, etc. - some state would revert to its pre-trigger state
+- [x] Develop a `FLOOR_PRESSURE_PLATE` system where
+  - [x] A heavy object such as a `pushable` or `pullable` must be on the tile that has the pressure plate
+  - [x] When triggered, can be tied to some state such as a `ENTITY_DOOR` opening and remaining opened so long as the plate is activated
+  - [x] When a `pullable` or `pushable` or `ENTITY_PLAYER` or `ENTITY_NPC` removes from the tile, then the plate is no longer triggered, so an opened door would close, etc. - some state would revert to its pre-trigger state
 - [ ] Remove the orc spawning on floor 4 for now
-- [ ] In one of the rooms on floor 4, add a new pressure plate tile and connect it to a door
-  - [ ] this door can only open if the pressure plate is activated
-  - [ ] the player can walk on top of the pressure plate and watch the door open
-  - [ ] the player can walk off the pressure plate and watch the door close
+- [x] In one of the rooms on floor 4, add a new pressure plate tile and connect it to a door
+  - [x] this door can only open if the pressure plate is activated
+  - [x] the player can walk on top of the pressure plate and watch the door open
+  - [x] the player can walk off the pressure plate and watch the door close
   - [ ] we remove all props so that we can force the player into learning about dragging dead bodies onto pressure plates
+  - Floor 4 now gets a deterministic arrival-room tutorial setup with a linked pressure plate and door.
 
 - [ ] save game
   - [ ] a lot of stuff goes here

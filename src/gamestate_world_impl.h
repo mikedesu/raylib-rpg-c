@@ -566,3 +566,84 @@ inline int gamestate::place_props() {
     }
     return placed_props;
 }
+
+inline bool gamestate::create_floor_pressure_plate(vec3 loc, entityid linked_door_id) {
+    if (vec3_invalid(loc) || loc.z < 0 || static_cast<size_t>(loc.z) >= d.floors.size()) {
+        return false;
+    }
+    if (linked_door_id == ENTITYID_INVALID || ct.get<entitytype>(linked_door_id).value_or(ENTITY_NONE) != ENTITY_DOOR) {
+        return false;
+    }
+
+    auto df = d.get_floor(static_cast<size_t>(loc.z));
+    tile_t& tile = df->tile_at(loc);
+    if (!tile_is_walkable(tile.get_type()) || tile.get_type() == TILE_UPSTAIRS || tile.get_type() == TILE_DOWNSTAIRS) {
+        return false;
+    }
+
+    tile.set_can_have_door(false);
+    floor_pressure_plates.push_back(floor_pressure_plate_t{
+        loc,
+        linked_door_id,
+        false,
+        false,
+        TX_SWITCHES_PRESSURE_PLATE_UP_00,
+        TX_SWITCHES_PRESSURE_PLATE_DOWN_00,
+    });
+    update_pressure_plates_for_floor(loc.z);
+    return true;
+}
+
+inline bool gamestate::destroy_floor_pressure_plate(vec3 loc) {
+    floor_pressure_plate_t* plate = get_floor_pressure_plate(loc);
+    if (!plate || plate->destroyed) {
+        return false;
+    }
+
+    if (plate->linked_door_id != ENTITYID_INVALID && ct.get<entitytype>(plate->linked_door_id).value_or(ENTITY_NONE) == ENTITY_DOOR) {
+        ct.set<door_open>(plate->linked_door_id, false);
+        ct.set<update>(plate->linked_door_id, true);
+    }
+
+    plate->active = false;
+    plate->destroyed = true;
+    plate->linked_door_id = ENTITYID_INVALID;
+    frame_dirty = true;
+    return true;
+}
+
+inline bool gamestate::setup_floor_four_pressure_plate_tutorial() {
+    if (d.get_floor_count() < 4) {
+        return false;
+    }
+
+    auto df = d.get_floor(3);
+    const int room_x = dungeon_clamp_int(df->get_upstairs_loc().x - 1, 1, df->get_width() - 9);
+    const int room_y = dungeon_clamp_int(df->get_upstairs_loc().y - 2, 1, df->get_height() - 6);
+
+    for (int x = room_x; x < room_x + 7; x++) {
+        for (int y = room_y; y < room_y + 5; y++) {
+            const bool is_wall = x == room_x || x == room_x + 6 || y == room_y || y == room_y + 4;
+            df->df_set_tile(is_wall ? TILE_STONE_WALL_00 : TILE_FLOOR_STONE_00, x, y);
+            df->tile_at(vec3{x, y, 3}).set_can_have_door(false);
+        }
+    }
+
+    const vec3 upstairs_loc{room_x + 1, room_y + 2, 3};
+    const vec3 plate_loc{room_x + 3, room_y + 2, 3};
+    const vec3 door_loc{room_x + 6, room_y + 2, 3};
+    const vec3 corridor_loc{room_x + 7, room_y + 2, 3};
+
+    df->df_set_tile(TILE_FLOOR_STONE_00, upstairs_loc.x, upstairs_loc.y);
+    df->df_set_tile(TILE_FLOOR_STONE_00, plate_loc.x, plate_loc.y);
+    df->df_set_tile(TILE_FLOOR_STONE_00, corridor_loc.x, corridor_loc.y);
+    df->df_set_tile(TILE_FLOOR_STONE_00, door_loc.x, door_loc.y);
+    df->df_set_upstairs_loc(upstairs_loc);
+
+    const entityid door_id = create_door_at_with(door_loc, [](CT&, const entityid) {});
+    if (door_id == ENTITYID_INVALID) {
+        return false;
+    }
+
+    return create_floor_pressure_plate(plate_loc, door_id);
+}

@@ -63,3 +63,5 @@ docs/api
 docs/api/*
 src/docs/api
 src/docs/api/*
+tests_heavy
+tests_heavy.cpp

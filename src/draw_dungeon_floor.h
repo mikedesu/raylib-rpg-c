@@ -50,6 +50,41 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, int x, int y, int z, in
     return true;
 }
 
+/** @brief Draw floor pressure plates as overlays after floor tiles but before all entities. */
+static inline void draw_dungeon_floor_pressure_plates(gamestate& g, int light_rad) {
+    auto df = g.d.get_current_floor();
+    const int z = g.d.current_floor;
+    const vec3 hero_loc = g.ct.get<location>(g.hero_id).value_or(vec3{-1, -1, -1});
+    const bool full_light = df->get_full_light();
+    const Rectangle src = {0, 0, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
+
+    for (const floor_pressure_plate_t& plate : g.floor_pressure_plates) {
+        if (plate.destroyed || plate.loc.z != z) {
+            continue;
+        }
+
+        if (!full_light) {
+            if (abs(plate.loc.x - hero_loc.x) + abs(plate.loc.y - hero_loc.y) > light_rad) {
+                continue;
+            }
+
+            tile_t& tile = df->tile_at(plate.loc);
+            if (!tile.get_explored() || !tile.get_visible()) {
+                continue;
+            }
+        }
+
+        const int txkey = plate.active ? plate.txkey_down : plate.txkey_up;
+        Texture2D* texture = &txinfo[txkey].texture;
+        massert(texture->id > 0, "pressure plate texture->id is <= 0");
+
+        const float px = plate.loc.x * DEFAULT_TILE_SIZE + DEFAULT_OFFSET;
+        const float py = plate.loc.y * DEFAULT_TILE_SIZE + DEFAULT_OFFSET;
+        const Rectangle dest = {px, py, DEFAULT_TILE_SIZE_FLOAT, DEFAULT_TILE_SIZE_FLOAT};
+        DrawTexturePro(*texture, src, dest, Vector2{0, 0}, 0, WHITE);
+    }
+}
+
 /** @brief Draw one entity category across the current floor subject to visibility checks. */
 static inline void
 draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type_0, int vision_dist, int light_rad, function<bool(gamestate&, entityid)> extra_check) {
@@ -161,6 +196,7 @@ static inline bool draw_dungeon_floor(gamestate& g, int vision_dist, int light_r
             draw_dungeon_floor_tile(g, x, y, z, light_rad, hero_loc, distance);
         }
     }
+    draw_dungeon_floor_pressure_plates(g, light_rad);
 
     auto mydefault = [](gamestate& g, entityid id) { return true; };
     auto alive_check = [](gamestate& g, entityid id) {
