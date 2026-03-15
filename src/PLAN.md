@@ -12,7 +12,6 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
 - [x] Implement the core `FLOOR_PRESSURE_PLATE` system with live activate/deactivate behavior tied to world state changes.
 - [x] Add the floor 4 tutorial room with a pressure plate wired to a door that opens while occupied and closes when vacated.
 - [x] Add the "open door" sound effect on the pressure plate on floor 4 if the door exists and is opened by the pressure plate being activated
-- [ ] Remove the orc spawning on floor 4 for now so the tutorial flow is not disrupted.
 - [ ] Continue top-down `libdraw` cleanup and reduce remaining rendering global-state coupling.
 
 - Keyboard customization is now live in the gameplay scene.
