@@ -129,7 +129,7 @@ inline const char* dungeon_prop_description(proptype_t type) {
     case PROP_DUNGEON_WOODEN_TABLE_01:
         return "A sturdy wooden table scarred by cuts, heat marks, and years of hard use.";
     case PROP_DUNGEON_WOODEN_SIGN:
-        return "TEXT GOES HERE";
+        return "Pull something onto the\npressure plate to keep the door open.";
     default:
         return "A bit of dungeon clutter left to rot in the dark.";
     }

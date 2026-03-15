@@ -681,7 +681,7 @@ public:
             TS_ASSERT(vec3_valid(loc));
             TS_ASSERT_EQUALS(loc.z, 2);
             TS_ASSERT_EQUALS(g.ct.get<name>(id).value_or(""), "wooden sign");
-            TS_ASSERT_EQUALS(g.ct.get<description>(id).value_or(""), "TEXT GOES HERE");
+            TS_ASSERT_EQUALS(g.ct.get<description>(id).value_or(""), "Pull something onto the\npressure plate to keep the door open.");
             TS_ASSERT(g.ct.get<solid>(id).value_or(false));
             TS_ASSERT(!g.ct.get<pushable>(id).value_or(true));
             TS_ASSERT(!g.ct.get<pullable>(id).value_or(true));
