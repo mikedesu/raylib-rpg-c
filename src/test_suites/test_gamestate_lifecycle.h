@@ -467,7 +467,7 @@ public:
         inputstate_reset(is);
         press_key(is, KEY_RIGHT);
         g.handle_input_sound_menu(is);
-        TS_ASSERT_DELTA(master_volume, DEFAULT_MASTER_VOLUME, 0.001f);
+        TS_ASSERT_DELTA(g.master_volume, DEFAULT_MASTER_VOLUME, 0.001f);
 
         inputstate_reset(is);
         press_key(is, KEY_DOWN);

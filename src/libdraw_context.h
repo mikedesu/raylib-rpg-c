@@ -26,6 +26,12 @@ struct libdraw_context_t {
     textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
     /// @brief Loaded shaders keyed by project-specific shader identifiers.
     unordered_map<int, Shader> shaders;
+    /// @brief Currently loaded background music stream.
+    Music music = {};
+    /// @brief Runtime music volume multiplier shared by libdraw audio helpers.
+    float music_volume = DEFAULT_MUSIC_VOLUME;
+    /// @brief Runtime master volume multiplier shared across audio systems.
+    float master_volume = DEFAULT_MASTER_VOLUME;
     /// @brief Off-screen target used to compose the title screen.
     RenderTexture2D title_target_texture = {};
     /// @brief Off-screen target used to compose the character-creation scene.
@@ -47,4 +53,8 @@ struct libdraw_context_t {
 };
 
 /// @brief Shared libdraw renderer context instance.
+#ifdef CXXTEST_RUNNING
+inline libdraw_context_t libdraw_ctx;
+#else
 extern libdraw_context_t libdraw_ctx;
+#endif

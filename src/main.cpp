@@ -18,12 +18,6 @@ gamestate g;
 
 /// @brief Process-lifetime renderer state shared by the libdraw subsystem.
 libdraw_context_t libdraw_ctx;
-/// @brief Currently loaded background music stream.
-Music music;
-/// @brief Runtime music volume multiplier exposed to gameplay and renderer code.
-float music_volume = DEFAULT_MUSIC_VOLUME;
-/// @brief Runtime master volume multiplier shared across audio systems.
-float master_volume = DEFAULT_MASTER_VOLUME;
 
 /**
  * @brief Advance one outer frame of the application loop.

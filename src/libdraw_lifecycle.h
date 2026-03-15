@@ -94,7 +94,7 @@ static inline bool libdraw_windowshouldclose(gamestate& g) {
 
 /** @brief Release renderer-owned resources without closing the OS window. */
 static inline void libdraw_close_partial() {
-    UnloadMusicStream(music);
+    UnloadMusicStream(libdraw_ctx.music);
     CloseAudioDevice();
     libdraw_unload_textures(libdraw_ctx.txinfo);
     unload_shaders();

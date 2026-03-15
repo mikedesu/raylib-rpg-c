@@ -71,16 +71,6 @@ using std::chrono::nanoseconds;
 using std::chrono::system_clock;
 using std::chrono::time_point;
 
-#ifdef CXXTEST_RUNNING
-inline float music_volume = DEFAULT_MUSIC_VOLUME;
-inline float master_volume = DEFAULT_MASTER_VOLUME;
-inline Music music = {};
-#else
-extern float music_volume;
-extern float master_volume;
-extern Music music;
-#endif
-
 constexpr Color DEFAULT_WINDOW_BOX_BGCOLOR = Color{0, 0, 255, 128};
 constexpr Color DEFAULT_WINDOW_BOX_FGCOLOR = Color{255, 255, 255, 255};
 constexpr float AUDIO_VOLUME_STEP = 0.1f;
@@ -196,6 +186,7 @@ public:
     unsigned long int ticks;
     size_t action_selection;
     float line_spacing;
+    float master_volume;
     float music_volume;
     float sfx_volume;
     double last_frame_time;
@@ -415,9 +406,8 @@ public:
         chara_creation.alignment = ALIGNMENT_NEUTRAL_NEUTRAL;
         chara_creation.hitdie = get_racial_hd(RACE_HUMAN);
         current_scene = SCENE_TITLE;
+        master_volume = DEFAULT_MASTER_VOLUME;
         music_volume = DEFAULT_MUSIC_VOLUME;
-        ::music_volume = DEFAULT_MUSIC_VOLUME;
-        ::master_volume = DEFAULT_MASTER_VOLUME;
         sfx_volume = DEFAULT_MASTER_VOLUME;
         window_box_bgcolor = DEFAULT_WINDOW_BOX_BGCOLOR;
         window_box_fgcolor = DEFAULT_WINDOW_BOX_FGCOLOR;

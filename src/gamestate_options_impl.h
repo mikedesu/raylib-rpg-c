@@ -4,27 +4,29 @@
 
 #pragma once
 
+#include "libdraw_context.h"
 #include <algorithm>
 
 inline void gamestate::apply_audio_settings() {
-    ::master_volume = std::clamp(::master_volume, 0.0f, 1.0f);
+    master_volume = std::clamp(master_volume, 0.0f, 1.0f);
+    libdraw_ctx.master_volume = master_volume;
     this->music_volume = std::clamp(this->music_volume, 0.0f, 1.0f);
-    ::music_volume = this->music_volume;
+    libdraw_ctx.music_volume = this->music_volume;
     sfx_volume = std::clamp(sfx_volume, 0.0f, 1.0f);
 
     if (test || !IsAudioDeviceReady()) {
         return;
     }
 
-    SetMasterVolume(::master_volume);
-    SetMusicVolume(music, ::music_volume);
+    SetMasterVolume(libdraw_ctx.master_volume);
+    SetMusicVolume(libdraw_ctx.music, libdraw_ctx.music_volume);
     for (size_t i = 0; i < sfx.size(); i++) {
         SetSoundVolume(sfx[i], sfx_volume);
     }
 }
 
 inline void gamestate::adjust_master_volume(int dir) {
-    ::master_volume = std::clamp(::master_volume + AUDIO_VOLUME_STEP * dir, 0.0f, 1.0f);
+    master_volume = std::clamp(master_volume + AUDIO_VOLUME_STEP * dir, 0.0f, 1.0f);
     apply_audio_settings();
     frame_dirty = true;
 }

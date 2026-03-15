@@ -5,12 +5,9 @@
 #pragma once
 
 #include "gamestate.h"
+#include "libdraw_context.h"
 #include "libgame_defines.h"
 #include <random>
-
-extern Music music;
-extern float music_volume;
-extern float master_volume;
 
 /** @brief Load one random music track from the configured music path list. */
 static inline void load_random_music(gamestate& g) {
@@ -21,18 +18,18 @@ static inline void load_random_music(gamestate& g) {
     const size_t index = gen(g.mt);
     const char* music_path = g.music_file_paths[index].c_str();
     minfo("Music path: %s", music_path);
-    music = LoadMusicStream(music_path);
-    music.looping = false;
+    libdraw_ctx.music = LoadMusicStream(music_path);
+    libdraw_ctx.music.looping = false;
     minfo2("END load_random_music");
 }
 
 /** @brief Advance the active music stream and rotate tracks when playback ends. */
 static inline void handle_music_stream(gamestate& g) {
-    UpdateMusicStream(music);
+    UpdateMusicStream(libdraw_ctx.music);
     // handle load next music track
-    if (!IsMusicStreamPlaying(music)) {
-        StopMusicStream(music);
-        UnloadMusicStream(music);
+    if (!IsMusicStreamPlaying(libdraw_ctx.music)) {
+        StopMusicStream(libdraw_ctx.music);
+        UnloadMusicStream(libdraw_ctx.music);
         load_random_music(g);
 
         //#ifdef MUSIC_OFF
@@ -52,19 +49,19 @@ static inline void handle_music_stream(gamestate& g) {
         //#endif
 
 #ifdef MUSIC_VOLUME
-        music_volume = MUSIC_VOLUME;
+        libdraw_ctx.music_volume = MUSIC_VOLUME;
 #endif
 
 
 // if MUSIC_OFF is defined
 #ifdef MUSIC_OFF
-        music_volume = 0.0f;
-        //SetMusicVolume(music, music_volume); // Set initial music volume
+        libdraw_ctx.music_volume = 0.0f;
+        //SetMusicVolume(libdraw_ctx.music, libdraw_ctx.music_volume); // Set initial music volume
 #endif
 
-        SetMusicVolume(music, music_volume); // Set initial music volume
-        g.music_volume = music_volume;
-        PlayMusicStream(music);
+        SetMusicVolume(libdraw_ctx.music, libdraw_ctx.music_volume); // Set initial music volume
+        g.music_volume = libdraw_ctx.music_volume;
+        PlayMusicStream(libdraw_ctx.music);
     }
 }
 
@@ -74,28 +71,29 @@ static inline void libdraw_load_music(gamestate& g) {
     load_random_music(g);
 
 #ifndef MASTER_VOLUME
-    master_volume = DEFAULT_MASTER_VOLUME;
+    libdraw_ctx.master_volume = DEFAULT_MASTER_VOLUME;
 #else
-    master_volume = MASTER_VOLUME;
+    libdraw_ctx.master_volume = MASTER_VOLUME;
 #endif
 
 
 #ifdef MUSIC_OFF
-    music_volume = 0.0f;
+    libdraw_ctx.music_volume = 0.0f;
 #else
 #ifdef MUSIC_VOLUME
-    music_volume = MUSIC_VOLUME;
+    libdraw_ctx.music_volume = MUSIC_VOLUME;
 #else
-    music_volume = DEFAULT_MUSIC_VOLUME;
+    libdraw_ctx.music_volume = DEFAULT_MUSIC_VOLUME;
 #endif
 #endif
 
-    //SetMusicVolume(music, DEFAULT_MUSIC_VOLUME); // Set initial music volume
+    //SetMusicVolume(libdraw_ctx.music, DEFAULT_MUSIC_VOLUME); // Set initial music volume
 
-    SetMasterVolume(master_volume);
-    SetMusicVolume(music, music_volume); // Set initial music volume
-    g.music_volume = music_volume;
+    g.master_volume = libdraw_ctx.master_volume;
+    SetMasterVolume(libdraw_ctx.master_volume);
+    SetMusicVolume(libdraw_ctx.music, libdraw_ctx.music_volume); // Set initial music volume
+    g.music_volume = libdraw_ctx.music_volume;
 
-    PlayMusicStream(music);
+    PlayMusicStream(libdraw_ctx.music);
     minfo2("END load_music");
 }
