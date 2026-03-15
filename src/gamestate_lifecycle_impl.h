@@ -226,7 +226,7 @@ inline void gamestate::logic_init() {
         create_npc_at_with(RACE_GREEN_SLIME, slime_loc, green_slime_init);
     }
 
-    const vec3 floor_three_orc_loc = d.get_floor(3)->get_random_loc();
+    const vec3 floor_three_orc_loc = vec3_valid(floor_four_tutorial_orc_spawn) ? floor_four_tutorial_orc_spawn : d.get_floor(3)->get_random_loc();
     create_orc_at_with(floor_three_orc_loc, armed_orc_init);
     msuccess("end creating monsters...");
     add_message("Welcome to the game! Press enter to cycle messages.");

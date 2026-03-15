@@ -634,5 +634,30 @@ public:
         TS_ASSERT_EQUALS(g.floor_pressure_plates.front().txkey_down, TX_SWITCHES_PRESSURE_PLATE_DOWN_00);
         TS_ASSERT_DIFFERS(g.floor_pressure_plates.front().linked_door_id, ENTITYID_INVALID);
         TS_ASSERT_EQUALS(g.ct.get<entitytype>(g.floor_pressure_plates.front().linked_door_id).value_or(ENTITY_NONE), ENTITY_DOOR);
+        TS_ASSERT(vec3_valid(g.floor_four_tutorial_orc_spawn));
+        TS_ASSERT_EQUALS(g.floor_four_tutorial_orc_spawn.z, 3);
+
+        auto floor_four = g.d.get_floor(3);
+        TS_ASSERT(tile_is_walkable(floor_four->tile_at(g.floor_four_tutorial_orc_spawn).get_type()));
+
+        size_t floor_four_orc_count = 0;
+        bool found_orc_in_tutorial_room = false;
+        for (entityid id = 1; id < g.next_entityid; id++) {
+            if (g.ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_NPC) {
+                continue;
+            }
+            if (g.ct.get<race>(id).value_or(RACE_NONE) != RACE_ORC) {
+                continue;
+            }
+            const vec3 loc = g.ct.get<location>(id).value_or(vec3{-1, -1, -1});
+            if (loc.z != 3) {
+                continue;
+            }
+            floor_four_orc_count++;
+            found_orc_in_tutorial_room = vec3_equal(loc, g.floor_four_tutorial_orc_spawn);
+        }
+
+        TS_ASSERT_EQUALS(floor_four_orc_count, 1U);
+        TS_ASSERT(found_orc_in_tutorial_room);
     }
 };

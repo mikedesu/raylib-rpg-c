@@ -618,26 +618,27 @@ inline bool gamestate::setup_floor_four_pressure_plate_tutorial() {
     }
 
     auto df = d.get_floor(3);
-    const int room_x = dungeon_clamp_int(df->get_upstairs_loc().x - 1, 1, df->get_width() - 9);
-    const int room_y = dungeon_clamp_int(df->get_upstairs_loc().y - 2, 1, df->get_height() - 6);
+    constexpr int tutorial_width = 13;
+    constexpr int tutorial_height = 7;
+    const int room_x = dungeon_clamp_int(df->get_upstairs_loc().x - 2, 1, df->get_width() - tutorial_width - 1);
+    const int room_y = dungeon_clamp_int(df->get_upstairs_loc().y - 3, 1, df->get_height() - tutorial_height - 1);
+    const int split_x = room_x + 6;
+    const int center_y = room_y + 3;
 
-    for (int x = room_x; x < room_x + 7; x++) {
-        for (int y = room_y; y < room_y + 5; y++) {
-            const bool is_wall = x == room_x || x == room_x + 6 || y == room_y || y == room_y + 4;
-            df->df_set_tile(is_wall ? TILE_STONE_WALL_00 : TILE_FLOOR_STONE_00, x, y);
+    for (int x = room_x; x < room_x + tutorial_width; x++) {
+        for (int y = room_y; y < room_y + tutorial_height; y++) {
+            const bool outer_wall = x == room_x || x == room_x + tutorial_width - 1 || y == room_y || y == room_y + tutorial_height - 1;
+            const bool center_divider = x == split_x && y != center_y;
+            df->df_set_tile((outer_wall || center_divider) ? TILE_STONE_WALL_00 : TILE_FLOOR_STONE_00, x, y);
             df->tile_at(vec3{x, y, 3}).set_can_have_door(false);
         }
     }
 
-    const vec3 upstairs_loc{room_x + 1, room_y + 2, 3};
-    const vec3 plate_loc{room_x + 3, room_y + 2, 3};
-    const vec3 door_loc{room_x + 6, room_y + 2, 3};
-    const vec3 corridor_loc{room_x + 7, room_y + 2, 3};
+    const vec3 upstairs_loc{room_x + 2, center_y, 3};
+    const vec3 plate_loc{room_x + 4, center_y, 3};
+    const vec3 door_loc{split_x, center_y, 3};
+    floor_four_tutorial_orc_spawn = vec3{room_x + 9, center_y, 3};
 
-    df->df_set_tile(TILE_FLOOR_STONE_00, upstairs_loc.x, upstairs_loc.y);
-    df->df_set_tile(TILE_FLOOR_STONE_00, plate_loc.x, plate_loc.y);
-    df->df_set_tile(TILE_FLOOR_STONE_00, corridor_loc.x, corridor_loc.y);
-    df->df_set_tile(TILE_FLOOR_STONE_00, door_loc.x, door_loc.y);
     df->df_set_upstairs_loc(upstairs_loc);
 
     const entityid door_id = create_door_at_with(door_loc, [](CT&, const entityid) {});

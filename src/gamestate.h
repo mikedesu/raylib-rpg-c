@@ -236,6 +236,7 @@ public:
     int pending_level_ups;
     vector<damage_popup_t> damage_popups;
     vector<floor_pressure_plate_t> floor_pressure_plates;
+    vec3 floor_four_tutorial_orc_spawn = vec3{-1, -1, -1};
 
     void set_seed() {
         srand(time(NULL));
@@ -430,6 +431,7 @@ public:
         pending_level_ups = 0;
         damage_popups.clear();
         floor_pressure_plates.clear();
+        floor_four_tutorial_orc_spawn = vec3{-1, -1, -1};
         prefer_mini_inventory_menu = false;
         controls_menu_waiting_for_key = false;
         controls_menu_selection = 0;

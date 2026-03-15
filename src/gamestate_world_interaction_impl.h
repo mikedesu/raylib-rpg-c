@@ -221,9 +221,13 @@ inline void gamestate::update_pressure_plates_for_floor(int z) {
         }
 
         const bool active = tile_has_pressure_plate_occupant(plate.loc);
+        const bool was_active = plate.active;
         if (plate.linked_door_id != ENTITYID_INVALID && ct.get<entitytype>(plate.linked_door_id).value_or(ENTITY_NONE) == ENTITY_DOOR) {
             ct.set<door_open>(plate.linked_door_id, active);
             ct.set<update>(plate.linked_door_id, true);
+            if (!was_active && active && IsAudioDeviceReady() && sfx.size() > SFX_CHEST_OPEN) {
+                PlaySound(sfx.at(SFX_CHEST_OPEN));
+            }
         }
         else {
             plate.linked_door_id = ENTITYID_INVALID;
