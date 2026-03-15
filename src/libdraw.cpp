@@ -12,6 +12,7 @@
 #include "draw_controls_menu.h"
 #include "draw_damage_numbers.h"
 #include "draw_dungeon_floor.h"
+#include "draw_entity_sprite.h"
 #include "draw_sprite.h"
 #include "draw_handle_gamestate_flag.h"
 #include "draw_handle_debug_panel.h"
@@ -31,6 +32,8 @@
 #include "draw_window_color_menu.h"
 #include "entitytype.h"
 #include "get_txkey_for_tiletype.h"
+#include "get_shield_sprite.h"
+#include "get_weapon_sprite.h"
 #include "item.h"
 #include "libdraw_frame_stats.h"
 #include "libdraw_from_texture.h"
@@ -45,6 +48,7 @@
 #include "set_sg.h"
 #include "shaders.h"
 #include "spritegroup_anim.h"
+#include "stat_bonus.h"
 #include "tx_keys_boxes.h"
 #include "tx_keys_chests.h"
 #include "tx_keys_doors.h"
@@ -56,6 +60,8 @@
 #include "tx_keys_weapons.h"
 #include "unload_textures.h"
 #include "update_sprite.h"
+#include <algorithm>
+#include <array>
 #include <cstdio>
 
 libdraw_context_t libdraw_ctx;
@@ -151,6 +157,669 @@ bool create_spritegroup(gamestate& g, entityid id, int* keys, int num_keys, int 
 
 bool create_sg(gamestate& g, entityid id, int* keys, int num_keys) {
     return create_spritegroup(g, id, keys, num_keys, -12, -12);
+}
+
+void draw_hud(gamestate& g) {
+    constexpr int font_size = DEFAULT_HUD_FONT_SIZE;
+    constexpr int line_thickness = 2;
+    constexpr int line_gap = 2;
+    constexpr int line_count = 5;
+    constexpr int inner_pad = 8;
+
+    const int turn = g.turn_count;
+    const vec2 hp_value = g.ct.get<hp>(g.hero_id).value_or(vec2{-1, -1});
+    const int myhp = hp_value.x;
+    const int mymaxhp = hp_value.y;
+    const int mylevel = g.ct.get<level>(g.hero_id).value_or(0);
+    const int myxp = g.ct.get<xp>(g.hero_id).value_or(0);
+    const int attack_bonus = get_stat_bonus(g.ct.get<strength>(g.hero_id).value_or(10));
+    const int ac = g.compute_armor_class(g.hero_id);
+    const int str = g.ct.get<strength>(g.hero_id).value_or(-1);
+    const int dex = g.ct.get<dexterity>(g.hero_id).value_or(-1);
+    const int con = g.ct.get<constitution>(g.hero_id).value_or(-1);
+    const int int_ = g.ct.get<intelligence>(g.hero_id).value_or(-1);
+    const int wis = g.ct.get<wisdom>(g.hero_id).value_or(-1);
+    const int cha = g.ct.get<charisma>(g.hero_id).value_or(-1);
+    const string n = g.ct.get<name>(g.hero_id).value_or("no-name");
+    const vec3 loc = g.ct.get<location>(g.hero_id).value_or(vec3{-1, -1, -1});
+    const alignment_t hero_alignment = g.ct.get<alignment>(g.hero_id).value_or(ALIGNMENT_NONE);
+    const std::array<std::string, line_count> lines = {
+        n,
+        TextFormat("Lvl %d HP %d/%d  Atk: %d  AC: %d", mylevel, myhp, mymaxhp, attack_bonus, ac),
+        TextFormat("Str %d Dex %d Con %d Int %d Wis %d Cha %d", str, dex, con, int_, wis, cha),
+        TextFormat("Location: (%d, %d, %d) Turn %d  XP %d", loc.x, loc.y, loc.z, turn, myxp),
+        TextFormat("Alignment: %s", alignment_to_str(hero_alignment).c_str()),
+    };
+
+    int max_w = 0;
+    for (const std::string& line : lines) {
+        max_w = std::max(max_w, MeasureText(line.c_str(), font_size));
+    }
+
+    const float box_w = max_w + inner_pad * 2;
+    const float box_h = line_count * font_size + (line_count - 1) * line_gap + inner_pad * 2;
+    const float box_x = g.targetwidth / 2.0f - (box_w / 2.0f);
+    const float box_y = g.targetheight - box_h - g.pad;
+
+    DrawRectangleRec(Rectangle{box_x, box_y, box_w, box_h}, g.window_box_bgcolor);
+    DrawRectangleLinesEx(Rectangle{box_x, box_y, box_w, box_h}, line_thickness, g.window_box_fgcolor);
+
+    const int text_x = box_x + inner_pad;
+    int text_y = box_y + inner_pad;
+    for (const std::string& line : lines) {
+        DrawText(line.c_str(), text_x, text_y, font_size, g.window_box_fgcolor);
+        text_y += font_size + line_gap;
+    }
+}
+
+void draw_action_menu(gamestate& g) {
+    constexpr int fontsize = 10;
+    constexpr int hp = 20;
+    constexpr float x = 10;
+    constexpr float y = 10;
+    constexpr float rotation = 0;
+    constexpr int thickness = 1;
+    constexpr float xp = 10;
+    constexpr float yp = 10;
+    constexpr float wp = 20;
+    constexpr Vector2 origin = {0, 0};
+    const vector<string> actions = {"Attack", "Open", "Inventory"};
+    const float h = fontsize * actions.size();
+    const string s = "> Inventory";
+    const float w = MeasureText(s.c_str(), fontsize);
+    const Rectangle r = {x, y, w + wp, h + hp};
+    DrawRectanglePro(r, origin, rotation, g.window_box_bgcolor);
+    DrawRectangleLinesEx(r, thickness, g.window_box_fgcolor);
+    for (size_t i = 0; i < actions.size(); i++) {
+        if (g.action_selection == i) {
+            DrawText(TextFormat("> %s", actions[i].c_str()), x + xp, y + yp + (fontsize * i), fontsize, YELLOW);
+        }
+        else {
+            DrawText(TextFormat("  %s", actions[i].c_str()), x + xp, y + yp + (fontsize * i), fontsize, g.window_box_fgcolor);
+        }
+    }
+}
+
+void draw_option_menu(gamestate& g) {
+    constexpr float x = 10, y = 10, p = 20, pa = 10, rotation = 0;
+    constexpr int fsize = 10, thickness = 1;
+    constexpr Vector2 origin = {0, 0};
+    float max_w = 0;
+    for (size_t i = 0; i < g.options_menu.get_option_count(); i++) {
+        const option_type option = g.options_menu.get_option(i);
+        const string option_label =
+            option == OPTION_INVENTORY_MENU
+                ? TextFormat("inventory menu: %s", g.prefer_mini_inventory_menu ? "mini" : "full")
+                : g.options_menu.get_option_str(option);
+        const char* spaced_str = TextFormat("  %s", option_label.c_str());
+        const float w = MeasureText(spaced_str, fsize);
+        if (w > max_w) {
+            max_w = w;
+        }
+    }
+    const float h = fsize * g.options_menu.get_option_count();
+    const float padded_w = max_w + p, padded_h = h + p;
+    const Rectangle r = {x, y, padded_w, padded_h};
+    DrawRectanglePro(r, origin, rotation, g.window_box_bgcolor);
+    DrawRectangleLinesEx(r, thickness, g.window_box_fgcolor);
+    for (size_t i = 0; i < g.options_menu.get_option_count(); i++) {
+        constexpr int x0 = x + pa;
+        const int y0 = y + pa + fsize * i;
+        const option_type otype = g.options_menu.get_option(i);
+        const string ostr =
+            otype == OPTION_INVENTORY_MENU
+                ? TextFormat("inventory menu: %s", g.prefer_mini_inventory_menu ? "mini" : "full")
+                : g.options_menu.get_option_str(otype);
+        const char* cstr = ostr.c_str();
+        if (g.options_menu.get_selection() == i) {
+            DrawText(TextFormat("> %s", cstr), x0, y0, fsize, YELLOW);
+        }
+        else {
+            DrawText(TextFormat("  %s", cstr), x0, y0, fsize, g.window_box_fgcolor);
+        }
+    }
+}
+
+void draw_sound_menu(gamestate& g) {
+    if (!g.display_sound_menu) {
+        return;
+    }
+
+    constexpr int font_size = 12;
+    constexpr int title_font_size = 18;
+    constexpr int line_height = 16;
+    constexpr int padding = 12;
+    const int box_w = 360;
+    const int box_h = 140;
+    const int box_x = (DEFAULT_TARGET_WIDTH - box_w) / 2;
+    const int box_y = (DEFAULT_TARGET_HEIGHT - box_h) / 2;
+    const Rectangle box = {(float)box_x, (float)box_y, (float)box_w, (float)box_h};
+
+    DrawRectangleRec(box, g.window_box_bgcolor);
+    DrawRectangleLinesEx(box, 2.0f, g.window_box_fgcolor);
+    DrawText("Sound", box_x + padding, box_y + padding, title_font_size, g.window_box_fgcolor);
+    DrawText("Up/Down select, Left/Right adjust, Esc returns", box_x + padding, box_y + padding + 22, font_size, g.window_box_fgcolor);
+
+    const char* labels[] = {"Master", "Music", "Sound Effects"};
+    const float values[] = {g.get_master_volume(), g.get_music_volume(), g.get_sfx_volume()};
+    int y = box_y + padding + 48;
+    for (size_t i = 0; i < 3; i++) {
+        const bool selected = g.sound_menu_selection == i;
+        DrawText(selected ? TextFormat("> %-14s %3d%%", labels[i], (int)(values[i] * 100.0f))
+                          : TextFormat("  %-14s %3d%%", labels[i], (int)(values[i] * 100.0f)),
+            box_x + padding,
+            y,
+            font_size,
+            selected ? YELLOW : g.window_box_fgcolor);
+        y += line_height;
+    }
+}
+
+void draw_window_color_menu(gamestate& g) {
+    if (!g.display_window_color_menu) {
+        return;
+    }
+
+    constexpr int font_size = 11;
+    constexpr int title_font_size = 18;
+    constexpr int line_height = 14;
+    constexpr int padding = 12;
+    const int box_w = 420;
+    const int box_h = 220;
+    const int box_x = (DEFAULT_TARGET_WIDTH - box_w) / 2;
+    const int box_y = (DEFAULT_TARGET_HEIGHT - box_h) / 2;
+    const Rectangle box = {(float)box_x, (float)box_y, (float)box_w, (float)box_h};
+
+    DrawRectangleRec(box, g.window_box_bgcolor);
+    DrawRectangleLinesEx(box, 2.0f, g.window_box_fgcolor);
+    DrawText("Window Box Colors", box_x + padding, box_y + padding, title_font_size, g.window_box_fgcolor);
+    DrawText("Up/Down select, Left/Right adjust, Enter reset, Esc returns", box_x + padding, box_y + padding + 22, font_size, g.window_box_fgcolor);
+
+    const unsigned char values[] = {
+        g.window_box_bgcolor.r, g.window_box_bgcolor.g, g.window_box_bgcolor.b, g.window_box_bgcolor.a,
+        g.window_box_fgcolor.r, g.window_box_fgcolor.g, g.window_box_fgcolor.b, g.window_box_fgcolor.a
+    };
+    const char* labels[] = {
+        "Background R", "Background G", "Background B", "Background A",
+        "Foreground R", "Foreground G", "Foreground B", "Foreground A",
+        "Reset Defaults"
+    };
+
+    int y = box_y + padding + 48;
+    for (size_t i = 0; i < 9; i++) {
+        const bool selected = g.window_color_menu_selection == i;
+        const char* text = i < 8 ? TextFormat("%c %-14s %3d", selected ? '>' : ' ', labels[i], values[i])
+                                 : (selected ? "> Reset Defaults" : "  Reset Defaults");
+        DrawText(text, box_x + padding, y, font_size, selected ? YELLOW : g.window_box_fgcolor);
+        y += line_height;
+    }
+
+    Rectangle preview = {(float)(box_x + box_w - 112), (float)(box_y + 60), 84.0f, 84.0f};
+    DrawRectangleRec(preview, g.window_box_bgcolor);
+    DrawRectangleLinesEx(preview, 2.0f, g.window_box_fgcolor);
+    DrawText("Preview", (int)preview.x + 10, (int)preview.y + 32, font_size, g.window_box_fgcolor);
+}
+
+void draw_controls_menu(gamestate& g) {
+    if (!g.display_controls_menu) {
+        return;
+    }
+
+    constexpr int font_size = 10;
+    constexpr int line_height = 12;
+    constexpr int padding = 12;
+    const int visible_rows = INPUT_ACTION_COUNT + 4;
+    const int box_w = 500;
+    const int box_h = visible_rows * line_height + padding * 2 + 24;
+    const int box_x = (DEFAULT_TARGET_WIDTH - box_w) / 2;
+    const int box_y = (DEFAULT_TARGET_HEIGHT - box_h) / 2;
+    const Rectangle box = {(float)box_x, (float)box_y, (float)box_w, (float)box_h};
+
+    DrawRectangleRec(box, g.window_box_bgcolor);
+    DrawRectangleLinesEx(box, 2.0f, g.window_box_fgcolor);
+    DrawText("Keyboard Controls", box_x + padding, box_y + padding, 18, g.window_box_fgcolor);
+    const char* subtitle = g.controls_menu_waiting_for_key
+        ? TextFormat("Press a new key for %s. Esc cancels.", gameplay_input_action_label(g.controls_menu_pending_action))
+        : "Up/Down select, Enter edit, Left/Right swap profile, Esc closes";
+    DrawText(subtitle, box_x + padding, box_y + padding + 20, font_size, g.window_box_fgcolor);
+
+    int y = box_y + padding + 38;
+    const bool profile_selected = g.controls_menu_selection == 0;
+    DrawText(profile_selected ? TextFormat("> Profile: %s", keyboard_profile_label(g.keyboard_profile))
+                              : TextFormat("  Profile: %s", keyboard_profile_label(g.keyboard_profile)),
+        box_x + padding, y, font_size, profile_selected ? YELLOW : g.window_box_fgcolor);
+    y += line_height;
+
+    const bool reset_selected = g.controls_menu_selection == 1;
+    DrawText(reset_selected ? "> Reset Current Profile To Defaults" : "  Reset Current Profile To Defaults",
+        box_x + padding, y, font_size, reset_selected ? YELLOW : g.window_box_fgcolor);
+    y += line_height;
+
+    for (int action = 0; action < INPUT_ACTION_COUNT; action++) {
+        const bool selected = g.controls_menu_selection == static_cast<size_t>(action + 2);
+        const char* action_label = gameplay_input_action_label(static_cast<gameplay_input_action_t>(action));
+        const string binding = g.get_keybinding_label(g.keyboard_profile, static_cast<gameplay_input_action_t>(action));
+        DrawText(selected ? TextFormat("> %-22s %s", action_label, binding.c_str())
+                          : TextFormat("  %-22s %s", action_label, binding.c_str()),
+            box_x + padding, y, font_size, selected ? YELLOW : g.window_box_fgcolor);
+        y += line_height;
+    }
+}
+
+void draw_help_menu(gamestate& g) {
+    const string text = TextFormat(
+        "Help Menu\n"
+        "\n"
+        "Profile: %s\n"
+        "Move Up: %s\n"
+        "Move Down: %s\n"
+        "Move Left / Right: %s / %s\n"
+        "Move Diagonals: %s %s %s %s\n"
+        "Face Mode: %s\n"
+        "Face Attack: %s\n"
+        "Camera mode: %s\n"
+        "Zoom: %s and %s\n"
+        "\n"
+        "Pick up item: %s\n"
+        "Attack: %s\n"
+        "Pull: %s\n"
+        "Open door / chest: %s\n"
+        "Interact / examine: %s\n"
+        "Use stairs: %s\n"
+        "Toggle full light: %s\n"
+        "Level-up select: arrows + enter\n"
+        "\n"
+        "Inventory: %s\n"
+        "Inventory equip/use: e or enter\n"
+        "Inventory drop: q\n"
+        "Inventory close: esc or inventory key\n"
+        "\n"
+        "Options: %s\n"
+        "Open this help menu: %s\n"
+        "Debug panel: p\n"
+        "Quit prompt: esc\n"
+        "\n"
+        "@evildojo666",
+        keyboard_profile_label(g.keyboard_profile),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_MOVE_UP).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_MOVE_DOWN).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_MOVE_LEFT).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_MOVE_RIGHT).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_MOVE_UP_LEFT).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_MOVE_UP_RIGHT).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_MOVE_DOWN_LEFT).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_MOVE_DOWN_RIGHT).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_DIRECTION_MODE).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_FACE_ATTACK).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_CAMERA_TOGGLE).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_ZOOM_IN).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_ZOOM_OUT).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_PICKUP).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_ATTACK).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_PULL).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_OPEN).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_INTERACT).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_STAIRS).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_TOGGLE_FULL_LIGHT).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_INVENTORY).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_OPTIONS).c_str(),
+        g.get_keybinding_label(g.keyboard_profile, INPUT_ACTION_HELP).c_str());
+
+    constexpr int font_size = 20;
+    constexpr int line_spacing = 4;
+    const int padding = DEFAULT_PAD * 2;
+
+    int max_text_width = 0;
+    int line_count = 0;
+    size_t line_start = 0;
+    while (line_start <= text.size()) {
+        const size_t line_end = text.find('\n', line_start);
+        const string line = line_end == string::npos ? text.substr(line_start) : text.substr(line_start, line_end - line_start);
+        const int line_width = MeasureText(line.c_str(), font_size);
+        if (line_width > max_text_width) {
+            max_text_width = line_width;
+        }
+        line_count++;
+        if (line_end == string::npos) {
+            break;
+        }
+        line_start = line_end + 1;
+    }
+
+    const int text_height = line_count * font_size + (line_count - 1) * line_spacing;
+    const int box_width = max_text_width + padding * 2;
+    const int box_height = text_height + padding * 2;
+    const int box_x = (DEFAULT_TARGET_WIDTH - box_width) / 2;
+    const int box_y = (DEFAULT_TARGET_HEIGHT - box_height) / 2;
+
+    DrawRectangle(box_x, box_y, box_width, box_height, g.window_box_bgcolor);
+    DrawRectangleLinesEx({(float)box_x, (float)box_y, (float)box_width, (float)box_height}, 2, g.window_box_fgcolor);
+
+    const int text_x = box_x + padding;
+    int text_y = box_y + padding;
+    line_start = 0;
+    while (line_start <= text.size()) {
+        const size_t line_end = text.find('\n', line_start);
+        const string line = line_end == string::npos ? text.substr(line_start) : text.substr(line_start, line_end - line_start);
+        DrawText(line.c_str(), text_x, text_y, font_size, g.window_box_fgcolor);
+        text_y += font_size + line_spacing;
+        if (line_end == string::npos) {
+            break;
+        }
+        line_start = line_end + 1;
+    }
+}
+
+void draw_keyboard_profile_prompt(gamestate& g) {
+    if (!g.display_keyboard_profile_prompt) {
+        return;
+    }
+
+    const int box_w = 420;
+    const int box_h = 150;
+    const int box_x = (DEFAULT_TARGET_WIDTH - box_w) / 2;
+    const int box_y = (DEFAULT_TARGET_HEIGHT - box_h) / 2;
+    const Rectangle box = {(float)box_x, (float)box_y, (float)box_w, (float)box_h};
+
+    DrawRectangleRec(box, g.window_box_bgcolor);
+    DrawRectangleLinesEx(box, 2.0f, g.window_box_fgcolor);
+    DrawText("Choose Keyboard Layout", box_x + 16, box_y + 14, 20, g.window_box_fgcolor);
+    DrawText("Select a default gameplay profile before entering the dungeon.", box_x + 16, box_y + 42, 10, g.window_box_fgcolor);
+    DrawText("You can change this later in ` -> controls.", box_x + 16, box_y + 56, 10, g.window_box_fgcolor);
+
+    for (int i = 0; i < KEYBOARD_PROFILE_COUNT; i++) {
+        const bool selected = g.keyboard_profile_selection == (unsigned int)i;
+        const int option_y = box_y + 88 + i * 18;
+        const char* label = keyboard_profile_label(static_cast<keyboard_profile_t>(i));
+        DrawText(selected ? TextFormat("> %s", label) : TextFormat("  %s", label), box_x + 24, option_y, 12, selected ? YELLOW : g.window_box_fgcolor);
+    }
+
+    DrawText("Arrows to choose, Enter to confirm", box_x + 16, box_y + box_h - 20, 10, g.window_box_fgcolor);
+}
+
+void draw_entity_sprite(gamestate& g, spritegroup* sg) {
+    (void)g;
+    massert(sg, "spritegroup is NULL");
+    Rectangle dest = {sg->dest.x, sg->dest.y, sg->dest.width, sg->dest.height};
+    massert(dest.width > 0, "dest.width is 0");
+    massert(dest.height > 0, "dest.height is 0");
+    shared_ptr<sprite> s = sg->get_current();
+    massert(s, "sprite is NULL");
+    DrawTexturePro(*s->get_texture(), s->get_src(), dest, Vector2{0, 0}, 0, WHITE);
+#ifdef ENTITY_BORDER
+    DrawRectangleLinesEx(dest, 1, Color{255, 0, 0, 255});
+#endif
+}
+
+void draw_weapon_sprite_back(gamestate& g, entityid id, spritegroup* sg) {
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    massert(sg, "spritegroup is NULL");
+    auto weapon_back_s = get_weapon_back_sprite(g, id, sg);
+    if (weapon_back_s) {
+        DrawTexturePro(*weapon_back_s->get_texture(), weapon_back_s->get_src(), sg->dest, Vector2{0, 0}, 0, WHITE);
+    }
+}
+
+void draw_weapon_sprite_front(gamestate& g, entityid id, spritegroup* sg) {
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    massert(sg, "spritegroup is NULL");
+    auto weapon_front_s = get_weapon_front_sprite(g, id, sg);
+    if (weapon_front_s) {
+        DrawTexturePro(*weapon_front_s->get_texture(), weapon_front_s->get_src(), sg->dest, Vector2{0, 0}, 0, WHITE);
+    }
+}
+
+void draw_shield_sprite_back(gamestate& g, entityid id, spritegroup* sg) {
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    massert(sg, "spritegroup is NULL");
+    auto shield_back_s = get_shield_back_sprite(g, id, sg);
+    if (shield_back_s) {
+        DrawTexturePro(*shield_back_s->get_texture(), shield_back_s->get_src(), sg->dest, Vector2{0, 0}, 0, WHITE);
+    }
+    else {
+        merror3("no shield back sprite");
+    }
+}
+
+void draw_shield_sprite_front(gamestate& g, entityid id, spritegroup* sg) {
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    massert(sg, "spritegroup is NULL");
+    auto shield_front_s = get_shield_front_sprite(g, id, sg);
+    if (shield_front_s) {
+        DrawTexturePro(*shield_front_s->get_texture(), shield_front_s->get_src(), sg->dest, Vector2{0, 0}, 0, WHITE);
+    }
+    else {
+        merror3("no shield front sprite");
+    }
+}
+
+void draw_sprite_and_shadow(gamestate& g, entityid id) {
+    massert(id != ENTITYID_INVALID, "id is invalid");
+    massert(libdraw_ctx.spritegroups.find(id) != libdraw_ctx.spritegroups.end(), "NO SPRITE GROUP FOR ID %d", id);
+    spritegroup* sg = libdraw_ctx.spritegroups[id];
+    massert(sg, "sg is NULL");
+    draw_shield_sprite_back(g, id, sg);
+    draw_weapon_sprite_back(g, id, sg);
+    draw_entity_sprite(g, sg);
+    draw_shield_sprite_front(g, id, sg);
+    draw_weapon_sprite_front(g, id, sg);
+}
+
+void draw_message_box(gamestate& g) {
+    if (!g.display_confirm_prompt && (!g.msg_system_is_active || g.msg_system.size() == 0)) {
+        return;
+    }
+
+    constexpr int w = DEFAULT_TARGET_WIDTH;
+    constexpr int font_size = DEFAULT_MSG_WINDOW_FONT_SIZE;
+    constexpr float text_height = font_size;
+    constexpr float y = (DEFAULT_TARGET_HEIGHT - text_height) / 2.0 - DEFAULT_PAD;
+
+    const string msg = g.display_confirm_prompt ? g.confirm_prompt_message : g.msg_system.at(0);
+    char tmp[1024] = {0};
+    snprintf(tmp, sizeof(tmp), "%s", msg.c_str());
+
+    const int measure = MeasureText(tmp, font_size);
+    const float text_width = measure;
+    const float x = (w - text_width) / 2.0 - DEFAULT_PAD;
+    const float box_width = text_width + DEFAULT_PAD * 2;
+    const float box_height = text_height + g.pad * 2;
+    const Rectangle box = {x, y, box_width, box_height};
+
+    DrawRectangleRec(box, g.window_box_bgcolor);
+    DrawRectangleLinesEx(box, 1, g.window_box_fgcolor);
+
+    const int text_x = box.x + g.pad;
+    const int text_y = box.y + g.pad;
+    DrawText(tmp, text_x, text_y, font_size, g.window_box_fgcolor);
+}
+
+void draw_message_history(gamestate& g) {
+    char tmp[1024] = {0};
+    const int font_size = DEFAULT_MSG_HISTORY_FONT_SIZE;
+    constexpr int max_messages = 30;
+    const int msg_count = g.msg_history.size();
+    if (msg_count == 0) {
+        return;
+    }
+    const int max_measure = g.msg_history_max_len_msg_measure;
+
+    const float w = max_measure + g.pad;
+    const float h = (font_size + 2) * std::min(msg_count, max_messages) + g.pad;
+    const float x = g.targetwidth - w;
+    constexpr float y = 0;
+    const Rectangle box = {x, y, w, h};
+    DrawRectangleRec(box, g.window_box_bgcolor);
+    DrawRectangleLinesEx(box, 1, g.window_box_fgcolor);
+
+    if (msg_count > max_messages) {
+        int outer_count = 0;
+        for (int i = msg_count - max_messages; i < msg_count; i++) {
+            const string msg = g.msg_history.at(i);
+            bzero(tmp, 1024);
+            snprintf(tmp, sizeof(tmp), "%s", msg.c_str());
+            const float msg_x = box.x + g.pad / 2.0;
+            const float msg_y = box.y + g.pad / 2.0 + (outer_count * (font_size + 2));
+            DrawText(tmp, msg_x, msg_y, font_size, g.window_box_fgcolor);
+            outer_count++;
+        }
+        return;
+    }
+    for (int i = 0; i < msg_count; i++) {
+        const string msg = g.msg_history.at(i);
+        bzero(tmp, 1024);
+        snprintf(tmp, sizeof(tmp), "%s", msg.c_str());
+        const float msg_x = box.x + g.pad / 2.0;
+        const float msg_y = box.y + g.pad / 2.0 + (i * (font_size + 2));
+        DrawText(tmp, msg_x, msg_y, font_size, g.window_box_fgcolor);
+    }
+}
+
+void draw_look_panel(gamestate& g) {
+    auto loc = g.ct.get<location>(g.hero_id).value_or((vec3){-1, -1, -1});
+    auto df = g.d.get_floor(loc.z);
+    tile_t& tile = df->tile_at(loc);
+    const int entity_count = tile.entity_count() - 1;
+    const int texts_size = 7;
+    const char* dummy_text = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+    const int font_size = DEFAULT_LOOK_PANEL_FONT_SIZE;
+    const int pad_w = 10;
+    const int pad_h = 10;
+    const int m = MeasureText(dummy_text, font_size);
+    const float w = m + pad_w * 2;
+    const float h = font_size * texts_size + pad_h * (texts_size + 2);
+    const float base_x = 10;
+    const float base_y = g.targetheight - h;
+    Rectangle r = {base_x, base_y, w, h};
+
+    DrawRectanglePro(r, Vector2{0, 0}, 0.0f, g.window_box_bgcolor);
+    DrawRectangleLinesEx(r, 1, g.window_box_fgcolor);
+    DrawText("Look Panel", r.x + pad_w, r.y + pad_h + (font_size + 5) * 0, font_size, g.window_box_fgcolor);
+    DrawText(TextFormat("There are %d things here", entity_count), r.x + pad_w, r.y + pad_h + (font_size + 5) * 1, font_size, g.window_box_fgcolor);
+    DrawText(TextFormat("living npc %d", tile.get_cached_live_npc()), r.x + pad_w, r.y + pad_h + (font_size + 5) * 2, font_size, g.window_box_fgcolor);
+    DrawText(TextFormat("dead npc %d", tile.get_cached_dead_npc()), r.x + pad_w, r.y + pad_h + (font_size + 5) * 3, font_size, g.window_box_fgcolor);
+    DrawText(TextFormat("items %d (%d)", (int)tile.get_item_count(), tile.get_cached_item()), r.x + pad_w, r.y + pad_h + (font_size + 5) * 4, font_size, g.window_box_fgcolor);
+    DrawText(TextFormat("door %d", tile.get_cached_door()), r.x + pad_w, r.y + pad_h + (font_size + 5) * 5, font_size, g.window_box_fgcolor);
+    DrawText(TextFormat("box %d", tile.get_cached_box()), r.x + pad_w, r.y + pad_h + (font_size + 5) * 6, font_size, g.window_box_fgcolor);
+}
+
+void draw_interaction_modal(gamestate& g) {
+    if (!g.display_interaction_modal || g.interaction_body.empty()) {
+        return;
+    }
+
+    constexpr int title_font_size = 24;
+    constexpr int body_font_size = DEFAULT_MSG_WINDOW_FONT_SIZE;
+    constexpr int line_spacing = 6;
+    constexpr int padding = DEFAULT_PAD;
+    constexpr int min_width = 360;
+    vector<string> lines;
+    if (!g.interaction_title.empty()) {
+        lines.push_back(g.interaction_title);
+    }
+
+    size_t line_start = 0;
+    while (line_start <= g.interaction_body.size()) {
+        const size_t line_end = g.interaction_body.find('\n', line_start);
+        const string line = line_end == string::npos ? g.interaction_body.substr(line_start) : g.interaction_body.substr(line_start, line_end - line_start);
+        lines.push_back(line);
+        if (line_end == string::npos) {
+            break;
+        }
+        line_start = line_end + 1;
+    }
+
+    int max_text_width = 0;
+    for (size_t i = 0; i < lines.size(); i++) {
+        const int font_size = i == 0 && !g.interaction_title.empty() ? title_font_size : body_font_size;
+        max_text_width = std::max(max_text_width, MeasureText(lines[i].c_str(), font_size));
+    }
+
+    const int box_width = std::max(min_width, max_text_width + padding * 2);
+    const int title_height = g.interaction_title.empty() ? 0 : title_font_size;
+    const int body_lines = static_cast<int>(lines.size()) - static_cast<int>(!g.interaction_title.empty());
+    const int body_height = body_lines > 0 ? body_lines * body_font_size + (body_lines - 1) * line_spacing : 0;
+    const int section_gap = (!g.interaction_title.empty() && body_lines > 0) ? line_spacing + 4 : 0;
+    const int box_height = padding * 2 + title_height + body_height + section_gap;
+    const int box_x = (DEFAULT_TARGET_WIDTH - box_width) / 2;
+    const int box_y = (DEFAULT_TARGET_HEIGHT - box_height) / 2;
+
+    DrawRectangle(box_x, box_y, box_width, box_height, g.window_box_bgcolor);
+    DrawRectangleLinesEx(Rectangle{static_cast<float>(box_x), static_cast<float>(box_y), static_cast<float>(box_width), static_cast<float>(box_height)}, 2, g.window_box_fgcolor);
+
+    int text_y = box_y + padding;
+    if (!g.interaction_title.empty()) {
+        const int title_width = MeasureText(g.interaction_title.c_str(), title_font_size);
+        const int title_x = box_x + (box_width - title_width) / 2;
+        DrawText(g.interaction_title.c_str(), title_x, text_y, title_font_size, g.window_box_fgcolor);
+        text_y += title_font_size + section_gap;
+    }
+
+    const int body_x = box_x + padding;
+    for (size_t i = g.interaction_title.empty() ? 0 : 1; i < lines.size(); i++) {
+        DrawText(lines[i].c_str(), body_x, text_y, body_font_size, g.window_box_fgcolor);
+        text_y += body_font_size + line_spacing;
+    }
+}
+
+void draw_level_up_modal(gamestate& g) {
+    if (!g.display_level_up_modal) {
+        return;
+    }
+
+    constexpr int title_font_size = 26;
+    constexpr int body_font_size = 18;
+    constexpr int cell_font_size = 20;
+    constexpr int padding = DEFAULT_PAD;
+    constexpr int cols = 2;
+    constexpr int rows = 3;
+    constexpr int cell_w = 200;
+    constexpr int cell_h = 52;
+    constexpr int cell_gap = 12;
+
+    const std::array<const char*, 6> labels = {
+        "Strength",
+        "Dexterity",
+        "Constitution",
+        "Intelligence",
+        "Wisdom",
+        "Charisma",
+    };
+
+    const int grid_w = cols * cell_w + (cols - 1) * cell_gap;
+    const int grid_h = rows * cell_h + (rows - 1) * cell_gap;
+    const int box_w = grid_w + padding * 2;
+    const int box_h = padding * 2 + title_font_size + body_font_size + 20 + grid_h;
+    const int box_x = (DEFAULT_TARGET_WIDTH - box_w) / 2;
+    const int box_y = (DEFAULT_TARGET_HEIGHT - box_h) / 2;
+
+    DrawRectangle(box_x, box_y, box_w, box_h, g.window_box_bgcolor);
+    DrawRectangleLinesEx(Rectangle{static_cast<float>(box_x), static_cast<float>(box_y), static_cast<float>(box_w), static_cast<float>(box_h)}, 2, g.window_box_fgcolor);
+
+    const char* title = "Level Up";
+    const char* subtitle = "Choose one attribute to permanently increase by 1";
+    const int title_x = box_x + (box_w - MeasureText(title, title_font_size)) / 2;
+    const int subtitle_x = box_x + (box_w - MeasureText(subtitle, body_font_size)) / 2;
+    DrawText(title, title_x, box_y + padding, title_font_size, g.window_box_fgcolor);
+    DrawText(subtitle, subtitle_x, box_y + padding + title_font_size + 8, body_font_size, g.window_box_fgcolor);
+
+    const int grid_x = box_x + padding;
+    const int grid_y = box_y + padding + title_font_size + body_font_size + 20;
+    for (int i = 0; i < 6; i++) {
+        const int col = i % cols;
+        const int row = i / cols;
+        const int cell_x = grid_x + col * (cell_w + cell_gap);
+        const int cell_y = grid_y + row * (cell_h + cell_gap);
+        const bool selected = static_cast<int>(g.level_up_selection % 6) == i;
+        const Color fill = selected ? Color{0x00, 0x88, 0x44, 220} : Color{0x11, 0x11, 0x66, 180};
+        DrawRectangle(cell_x, cell_y, cell_w, cell_h, fill);
+        DrawRectangleLinesEx(Rectangle{static_cast<float>(cell_x), static_cast<float>(cell_y), static_cast<float>(cell_w), static_cast<float>(cell_h)}, 2, g.window_box_fgcolor);
+
+        const int text_w = MeasureText(labels[i], cell_font_size);
+        const int text_x = cell_x + (cell_w - text_w) / 2;
+        const int text_y = cell_y + (cell_h - cell_font_size) / 2;
+        DrawText(labels[i], text_x, text_y, cell_font_size, g.window_box_fgcolor);
+    }
 }
 
 void draw_hud_to_texture(gamestate& g) {

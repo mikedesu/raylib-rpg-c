@@ -19,7 +19,8 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
   - Latest follow-up also moved the top-level renderer entry points out of header-only `static inline` implementations into a real `libdraw.cpp`, so `libdraw.h`/`libdraw_*` API headers are now declaration-first at the entry-point layer.
   - Latest follow-up also moved sprite lifecycle/update helpers and spritegroup factory dispatch out of implementation headers into `libdraw.cpp`, shrinking a large part of the renderer-side implementation-header surface.
   - Latest follow-up also moved scene composition helpers, gameplay-scene composition, dungeon-floor rendering, and the player target box into `libdraw.cpp`.
-  - Remaining cleanup still exists mostly in leaf scene/UI draw headers rather than libdraw orchestration itself.
+  - Latest follow-up also moved a broad set of gameplay-scene leaf draw helpers into `libdraw.cpp`, including HUD/info overlays, gameplay menus/prompts, and sprite/equipment draw layering.
+  - Remaining cleanup now exists mostly in the larger scene/widget headers such as inventory/chest/title/character-creation and a few small utility draw helpers.
 
 - Keyboard customization is now live in the gameplay scene.
 - Current shipped state:
@@ -48,6 +49,7 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
   - Recent progress: top-level renderer orchestration now lives in `libdraw.cpp` rather than header-only entry points, reducing implementation-header coupling at the public API boundary.
   - Recent progress: sprite update/animation dispatch and spritegroup creation dispatch now also live in `libdraw.cpp`, reducing renderer helper churn in public headers.
   - Recent progress: scene-to-texture composition and gameplay floor-rendering helpers now also live in `libdraw.cpp`, leaving mostly leaf draw widgets in implementation headers.
+  - Recent progress: many gameplay-scene leaf draw widgets now also live in `libdraw.cpp`, so the remaining implementation-header surface is concentrated in a smaller number of larger draw modules.
   - [ ] eventually move away from implementation headers toward real `.cpp` files
   - [ ] evaluate migrating direct `try_entity_*` gameplay mutations toward an event-queue / action-resolution pipeline
     - Current candidates include `try_entity_attack`, `try_entity_move`, push/pull handling, door/chest toggles, pressure-plate updates, and other world-state mutations that presently happen inline.
