@@ -18,7 +18,7 @@ static inline void update_weapon_for_entity(gamestate& g, entityid id, spritegro
     int ctx = -1;
     weaponid = g.ct.get<equipped_weapon>(id).value_or(ENTITYID_INVALID);
     if (weaponid == ENTITYID_INVALID) return;
-    w_sg = spritegroups[weaponid];
+    w_sg = libdraw_ctx.spritegroups[weaponid];
     if (!w_sg) return;
     ctx = sg->sprites2->at(sg->current)->get_currentcontext();
     w_sg->setcontexts(ctx);

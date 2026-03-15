@@ -13,7 +13,7 @@
 
 /** @brief Render the HUD overlay into its dedicated off-screen texture. */
 static inline void draw_hud_to_texture(gamestate& g) {
-    BeginTextureMode(hud_target_texture);
+    BeginTextureMode(libdraw_ctx.hud_target_texture);
     draw_hud(g);
     EndTextureMode();
 }
@@ -21,7 +21,7 @@ static inline void draw_hud_to_texture(gamestate& g) {
 /** @brief Render the character-creation scene into its dedicated off-screen texture. */
 static inline void draw_char_creation_to_texture(gamestate& g) {
     minfo3("draw char creation to texture");
-    BeginTextureMode(char_creation_target_texture);
+    BeginTextureMode(libdraw_ctx.char_creation_target_texture);
     draw_character_creation_screen(g);
     handle_debug_panel(g);
     EndTextureMode();
@@ -30,7 +30,7 @@ static inline void draw_char_creation_to_texture(gamestate& g) {
 
 /** @brief Render the title or main-menu scene into its dedicated off-screen texture. */
 static inline void draw_title_screen_to_texture(gamestate& g, bool show_menu) {
-    BeginTextureMode(title_target_texture);
+    BeginTextureMode(libdraw_ctx.title_target_texture);
     draw_title_screen(g, show_menu);
     handle_debug_panel(g);
     EndTextureMode();
@@ -38,7 +38,7 @@ static inline void draw_title_screen_to_texture(gamestate& g, bool show_menu) {
 
 /** @brief Render the gameplay world scene into its dedicated off-screen texture. */
 static inline void libdraw_drawframe_2d_to_texture(gamestate& g, int vision_dist, int light_rad) {
-    BeginTextureMode(main_game_target_texture);
+    BeginTextureMode(libdraw_ctx.main_game_target_texture);
 
     libdraw_drawframe_2d(g, vision_dist, light_rad);
 

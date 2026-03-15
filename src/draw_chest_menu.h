@@ -11,7 +11,7 @@
 
 /** @brief Draw the right-side detail panel for the selected chest item. */
 static inline void draw_item_detail_panel(gamestate& g, const Rectangle& right_box, entityid selection_id) {
-    spritegroup* sg = spritegroups[selection_id];
+    spritegroup* sg = libdraw_ctx.spritegroups[selection_id];
     if (!sg) {
         return;
     }
@@ -45,7 +45,7 @@ static inline void draw_inventory_grid(gamestate& g, shared_ptr<vector<entityid>
             Rectangle grid_box2 = {x + 2, y + 2, w - 4, h - 4};
             DrawRectangleLinesEx(grid_box, 1, (Color){0x66, 0x66, 0x66, 255});
             if (it != inventory->end()) {
-                spritegroup* sg = spritegroups[*it];
+                spritegroup* sg = libdraw_ctx.spritegroups[*it];
                 if (sg) {
                     auto sprite = sg->get_current();
                     DrawTexturePro(*(sprite->get_texture()), Rectangle{10, 10, 12, 12}, grid_box2, Vector2{0, 0}, 0.0f, WHITE);

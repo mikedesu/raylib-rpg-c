@@ -16,12 +16,12 @@
 static inline void draw_sprite_and_shadow(gamestate& g, entityid id) {
     //massert(g, "gamestate is NULL");
     massert(id != ENTITYID_INVALID, "id is invalid");
-    massert(spritegroups.find(id) != spritegroups.end(), "NO SPRITE GROUP FOR ID %d", id);
-    //if (spritegroups.find(id) == spritegroups.end()) {
+    massert(libdraw_ctx.spritegroups.find(id) != libdraw_ctx.spritegroups.end(), "NO SPRITE GROUP FOR ID %d", id);
+    //if (libdraw_ctx.spritegroups.find(id) == libdraw_ctx.spritegroups.end()) {
     //    merror("NO SPRITE GROUP FOR ID %d", id);
     //    return;
     //}
-    spritegroup* sg = spritegroups[id];
+    spritegroup* sg = libdraw_ctx.spritegroups[id];
     massert(sg, "sg is NULL");
     // Draw components in correct order
     //draw_shadow_for_entity(g, sg, id);

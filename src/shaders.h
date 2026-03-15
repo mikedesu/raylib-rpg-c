@@ -13,9 +13,9 @@ using std::unordered_map;
 /** @brief Load the project's runtime shaders into the shared shader map. */
 static inline void load_shaders() {
 #ifdef WEB
-    shaders[1] = LoadShader(0, "shaders/web/green-glow.frag");
+    libdraw_ctx.shaders[1] = LoadShader(0, "shaders/web/green-glow.frag");
 #else
-    shaders[1] = LoadShader(0, "shaders/desktop/green-glow.frag");
+    libdraw_ctx.shaders[1] = LoadShader(0, "shaders/desktop/green-glow.frag");
 #endif
 
     //shader_grayscale = LoadShader(0, "grayscale.frag"); // No vertex shader needed
@@ -28,7 +28,7 @@ static inline void load_shaders() {
 
 /** @brief Unload the shaders currently stored in the shared shader map. */
 static inline void unload_shaders() {
-    UnloadShader(shaders[1]);
+    UnloadShader(libdraw_ctx.shaders[1]);
 
     //UnloadShader(shader_grayscale);
     //UnloadShader(shader_glow);

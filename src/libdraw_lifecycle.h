@@ -20,25 +20,25 @@ static inline void libdraw_init_render_targets(gamestate& g) {
     g.targetheight = DEFAULT_TARGET_HEIGHT;
 
     const TextureFilter filter = TEXTURE_FILTER_POINT;
-    target = LoadRenderTexture(DEFAULT_TARGET_WIDTH, DEFAULT_TARGET_HEIGHT);
-    title_target_texture = LoadRenderTexture(DEFAULT_TARGET_WIDTH, DEFAULT_TARGET_HEIGHT);
-    char_creation_target_texture = LoadRenderTexture(DEFAULT_TARGET_WIDTH, DEFAULT_TARGET_HEIGHT);
-    main_game_target_texture = LoadRenderTexture(DEFAULT_TARGET_WIDTH, DEFAULT_TARGET_HEIGHT);
-    hud_target_texture = LoadRenderTexture(DEFAULT_TARGET_WIDTH, DEFAULT_TARGET_HEIGHT);
+    libdraw_ctx.target = LoadRenderTexture(DEFAULT_TARGET_WIDTH, DEFAULT_TARGET_HEIGHT);
+    libdraw_ctx.title_target_texture = LoadRenderTexture(DEFAULT_TARGET_WIDTH, DEFAULT_TARGET_HEIGHT);
+    libdraw_ctx.char_creation_target_texture = LoadRenderTexture(DEFAULT_TARGET_WIDTH, DEFAULT_TARGET_HEIGHT);
+    libdraw_ctx.main_game_target_texture = LoadRenderTexture(DEFAULT_TARGET_WIDTH, DEFAULT_TARGET_HEIGHT);
+    libdraw_ctx.hud_target_texture = LoadRenderTexture(DEFAULT_TARGET_WIDTH, DEFAULT_TARGET_HEIGHT);
 
-    SetTextureFilter(target.texture, filter);
-    SetTextureFilter(title_target_texture.texture, filter);
-    SetTextureFilter(char_creation_target_texture.texture, filter);
-    SetTextureFilter(main_game_target_texture.texture, filter);
-    SetTextureFilter(hud_target_texture.texture, filter);
+    SetTextureFilter(libdraw_ctx.target.texture, filter);
+    SetTextureFilter(libdraw_ctx.title_target_texture.texture, filter);
+    SetTextureFilter(libdraw_ctx.char_creation_target_texture.texture, filter);
+    SetTextureFilter(libdraw_ctx.main_game_target_texture.texture, filter);
+    SetTextureFilter(libdraw_ctx.hud_target_texture.texture, filter);
 
-    target_src = Rectangle{0, 0, DEFAULT_TARGET_WIDTH * 1.0f, -DEFAULT_TARGET_HEIGHT * 1.0f};
-    target_dest = Rectangle{0, 0, DEFAULT_TARGET_WIDTH * 1.0f, DEFAULT_TARGET_HEIGHT * 1.0f};
+    libdraw_ctx.target_src = Rectangle{0, 0, DEFAULT_TARGET_WIDTH * 1.0f, -DEFAULT_TARGET_HEIGHT * 1.0f};
+    libdraw_ctx.target_dest = Rectangle{0, 0, DEFAULT_TARGET_WIDTH * 1.0f, DEFAULT_TARGET_HEIGHT * 1.0f};
 }
 
 /** @brief Load textures, shaders, audio, and initial scene textures for rendering. */
 static inline void libdraw_init_resources(gamestate& g) {
-    load_textures(txinfo);
+    load_textures(libdraw_ctx.txinfo);
     load_shaders();
 
     const float x = DEFAULT_TARGET_WIDTH / 4.0f;
@@ -96,13 +96,13 @@ static inline bool libdraw_windowshouldclose(gamestate& g) {
 static inline void libdraw_close_partial() {
     UnloadMusicStream(music);
     CloseAudioDevice();
-    libdraw_unload_textures(txinfo);
+    libdraw_unload_textures(libdraw_ctx.txinfo);
     unload_shaders();
-    UnloadRenderTexture(title_target_texture);
-    UnloadRenderTexture(char_creation_target_texture);
-    UnloadRenderTexture(main_game_target_texture);
-    UnloadRenderTexture(hud_target_texture);
-    UnloadRenderTexture(target);
+    UnloadRenderTexture(libdraw_ctx.title_target_texture);
+    UnloadRenderTexture(libdraw_ctx.char_creation_target_texture);
+    UnloadRenderTexture(libdraw_ctx.main_game_target_texture);
+    UnloadRenderTexture(libdraw_ctx.hud_target_texture);
+    UnloadRenderTexture(libdraw_ctx.target);
 }
 
 /**

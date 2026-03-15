@@ -20,7 +20,7 @@ static inline void update_shield_for_entity(gamestate& g, entityid id, spritegro
         merror2("shield_id invalid");
         return;
     }
-    shield_sg = spritegroups[shield_id];
+    shield_sg = libdraw_ctx.spritegroups[shield_id];
     if (!shield_sg) {
         merror2("shield_sg null");
         return;

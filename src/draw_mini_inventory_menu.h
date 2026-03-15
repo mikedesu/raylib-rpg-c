@@ -91,7 +91,7 @@ static inline void draw_mini_inventory_menu(gamestate& g, shared_ptr<vector<enti
     const entityid selection_id = inventory->at(selected_index);
     const Rectangle preview = {panel.x + padding, list_box.y + list_box.height + 10.0f, panel.width - padding * 2.0f, preview_h};
     DrawRectangleLinesEx(preview, 1, g.window_box_fgcolor);
-    spritegroup* sg = spritegroups[selection_id];
+    spritegroup* sg = libdraw_ctx.spritegroups[selection_id];
     const float preview_sprite_size = 72.0f;
     if (sg) {
         auto sprite = sg->get_current();

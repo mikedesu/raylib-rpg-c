@@ -30,9 +30,9 @@ static inline bool libdraw_draw_player_target_box(gamestate& g) {
     }
     //minfo("begin shaders");
     float time = (float)GetTime();
-    SetShaderValue(shaders[1], GetShaderLocation(shaders[1], "time"), &time, SHADER_UNIFORM_FLOAT);
-    SetShaderValue(shaders[1], GetShaderLocation(shaders[1], "alpha"), &a, SHADER_UNIFORM_FLOAT);
-    BeginShaderMode(shaders[1]);
+    SetShaderValue(libdraw_ctx.shaders[1], GetShaderLocation(libdraw_ctx.shaders[1], "time"), &time, SHADER_UNIFORM_FLOAT);
+    SetShaderValue(libdraw_ctx.shaders[1], GetShaderLocation(libdraw_ctx.shaders[1], "alpha"), &a, SHADER_UNIFORM_FLOAT);
+    BeginShaderMode(libdraw_ctx.shaders[1]);
     DrawRectangleLinesEx((Rectangle){x * w, y * h, w, h}, 1, Fade(GREEN, a));
     //minfo("end shaders");
     EndShaderMode();

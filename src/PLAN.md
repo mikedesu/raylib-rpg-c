@@ -13,8 +13,9 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
 - [x] Add the floor 4 tutorial room with a pressure plate wired to a door that opens while occupied and closes when vacated.
 - [x] Add the "open door" sound effect on the pressure plate on floor 4 if the door exists and is opened by the pressure plate being activated
 - [ ] Continue top-down `libdraw` cleanup and reduce remaining rendering global-state coupling.
-  - Latest pass centralized renderer-global declarations through `libdraw_context.h` instead of repeating ad hoc `extern` declarations across draw/update headers, and `libdraw.h` now routes scene dispatch through the compatibility include.
-  - Remaining cleanup still exists: renderer state is still globally owned in `main.cpp`/`libdraw_context.h`, and the renderer is still largely implementation-header based.
+  - Recent passes centralized renderer-global declarations through `libdraw_context.h`, removed repeated ad hoc `extern` declarations across draw/update headers, and routed `libdraw.h` scene dispatch through the compatibility include.
+  - Latest pass also collapsed libdraw-owned process-lifetime renderer state into a single `libdraw_ctx` object instead of many separate globals in `main.cpp`, so spritegroups, texture metadata, shaders, render targets, and presentation rectangles now move through one shared renderer context.
+  - Remaining cleanup still exists: audio/shared settings are not yet folded into the renderer context, and the renderer is still largely implementation-header based.
 
 - Keyboard customization is now live in the gameplay scene.
 - Current shipped state:
@@ -38,7 +39,7 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
 - [ ] Renderer / architecture
   - [ ] continue top-down `libdraw` cleanup
   - [ ] reduce remaining global-state coupling in rendering
-  - Recent progress: removed a broad layer of duplicated renderer-global declarations from draw/update helpers by funneling them through `libdraw_context.h`, which reduced header-level coupling without changing runtime behavior.
+  - Recent progress: removed a broad layer of duplicated renderer-global declarations from draw/update helpers by funneling them through `libdraw_context.h`, then consolidated libdraw-owned runtime renderer state behind a single `libdraw_ctx` object instead of many separate globals.
   - [ ] eventually move away from implementation headers toward real `.cpp` files
   - [ ] evaluate migrating direct `try_entity_*` gameplay mutations toward an event-queue / action-resolution pipeline
     - Current candidates include `try_entity_attack`, `try_entity_move`, push/pull handling, door/chest toggles, pressure-plate updates, and other world-state mutations that presently happen inline.
@@ -143,7 +144,7 @@ Compact status handoff for the current C++ / raylib dungeon project.
   - Recent added coverage includes dungeon connectivity, bounded combat invariants, renderer-adjacent seam tests, and heavy pathfinding/chase plus combat soak tests.
   - Recent added coverage now also includes compact inventory selection behavior plus pull/push interactions for newly movable props.
   - Core header documentation was brought up to date across the current non-generated header set with Doxygen file/type/helper coverage.
-  - Recent renderer cleanup also removed repeated renderer-global `extern` declarations across many `libdraw`-adjacent headers and consolidated them behind `libdraw_context.h`.
+  - Recent renderer cleanup removed repeated renderer-global `extern` declarations across many `libdraw`-adjacent headers, consolidated them behind `libdraw_context.h`, and grouped libdraw-owned runtime renderer state into the shared `libdraw_ctx` object.
 
 - open door/open chest input change from KEY_O to KEY_D
 

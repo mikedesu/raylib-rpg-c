@@ -103,12 +103,12 @@ static inline void draw_title_screen(gamestate& g, bool show_menu) {
     // draw the first frame of one of our hero textures
     const float mx = frame.x;
     const float my = frame.y + sw / 2;
-    const Texture t1 = txinfo[TX_ACTIONS_SLASH_SHORT_SWORD_B].texture;
-    const Texture t2 = txinfo[TX_CHAR_HUMAN_ATTACK_SLASH].texture;
-    const Texture t3 = txinfo[TX_ACTIONS_SLASH_SHORT_SWORD_F].texture;
-    const Texture t4 = txinfo[TX_ACTIONS_SLASH_AXE_B].texture;
-    const Texture t5 = txinfo[TX_CHAR_ORC_ATTACK].texture;
-    const Texture t6 = txinfo[TX_ACTIONS_SLASH_AXE_F].texture;
+    const Texture t1 = libdraw_ctx.txinfo[TX_ACTIONS_SLASH_SHORT_SWORD_B].texture;
+    const Texture t2 = libdraw_ctx.txinfo[TX_CHAR_HUMAN_ATTACK_SLASH].texture;
+    const Texture t3 = libdraw_ctx.txinfo[TX_ACTIONS_SLASH_SHORT_SWORD_F].texture;
+    const Texture t4 = libdraw_ctx.txinfo[TX_ACTIONS_SLASH_AXE_B].texture;
+    const Texture t5 = libdraw_ctx.txinfo[TX_CHAR_ORC_ATTACK].texture;
+    const Texture t6 = libdraw_ctx.txinfo[TX_ACTIONS_SLASH_AXE_F].texture;
 
     constexpr Rectangle src = {rx, ry, 32, 32};
     const Rectangle dst = {mx, my, sw, sw};

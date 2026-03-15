@@ -67,7 +67,7 @@ static inline void draw_inventory_menu(gamestate& g) {
                 Rectangle grid_box2 = {x + 2, y + 2, w - 4, h - 4};
                 DrawRectangleLinesEx(grid_box, 1, (Color){0x66, 0x66, 0x66, 255});
                 if (it != unpacked_inventory->end()) {
-                    spritegroup* sg = spritegroups[*it];
+                    spritegroup* sg = libdraw_ctx.spritegroups[*it];
                     if (!sg) continue;
                     auto sprite = sg->get_current();
                     DrawTexturePro(*(sprite->get_texture()), Rectangle{10, 10, 12, 12}, grid_box2, Vector2{0, 0}, 0.0f, WHITE);
@@ -99,7 +99,7 @@ static inline void draw_inventory_menu(gamestate& g) {
             size_t index = g.inventory_cursor.y * 7 + g.inventory_cursor.x;
             if (index >= 0 && index < unpacked_inventory->size()) {
                 entityid selection_id = unpacked_inventory->at(index);
-                spritegroup* sg = spritegroups[selection_id];
+                spritegroup* sg = libdraw_ctx.spritegroups[selection_id];
 
                 if (sg) {
                     //auto sprite = sg_get_current(sg);

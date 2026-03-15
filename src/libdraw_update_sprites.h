@@ -34,7 +34,7 @@ static inline void libdraw_update_sprites_post(gamestate& g) {
     }
 
     // for the gameplay scene...
-    if (g.framecount % ANIM_SPEED != 0) {
+    if (g.framecount % libdraw_ctx.anim_speed != 0) {
         libdraw_handle_gamestate_flag(g);
         return;
     }
@@ -52,7 +52,7 @@ static inline void libdraw_update_sprites_post(gamestate& g) {
         }
 
         // grab the sprite group for that entity
-        spritegroup* sg = spritegroups[id];
+        spritegroup* sg = libdraw_ctx.spritegroups[id];
         if (!sg) {
             continue;
         }

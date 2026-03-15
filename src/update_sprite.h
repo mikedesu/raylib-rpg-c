@@ -136,7 +136,7 @@ static inline void libdraw_update_sprite_ptr(gamestate& g, entityid id, spritegr
 /** @brief Update one entity's spritegroup when it exists in the renderer cache. */
 static inline void libdraw_update_sprite_pre(gamestate& g, entityid id) {
     massert(id != ENTITYID_INVALID, "entityid is invalid");
-    if (spritegroups.find(id) != spritegroups.end()) {
-        libdraw_update_sprite_ptr(g, id, spritegroups[id]);
+    if (libdraw_ctx.spritegroups.find(id) != libdraw_ctx.spritegroups.end()) {
+        libdraw_update_sprite_ptr(g, id, libdraw_ctx.spritegroups[id]);
     }
 }

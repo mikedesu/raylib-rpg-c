@@ -40,7 +40,7 @@ static inline bool draw_dungeon_floor_tile(gamestate& g, int x, int y, int z, in
     // Get tile texture
     const int txkey = get_txkey_for_tiletype(tile.get_type());
     massert(txkey >= 0, "txkey is invalid");
-    Texture2D* texture = &txinfo[txkey].texture;
+    Texture2D* texture = &libdraw_ctx.txinfo[txkey].texture;
     massert(texture->id > 0, "texture->id is <= 0");
     const bool tile_visible = full_light || tile.get_visible();
     const unsigned char a = tile_visible ? 255 : 102;
@@ -74,7 +74,7 @@ static inline void draw_dungeon_floor_pressure_plates(gamestate& g, int light_ra
         }
 
         const int txkey = plate.active ? plate.txkey_down : plate.txkey_up;
-        Texture2D* texture = &txinfo[txkey].texture;
+        Texture2D* texture = &libdraw_ctx.txinfo[txkey].texture;
         massert(texture->id > 0, "pressure plate texture->id is <= 0");
 
         const float px = plate.loc.x * DEFAULT_TILE_SIZE + DEFAULT_OFFSET;

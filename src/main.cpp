@@ -16,38 +16,14 @@ inputstate is;
 /// @brief Global gameplay state shared across the single-translation-unit runtime.
 gamestate g;
 
-/// @brief Renderer-owned sprite batches keyed by entity id.
-unordered_map<entityid, spritegroup*> spritegroups;
-/// @brief Global texture metadata table loaded during renderer initialization.
-textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
-/// @brief Shader cache keyed by project-defined shader id.
-unordered_map<int, Shader> shaders;
-/// @brief Off-screen target for the title scene.
-RenderTexture2D title_target_texture;
-/// @brief Off-screen target for the character creation scene.
-RenderTexture2D char_creation_target_texture;
-/// @brief Off-screen target for the gameplay scene.
-RenderTexture2D main_game_target_texture;
-/// @brief Off-screen target for HUD composition.
-RenderTexture2D hud_target_texture;
-/// @brief Shared presentation target composed into the OS window each frame.
-RenderTexture2D target;
-/// @brief Source rectangle used when blitting the shared render target.
-Rectangle target_src = {0, 0, DEFAULT_TARGET_WIDTH, DEFAULT_TARGET_HEIGHT};
-/// @brief Destination rectangle used when composing into the shared target.
-Rectangle target_dest = {0, 0, DEFAULT_TARGET_WIDTH, DEFAULT_TARGET_HEIGHT};
-/// @brief Window-space destination rectangle for final presentation.
-Rectangle win_dest = {0, 0, DEFAULT_WIN_WIDTH, DEFAULT_WIN_HEIGHT};
+/// @brief Process-lifetime renderer state shared by the libdraw subsystem.
+libdraw_context_t libdraw_ctx;
 /// @brief Currently loaded background music stream.
 Music music;
-
 /// @brief Runtime music volume multiplier exposed to gameplay and renderer code.
 float music_volume = DEFAULT_MUSIC_VOLUME;
 /// @brief Runtime master volume multiplier shared across audio systems.
 float master_volume = DEFAULT_MASTER_VOLUME;
-
-/// @brief Global animation speed tuning value used by sprite update code.
-int ANIM_SPEED = DEFAULT_ANIM_SPEED;
 
 /**
  * @brief Advance one outer frame of the application loop.

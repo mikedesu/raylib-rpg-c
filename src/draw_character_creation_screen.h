@@ -75,48 +75,48 @@ static inline void draw_character_creation_screen(gamestate& g) {
     // Draw a frame of the human idle texture
     switch (g.chara_creation.race) {
     case RACE_HUMAN: {
-        DrawTexturePro(txinfo[TX_CHAR_HUMAN_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
+        DrawTexturePro(libdraw_ctx.txinfo[TX_CHAR_HUMAN_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
     } break;
     case RACE_ORC: {
-        DrawTexturePro(txinfo[TX_CHAR_ORC_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
+        DrawTexturePro(libdraw_ctx.txinfo[TX_CHAR_ORC_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
     } break;
     case RACE_ELF: {
-        DrawTexturePro(txinfo[TX_CHAR_ELF_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
+        DrawTexturePro(libdraw_ctx.txinfo[TX_CHAR_ELF_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
     } break;
     case RACE_DWARF: {
-        DrawTexturePro(txinfo[TX_CHAR_DWARF_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
+        DrawTexturePro(libdraw_ctx.txinfo[TX_CHAR_DWARF_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
     } break;
     case RACE_HALFLING: {
-        DrawTexturePro(txinfo[TX_CHAR_HALFLING_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
+        DrawTexturePro(libdraw_ctx.txinfo[TX_CHAR_HALFLING_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
     } break;
     case RACE_GOBLIN: {
-        DrawTexturePro(txinfo[TX_CHAR_GOBLIN_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
+        DrawTexturePro(libdraw_ctx.txinfo[TX_CHAR_GOBLIN_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
     } break;
     case RACE_GREEN_SLIME: {
-        DrawTexturePro(txinfo[TX_MONSTER_GREEN_SLIME_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
+        DrawTexturePro(libdraw_ctx.txinfo[TX_MONSTER_GREEN_SLIME_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
     } break;
     case RACE_BAT: {
-        DrawTexturePro(txinfo[TX_MONSTER_BAT_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
+        DrawTexturePro(libdraw_ctx.txinfo[TX_MONSTER_BAT_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
     } break;
     case RACE_WOLF: {
-        DrawTexturePro(txinfo[TX_MONSTER_WOLF_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
+        DrawTexturePro(libdraw_ctx.txinfo[TX_MONSTER_WOLF_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
     } break;
     case RACE_WARG: {
-        DrawTexturePro(txinfo[TX_MONSTER_WARG_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
+        DrawTexturePro(libdraw_ctx.txinfo[TX_MONSTER_WARG_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
     } break;
 
     case RACE_ZOMBIE: {
-        DrawTexturePro(txinfo[TX_MONSTER_ZOMBIE_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
+        DrawTexturePro(libdraw_ctx.txinfo[TX_MONSTER_ZOMBIE_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
     } break;
 
 
     case RACE_SKELETON: {
-        DrawTexturePro(txinfo[TX_MONSTER_SKELETON_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
+        DrawTexturePro(libdraw_ctx.txinfo[TX_MONSTER_SKELETON_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
     } break;
 
 
     case RACE_RAT: {
-        DrawTexturePro(txinfo[TX_MONSTER_RAT_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
+        DrawTexturePro(libdraw_ctx.txinfo[TX_MONSTER_RAT_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
     } break;
 
 

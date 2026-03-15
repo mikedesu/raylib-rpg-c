@@ -20,7 +20,7 @@
  */
 static inline bool create_spritegroup(gamestate& g, entityid id, int* keys, int num_keys, int offset_x, int offset_y) {
     minfo("BEGIN create_spritegroup");
-    massert(txinfo, "txinfo is null");
+    massert(libdraw_ctx.txinfo, "txinfo is null");
     // can hold up to 32 sprites
     //spritegroup* group = spritegroup_create(SPRITEGROUP_DEFAULT_SIZE);
     spritegroup* group = new spritegroup(SPRITEGROUP_DEFAULT_SIZE);
@@ -46,8 +46,8 @@ static inline bool create_spritegroup(gamestate& g, entityid id, int* keys, int 
         for (int i = 0; i < num_keys; i++) {
             const int k = keys[i];
             minfo("k: %d", k);
-            Texture2D* tex = &txinfo[k].texture;
-            auto s = make_shared<sprite>(tex, txinfo[k].contexts, txinfo[k].num_frames);
+            Texture2D* tex = &libdraw_ctx.txinfo[k].texture;
+            auto s = make_shared<sprite>(tex, libdraw_ctx.txinfo[k].contexts, libdraw_ctx.txinfo[k].num_frames);
             massert(s, "s is NULL for some reason!");
             group->add(s);
             count++;
@@ -84,7 +84,7 @@ static inline bool create_spritegroup(gamestate& g, entityid id, int* keys, int 
         group->dest = Rectangle{x, y, w, h};
         group->off_x = offset_x;
         group->off_y = offset_y;
-        spritegroups[id] = group;
+        libdraw_ctx.spritegroups[id] = group;
 
         msuccess("END create spritegroup");
 
@@ -95,8 +95,8 @@ static inline bool create_spritegroup(gamestate& g, entityid id, int* keys, int 
     // if it does not have a location...
     for (int i = 0; i < num_keys; i++) {
         int k = keys[i];
-        Texture2D* tex = &txinfo[k].texture;
-        auto s = make_shared<sprite>(tex, txinfo[k].contexts, txinfo[k].num_frames);
+        Texture2D* tex = &libdraw_ctx.txinfo[k].texture;
+        auto s = make_shared<sprite>(tex, libdraw_ctx.txinfo[k].contexts, libdraw_ctx.txinfo[k].num_frames);
         group->add(s);
     }
     group->id = id;
@@ -111,7 +111,7 @@ static inline bool create_spritegroup(gamestate& g, entityid id, int* keys, int 
     group->dest = Rectangle{x, y, w, h};
     group->off_x = offset_x;
     group->off_y = offset_y;
-    spritegroups[id] = group;
+    libdraw_ctx.spritegroups[id] = group;
     msuccess("END create spritegroup");
     return true;
 }

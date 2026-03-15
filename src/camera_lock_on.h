@@ -14,11 +14,11 @@ static inline bool camera_lock_on(gamestate& g) {
         return false;
     }
 
-    if (spritegroups.find(g.hero_id) == spritegroups.end()) {
+    if (libdraw_ctx.spritegroups.find(g.hero_id) == libdraw_ctx.spritegroups.end()) {
         return false;
     }
 
-    spritegroup* grp = spritegroups[g.hero_id];
+    spritegroup* grp = libdraw_ctx.spritegroups[g.hero_id];
     if (!grp) {
         return false;
     }
