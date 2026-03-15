@@ -298,6 +298,14 @@ inline bool gamestate::queue_open_door_event(entityid id, vec3 loc) {
     return queue_gameplay_event(event);
 }
 
+inline bool gamestate::queue_open_chest_event(entityid id, vec3 loc) {
+    gameplay_event_t event;
+    event.type = EVENT_OPEN_CHEST_INTENT;
+    event.actor_id = id;
+    event.target_loc = loc;
+    return queue_gameplay_event(event);
+}
+
 inline bool gamestate::queue_traverse_stairs_event(entityid id) {
     gameplay_event_t event;
     event.type = EVENT_TRAVERSE_STAIRS_INTENT;
@@ -342,6 +350,10 @@ inline gameplay_event_result_t gamestate::process_gameplay_event(const gameplay_
     case EVENT_OPEN_DOOR_INTENT:
         result.handled = true;
         result.succeeded = try_entity_open_door(event.actor_id, event.target_loc);
+        return result;
+    case EVENT_OPEN_CHEST_INTENT:
+        result.handled = true;
+        result.succeeded = try_entity_open_chest(event.actor_id, event.target_loc);
         return result;
     case EVENT_TRAVERSE_STAIRS_INTENT:
         result.handled = true;
@@ -399,6 +411,14 @@ inline bool gamestate::run_pull_action(entityid id) {
 inline bool gamestate::run_open_door_action(entityid id, vec3 loc) {
     clear_gameplay_events();
     if (!queue_open_door_event(id, loc)) {
+        return false;
+    }
+    return process_gameplay_events().succeeded;
+}
+
+inline bool gamestate::run_open_chest_action(entityid id, vec3 loc) {
+    clear_gameplay_events();
+    if (!queue_open_chest_event(id, loc)) {
         return false;
     }
     return process_gameplay_events().succeeded;
@@ -959,7 +979,7 @@ inline bool gamestate::handle_open_door(inputstate& is, bool is_dead) {
             return add_message("You cannot open doors while dead");
         }
         vec3 loc = get_loc_facing_player();
-        if (!try_entity_open_chest(hero_id, loc)) {
+        if (!run_open_chest_action(hero_id, loc)) {
             run_open_door_action(hero_id, loc);
         }
         flag = GAMESTATE_FLAG_PLAYER_ANIM;

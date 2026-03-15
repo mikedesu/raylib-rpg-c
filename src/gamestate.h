@@ -1005,6 +1005,9 @@ public:
     /** @brief Queue a manual door-toggle intent for ordered turn resolution. */
     bool queue_open_door_event(entityid id, vec3 loc);
 
+    /** @brief Queue a chest-toggle intent for ordered turn resolution. */
+    bool queue_open_chest_event(entityid id, vec3 loc);
+
     /** @brief Queue a stairs-traversal intent for ordered turn resolution. */
     bool queue_traverse_stairs_event(entityid id);
 
@@ -1025,6 +1028,9 @@ public:
 
     /** @brief Queue and immediately resolve one manual door-toggle intent. */
     bool run_open_door_action(entityid id, vec3 loc);
+
+    /** @brief Queue and immediately resolve one chest-toggle intent. */
+    bool run_open_chest_action(entityid id, vec3 loc);
 
     /** @brief Queue and immediately resolve one stairs-traversal intent. */
     bool run_traverse_stairs_action(entityid id);

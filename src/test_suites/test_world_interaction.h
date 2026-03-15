@@ -419,6 +419,48 @@ public:
         TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_CHEST);
     }
 
+    void testRunOpenChestActionUsesQueuedChestIntent() {
+        gamestate g;
+        g.sfx.resize(71);
+        add_floor(g);
+
+        const entityid hero = create_hero(g, vec3{1, 1, 0});
+        const entityid chest = g.create_chest_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
+
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(chest, ENTITYID_INVALID);
+        TS_ASSERT(!g.ct.get<door_open>(chest).value_or(true));
+
+        TS_ASSERT(g.run_open_chest_action(hero, vec3{2, 1, 0}));
+        TS_ASSERT(g.ct.get<door_open>(chest).value_or(false));
+        TS_ASSERT_EQUALS(g.active_chest_id, chest);
+        TS_ASSERT(g.display_chest_menu);
+        TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_CHEST);
+        TS_ASSERT(g.gameplay_events.empty());
+    }
+
+    void testRunOpenChestActionClosesExistingChestMenu() {
+        gamestate g;
+        g.sfx.resize(71);
+        add_floor(g);
+
+        const entityid hero = create_hero(g, vec3{1, 1, 0});
+        const entityid chest = g.create_chest_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
+
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(chest, ENTITYID_INVALID);
+        TS_ASSERT(g.run_open_chest_action(hero, vec3{2, 1, 0}));
+        TS_ASSERT(g.display_chest_menu);
+        TS_ASSERT_EQUALS(g.active_chest_id, chest);
+
+        TS_ASSERT(g.run_open_chest_action(hero, vec3{2, 1, 0}));
+        TS_ASSERT(!g.ct.get<door_open>(chest).value_or(true));
+        TS_ASSERT_EQUALS(g.active_chest_id, ENTITYID_INVALID);
+        TS_ASSERT(!g.display_chest_menu);
+        TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_PLAYER);
+        TS_ASSERT(g.gameplay_events.empty());
+    }
+
     void testRunTraverseStairsActionUsesQueuedStairsIntent() {
         gamestate g;
         g.sfx.resize(71);
