@@ -215,25 +215,43 @@ inline floor_pressure_plate_t* gamestate::get_floor_pressure_plate(vec3 loc) {
 }
 
 inline void gamestate::update_pressure_plates_for_floor(int z) {
+    vector<entityid> linked_doors;
     for (floor_pressure_plate_t& plate : floor_pressure_plates) {
         if (plate.loc.z != z || plate.destroyed) {
             continue;
         }
 
         const bool active = tile_has_pressure_plate_occupant(plate.loc);
-        const bool was_active = plate.active;
-        if (plate.linked_door_id != ENTITYID_INVALID && ct.get<entitytype>(plate.linked_door_id).value_or(ENTITY_NONE) == ENTITY_DOOR) {
-            ct.set<door_open>(plate.linked_door_id, active);
-            ct.set<update>(plate.linked_door_id, true);
-            if (!was_active && active && IsAudioDeviceReady() && sfx.size() > SFX_CHEST_OPEN) {
-                PlaySound(sfx.at(SFX_CHEST_OPEN));
-            }
-        }
-        else {
+        if (plate.linked_door_id == ENTITYID_INVALID || ct.get<entitytype>(plate.linked_door_id).value_or(ENTITY_NONE) != ENTITY_DOOR) {
             plate.linked_door_id = ENTITYID_INVALID;
+            plate.active = false;
+            continue;
         }
 
+        if (std::find(linked_doors.begin(), linked_doors.end(), plate.linked_door_id) == linked_doors.end()) {
+            linked_doors.push_back(plate.linked_door_id);
+        }
         plate.active = active;
+    }
+
+    for (const entityid door_id : linked_doors) {
+        bool should_open = false;
+        for (const floor_pressure_plate_t& plate : floor_pressure_plates) {
+            if (plate.destroyed || plate.linked_door_id != door_id) {
+                continue;
+            }
+            if (plate.active) {
+                should_open = true;
+                break;
+            }
+        }
+
+        const bool was_open = ct.get<door_open>(door_id).value_or(false);
+        ct.set<door_open>(door_id, should_open);
+        ct.set<update>(door_id, true);
+        if (!was_open && should_open && IsAudioDeviceReady() && sfx.size() > SFX_CHEST_OPEN) {
+            PlaySound(sfx.at(SFX_CHEST_OPEN));
+        }
     }
 
     frame_dirty = true;

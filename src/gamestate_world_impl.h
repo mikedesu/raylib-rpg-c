@@ -581,6 +581,8 @@ inline int gamestate::place_floor_three_pullable_props() {
     const vec3 candidate_locs[] = {
         vec3{upstairs_loc.x + 2, upstairs_loc.y - 1, upstairs_loc.z},
         vec3{upstairs_loc.x + 2, upstairs_loc.y + 1, upstairs_loc.z},
+        vec3{upstairs_loc.x + 8, upstairs_loc.y - 1, upstairs_loc.z},
+        vec3{upstairs_loc.x + 8, upstairs_loc.y + 1, upstairs_loc.z},
     };
 
     int placed = 0;
@@ -721,5 +723,9 @@ inline bool gamestate::setup_floor_four_pressure_plate_tutorial() {
         return false;
     }
 
-    return create_floor_pressure_plate(plate_loc, door_id);
+    const vec3 right_plate_loc{room_x + 8, center_y, 2};
+    if (!create_floor_pressure_plate(plate_loc, door_id)) {
+        return false;
+    }
+    return create_floor_pressure_plate(right_plate_loc, door_id);
 }

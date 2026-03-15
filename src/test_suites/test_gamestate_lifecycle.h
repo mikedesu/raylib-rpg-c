@@ -627,13 +627,17 @@ public:
         g.logic_init();
 
         TS_ASSERT_EQUALS(g.d.get_floor_count(), 3U);
-        TS_ASSERT_EQUALS(g.floor_pressure_plates.size(), 1U);
-        TS_ASSERT_EQUALS(g.floor_pressure_plates.front().loc.z, 2);
-        TS_ASSERT(!g.floor_pressure_plates.front().destroyed);
-        TS_ASSERT_EQUALS(g.floor_pressure_plates.front().txkey_up, TX_SWITCHES_PRESSURE_PLATE_UP_00);
-        TS_ASSERT_EQUALS(g.floor_pressure_plates.front().txkey_down, TX_SWITCHES_PRESSURE_PLATE_DOWN_00);
-        TS_ASSERT_DIFFERS(g.floor_pressure_plates.front().linked_door_id, ENTITYID_INVALID);
-        TS_ASSERT_EQUALS(g.ct.get<entitytype>(g.floor_pressure_plates.front().linked_door_id).value_or(ENTITY_NONE), ENTITY_DOOR);
+        TS_ASSERT_EQUALS(g.floor_pressure_plates.size(), 2U);
+        const entityid linked_door_id = g.floor_pressure_plates.front().linked_door_id;
+        TS_ASSERT_DIFFERS(linked_door_id, ENTITYID_INVALID);
+        for (const floor_pressure_plate_t& plate : g.floor_pressure_plates) {
+            TS_ASSERT_EQUALS(plate.loc.z, 2);
+            TS_ASSERT(!plate.destroyed);
+            TS_ASSERT_EQUALS(plate.txkey_up, TX_SWITCHES_PRESSURE_PLATE_UP_00);
+            TS_ASSERT_EQUALS(plate.txkey_down, TX_SWITCHES_PRESSURE_PLATE_DOWN_00);
+            TS_ASSERT_EQUALS(plate.linked_door_id, linked_door_id);
+        }
+        TS_ASSERT_EQUALS(g.ct.get<entitytype>(linked_door_id).value_or(ENTITY_NONE), ENTITY_DOOR);
         TS_ASSERT(vec3_valid(g.floor_four_tutorial_orc_spawn));
         TS_ASSERT_EQUALS(g.floor_four_tutorial_orc_spawn.z, 2);
 
@@ -718,6 +722,6 @@ public:
             floor_three_pullable_prop_count++;
         }
 
-        TS_ASSERT_EQUALS(floor_three_pullable_prop_count, 2U);
+        TS_ASSERT_EQUALS(floor_three_pullable_prop_count, 4U);
     }
 };
