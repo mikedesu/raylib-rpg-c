@@ -7,12 +7,10 @@
 #include "dungeon_floor.h"
 #include "entitytype.h"
 #include "gamestate.h"
+#include "libdraw_context.h"
 #include "libgame_defines.h"
 #include "spritegroup.h"
 #include "textureinfo.h"
-
-extern textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
-extern unordered_map<entityid, spritegroup*> spritegroups;
 
 /**
  * @brief Create and register a spritegroup for an entity.

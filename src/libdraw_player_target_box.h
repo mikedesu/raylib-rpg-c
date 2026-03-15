@@ -5,10 +5,8 @@
 #pragma once
 
 #include "gamestate.h"
+#include "libdraw_context.h"
 #include "libgame_defines.h"
-
-
-extern unordered_map<int, Shader> shaders;
 
 /** @brief Draw the highlighted tile box in front of the player actor. */
 static inline bool libdraw_draw_player_target_box(gamestate& g) {

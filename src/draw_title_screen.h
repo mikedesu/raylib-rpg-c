@@ -5,11 +5,10 @@
 #pragma once
 
 #include "gamestate.h"
+#include "libdraw_context.h"
 #include "texture_ids.h"
 #include "textureinfo.h"
 #include <raylib.h>
-
-extern textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
 /** @brief Draw the title screen and optionally its menu selection list. */
 static inline void draw_title_screen(gamestate& g, bool show_menu) {

@@ -6,9 +6,8 @@
 
 #include "draw_item_detail_text.h"
 #include "gamestate.h"
+#include "libdraw_context.h"
 #include "spritegroup.h"
-
-extern unordered_map<entityid, spritegroup*> spritegroups;
 
 /** @brief Draw the right-side detail panel for the selected chest item. */
 static inline void draw_item_detail_panel(gamestate& g, const Rectangle& right_box, entityid selection_id) {

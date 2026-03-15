@@ -4,10 +4,9 @@
 
 #pragma once
 #include "gamestate.h"
+#include "libdraw_context.h"
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
-
-extern unordered_map<entityid, spritegroup*> spritegroups;
 
 /** @brief Update an equipped shield spritegroup to match the owner's current context. */
 static inline void update_shield_for_entity(gamestate& g, entityid id, spritegroup* sg) {

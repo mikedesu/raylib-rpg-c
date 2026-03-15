@@ -6,12 +6,11 @@
 #include "ComponentTraits.h"
 #include "entitytype.h"
 #include "gamestate.h"
+#include "libdraw_context.h"
 #include "set_sg.h"
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
 #include "update_sprite.h"
-
-extern unordered_map<entityid, spritegroup*> spritegroups;
 
 /** @brief Update a spritegroup's directional context row from an entity direction. */
 static inline void libdraw_update_sprite_context_ptr(gamestate& g, spritegroup* group, direction_t dir) {

@@ -8,5 +8,5 @@
 #include "libdraw_create_spritegroup.h"
 #include "libdraw_frame.h"
 #include "libdraw_lifecycle.h"
-#include "libdraw_scene_render.h"
+#include "libdraw_scene_dispatch.h"
 #include "libdraw_window_present.h"

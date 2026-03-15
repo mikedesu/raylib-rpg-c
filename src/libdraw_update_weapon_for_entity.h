@@ -5,11 +5,9 @@
 #pragma once
 
 #include "gamestate.h"
+#include "libdraw_context.h"
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
-
-
-extern unordered_map<entityid, spritegroup*> spritegroups;
 
 /** @brief Update an equipped weapon spritegroup to match the owner's current context. */
 static inline void update_weapon_for_entity(gamestate& g, entityid id, spritegroup* sg) {

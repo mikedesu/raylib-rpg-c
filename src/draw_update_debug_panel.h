@@ -5,9 +5,8 @@
 #pragma once
 
 #include "gamestate.h"
+#include "libdraw_context.h"
 #include "spritegroup.h"
-
-extern unordered_map<entityid, spritegroup*> spritegroups;
 
 /** @brief Append the current debug text payload into the debug panel buffer. */
 static inline void update_debug_panel(gamestate& g) {

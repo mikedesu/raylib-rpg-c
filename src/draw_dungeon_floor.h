@@ -7,10 +7,9 @@
 #include "draw_sprite.h"
 #include "get_txkey_for_tiletype.h"
 #include "is_loc_path_blocked.h"
+#include "libdraw_context.h"
 #include "libdraw_player_target_box.h"
 #include "textureinfo.h"
-
-extern textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
 /** @brief Return the Manhattan distance between two dungeon locations. */
 constexpr static inline int manhattan_distance(vec3 a, vec3 b) {

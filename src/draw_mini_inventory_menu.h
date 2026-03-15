@@ -6,10 +6,9 @@
 
 #include "draw_item_detail_text.h"
 #include "gamestate.h"
+#include "libdraw_context.h"
 #include "spritegroup.h"
 #include <algorithm>
-
-extern unordered_map<entityid, spritegroup*> spritegroups;
 
 /** @brief Compute the on-screen panel rectangle near the hero for the mini inventory UI. */
 static inline Rectangle mini_inventory_panel_for_hero(gamestate& g, float width, float height) {

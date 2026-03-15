@@ -5,11 +5,10 @@
 #pragma once
 
 #include "gamestate.h"
+#include "libdraw_context.h"
 #include "sprite.h"
 #include "spritegroup.h"
 #include "spritegroup_anim.h"
-
-extern unordered_map<entityid, spritegroup*> spritegroups;
 
 /** @brief Return the equipped weapon's front-layer sprite for the entity's current animation. */
 static inline shared_ptr<sprite> get_weapon_front_sprite(gamestate& g, entityid id, spritegroup* sg) {

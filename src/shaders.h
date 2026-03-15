@@ -4,12 +4,11 @@
 
 #pragma once
 
+#include "libdraw_context.h"
 #include <raylib.h>
 #include <unordered_map>
 
 using std::unordered_map;
-
-extern unordered_map<int, Shader> shaders;
 
 /** @brief Load the project's runtime shaders into the shared shader map. */
 static inline void load_shaders() {

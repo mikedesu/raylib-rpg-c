@@ -6,9 +6,8 @@
 
 #include "draw_item_detail_text.h"
 #include "gamestate.h"
+#include "libdraw_context.h"
 #include "spritegroup.h"
-
-extern unordered_map<entityid, spritegroup*> spritegroups;
 
 /** @brief Draw the full inventory grid and selected-item detail panel. */
 static inline void draw_inventory_menu(gamestate& g) {

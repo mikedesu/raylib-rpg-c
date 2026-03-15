@@ -9,9 +9,8 @@
 #include "draw_shield_sprite.h"
 #include "draw_weapon_sprite.h"
 #include "gamestate.h"
+#include "libdraw_context.h"
 #include "spritegroup.h"
-
-extern unordered_map<entityid, spritegroup*> spritegroups;
 
 /** @brief Draw an entity sprite together with any equipped shield and weapon layers. */
 static inline void draw_sprite_and_shadow(gamestate& g, entityid id) {

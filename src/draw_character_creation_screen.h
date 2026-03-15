@@ -5,14 +5,12 @@
 #pragma once
 
 #include "gamestate.h"
+#include "libdraw_context.h"
 #include "libgame_defines.h"
 #include "texture_ids.h"
 #include "textureinfo.h"
 #include <array>
 #include <string>
-
-
-extern textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
 
 /** @brief Draw the character-creation UI, stats, instructions, and race preview. */
 static inline void draw_character_creation_screen(gamestate& g) {
