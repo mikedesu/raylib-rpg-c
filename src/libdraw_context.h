@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "gamestate.h"
+#include "entityid.h"
 #include "libgame_defines.h"
 #include "spritegroup.h"
 #include "textureinfo.h"
@@ -12,6 +12,24 @@
 #include <unordered_map>
 
 using std::unordered_map;
+
+/**
+ * @brief Process-lifetime audio state shared across the libdraw subsystem.
+ */
+struct libdraw_audio_state_t {
+    /// @brief Currently loaded background music stream.
+    Music music = {};
+    /// @brief Runtime music volume multiplier shared by libdraw audio helpers.
+    float music_volume = DEFAULT_MUSIC_VOLUME;
+    /// @brief Runtime master volume multiplier shared across audio systems.
+    float master_volume = DEFAULT_MASTER_VOLUME;
+    /// @brief Runtime sound-effect volume multiplier shared across audio systems.
+    float sfx_volume = DEFAULT_MASTER_VOLUME;
+    /// @brief Sticky flag used by gameplay/UI code to note music-volume edits.
+    bool music_volume_changed = false;
+    /// @brief Bookkeeping slot for the active music selection index.
+    unsigned int current_music_index = 0;
+};
 
 /**
  * @brief Process-lifetime renderer state shared across the libdraw subsystem.
@@ -26,12 +44,8 @@ struct libdraw_context_t {
     textureinfo txinfo[GAMESTATE_SIZEOFTEXINFOARRAY];
     /// @brief Loaded shaders keyed by project-specific shader identifiers.
     unordered_map<int, Shader> shaders;
-    /// @brief Currently loaded background music stream.
-    Music music = {};
-    /// @brief Runtime music volume multiplier shared by libdraw audio helpers.
-    float music_volume = DEFAULT_MUSIC_VOLUME;
-    /// @brief Runtime master volume multiplier shared across audio systems.
-    float master_volume = DEFAULT_MASTER_VOLUME;
+    /// @brief Shared audio state and user-facing volume settings.
+    libdraw_audio_state_t audio;
     /// @brief Off-screen target used to compose the title screen.
     RenderTexture2D title_target_texture = {};
     /// @brief Off-screen target used to compose the character-creation scene.

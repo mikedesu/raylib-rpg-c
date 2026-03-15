@@ -18,6 +18,7 @@
 #include "get_racial_hd.h"
 #include "get_racial_modifiers.h"
 #include "inputstate.h"
+#include "libdraw_context.h"
 #include "libgame_defines.h"
 #include "magic_values.h"
 #include "option_menu.h"
@@ -38,7 +39,6 @@
 
 #define GAMESTATE_SIZEOFTIMEBUF 64
 #define GAMESTATE_SIZEOFDEBUGPANELBUF 1024
-#define GAMESTATE_SIZEOFTEXINFOARRAY 2048
 #define MAX_MESSAGES 64
 #define MAX_MSG_LENGTH 256
 #define LIST_INIT_CAPACITY 16
@@ -154,7 +154,6 @@ public:
     bool display_help_menu;
     bool cam_changed;
     bool frame_dirty;
-    bool music_volume_changed;
     bool do_restart;
     bool msg_system_is_active;
     bool chest_deposit_mode;
@@ -179,16 +178,12 @@ public:
     unsigned int max_title_screen_selections;
     unsigned int msg_history_max_len_msg;
     unsigned int msg_history_max_len_msg_measure;
-    unsigned int current_music_index;
     unsigned int restart_count;
     unsigned int font_size;
     unsigned int turn_count;
     unsigned long int ticks;
     size_t action_selection;
     float line_spacing;
-    float master_volume;
-    float music_volume;
-    float sfx_volume;
     double last_frame_time;
     double max_frame_time;
     size_t last_frame_times_current;
@@ -334,8 +329,7 @@ public:
         player_changing_dir = false;
         msg_system_is_active = false;
         chest_deposit_mode = false;
-        music_volume_changed = false;
-#ifndef TEST
+        #ifndef TEST
         test = false;
 #else
         test = true;
@@ -369,7 +363,6 @@ public:
         line_spacing = 1.0f;
         // weird bug maybe when set to 0?
         next_entityid = 1;
-        current_music_index = 0;
         do_restart = 0;
         title_screen_selection = 0;
         lock = 0;
@@ -406,9 +399,11 @@ public:
         chara_creation.alignment = ALIGNMENT_NEUTRAL_NEUTRAL;
         chara_creation.hitdie = get_racial_hd(RACE_HUMAN);
         current_scene = SCENE_TITLE;
-        master_volume = DEFAULT_MASTER_VOLUME;
-        music_volume = DEFAULT_MUSIC_VOLUME;
-        sfx_volume = DEFAULT_MASTER_VOLUME;
+        libdraw_ctx.audio.master_volume = DEFAULT_MASTER_VOLUME;
+        libdraw_ctx.audio.music_volume = DEFAULT_MUSIC_VOLUME;
+        libdraw_ctx.audio.sfx_volume = DEFAULT_MASTER_VOLUME;
+        libdraw_ctx.audio.music_volume_changed = false;
+        libdraw_ctx.audio.current_music_index = 0;
         window_box_bgcolor = DEFAULT_WINDOW_BOX_BGCOLOR;
         window_box_fgcolor = DEFAULT_WINDOW_BOX_FGCOLOR;
         message_history_bgcolor = DEFAULT_WINDOW_BOX_BGCOLOR;
@@ -1269,7 +1264,7 @@ public:
             full_light,
             god_mode,
             player_dir,
-            master_volume);
+            get_master_volume());
 
         msuccess2("successfully updated debug panel buffer");
     }
@@ -1300,6 +1295,16 @@ public:
     void adjust_master_volume(int dir);
     void adjust_music_volume(int dir);
     void adjust_sfx_volume(int dir);
+    float get_master_volume() const;
+    float get_music_volume() const;
+    float get_sfx_volume() const;
+    bool get_music_volume_changed() const;
+    unsigned int get_current_music_index() const;
+    void set_master_volume(float value);
+    void set_music_volume(float value);
+    void set_sfx_volume(float value);
+    void set_music_volume_changed(bool value);
+    void set_current_music_index(unsigned int value);
     void adjust_window_box_bg_channel(size_t channel, int dir);
     void adjust_window_box_fg_channel(size_t channel, int dir);
     void reset_window_box_colors();

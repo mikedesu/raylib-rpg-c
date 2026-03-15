@@ -8,40 +8,78 @@
 #include <algorithm>
 
 inline void gamestate::apply_audio_settings() {
-    master_volume = std::clamp(master_volume, 0.0f, 1.0f);
-    libdraw_ctx.master_volume = master_volume;
-    this->music_volume = std::clamp(this->music_volume, 0.0f, 1.0f);
-    libdraw_ctx.music_volume = this->music_volume;
-    sfx_volume = std::clamp(sfx_volume, 0.0f, 1.0f);
+    libdraw_ctx.audio.master_volume = std::clamp(libdraw_ctx.audio.master_volume, 0.0f, 1.0f);
+    libdraw_ctx.audio.music_volume = std::clamp(libdraw_ctx.audio.music_volume, 0.0f, 1.0f);
+    libdraw_ctx.audio.sfx_volume = std::clamp(libdraw_ctx.audio.sfx_volume, 0.0f, 1.0f);
 
     if (test || !IsAudioDeviceReady()) {
         return;
     }
 
-    SetMasterVolume(libdraw_ctx.master_volume);
-    SetMusicVolume(libdraw_ctx.music, libdraw_ctx.music_volume);
+    SetMasterVolume(libdraw_ctx.audio.master_volume);
+    SetMusicVolume(libdraw_ctx.audio.music, libdraw_ctx.audio.music_volume);
     for (size_t i = 0; i < sfx.size(); i++) {
-        SetSoundVolume(sfx[i], sfx_volume);
+        SetSoundVolume(sfx[i], libdraw_ctx.audio.sfx_volume);
     }
 }
 
 inline void gamestate::adjust_master_volume(int dir) {
-    master_volume = std::clamp(master_volume + AUDIO_VOLUME_STEP * dir, 0.0f, 1.0f);
+    libdraw_ctx.audio.master_volume = std::clamp(libdraw_ctx.audio.master_volume + AUDIO_VOLUME_STEP * dir, 0.0f, 1.0f);
     apply_audio_settings();
     frame_dirty = true;
 }
 
 inline void gamestate::adjust_music_volume(int dir) {
-    this->music_volume = std::clamp(this->music_volume + AUDIO_VOLUME_STEP * dir, 0.0f, 1.0f);
-    music_volume_changed = true;
+    libdraw_ctx.audio.music_volume = std::clamp(libdraw_ctx.audio.music_volume + AUDIO_VOLUME_STEP * dir, 0.0f, 1.0f);
+    libdraw_ctx.audio.music_volume_changed = true;
     apply_audio_settings();
     frame_dirty = true;
 }
 
 inline void gamestate::adjust_sfx_volume(int dir) {
-    sfx_volume = std::clamp(sfx_volume + AUDIO_VOLUME_STEP * dir, 0.0f, 1.0f);
+    libdraw_ctx.audio.sfx_volume = std::clamp(libdraw_ctx.audio.sfx_volume + AUDIO_VOLUME_STEP * dir, 0.0f, 1.0f);
     apply_audio_settings();
     frame_dirty = true;
+}
+
+inline float gamestate::get_master_volume() const {
+    return libdraw_ctx.audio.master_volume;
+}
+
+inline float gamestate::get_music_volume() const {
+    return libdraw_ctx.audio.music_volume;
+}
+
+inline float gamestate::get_sfx_volume() const {
+    return libdraw_ctx.audio.sfx_volume;
+}
+
+inline bool gamestate::get_music_volume_changed() const {
+    return libdraw_ctx.audio.music_volume_changed;
+}
+
+inline unsigned int gamestate::get_current_music_index() const {
+    return libdraw_ctx.audio.current_music_index;
+}
+
+inline void gamestate::set_master_volume(float value) {
+    libdraw_ctx.audio.master_volume = value;
+}
+
+inline void gamestate::set_music_volume(float value) {
+    libdraw_ctx.audio.music_volume = value;
+}
+
+inline void gamestate::set_sfx_volume(float value) {
+    libdraw_ctx.audio.sfx_volume = value;
+}
+
+inline void gamestate::set_music_volume_changed(bool value) {
+    libdraw_ctx.audio.music_volume_changed = value;
+}
+
+inline void gamestate::set_current_music_index(unsigned int value) {
+    libdraw_ctx.audio.current_music_index = value;
 }
 
 inline void gamestate::open_sound_menu() {

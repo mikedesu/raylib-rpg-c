@@ -15,7 +15,9 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
 - [ ] Continue top-down `libdraw` cleanup and reduce remaining rendering global-state coupling.
   - Recent passes centralized renderer-global declarations through `libdraw_context.h`, removed repeated ad hoc `extern` declarations across draw/update headers, and routed `libdraw.h` scene dispatch through the compatibility include.
   - Latest pass also collapsed libdraw-owned process-lifetime renderer state into a single `libdraw_ctx` object instead of many separate globals in `main.cpp`, so spritegroups, texture metadata, shaders, render targets, and presentation rectangles now move through one shared renderer context.
-  - Remaining cleanup still exists: audio/shared settings are not yet folded into the renderer context, and the renderer is still largely implementation-header based.
+  - Latest follow-up also folded shared audio state and volume settings into `libdraw_ctx`, removing the remaining duplicated `gamestate` mirrors for renderer-owned music/settings state.
+  - Latest follow-up also moved the top-level renderer entry points out of header-only `static inline` implementations into a real `libdraw.cpp`, so `libdraw.h`/`libdraw_*` API headers are now declaration-first at the entry-point layer.
+  - Remaining cleanup still exists deeper in the renderer helpers: most draw/update helper bodies still live in implementation headers.
 
 - Keyboard customization is now live in the gameplay scene.
 - Current shipped state:
@@ -40,6 +42,8 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
   - [ ] continue top-down `libdraw` cleanup
   - [ ] reduce remaining global-state coupling in rendering
   - Recent progress: removed a broad layer of duplicated renderer-global declarations from draw/update helpers by funneling them through `libdraw_context.h`, then consolidated libdraw-owned runtime renderer state behind a single `libdraw_ctx` object instead of many separate globals.
+  - Recent progress: shared audio state and volume settings now also live in `libdraw_ctx`, with gameplay/UI paths using accessor-backed reads instead of redundant `gamestate` mirrors.
+  - Recent progress: top-level renderer orchestration now lives in `libdraw.cpp` rather than header-only entry points, reducing implementation-header coupling at the public API boundary.
   - [ ] eventually move away from implementation headers toward real `.cpp` files
   - [ ] evaluate migrating direct `try_entity_*` gameplay mutations toward an event-queue / action-resolution pipeline
     - Current candidates include `try_entity_attack`, `try_entity_move`, push/pull handling, door/chest toggles, pressure-plate updates, and other world-state mutations that presently happen inline.

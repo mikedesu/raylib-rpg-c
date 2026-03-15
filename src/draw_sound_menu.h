@@ -30,7 +30,7 @@ static inline void draw_sound_menu(gamestate& g) {
     DrawText("Up/Down select, Left/Right adjust, Esc returns", box_x + padding, box_y + padding + 22, font_size, g.window_box_fgcolor);
 
     const char* labels[] = {"Master", "Music", "Sound Effects"};
-    const float values[] = {g.master_volume, g.music_volume, g.sfx_volume};
+    const float values[] = {g.get_master_volume(), g.get_music_volume(), g.get_sfx_volume()};
     int y = box_y + padding + 48;
     for (size_t i = 0; i < 3; i++) {
         const bool selected = g.sound_menu_selection == i;

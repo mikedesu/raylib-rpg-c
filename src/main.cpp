@@ -16,9 +16,6 @@ inputstate is;
 /// @brief Global gameplay state shared across the single-translation-unit runtime.
 gamestate g;
 
-/// @brief Process-lifetime renderer state shared by the libdraw subsystem.
-libdraw_context_t libdraw_ctx;
-
 /**
  * @brief Advance one outer frame of the application loop.
  *

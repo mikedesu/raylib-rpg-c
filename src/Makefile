@@ -16,6 +16,8 @@ STATIC_LINK_RAYLIB = -l:libraylib.a  # Desktop Raylib
 
 
 MAIN_C = main.cpp
+LIBDRAW_C = libdraw.cpp
+GAME_SOURCES = $(MAIN_C) $(LIBDRAW_C)
 
 
 LINK_MATH = -lm
@@ -46,7 +48,7 @@ WEB_OPTIONS = -DPLATFORM_WEB -DWEB -DSPAWN_MONSTERS -DNPCS_ALL_AT_ONCE -DSTART_M
 all: game index.html tests
 
 # Desktop build
-game: main.o
+game: main.o libdraw.o
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $(CFLAGS) $^ -L. $(RAYLIB_LIBS)   -o $@ 
 	bash log_build_stats.sh
 
@@ -54,10 +56,13 @@ game: main.o
 main.o: main.cpp
 	$(CXX) $(WFLAGS) $(CXXFLAGS) $(CFLAGS) main.cpp -c  
 
+libdraw.o: libdraw.cpp
+	$(CXX) $(WFLAGS) $(CXXFLAGS) $(CFLAGS) libdraw.cpp -c
+
 
 # Web build
-index.html: main.cpp
-	$(WEB_CC) -o $@ main.cpp $(WEB_INCLUDES) $(WEB_LINKS) $(EMCC_OPTIONS) $(SHELL_FILE) $(PRELOAD_FILES) $(WEB_OPTIONS) $(CFLAGS) $(CXXFLAGS)
+index.html: $(GAME_SOURCES)
+	$(WEB_CC) -o $@ $(GAME_SOURCES) $(WEB_INCLUDES) $(WEB_LINKS) $(EMCC_OPTIONS) $(SHELL_FILE) $(PRELOAD_FILES) $(WEB_OPTIONS) $(CFLAGS) $(CXXFLAGS)
 
 # Unit tests
 tests: tests.cpp
