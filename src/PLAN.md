@@ -75,7 +75,6 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
   - [x] A heavy object such as a `pushable` or `pullable` must be on the tile that has the pressure plate
   - [x] When triggered, can be tied to some state such as a `ENTITY_DOOR` opening and remaining opened so long as the plate is activated
   - [x] When a `pullable` or `pushable` or `ENTITY_PLAYER` or `ENTITY_NPC` removes from the tile, then the plate is no longer triggered, so an opened door would close, etc. - some state would revert to its pre-trigger state
-- [ ] Remove the orc spawning on floor 4 for now
 - [x] In one of the rooms on floor 4, add a new pressure plate tile and connect it to a door
   - [x] this door can only open if the pressure plate is activated
   - [x] the player can walk on top of the pressure plate and watch the door open
