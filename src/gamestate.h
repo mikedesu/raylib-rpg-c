@@ -813,6 +813,9 @@ public:
     /** @brief Drop the currently selected item from the hero inventory UI. */
     bool drop_item_from_hero_inventory();
 
+    /** @brief Drop one specific item from an actor inventory onto that actor's tile. */
+    bool drop_inventory_item(entityid actor_id, entityid item_id);
+
     /** @brief Return whether an actor inventory currently contains an item entity. */
     bool is_in_inventory(entityid actor_id, entityid item_id);
 
@@ -1008,6 +1011,9 @@ public:
     /** @brief Queue an attack intent for ordered turn resolution. */
     bool queue_attack_event(entityid id, vec3 loc);
 
+    /** @brief Queue NPC aggro/provoke follow-up resolution for combat. */
+    bool queue_provoke_npc_event(entityid npc_id, entityid source_id);
+
     /** @brief Queue shield-block follow-up resolution for an attack exchange. */
     bool queue_attack_block_event(entityid attacker_id, entityid target_id);
 
@@ -1016,6 +1022,21 @@ public:
 
     /** @brief Queue death cleanup follow-up for a defeated combat target. */
     bool queue_attack_death_event(entityid attacker_id, entityid target_id);
+
+    /** @brief Queue experience-award follow-up for defeating an NPC. */
+    bool queue_attack_award_xp_event(entityid attacker_id, entityid target_id);
+
+    /** @brief Queue inventory-drop follow-up for a defeated target. */
+    bool queue_attack_drop_inventory_event(entityid target_id);
+
+    /** @brief Queue player-death consequence follow-up for combat. */
+    bool queue_attack_player_death_event(entityid target_id);
+
+    /** @brief Queue attacker weapon durability loss follow-up for an attack exchange. */
+    bool queue_attack_weapon_durability_event(entityid attacker_id, entityid target_id);
+
+    /** @brief Queue defender shield durability loss follow-up for an attack exchange. */
+    bool queue_attack_shield_durability_event(entityid defender_id, entityid attacker_id);
 
     /** @brief Queue a pull intent for ordered turn resolution. */
     bool queue_pull_event(entityid id);
@@ -1034,6 +1055,15 @@ public:
 
     /** @brief Queue an item-use intent for ordered turn resolution. */
     bool queue_use_item_event(entityid id, entityid item_id);
+
+    /** @brief Queue an equip/unequip intent for ordered turn resolution. */
+    bool queue_equip_item_event(entityid id, entityid item_id);
+
+    /** @brief Queue an inventory drop intent for ordered turn resolution. */
+    bool queue_drop_item_event(entityid id, entityid item_id);
+
+    /** @brief Queue a chest-transfer intent for ordered turn resolution. */
+    bool queue_chest_transfer_event(entityid from_id, entityid to_id, entityid item_id);
 
     /** @brief Queue a stairs-traversal intent for ordered turn resolution. */
     bool queue_traverse_stairs_event(entityid id);
@@ -1076,6 +1106,15 @@ public:
 
     /** @brief Queue and immediately resolve one item-use intent. */
     bool run_use_item_action(entityid id, entityid item_id);
+
+    /** @brief Queue and immediately resolve one equip/unequip intent. */
+    bool run_equip_item_action(entityid id, entityid item_id);
+
+    /** @brief Queue and immediately resolve one inventory drop intent. */
+    bool run_drop_item_action(entityid id, entityid item_id);
+
+    /** @brief Queue and immediately resolve one chest-transfer intent. */
+    bool run_chest_transfer_action(entityid from_id, entityid to_id, entityid item_id);
 
     /** @brief Queue and immediately resolve one stairs-traversal intent. */
     bool run_traverse_stairs_action(entityid id);
@@ -1169,6 +1208,24 @@ public:
 
     /** @brief Apply queued death cleanup and rewards for a defeated target. */
     void resolve_attack_death_event(entityid attacker_id, entityid target_id);
+
+    /** @brief Apply queued experience-award follow-up for defeating an NPC. */
+    void resolve_attack_award_xp_event(entityid attacker_id, entityid target_id);
+
+    /** @brief Apply queued inventory-drop follow-up for a defeated target. */
+    void resolve_attack_drop_inventory_event(entityid target_id);
+
+    /** @brief Apply queued player-death consequence follow-up for combat. */
+    void resolve_attack_player_death_event(entityid target_id);
+
+    /** @brief Apply queued NPC aggro/provoke consequences for combat. */
+    void resolve_provoke_npc_event(entityid npc_id, entityid source_id);
+
+    /** @brief Apply queued attacker weapon durability loss consequences. */
+    void resolve_attack_weapon_durability_event(entityid attacker_id, entityid target_id);
+
+    /** @brief Apply queued defender shield durability loss consequences. */
+    void resolve_attack_shield_durability_event(entityid defender_id, entityid attacker_id);
 
     /**
      * @brief Resolve a direct attack against a target entity on a tile.

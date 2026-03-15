@@ -318,6 +318,14 @@ inline bool gamestate::queue_attack_event(entityid id, vec3 loc) {
     return queue_gameplay_event(event);
 }
 
+inline bool gamestate::queue_provoke_npc_event(entityid npc_id, entityid source_id) {
+    gameplay_event_t event;
+    event.type = EVENT_PROVOKE_NPC;
+    event.actor_id = npc_id;
+    event.target_id = source_id;
+    return queue_gameplay_event(event);
+}
+
 inline bool gamestate::queue_attack_block_event(entityid attacker_id, entityid target_id) {
     gameplay_event_t event;
     event.type = EVENT_ATTACK_BLOCK;
@@ -342,6 +350,44 @@ inline bool gamestate::queue_attack_death_event(entityid attacker_id, entityid t
     event.type = EVENT_ATTACK_DEATH;
     event.actor_id = attacker_id;
     event.target_id = target_id;
+    return queue_gameplay_event(event);
+}
+
+inline bool gamestate::queue_attack_award_xp_event(entityid attacker_id, entityid target_id) {
+    gameplay_event_t event;
+    event.type = EVENT_ATTACK_AWARD_XP;
+    event.actor_id = attacker_id;
+    event.target_id = target_id;
+    return queue_gameplay_event(event);
+}
+
+inline bool gamestate::queue_attack_drop_inventory_event(entityid target_id) {
+    gameplay_event_t event;
+    event.type = EVENT_ATTACK_DROP_INVENTORY;
+    event.actor_id = target_id;
+    return queue_gameplay_event(event);
+}
+
+inline bool gamestate::queue_attack_player_death_event(entityid target_id) {
+    gameplay_event_t event;
+    event.type = EVENT_ATTACK_PLAYER_DEATH;
+    event.actor_id = target_id;
+    return queue_gameplay_event(event);
+}
+
+inline bool gamestate::queue_attack_weapon_durability_event(entityid attacker_id, entityid target_id) {
+    gameplay_event_t event;
+    event.type = EVENT_ATTACK_WEAPON_DURABILITY;
+    event.actor_id = attacker_id;
+    event.target_id = target_id;
+    return queue_gameplay_event(event);
+}
+
+inline bool gamestate::queue_attack_shield_durability_event(entityid defender_id, entityid attacker_id) {
+    gameplay_event_t event;
+    event.type = EVENT_ATTACK_SHIELD_DURABILITY;
+    event.actor_id = defender_id;
+    event.target_id = attacker_id;
     return queue_gameplay_event(event);
 }
 
@@ -388,6 +434,31 @@ inline bool gamestate::queue_use_item_event(entityid id, entityid item_id) {
     event.type = EVENT_USE_ITEM_INTENT;
     event.actor_id = id;
     event.target_id = item_id;
+    return queue_gameplay_event(event);
+}
+
+inline bool gamestate::queue_equip_item_event(entityid id, entityid item_id) {
+    gameplay_event_t event;
+    event.type = EVENT_EQUIP_ITEM_INTENT;
+    event.actor_id = id;
+    event.target_id = item_id;
+    return queue_gameplay_event(event);
+}
+
+inline bool gamestate::queue_drop_item_event(entityid id, entityid item_id) {
+    gameplay_event_t event;
+    event.type = EVENT_DROP_ITEM_INTENT;
+    event.actor_id = id;
+    event.item_id = item_id;
+    return queue_gameplay_event(event);
+}
+
+inline bool gamestate::queue_chest_transfer_event(entityid from_id, entityid to_id, entityid item_id) {
+    gameplay_event_t event;
+    event.type = EVENT_CHEST_TRANSFER_INTENT;
+    event.actor_id = from_id;
+    event.target_id = to_id;
+    event.item_id = item_id;
     return queue_gameplay_event(event);
 }
 
@@ -449,6 +520,11 @@ inline gameplay_event_result_t gamestate::process_gameplay_event(const gameplay_
         }
         result.succeeded = result.attack_result != ATTACK_RESULT_NONE;
         return result;
+    case EVENT_PROVOKE_NPC:
+        result.handled = true;
+        resolve_provoke_npc_event(event.actor_id, event.target_id);
+        result.succeeded = true;
+        return result;
     case EVENT_ATTACK_BLOCK:
         result.handled = true;
         resolve_attack_block_event(event.actor_id, event.target_id);
@@ -465,6 +541,31 @@ inline gameplay_event_result_t gamestate::process_gameplay_event(const gameplay_
         result.handled = true;
         resolve_attack_death_event(event.actor_id, event.target_id);
         result.attack_result = ATTACK_RESULT_HIT;
+        result.succeeded = true;
+        return result;
+    case EVENT_ATTACK_AWARD_XP:
+        result.handled = true;
+        resolve_attack_award_xp_event(event.actor_id, event.target_id);
+        result.succeeded = true;
+        return result;
+    case EVENT_ATTACK_DROP_INVENTORY:
+        result.handled = true;
+        resolve_attack_drop_inventory_event(event.actor_id);
+        result.succeeded = true;
+        return result;
+    case EVENT_ATTACK_PLAYER_DEATH:
+        result.handled = true;
+        resolve_attack_player_death_event(event.actor_id);
+        result.succeeded = true;
+        return result;
+    case EVENT_ATTACK_WEAPON_DURABILITY:
+        result.handled = true;
+        resolve_attack_weapon_durability_event(event.actor_id, event.target_id);
+        result.succeeded = true;
+        return result;
+    case EVENT_ATTACK_SHIELD_DURABILITY:
+        result.handled = true;
+        resolve_attack_shield_durability_event(event.actor_id, event.target_id);
         result.succeeded = true;
         return result;
     case EVENT_PULL_INTENT: {
@@ -506,6 +607,36 @@ inline gameplay_event_result_t gamestate::process_gameplay_event(const gameplay_
                 display_inventory_menu = false;
             }
             result.succeeded = true;
+        }
+        return result;
+    case EVENT_EQUIP_ITEM_INTENT:
+        result.handled = true;
+        result.succeeded = false;
+        if (event.actor_id == hero_id && ct.get<entitytype>(event.target_id).value_or(ENTITY_NONE) == ENTITY_ITEM) {
+            const itemtype_t item_type = ct.get<itemtype>(event.target_id).value_or(ITEM_NONE);
+            if (item_type == ITEM_WEAPON || item_type == ITEM_SHIELD) {
+                handle_hero_inventory_equip_item(event.target_id);
+                result.succeeded = true;
+            }
+        }
+        return result;
+    case EVENT_DROP_ITEM_INTENT:
+        result.handled = true;
+        result.succeeded = false;
+        if (event.actor_id == hero_id && ct.get<entitytype>(event.item_id).value_or(ENTITY_NONE) == ENTITY_ITEM) {
+            result.succeeded = drop_inventory_item(event.actor_id, event.item_id);
+        }
+        return result;
+    case EVENT_CHEST_TRANSFER_INTENT:
+        result.handled = true;
+        result.succeeded = transfer_inventory_item(event.actor_id, event.target_id, event.item_id);
+        if (result.succeeded) {
+            frame_dirty = true;
+            if (IsAudioDeviceReady() && sfx.size() > SFX_CONFIRM_01) {
+                PlaySound(sfx.at(SFX_CONFIRM_01));
+            }
+            auto updated_inventory = ct.get<inventory>(event.actor_id).value_or(make_shared<vector<entityid>>());
+            clamp_inventory_selection(updated_inventory->size());
         }
         return result;
     case EVENT_TRAVERSE_STAIRS_INTENT:
@@ -616,6 +747,30 @@ inline bool gamestate::run_pickup_action(entityid id) {
 inline bool gamestate::run_use_item_action(entityid id, entityid item_id) {
     clear_gameplay_events();
     if (!queue_use_item_event(id, item_id)) {
+        return false;
+    }
+    return process_gameplay_events().succeeded;
+}
+
+inline bool gamestate::run_equip_item_action(entityid id, entityid item_id) {
+    clear_gameplay_events();
+    if (!queue_equip_item_event(id, item_id)) {
+        return false;
+    }
+    return process_gameplay_events().succeeded;
+}
+
+inline bool gamestate::run_drop_item_action(entityid id, entityid item_id) {
+    clear_gameplay_events();
+    if (!queue_drop_item_event(id, item_id)) {
+        return false;
+    }
+    return process_gameplay_events().succeeded;
+}
+
+inline bool gamestate::run_chest_transfer_action(entityid from_id, entityid to_id, entityid item_id) {
+    clear_gameplay_events();
+    if (!queue_chest_transfer_event(from_id, to_id, item_id)) {
         return false;
     }
     return process_gameplay_events().succeeded;

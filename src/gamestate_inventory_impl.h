@@ -196,7 +196,7 @@ inline void gamestate::handle_hero_inventory_equip() {
     entityid item_id = inventory->at(index);
     entitytype_t type = ct.get<entitytype>(item_id).value_or(ENTITY_NONE);
     if (type == ENTITY_ITEM) {
-        handle_hero_inventory_equip_item(item_id);
+        run_equip_item_action(hero_id, item_id);
     }
 }
 
@@ -214,17 +214,41 @@ inline bool gamestate::drop_item_from_hero_inventory() {
         return false;
     }
     entityid item_id = inventory->at(index);
-    inventory->erase(inventory->begin() + index);
-    if (item_id == ct.get<equipped_weapon>(hero_id).value_or(ENTITYID_INVALID)) {
-        ct.set<equipped_weapon>(hero_id, ENTITYID_INVALID);
+    return drop_inventory_item(hero_id, item_id);
+}
+
+inline bool gamestate::drop_inventory_item(entityid actor_id, entityid item_id) {
+    if (actor_id == ENTITYID_INVALID || item_id == ENTITYID_INVALID) {
+        return false;
     }
-    if (item_id == ct.get<equipped_shield>(hero_id).value_or(ENTITYID_INVALID)) {
-        ct.set<equipped_shield>(hero_id, ENTITYID_INVALID);
+    if (!is_in_inventory(actor_id, item_id)) {
+        return false;
     }
-    vec3 loc = ct.get<location>(hero_id).value();
+
+    auto maybe_loc = ct.get<location>(actor_id);
+    if (!maybe_loc.has_value()) {
+        return false;
+    }
+
+    if (!remove_from_inventory(actor_id, item_id)) {
+        return false;
+    }
+
+    if (item_id == ct.get<equipped_weapon>(actor_id).value_or(ENTITYID_INVALID)) {
+        ct.set<equipped_weapon>(actor_id, ENTITYID_INVALID);
+    }
+    if (item_id == ct.get<equipped_shield>(actor_id).value_or(ENTITYID_INVALID)) {
+        ct.set<equipped_shield>(actor_id, ENTITYID_INVALID);
+    }
+
+    const vec3 loc = maybe_loc.value();
     auto df = d.get_current_floor();
+    if (static_cast<size_t>(loc.z) < d.get_floor_count()) {
+        df = d.get_floor(loc.z);
+    }
     if (!df->df_add_at(item_id, ENTITY_ITEM, loc)) {
         merror("Failed to add to %d, %d, %d", loc.x, loc.y, loc.z);
+        add_to_inventory(actor_id, item_id);
         return false;
     }
     ct.set<location>(item_id, loc);
@@ -400,11 +424,7 @@ inline void gamestate::handle_chest_menu_confirm() {
         return;
     }
     entityid item_id = items->at(index);
-    if (transfer_inventory_item(source_id, target_id, item_id)) {
-        frame_dirty = true;
-        if (IsAudioDeviceReady() && sfx.size() > SFX_CONFIRM_01) {
-            PlaySound(sfx.at(SFX_CONFIRM_01));
-        }
+    if (run_chest_transfer_action(source_id, target_id, item_id)) {
         auto updated_inventory = ct.get<inventory>(source_id).value_or(make_shared<vector<entityid>>());
         clamp_inventory_selection(updated_inventory->size());
     }

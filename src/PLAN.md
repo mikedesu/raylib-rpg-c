@@ -2,16 +2,14 @@
 
 ## Session Handoff
 
-- [ ] I noticed there is a bug with how PROPs are handled:
-  - [ ] While pushing a table around on floor 4, when the table is pushed on to a tile that contains a Jar Prop or some other prop that you can't interact with much, the table takes precadence, which is great, but when the table is pushed or pulled off that tile, the Jar Prop is gone!
-
 - Event-queue migration status:
-  - queued and working in the current tree: movement, implicit push resolution, pull, manual door toggles, chest toggles, interaction/talk intents, pickup intents, hero item-use intents, stairs traversal, and attack intent
+  - queued and working in the current tree: movement, implicit push resolution, pull, manual door toggles, chest toggles, interaction/talk intents, pickup intents, hero item-use intents, hero inventory equip/unequip intents, hero inventory drop intents, chest transfer intents, stairs traversal, and attack intent
   - explicit queued follow-up events currently exist for pressure-plate refresh after movement, push, pull, and stairs traversal
-  - attack intent now enters through the queue for both player and NPC adjacent attacks, and queued combat now fans out into explicit block, damage, and death follow-up events
+  - attack intent now enters through the queue for both player and NPC adjacent attacks, and queued combat now fans out into explicit block, damage, death, XP reward, inventory drop, and player-death follow-up events
+  - queued combat now also fans out into explicit NPC aggro/provoke and weapon/shield durability-loss follow-up events instead of resolving those side effects inline under attack resolution
   - queued pressure-plate refresh now also fans out into explicit linked-door open/close follow-up events instead of mutating those door states inline during queued processing
   - legacy direct combat helpers still exist for compatibility during the migration, including direct `try_entity_attack` / `process_attack_entity` / `process_attack_results` paths
-  - legacy direct `handle_box_push` / `try_entity_move` / `update_pressure_plates_for_floor` paths still work for compatibility outside the queued pipeline
+  - legacy direct `handle_box_push` / `try_entity_move` / `update_pressure_plates_for_floor` and direct inventory/combat helpers still work for compatibility outside the queued pipeline
 - Human-verified slices so far:
   - pull
   - open door
@@ -19,10 +17,11 @@
   - chest toggles
 - Current automated baseline:
   - `make tests && ./tests`
-  - latest passing count before handoff: `140` tests
+  - latest passing count before handoff: `163` tests
 - Next session target:
-  - human-verify the queued push and pressure-plate door-follow-up slices in live gameplay
-  - choose the next contained queue migration after push and pressure-plate door follow-ups
+  - human-verify the queued push and pressure-plate door-follow-up slices in live gameplay if that has not happened yet
+  - continue deeper combat migration by collapsing more of the legacy direct `process_attack_entity` / `process_attack_results` path onto the queued combat pipeline
+  - likely next contained combat-only slices: queued combat message-generation consequences, or retiring duplicated direct-combat branches once the queued path is judged stable enough
   - preserve the current gameplay contract while migrating, the same way earlier slices kept legacy `try_entity_*` helpers working during the transition
 - Files most relevant for the next step:
   - `event_type.h`
@@ -55,8 +54,11 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
     - Player interact/talk input now queues `EVENT_INTERACT_INTENT`.
     - Player pickup input now queues `EVENT_PICKUP_INTENT`.
     - Hero inventory item use now queues `EVENT_USE_ITEM_INTENT`, while the actual potion effect still resolves through the existing inventory helper behind that queued entrypoint.
+    - Hero inventory equip/unequip now queues `EVENT_EQUIP_ITEM_INTENT`, while the actual weapon/shield toggle still resolves through the existing inventory helper behind that queued entrypoint.
+    - Hero inventory drop now queues `EVENT_DROP_ITEM_INTENT`, while the actual inventory-to-floor transfer still resolves through the existing drop helper behind that queued entrypoint.
+    - Chest deposit/withdraw confirm now queues `EVENT_CHEST_TRANSFER_INTENT`, while the actual inventory transfer still resolves through the existing chest/inventory helper behind that queued entrypoint.
     - Player and NPC adjacent attacks now queue `EVENT_ATTACK_INTENT`.
-    - Queued attack intent now schedules explicit ordered `EVENT_ATTACK_BLOCK`, `EVENT_ATTACK_DAMAGE`, and `EVENT_ATTACK_DEATH` follow-up events so combat side effects no longer need to resolve inline under the queued entrypoint.
+    - Queued attack intent now schedules explicit ordered `EVENT_PROVOKE_NPC`, `EVENT_ATTACK_BLOCK`, `EVENT_ATTACK_DAMAGE`, `EVENT_ATTACK_DEATH`, `EVENT_ATTACK_AWARD_XP`, `EVENT_ATTACK_DROP_INVENTORY`, `EVENT_ATTACK_PLAYER_DEATH`, `EVENT_ATTACK_WEAPON_DURABILITY`, and `EVENT_ATTACK_SHIELD_DURABILITY` follow-up events so more combat side effects no longer need to resolve inline under the queued entrypoint.
     - Queued pressure-plate refresh now schedules explicit ordered door-state follow-up events for linked doors instead of toggling those doors inline during queued processing.
     - Pull was verified by a real human after the queue migration slice landed.
     - Manual door toggles were verified by a real human after the queue migration slice landed.
@@ -65,6 +67,10 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
     - Interaction/talk intents have automated coverage through the queued path and still preserve the legacy direct helper.
     - Pickup intents now also have automated coverage through the queued path and still preserve the legacy direct helper.
     - Hero item-use intents now also have automated coverage through the queued path and still preserve the legacy direct potion helper.
+    - Hero inventory equip/unequip intents now also have automated coverage through the queued path and still preserve the legacy direct equip/unequip helpers.
+    - Hero inventory drop intents now also have automated coverage through the queued path and still preserve the legacy direct drop helpers.
+    - Chest transfer intents now also have automated coverage through the queued path and still preserve the legacy direct transfer helper.
+    - Deeper queued combat coverage now also exists for provoke/aggro follow-ups, queued weapon/shield durability break handling, and queued NPC inventory drops after death.
     - Legacy direct `try_entity_move` / `try_entity_pull` / `try_entity_open_door` / `try_entity_stairs` / `try_entity_open_chest` / `try_entity_attack` paths still work during the migration so existing helpers and tests are not forced over all at once.
     - Current automated verification for the migrated slice: `make tests && ./tests`.
   - [ ] Below are some of the example type of events that shall be converted over from their existing hardcoded forms:
@@ -82,7 +88,7 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
     - Main gameplay payoff: much better orchestration for cascading systems such as pressure plates, traps, forced movement, on-hit reactions, death triggers, scripted room logic, and future multi-step interactions.
     - Main engineering payoff: easier debugging/logging/replay of world-state transitions, clearer separation between intent and resolution, and lower risk of fragile ordering bugs.
     - Likely migration path: introduce a narrow event queue for one domain first, such as movement plus world triggers, then expand to combat and other interaction systems after the pattern is stable.
-    - Current next suggested slice after movement + pull + manual door toggles + stairs traversal + chest toggles + combat intent: split damage/block/death into explicit follow-up events once the queued attack entrypoint is stable.
+    - Current next suggested slice after movement + pull + manual door toggles + stairs traversal + chest toggles + combat intent + deeper combat follow-ups: continue migrating the remaining legacy direct combat helper paths and other chained world mutations when a contained slice is clear, with combat message-generation consequences or direct-combat retirement as the leading candidates.
 
 - [ ] Continue top-down `libdraw` cleanup and reduce remaining rendering global-state coupling.
   - Recent passes centralized renderer-global declarations through `libdraw_context.h`, removed repeated ad hoc `extern` declarations across draw/update headers, and routed `libdraw.h` scene dispatch through the compatibility include.

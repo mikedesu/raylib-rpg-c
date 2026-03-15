@@ -46,7 +46,7 @@ inline void gamestate::handle_weapon_durability_loss(entityid atk_id, entityid t
     remove_from_inventory(atk_id, equipped_wpn);
     ct.set<destroyed>(equipped_wpn, true);
     bool event_heard = check_hearing(hero_id, ct.get<location>(tgt_id).value_or((vec3){-1, -1, -1}));
-    if (event_heard) {
+    if (!test && event_heard && IsAudioDeviceReady() && sfx.size() > SFX_05_ALCHEMY_GLASS_BREAK) {
         PlaySound(sfx[SFX_05_ALCHEMY_GLASS_BREAK]);
     }
     add_message_history("%s broke!", ct.get<name>(equipped_wpn).value_or("no-name-weapon").c_str());
@@ -67,7 +67,7 @@ inline void gamestate::handle_shield_durability_loss(entityid defender, entityid
     remove_from_inventory(defender, shield);
     ct.set<destroyed>(shield, true);
     bool event_heard = check_hearing(hero_id, ct.get<location>(defender).value_or((vec3){-1, -1, -1}));
-    if (event_heard) {
+    if (!test && event_heard && IsAudioDeviceReady() && sfx.size() > SFX_05_ALCHEMY_GLASS_BREAK) {
         PlaySound(sfx[SFX_05_ALCHEMY_GLASS_BREAK]);
     }
     add_message_history("%s broke!", ct.get<name>(shield).value_or("no-name-shield").c_str());
@@ -201,7 +201,7 @@ inline attack_result_t gamestate::resolve_attack_intent(entityid attacker_id, ve
         return ATTACK_RESULT_MISS;
     }
     if (type == ENTITY_NPC) {
-        provoke_npc(target_id, attacker_id);
+        queue_provoke_npc_event(target_id, attacker_id);
     }
 
     if (!compute_attack_roll(attacker_id, target_id)) {
@@ -231,7 +231,7 @@ inline void gamestate::resolve_attack_block_event(entityid attacker_id, entityid
     if (attacker_id == ENTITYID_INVALID || target_id == ENTITYID_INVALID) {
         return;
     }
-    handle_shield_durability_loss(target_id, attacker_id);
+    queue_attack_shield_durability_event(target_id, attacker_id);
     handle_shield_block_sfx(target_id);
     ct.set<block_success>(target_id, true);
     ct.set<update>(target_id, true);
@@ -264,7 +264,7 @@ inline void gamestate::resolve_attack_damage_event(entityid attacker_id, entityi
     add_message_history("%s deals %d damage to %s", atk_name.c_str(), damage, tgt_name.c_str());
     ct.set<hp>(target_id, tgt_hp);
     add_damage_popup(target_id, damage, false);
-    handle_weapon_durability_loss(attacker_id, target_id);
+    queue_attack_weapon_durability_event(attacker_id, target_id);
     if (tgt_hp.x <= 0) {
         queue_attack_death_event(attacker_id, target_id);
     }
@@ -291,15 +291,40 @@ inline void gamestate::resolve_attack_death_event(entityid attacker_id, entityid
 
     switch (ct.get<entitytype>(target_id).value_or(ENTITY_NONE)) {
     case ENTITY_NPC:
-        update_npc_xp(attacker_id, target_id);
-        drop_all_from_inventory(target_id);
+        queue_attack_award_xp_event(attacker_id, target_id);
+        queue_attack_drop_inventory_event(target_id);
         break;
     case ENTITY_PLAYER:
-        add_message("You died");
+        queue_attack_player_death_event(target_id);
         break;
     default:
         break;
     }
+}
+
+inline void gamestate::resolve_attack_award_xp_event(entityid attacker_id, entityid target_id) {
+    update_npc_xp(attacker_id, target_id);
+}
+
+inline void gamestate::resolve_attack_drop_inventory_event(entityid target_id) {
+    drop_all_from_inventory(target_id);
+}
+
+inline void gamestate::resolve_attack_player_death_event(entityid target_id) {
+    (void)target_id;
+    add_message("You died");
+}
+
+inline void gamestate::resolve_provoke_npc_event(entityid npc_id, entityid source_id) {
+    provoke_npc(npc_id, source_id);
+}
+
+inline void gamestate::resolve_attack_weapon_durability_event(entityid attacker_id, entityid target_id) {
+    handle_weapon_durability_loss(attacker_id, target_id);
+}
+
+inline void gamestate::resolve_attack_shield_durability_event(entityid defender_id, entityid attacker_id) {
+    handle_shield_durability_loss(defender_id, attacker_id);
 }
 
 inline attack_result_t gamestate::process_attack_entity(tile_t& tile, entityid attacker_id, entityid target_id) {

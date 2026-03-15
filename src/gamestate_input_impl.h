@@ -341,7 +341,12 @@ inline void gamestate::handle_input_inventory(inputstate& is) {
     }
     else if (inputstate_is_pressed(is, KEY_Q)) {
         PlaySound(sfx[SFX_DISCARD_ITEM]);
-        drop_item_from_hero_inventory();
+        size_t index = get_inventory_selection_index();
+        auto maybe_inventory = ct.get<inventory>(hero_id);
+        auto inventory = maybe_inventory.value_or(make_shared<vector<entityid>>());
+        if (index < inventory->size()) {
+            run_drop_item_action(hero_id, inventory->at(index));
+        }
     }
     else if (inputstate_is_pressed(is, KEY_ENTER)) {
         handle_hero_item_use();
