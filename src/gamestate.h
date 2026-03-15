@@ -1002,6 +1002,15 @@ public:
     /** @brief Queue an attack intent for ordered turn resolution. */
     bool queue_attack_event(entityid id, vec3 loc);
 
+    /** @brief Queue shield-block follow-up resolution for an attack exchange. */
+    bool queue_attack_block_event(entityid attacker_id, entityid target_id);
+
+    /** @brief Queue damage follow-up resolution for an attack exchange. */
+    bool queue_attack_damage_event(entityid attacker_id, entityid target_id, int damage);
+
+    /** @brief Queue death cleanup follow-up for a defeated combat target. */
+    bool queue_attack_death_event(entityid attacker_id, entityid target_id);
+
     /** @brief Queue a pull intent for ordered turn resolution. */
     bool queue_pull_event(entityid id);
 
@@ -1118,6 +1127,18 @@ public:
 
     /** @brief Play shield-block audio feedback for a defending entity. */
     void handle_shield_block_sfx(entityid target_id);
+
+    /** @brief Resolve queued attack intent and schedule follow-up combat events. */
+    attack_result_t resolve_attack_intent(entityid attacker_id, vec3 target_loc);
+
+    /** @brief Apply queued shield-block consequences for a defended attack. */
+    void resolve_attack_block_event(entityid attacker_id, entityid target_id);
+
+    /** @brief Apply queued damage consequences for a successful attack hit. */
+    void resolve_attack_damage_event(entityid attacker_id, entityid target_id, int damage);
+
+    /** @brief Apply queued death cleanup and rewards for a defeated target. */
+    void resolve_attack_death_event(entityid attacker_id, entityid target_id);
 
     /**
      * @brief Resolve a direct attack against a target entity on a tile.

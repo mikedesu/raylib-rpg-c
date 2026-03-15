@@ -13,6 +13,9 @@ typedef enum {
     EVENT_NONE = 0,
     EVENT_MOVE_INTENT,
     EVENT_ATTACK_INTENT,
+    EVENT_ATTACK_BLOCK,
+    EVENT_ATTACK_DAMAGE,
+    EVENT_ATTACK_DEATH,
     EVENT_PULL_INTENT,
     EVENT_OPEN_DOOR_INTENT,
     EVENT_OPEN_CHEST_INTENT,
@@ -30,9 +33,12 @@ typedef enum {
 struct gameplay_event_t {
     event_type_t type = EVENT_NONE;
     entityid actor_id = ENTITYID_INVALID;
+    entityid target_id = ENTITYID_INVALID;
     vec3 delta = vec3{0, 0, 0};
     vec3 target_loc = vec3{-1, -1, -1};
     int floor = -1;
+    int amount = 0;
+    attack_result_t attack_result = ATTACK_RESULT_NONE;
 };
 
 /// @brief Resolution summary for a processed gameplay event.

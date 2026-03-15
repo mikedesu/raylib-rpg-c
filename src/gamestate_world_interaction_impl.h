@@ -291,6 +291,33 @@ inline bool gamestate::queue_attack_event(entityid id, vec3 loc) {
     return queue_gameplay_event(event);
 }
 
+inline bool gamestate::queue_attack_block_event(entityid attacker_id, entityid target_id) {
+    gameplay_event_t event;
+    event.type = EVENT_ATTACK_BLOCK;
+    event.actor_id = attacker_id;
+    event.target_id = target_id;
+    event.attack_result = ATTACK_RESULT_BLOCK;
+    return queue_gameplay_event(event);
+}
+
+inline bool gamestate::queue_attack_damage_event(entityid attacker_id, entityid target_id, int damage) {
+    gameplay_event_t event;
+    event.type = EVENT_ATTACK_DAMAGE;
+    event.actor_id = attacker_id;
+    event.target_id = target_id;
+    event.amount = damage;
+    event.attack_result = ATTACK_RESULT_HIT;
+    return queue_gameplay_event(event);
+}
+
+inline bool gamestate::queue_attack_death_event(entityid attacker_id, entityid target_id) {
+    gameplay_event_t event;
+    event.type = EVENT_ATTACK_DEATH;
+    event.actor_id = attacker_id;
+    event.target_id = target_id;
+    return queue_gameplay_event(event);
+}
+
 inline bool gamestate::queue_pull_event(entityid id) {
     gameplay_event_t event;
     event.type = EVENT_PULL_INTENT;
@@ -346,8 +373,30 @@ inline gameplay_event_result_t gamestate::process_gameplay_event(const gameplay_
     }
     case EVENT_ATTACK_INTENT:
         result.handled = true;
-        result.attack_result = try_entity_attack(event.actor_id, event.target_loc.x, event.target_loc.y);
+        result.attack_result = resolve_attack_intent(event.actor_id, event.target_loc);
+        handle_attack_sfx(event.actor_id, result.attack_result);
+        if (!test) {
+            set_gamestate_flag_for_attack_animation(ct.get<entitytype>(event.actor_id).value_or(ENTITY_NONE));
+        }
         result.succeeded = result.attack_result != ATTACK_RESULT_NONE;
+        return result;
+    case EVENT_ATTACK_BLOCK:
+        result.handled = true;
+        resolve_attack_block_event(event.actor_id, event.target_id);
+        result.attack_result = ATTACK_RESULT_BLOCK;
+        result.succeeded = true;
+        return result;
+    case EVENT_ATTACK_DAMAGE:
+        result.handled = true;
+        resolve_attack_damage_event(event.actor_id, event.target_id, event.amount);
+        result.attack_result = ATTACK_RESULT_HIT;
+        result.succeeded = true;
+        return result;
+    case EVENT_ATTACK_DEATH:
+        result.handled = true;
+        resolve_attack_death_event(event.actor_id, event.target_id);
+        result.attack_result = ATTACK_RESULT_HIT;
+        result.succeeded = true;
         return result;
     case EVENT_PULL_INTENT: {
         result.handled = true;
