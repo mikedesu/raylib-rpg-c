@@ -533,7 +533,7 @@ inline entityid gamestate::create_prop_at_with(proptype_t type, vec3 loc, with_f
 inline int gamestate::place_props() {
     int placed_props = 0;
     for (int z = 0; z < (int)d.floors.size(); z++) {
-        if (z == 3) {
+        if (z == 2) {
             continue;
         }
         shared_ptr<dungeon_floor> df = d.get_floor(z);
@@ -613,11 +613,11 @@ inline bool gamestate::destroy_floor_pressure_plate(vec3 loc) {
 }
 
 inline bool gamestate::setup_floor_four_pressure_plate_tutorial() {
-    if (d.get_floor_count() < 4) {
+    if (d.get_floor_count() < 3) {
         return false;
     }
 
-    auto df = d.get_floor(3);
+    auto df = d.get_floor(2);
     constexpr int tutorial_width = 13;
     constexpr int tutorial_height = 7;
     const int room_x = dungeon_clamp_int(df->get_upstairs_loc().x - 2, 1, df->get_width() - tutorial_width - 1);
@@ -630,14 +630,14 @@ inline bool gamestate::setup_floor_four_pressure_plate_tutorial() {
             const bool outer_wall = x == room_x || x == room_x + tutorial_width - 1 || y == room_y || y == room_y + tutorial_height - 1;
             const bool center_divider = x == split_x && y != center_y;
             df->df_set_tile((outer_wall || center_divider) ? TILE_STONE_WALL_00 : TILE_FLOOR_STONE_00, x, y);
-            df->tile_at(vec3{x, y, 3}).set_can_have_door(false);
+            df->tile_at(vec3{x, y, 2}).set_can_have_door(false);
         }
     }
 
-    const vec3 upstairs_loc{room_x + 2, center_y, 3};
-    const vec3 plate_loc{room_x + 4, center_y, 3};
-    const vec3 door_loc{split_x, center_y, 3};
-    floor_four_tutorial_orc_spawn = vec3{room_x + 9, center_y, 3};
+    const vec3 upstairs_loc{room_x + 2, center_y, 2};
+    const vec3 plate_loc{room_x + 4, center_y, 2};
+    const vec3 door_loc{split_x, center_y, 2};
+    floor_four_tutorial_orc_spawn = vec3{room_x + 9, center_y, 2};
 
     df->df_set_upstairs_loc(upstairs_loc);
 

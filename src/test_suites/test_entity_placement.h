@@ -159,7 +159,7 @@ public:
 
             const vec3 loc = g.ct.get<location>(id).value_or(vec3{-1, -1, -1});
             TS_ASSERT(vec3_valid(loc));
-            if (loc.z == 3) {
+            if (loc.z == 2) {
                 tutorial_floor_props++;
             }
         }

@@ -132,8 +132,8 @@ public:
         g.mt.seed(12345);
         g.logic_init();
 
-        g.d.current_floor = 3;
-        const entityid orc = find_live_npc_on_floor(g, 3, RACE_ORC);
+        g.d.current_floor = 2;
+        const entityid orc = find_live_npc_on_floor(g, 2, RACE_ORC);
         TS_ASSERT_DIFFERS(orc, ENTITYID_INVALID);
 
         const vec3 orc_loc = g.ct.get<location>(orc).value_or(vec3{-1, -1, -1});
@@ -171,8 +171,8 @@ public:
         TS_ASSERT(resolved);
         TS_ASSERT_DIFFERS(g.ct.get<dead>(g.hero_id).value_or(false), g.ct.get<dead>(orc).value_or(false));
 
-        tile_t& hero_tile = g.d.get_floor(3)->tile_at(hero_loc);
-        tile_t& orc_tile = g.d.get_floor(3)->tile_at(orc_loc);
+        tile_t& hero_tile = g.d.get_floor(2)->tile_at(hero_loc);
+        tile_t& orc_tile = g.d.get_floor(2)->tile_at(orc_loc);
         if (g.ct.get<dead>(orc).value_or(false)) {
             TS_ASSERT_EQUALS(orc_tile.get_cached_live_npc(), ENTITYID_INVALID);
             TS_ASSERT_EQUALS(orc_tile.get_dead_npc_count(), 1U);

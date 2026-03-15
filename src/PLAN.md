@@ -8,10 +8,9 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
 
 ## Top 5 Next Things
 
-- [x] Remove all props from floor 4's creation so the pressure-plate tutorial setup is controlled and readable.
+- [ ] Want to add a sign on Floor 3 with text that explains how to pull/drag bodies.
+  - [ ] Human dev needs to pull in a sign asset into the appropriate `img/` folder first and re-generate the texture files.
 - [x] Implement the core `FLOOR_PRESSURE_PLATE` system with live activate/deactivate behavior tied to world state changes.
-- [x] Add the floor 4 tutorial room with a pressure plate wired to a door that opens while occupied and closes when vacated.
-- [x] Add the "open door" sound effect on the pressure plate on floor 4 if the door exists and is opened by the pressure plate being activated
 - [ ] Continue top-down `libdraw` cleanup and reduce remaining rendering global-state coupling.
   - Recent passes centralized renderer-global declarations through `libdraw_context.h`, removed repeated ad hoc `extern` declarations across draw/update headers, and routed `libdraw.h` scene dispatch through the compatibility include.
   - Latest pass also collapsed libdraw-owned process-lifetime renderer state into a single `libdraw_ctx` object instead of many separate globals in `main.cpp`, so spritegroups, texture metadata, shaders, render targets, and presentation rectangles now move through one shared renderer context.

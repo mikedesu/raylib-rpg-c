@@ -142,25 +142,22 @@ public:
         g.logic_init();
 
         TS_ASSERT(g.d.is_initialized);
-        TS_ASSERT_EQUALS(g.d.get_floor_count(), 4U);
+        TS_ASSERT_EQUALS(g.d.get_floor_count(), 3U);
         TS_ASSERT_EQUALS(g.d.current_floor, 0);
         TS_ASSERT_EQUALS(g.d.get_floor(0)->get_width(), 8);
         TS_ASSERT_EQUALS(g.d.get_floor(0)->get_height(), 8);
-        TS_ASSERT_EQUALS(g.d.get_floor(1)->get_width(), 16);
-        TS_ASSERT_EQUALS(g.d.get_floor(1)->get_height(), 16);
-        TS_ASSERT_EQUALS(g.d.get_floor(2)->get_width(), 24);
-        TS_ASSERT_EQUALS(g.d.get_floor(2)->get_height(), 24);
-        TS_ASSERT_EQUALS(g.d.get_floor(3)->get_width(), 16);
-        TS_ASSERT_EQUALS(g.d.get_floor(3)->get_height(), 16);
+        TS_ASSERT_EQUALS(g.d.get_floor(1)->get_width(), 24);
+        TS_ASSERT_EQUALS(g.d.get_floor(1)->get_height(), 24);
+        TS_ASSERT_EQUALS(g.d.get_floor(2)->get_width(), 16);
+        TS_ASSERT_EQUALS(g.d.get_floor(2)->get_height(), 16);
         TS_ASSERT(vec3_valid(g.d.get_floor(0)->get_upstairs_loc()));
         TS_ASSERT(vec3_valid(g.d.get_floor(0)->get_downstairs_loc()));
         TS_ASSERT(count_entities_of_type(g, ENTITY_DOOR) >= 1U);
         TS_ASSERT(count_entities_of_type(g, ENTITY_BOX) >= 1U);
         TS_ASSERT(count_entities_of_type(g, ENTITY_ITEM) >= 2U);
         TS_ASSERT(count_live_npcs_on_floor(g, 0) >= 1U);
-        TS_ASSERT(count_live_npcs_on_floor(g, 1) >= 1U);
-        TS_ASSERT(count_live_npcs_on_floor(g, 2) >= 9U);
-        TS_ASSERT(count_live_npcs_on_floor(g, 3) >= 1U);
+        TS_ASSERT(count_live_npcs_on_floor(g, 1) >= 9U);
+        TS_ASSERT(count_live_npcs_on_floor(g, 2) >= 1U);
         TS_ASSERT(g.msg_system.size() >= 2U);
     }
 
@@ -173,21 +170,21 @@ public:
 
         const entityid floor_zero_npc = find_live_npc_on_floor(g, 0);
         const entityid floor_one_npc = find_live_npc_on_floor(g, 1);
-        const entityid floor_three_npc = find_live_npc_on_floor(g, 3);
+        const entityid floor_two_npc = find_live_npc_on_floor(g, 2);
 
         TS_ASSERT_DIFFERS(floor_zero_npc, ENTITYID_INVALID);
         TS_ASSERT_DIFFERS(floor_one_npc, ENTITYID_INVALID);
-        TS_ASSERT_DIFFERS(floor_three_npc, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(floor_two_npc, ENTITYID_INVALID);
         TS_ASSERT(!g.ct.get<aggro>(floor_zero_npc).value_or(true));
         TS_ASSERT_EQUALS(g.ct.get<race>(floor_one_npc).value_or(RACE_NONE), RACE_GREEN_SLIME);
         TS_ASSERT(!g.ct.get<aggro>(floor_one_npc).value_or(true));
-        TS_ASSERT_EQUALS(count_live_npcs_of_race_on_floor(g, RACE_GREEN_SLIME, 2), 9U);
-        TS_ASSERT_EQUALS(g.ct.get<race>(floor_three_npc).value_or(RACE_NONE), RACE_ORC);
-        TS_ASSERT(g.ct.get<aggro>(floor_three_npc).value_or(false));
-        const auto npc_inventory = g.ct.get<inventory>(floor_three_npc).value_or(nullptr);
+        TS_ASSERT_EQUALS(count_live_npcs_of_race_on_floor(g, RACE_GREEN_SLIME, 1), 9U);
+        TS_ASSERT_EQUALS(g.ct.get<race>(floor_two_npc).value_or(RACE_NONE), RACE_ORC);
+        TS_ASSERT(g.ct.get<aggro>(floor_two_npc).value_or(false));
+        const auto npc_inventory = g.ct.get<inventory>(floor_two_npc).value_or(nullptr);
         TS_ASSERT(npc_inventory);
         TS_ASSERT_EQUALS(npc_inventory->size(), 2U);
-        const entityid equipped_weapon_id = g.ct.get<equipped_weapon>(floor_three_npc).value_or(ENTITYID_INVALID);
+        const entityid equipped_weapon_id = g.ct.get<equipped_weapon>(floor_two_npc).value_or(ENTITYID_INVALID);
         TS_ASSERT_DIFFERS(equipped_weapon_id, ENTITYID_INVALID);
         TS_ASSERT_EQUALS(g.ct.get<itemtype>(equipped_weapon_id).value_or(ITEM_NONE), ITEM_WEAPON);
         bool found_potion = false;

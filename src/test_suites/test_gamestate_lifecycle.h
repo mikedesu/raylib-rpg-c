@@ -206,7 +206,7 @@ public:
         g.restart_game();
 
         TS_ASSERT(g.d.is_initialized);
-        TS_ASSERT_EQUALS(g.d.get_floor_count(), 4U);
+        TS_ASSERT_EQUALS(g.d.get_floor_count(), 3U);
         TS_ASSERT_EQUALS(g.current_scene, SCENE_TITLE);
         TS_ASSERT_EQUALS(g.restart_count, 8U);
         TS_ASSERT(!g.do_restart);
@@ -626,18 +626,18 @@ public:
 
         g.logic_init();
 
-        TS_ASSERT_EQUALS(g.d.get_floor_count(), 4U);
+        TS_ASSERT_EQUALS(g.d.get_floor_count(), 3U);
         TS_ASSERT_EQUALS(g.floor_pressure_plates.size(), 1U);
-        TS_ASSERT_EQUALS(g.floor_pressure_plates.front().loc.z, 3);
+        TS_ASSERT_EQUALS(g.floor_pressure_plates.front().loc.z, 2);
         TS_ASSERT(!g.floor_pressure_plates.front().destroyed);
         TS_ASSERT_EQUALS(g.floor_pressure_plates.front().txkey_up, TX_SWITCHES_PRESSURE_PLATE_UP_00);
         TS_ASSERT_EQUALS(g.floor_pressure_plates.front().txkey_down, TX_SWITCHES_PRESSURE_PLATE_DOWN_00);
         TS_ASSERT_DIFFERS(g.floor_pressure_plates.front().linked_door_id, ENTITYID_INVALID);
         TS_ASSERT_EQUALS(g.ct.get<entitytype>(g.floor_pressure_plates.front().linked_door_id).value_or(ENTITY_NONE), ENTITY_DOOR);
         TS_ASSERT(vec3_valid(g.floor_four_tutorial_orc_spawn));
-        TS_ASSERT_EQUALS(g.floor_four_tutorial_orc_spawn.z, 3);
+        TS_ASSERT_EQUALS(g.floor_four_tutorial_orc_spawn.z, 2);
 
-        auto floor_four = g.d.get_floor(3);
+        auto floor_four = g.d.get_floor(2);
         TS_ASSERT(tile_is_walkable(floor_four->tile_at(g.floor_four_tutorial_orc_spawn).get_type()));
 
         size_t floor_four_orc_count = 0;
@@ -650,7 +650,7 @@ public:
                 continue;
             }
             const vec3 loc = g.ct.get<location>(id).value_or(vec3{-1, -1, -1});
-            if (loc.z != 3) {
+            if (loc.z != 2) {
                 continue;
             }
             floor_four_orc_count++;

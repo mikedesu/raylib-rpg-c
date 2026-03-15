@@ -165,7 +165,6 @@ inline void gamestate::logic_init() {
     constexpr float parts = 1.0;
     massert(!d.is_initialized, "dungeon is already initialized");
     create_and_add_df_1(BIOME_STONE, 8, 8, 4, parts);
-    create_and_add_df_1(BIOME_STONE, 16, 16, 4, parts);
     create_and_add_df_1(BIOME_STONE, 24, 24, 4, parts);
     create_and_add_df_1(BIOME_STONE, 16, 16, 4, parts);
     const bool stairs_assigned = assign_random_stairs();
@@ -217,17 +216,14 @@ inline void gamestate::logic_init() {
         ct.set<aggro>(id, false);
     });
 
-    const vec3 floor_one_slime_loc = d.get_floor(1)->get_random_loc();
-    create_npc_at_with(RACE_GREEN_SLIME, floor_one_slime_loc, green_slime_init);
-
-    auto floor_two = d.get_floor(2);
+    auto floor_one = d.get_floor(1);
     for (int i = 0; i < 9; i++) {
-        const vec3 slime_loc = floor_two->get_random_loc();
+        const vec3 slime_loc = floor_one->get_random_loc();
         create_npc_at_with(RACE_GREEN_SLIME, slime_loc, green_slime_init);
     }
 
-    const vec3 floor_three_orc_loc = vec3_valid(floor_four_tutorial_orc_spawn) ? floor_four_tutorial_orc_spawn : d.get_floor(3)->get_random_loc();
-    create_orc_at_with(floor_three_orc_loc, armed_orc_init);
+    const vec3 floor_two_orc_loc = vec3_valid(floor_four_tutorial_orc_spawn) ? floor_four_tutorial_orc_spawn : d.get_floor(2)->get_random_loc();
+    create_orc_at_with(floor_two_orc_loc, armed_orc_init);
     msuccess("end creating monsters...");
     add_message("Welcome to the game! Press enter to cycle messages.");
     add_message("For help, press ?");
