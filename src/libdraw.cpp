@@ -5,8 +5,32 @@
 #include "libdraw.h"
 #include "ComponentTraits.h"
 #include "create_sg_byid.h"
+#include "camera_lock_on.h"
+#include "draw_action_menu.h"
+#include "draw_character_creation_screen.h"
+#include "draw_chest_menu.h"
+#include "draw_controls_menu.h"
+#include "draw_damage_numbers.h"
+#include "draw_dungeon_floor.h"
+#include "draw_sprite.h"
 #include "draw_handle_gamestate_flag.h"
+#include "draw_handle_debug_panel.h"
+#include "draw_help_menu.h"
+#include "draw_hud.h"
+#include "draw_interaction_modal.h"
+#include "draw_inventory_menu.h"
+#include "draw_keyboard_profile_prompt.h"
+#include "draw_level_up_modal.h"
+#include "draw_look_panel.h"
+#include "draw_message_box.h"
+#include "draw_message_history.h"
+#include "draw_mini_inventory_menu.h"
+#include "draw_option_menu.h"
+#include "draw_sound_menu.h"
+#include "draw_title_screen.h"
+#include "draw_window_color_menu.h"
 #include "entitytype.h"
+#include "get_txkey_for_tiletype.h"
 #include "item.h"
 #include "libdraw_frame_stats.h"
 #include "libdraw_from_texture.h"
@@ -127,6 +151,346 @@ bool create_spritegroup(gamestate& g, entityid id, int* keys, int num_keys, int 
 
 bool create_sg(gamestate& g, entityid id, int* keys, int num_keys) {
     return create_spritegroup(g, id, keys, num_keys, -12, -12);
+}
+
+void draw_hud_to_texture(gamestate& g) {
+    BeginTextureMode(libdraw_ctx.hud_target_texture);
+    draw_hud(g);
+    EndTextureMode();
+}
+
+void draw_char_creation_to_texture(gamestate& g) {
+    minfo3("draw char creation to texture");
+    BeginTextureMode(libdraw_ctx.char_creation_target_texture);
+    draw_character_creation_screen(g);
+    handle_debug_panel(g);
+    EndTextureMode();
+    msuccess3("draw char creation to texture");
+}
+
+void draw_title_screen_to_texture(gamestate& g, bool show_menu) {
+    BeginTextureMode(libdraw_ctx.title_target_texture);
+    draw_title_screen(g, show_menu);
+    handle_debug_panel(g);
+    EndTextureMode();
+}
+
+void libdraw_drawframe_2d(gamestate& g, int vision_dist, int light_rad) {
+    camera_lock_on(g);
+
+    BeginMode2D(g.cam2d);
+    ClearBackground(BLACK);
+    draw_dungeon_floor(g, vision_dist, light_rad);
+    draw_damage_numbers(g);
+    EndMode2D();
+
+    draw_hud(g);
+    draw_look_panel(g);
+    draw_message_history(g);
+    draw_message_box(g);
+    draw_interaction_modal(g);
+    draw_level_up_modal(g);
+
+    if (g.display_inventory_menu) {
+        if (g.use_mini_inventory_menu()) {
+            auto maybe_inventory = g.ct.get<inventory>(g.hero_id);
+            auto items = maybe_inventory.value_or(nullptr);
+            if (items) {
+                draw_mini_inventory_menu(g, items, "Inventory", "E equip  Enter use  Q drop  Esc close", true);
+            }
+        }
+        else {
+            draw_inventory_menu(g);
+        }
+    }
+
+    if (g.display_chest_menu) {
+        if (g.use_mini_inventory_menu()) {
+            const entityid source_id = g.chest_deposit_mode ? g.hero_id : g.active_chest_id;
+            auto maybe_inventory = g.ct.get<inventory>(source_id);
+            auto items = maybe_inventory.value_or(nullptr);
+            if (items) {
+                draw_mini_inventory_menu(
+                    g,
+                    items,
+                    g.chest_deposit_mode ? "Chest Deposit" : "Chest",
+                    g.chest_deposit_mode ? "Tab chest  Enter deposit  D close" : "Tab hero  Enter take  D close",
+                    g.chest_deposit_mode);
+            }
+        }
+        else {
+            draw_chest_menu(g);
+        }
+    }
+
+    if (g.display_action_menu) {
+        draw_action_menu(g);
+    }
+    if (g.display_option_menu) {
+        draw_option_menu(g);
+    }
+    if (g.display_sound_menu) {
+        draw_sound_menu(g);
+    }
+    if (g.display_window_color_menu) {
+        draw_window_color_menu(g);
+    }
+    if (g.display_controls_menu) {
+        draw_controls_menu(g);
+    }
+    if (g.display_help_menu) {
+        draw_help_menu(g);
+    }
+
+    draw_keyboard_profile_prompt(g);
+#ifdef DEBUG
+    handle_debug_panel(g);
+#endif
+}
+
+void libdraw_drawframe_2d_to_texture(gamestate& g, int vision_dist, int light_rad) {
+    BeginTextureMode(libdraw_ctx.main_game_target_texture);
+    libdraw_drawframe_2d(g, vision_dist, light_rad);
+    EndTextureMode();
+}
+
+void draw_title_screen_from_texture(gamestate& g) {
+    (void)g;
+    DrawTexturePro(libdraw_ctx.title_target_texture.texture, libdraw_ctx.target_src, libdraw_ctx.target_dest, Vector2{0, 0}, 0.0f, WHITE);
+}
+
+void draw_hud_from_texture(gamestate& g) {
+    (void)g;
+    DrawTexturePro(libdraw_ctx.hud_target_texture.texture, libdraw_ctx.target_src, libdraw_ctx.target_dest, Vector2{0, 0}, 0.0f, WHITE);
+}
+
+void draw_char_creation_from_texture(gamestate& g) {
+    (void)g;
+    DrawTexturePro(libdraw_ctx.char_creation_target_texture.texture, libdraw_ctx.target_src, libdraw_ctx.target_dest, Vector2{0, 0}, 0.0f, WHITE);
+}
+
+void libdraw_drawframe_2d_from_texture(gamestate& g) {
+    (void)g;
+    DrawTexturePro(libdraw_ctx.main_game_target_texture.texture, libdraw_ctx.target_src, libdraw_ctx.target_dest, Vector2{0, 0}, 0.0f, WHITE);
+}
+
+bool libdraw_draw_player_target_box(gamestate& g) {
+    entityid id = g.hero_id;
+    if (id == -1) {
+        return false;
+    }
+    direction_t dir = g.ct.get<direction>(id).value();
+    vec3 loc = g.ct.get<location>(id).value();
+    float x = loc.x + get_x_from_dir(dir);
+    float y = loc.y + get_y_from_dir(dir);
+    float w = DEFAULT_TILE_SIZE;
+    float h = DEFAULT_TILE_SIZE;
+    float a = 0.75f;
+    if (g.player_changing_dir) {
+        a = 0.9f;
+    }
+    float time = (float)GetTime();
+    SetShaderValue(libdraw_ctx.shaders[1], GetShaderLocation(libdraw_ctx.shaders[1], "time"), &time, SHADER_UNIFORM_FLOAT);
+    SetShaderValue(libdraw_ctx.shaders[1], GetShaderLocation(libdraw_ctx.shaders[1], "alpha"), &a, SHADER_UNIFORM_FLOAT);
+    BeginShaderMode(libdraw_ctx.shaders[1]);
+    DrawRectangleLinesEx((Rectangle){x * w, y * h, w, h}, 1, Fade(GREEN, a));
+    EndShaderMode();
+    return true;
+}
+
+constexpr int manhattan_distance(vec3 a, vec3 b) {
+    return abs(a.x - b.x) + abs(a.y - b.y);
+}
+
+bool draw_dungeon_floor_tile(gamestate& g, int x, int y, int z, int light_dist, vec3 hero_loc, int distance) {
+    (void)light_dist;
+    (void)hero_loc;
+    (void)distance;
+    massert(z >= 0 && static_cast<size_t>(z) < g.d.get_floor_count(), "z is oob");
+    const float px = x * DEFAULT_TILE_SIZE + DEFAULT_OFFSET;
+    const float py = y * DEFAULT_TILE_SIZE + DEFAULT_OFFSET;
+    const Rectangle src = {0, 0, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
+    const Rectangle dest = {px, py, DEFAULT_TILE_SIZE_FLOAT, DEFAULT_TILE_SIZE_FLOAT};
+    auto df = g.d.get_floor(z);
+    massert(df, "dungeon_floor is NULL");
+    massert(x >= 0 && x < df->get_width(), "x is oob");
+    massert(y >= 0 && y < df->get_height(), "y is oob");
+    massert(!vec3_invalid(vec3{x, y, z}), "loc is invalid");
+    tile_t& tile = df->tile_at(vec3{x, y, z});
+    const bool full_light = df->get_full_light();
+    if (tile.get_type() == TILE_NONE) {
+        return true;
+    }
+    if (!full_light && !tile.get_explored()) {
+        return true;
+    }
+    const int txkey = get_txkey_for_tiletype(tile.get_type());
+    massert(txkey >= 0, "txkey is invalid");
+    Texture2D* texture = &libdraw_ctx.txinfo[txkey].texture;
+    massert(texture->id > 0, "texture->id is <= 0");
+    const bool tile_visible = full_light || tile.get_visible();
+    const unsigned char a = tile_visible ? 255 : 102;
+    const Color draw_color = Color{255, 255, 255, a};
+    DrawTexturePro(*texture, src, dest, Vector2{0, 0}, 0, draw_color);
+    return true;
+}
+
+void draw_dungeon_floor_pressure_plates(gamestate& g, int light_rad) {
+    auto df = g.d.get_current_floor();
+    const int z = g.d.current_floor;
+    const vec3 hero_loc = g.ct.get<location>(g.hero_id).value_or(vec3{-1, -1, -1});
+    const bool full_light = df->get_full_light();
+    const Rectangle src = {0, 0, DEFAULT_TILE_SIZE_SCALED, DEFAULT_TILE_SIZE_SCALED};
+
+    for (const floor_pressure_plate_t& plate : g.floor_pressure_plates) {
+        if (plate.destroyed || plate.loc.z != z) {
+            continue;
+        }
+
+        if (!full_light) {
+            if (abs(plate.loc.x - hero_loc.x) + abs(plate.loc.y - hero_loc.y) > light_rad) {
+                continue;
+            }
+
+            tile_t& tile = df->tile_at(plate.loc);
+            if (!tile.get_explored() || !tile.get_visible()) {
+                continue;
+            }
+        }
+
+        const int txkey = plate.active ? plate.txkey_down : plate.txkey_up;
+        Texture2D* texture = &libdraw_ctx.txinfo[txkey].texture;
+        massert(texture->id > 0, "pressure plate texture->id is <= 0");
+
+        const float px = plate.loc.x * DEFAULT_TILE_SIZE + DEFAULT_OFFSET;
+        const float py = plate.loc.y * DEFAULT_TILE_SIZE + DEFAULT_OFFSET;
+        const Rectangle dest = {px, py, DEFAULT_TILE_SIZE_FLOAT, DEFAULT_TILE_SIZE_FLOAT};
+        DrawTexturePro(*texture, src, dest, Vector2{0, 0}, 0, WHITE);
+    }
+}
+
+void draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type_0, int vision_dist, int light_rad, function<bool(gamestate&, entityid)> extra_check) {
+    (void)vision_dist;
+    auto df = g.d.get_current_floor();
+    auto hero_loc = g.ct.get<location>(g.hero_id).value_or(vec3{-1, -1, -1});
+    const bool full_light = df->get_full_light();
+    const int min_x = full_light ? 0 : std::max(0, hero_loc.x - light_rad);
+    const int max_x = full_light ? df->get_width() - 1 : std::min(df->get_width() - 1, hero_loc.x + light_rad);
+    const int min_y = full_light ? 0 : std::max(0, hero_loc.y - light_rad);
+    const int max_y = full_light ? df->get_height() - 1 : std::min(df->get_height() - 1, hero_loc.y + light_rad);
+    for (int y = min_y; y <= max_y; y++) {
+        for (int x = min_x; x <= max_x; x++) {
+            if (!full_light && abs(x - hero_loc.x) + abs(y - hero_loc.y) > light_rad) {
+                continue;
+            }
+            const vec3 loc = {x, y, g.d.current_floor};
+            tile_t& tile = df->tile_at(loc);
+            auto tiletype = tile.get_type();
+            if (tiletype_is_none(tiletype) || tiletype_is_wall(tiletype)) {
+                continue;
+            }
+            if (!full_light && (!tile.get_visible() || !tile.get_explored())) {
+                continue;
+            }
+            if (tile.entity_count() == 0) {
+                continue;
+            }
+
+            if (type_0 == ENTITY_NPC) {
+                entityid dead_npc_id = tile.get_cached_dead_npc();
+                if (dead_npc_id != INVALID && extra_check(g, dead_npc_id)) {
+                    draw_sprite_and_shadow(g, dead_npc_id);
+                }
+                entityid npc_id = tile.get_cached_live_npc();
+                if (npc_id != INVALID && extra_check(g, npc_id)) {
+                    draw_sprite_and_shadow(g, npc_id);
+                }
+            }
+            else if (type_0 == ENTITY_PLAYER) {
+                bool player_present = tile.get_cached_player_present();
+                if (player_present && extra_check(g, g.hero_id)) {
+                    draw_sprite_and_shadow(g, g.hero_id);
+                }
+            }
+            else if (type_0 == ENTITY_BOX) {
+                entityid box_id = tile.get_cached_box();
+                if (box_id != INVALID && extra_check(g, box_id)) {
+                    draw_sprite_and_shadow(g, box_id);
+                }
+            }
+            else if (type_0 == ENTITY_CHEST) {
+                entityid chest_id = tile.get_cached_chest();
+                if (chest_id != INVALID && extra_check(g, chest_id)) {
+                    draw_sprite_and_shadow(g, chest_id);
+                }
+            }
+            else if (type_0 == ENTITY_PROP) {
+                entityid prop_id = tile.get_cached_prop();
+                if (prop_id != INVALID && extra_check(g, prop_id)) {
+                    draw_sprite_and_shadow(g, prop_id);
+                }
+            }
+            else if (type_0 == ENTITY_ITEM) {
+                entityid item_id = tile.get_cached_item();
+                if (item_id != INVALID && extra_check(g, item_id)) {
+                    draw_sprite_and_shadow(g, item_id);
+                }
+            }
+            else if (type_0 == ENTITY_DOOR) {
+                entityid door_id = tile.get_cached_door();
+                if (door_id != INVALID && extra_check(g, door_id)) {
+                    draw_sprite_and_shadow(g, door_id);
+                }
+            }
+        }
+    }
+}
+
+bool draw_dungeon_floor(gamestate& g, int vision_dist, int light_rad) {
+    shared_ptr<dungeon_floor> df = g.d.get_current_floor();
+    const int z = g.d.current_floor;
+    auto maybe_hero_loc = g.ct.get<location>(g.hero_id);
+    if (!maybe_hero_loc.has_value()) {
+        return false;
+    }
+
+    const vec3 hero_loc = maybe_hero_loc.value();
+    for (int y = 0; y < df->get_height(); y++) {
+        for (int x = 0; x < df->get_width(); x++) {
+            const vec3 loc = {x, y, z};
+            const int distance = manhattan_distance(loc, hero_loc);
+            draw_dungeon_floor_tile(g, x, y, z, light_rad, hero_loc, distance);
+        }
+    }
+    draw_dungeon_floor_pressure_plates(g, light_rad);
+
+    auto mydefault = [](gamestate& g, entityid id) { return true; };
+    auto alive_check = [](gamestate& g, entityid id) {
+        auto maybe_dead = g.ct.get<dead>(id);
+        if (maybe_dead.has_value()) {
+            return !maybe_dead.value();
+        }
+        return false;
+    };
+
+    auto dead_check = [](gamestate& g, entityid id) {
+        auto maybe_dead = g.ct.get<dead>(id);
+        if (maybe_dead.has_value()) {
+            return maybe_dead.value();
+        }
+        return false;
+    };
+
+    draw_dungeon_floor_entitytype(g, ENTITY_DOOR, vision_dist, light_rad, mydefault);
+    draw_dungeon_floor_entitytype(g, ENTITY_PROP, vision_dist, light_rad, mydefault);
+    draw_dungeon_floor_entitytype(g, ENTITY_CHEST, vision_dist, light_rad, mydefault);
+    libdraw_draw_player_target_box(g);
+    draw_dungeon_floor_entitytype(g, ENTITY_ITEM, vision_dist, light_rad, mydefault);
+    draw_dungeon_floor_entitytype(g, ENTITY_NPC, vision_dist, light_rad, dead_check);
+    draw_dungeon_floor_entitytype(g, ENTITY_BOX, vision_dist, light_rad, mydefault);
+    draw_dungeon_floor_entitytype(g, ENTITY_NPC, vision_dist, light_rad, alive_check);
+    draw_dungeon_floor_entitytype(g, ENTITY_PLAYER, vision_dist, light_rad, mydefault);
+    return true;
 }
 
 void create_npc_sg_byid(gamestate& g, entityid id) {

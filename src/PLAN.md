@@ -18,7 +18,8 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
   - Latest follow-up also folded shared audio state and volume settings into `libdraw_ctx`, removing the remaining duplicated `gamestate` mirrors for renderer-owned music/settings state.
   - Latest follow-up also moved the top-level renderer entry points out of header-only `static inline` implementations into a real `libdraw.cpp`, so `libdraw.h`/`libdraw_*` API headers are now declaration-first at the entry-point layer.
   - Latest follow-up also moved sprite lifecycle/update helpers and spritegroup factory dispatch out of implementation headers into `libdraw.cpp`, shrinking a large part of the renderer-side implementation-header surface.
-  - Remaining cleanup still exists deeper in scene-specific draw helpers such as frame composition and UI/world drawing headers.
+  - Latest follow-up also moved scene composition helpers, gameplay-scene composition, dungeon-floor rendering, and the player target box into `libdraw.cpp`.
+  - Remaining cleanup still exists mostly in leaf scene/UI draw headers rather than libdraw orchestration itself.
 
 - Keyboard customization is now live in the gameplay scene.
 - Current shipped state:
@@ -46,6 +47,7 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
   - Recent progress: shared audio state and volume settings now also live in `libdraw_ctx`, with gameplay/UI paths using accessor-backed reads instead of redundant `gamestate` mirrors.
   - Recent progress: top-level renderer orchestration now lives in `libdraw.cpp` rather than header-only entry points, reducing implementation-header coupling at the public API boundary.
   - Recent progress: sprite update/animation dispatch and spritegroup creation dispatch now also live in `libdraw.cpp`, reducing renderer helper churn in public headers.
+  - Recent progress: scene-to-texture composition and gameplay floor-rendering helpers now also live in `libdraw.cpp`, leaving mostly leaf draw widgets in implementation headers.
   - [ ] eventually move away from implementation headers toward real `.cpp` files
   - [ ] evaluate migrating direct `try_entity_*` gameplay mutations toward an event-queue / action-resolution pipeline
     - Current candidates include `try_entity_attack`, `try_entity_move`, push/pull handling, door/chest toggles, pressure-plate updates, and other world-state mutations that presently happen inline.
