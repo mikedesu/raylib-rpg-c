@@ -690,4 +690,34 @@ public:
 
         TS_ASSERT_EQUALS(floor_three_sign_count, 1U);
     }
+
+    void testLogicInitAddsFloorThreePullableTutorialProps() {
+        gamestate g;
+        g.test = true;
+        g.mt.seed(12345);
+
+        g.logic_init();
+
+        size_t floor_three_pullable_prop_count = 0;
+        for (entityid id = 1; id < g.next_entityid; id++) {
+            if (g.ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_PROP) {
+                continue;
+            }
+            if (g.ct.get<proptype>(id).value_or(PROP_NONE) != PROP_DUNGEON_CANDLE_00) {
+                continue;
+            }
+
+            const vec3 loc = g.ct.get<location>(id).value_or(vec3{-1, -1, -1});
+            if (loc.z != 2) {
+                continue;
+            }
+
+            TS_ASSERT(vec3_valid(loc));
+            TS_ASSERT(g.ct.get<pullable>(id).value_or(false));
+            TS_ASSERT(!g.ct.get<solid>(id).value_or(true));
+            floor_three_pullable_prop_count++;
+        }
+
+        TS_ASSERT_EQUALS(floor_three_pullable_prop_count, 2U);
+    }
 };

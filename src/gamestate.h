@@ -511,6 +511,9 @@ public:
     /** @brief Populate generated floors with props after layout generation completes. */
     int place_props();
 
+    /** @brief Place deterministic pullable props in the floor-3 tutorial room. */
+    int place_floor_three_pullable_props();
+
     /** @brief Place the floor-3 tutorial sign that explains pullables. */
     entityid place_floor_three_pullable_sign();
 

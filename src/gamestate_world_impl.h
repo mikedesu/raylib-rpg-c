@@ -571,6 +571,41 @@ inline int gamestate::place_props() {
     return placed_props;
 }
 
+inline int gamestate::place_floor_three_pullable_props() {
+    if (d.get_floor_count() < 3) {
+        return 0;
+    }
+
+    shared_ptr<dungeon_floor> df = d.get_floor(2);
+    const vec3 upstairs_loc = df->get_upstairs_loc();
+    const vec3 candidate_locs[] = {
+        vec3{upstairs_loc.x + 2, upstairs_loc.y - 1, upstairs_loc.z},
+        vec3{upstairs_loc.x + 2, upstairs_loc.y + 1, upstairs_loc.z},
+    };
+
+    int placed = 0;
+    for (const vec3 loc : candidate_locs) {
+        if (loc.x < 0 || loc.x >= df->get_width() || loc.y < 0 || loc.y >= df->get_height()) {
+            continue;
+        }
+
+        tile_t& tile = df->tile_at(loc);
+        if (!tile_is_walkable(tile.get_type()) || tile.get_type() == TILE_UPSTAIRS || tile.get_type() == TILE_DOWNSTAIRS) {
+            continue;
+        }
+        if (tile.entity_count() != 0) {
+            continue;
+        }
+
+        const entityid id = create_prop_at_with(PROP_DUNGEON_CANDLE_00, loc, dungeon_prop_init(PROP_DUNGEON_CANDLE_00));
+        if (id != ENTITYID_INVALID) {
+            placed++;
+        }
+    }
+
+    return placed;
+}
+
 inline entityid gamestate::place_floor_three_pullable_sign() {
     if (d.get_floor_count() < 3) {
         return ENTITYID_INVALID;
