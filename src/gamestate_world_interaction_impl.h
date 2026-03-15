@@ -283,6 +283,14 @@ inline bool gamestate::queue_move_event(entityid id, vec3 v) {
     return queue_gameplay_event(event);
 }
 
+inline bool gamestate::queue_attack_event(entityid id, vec3 loc) {
+    gameplay_event_t event;
+    event.type = EVENT_ATTACK_INTENT;
+    event.actor_id = id;
+    event.target_loc = loc;
+    return queue_gameplay_event(event);
+}
+
 inline bool gamestate::queue_pull_event(entityid id) {
     gameplay_event_t event;
     event.type = EVENT_PULL_INTENT;
@@ -336,6 +344,11 @@ inline gameplay_event_result_t gamestate::process_gameplay_event(const gameplay_
         }
         return result;
     }
+    case EVENT_ATTACK_INTENT:
+        result.handled = true;
+        result.attack_result = try_entity_attack(event.actor_id, event.target_loc.x, event.target_loc.y);
+        result.succeeded = result.attack_result != ATTACK_RESULT_NONE;
+        return result;
     case EVENT_PULL_INTENT: {
         result.handled = true;
         result.succeeded = try_entity_pull(event.actor_id);
@@ -367,7 +380,6 @@ inline gameplay_event_result_t gamestate::process_gameplay_event(const gameplay_
         }
         return result;
     case EVENT_NONE:
-    case EVENT_ATTACK_INTENT:
     case EVENT_COUNT:
     default:
         return result;
@@ -398,6 +410,14 @@ inline bool gamestate::run_move_action(entityid id, vec3 v) {
         return false;
     }
     return process_gameplay_events().succeeded;
+}
+
+inline attack_result_t gamestate::run_attack_action(entityid id, vec3 loc) {
+    clear_gameplay_events();
+    if (!queue_attack_event(id, loc)) {
+        return ATTACK_RESULT_NONE;
+    }
+    return process_gameplay_events().attack_result;
 }
 
 inline bool gamestate::run_pull_action(entityid id) {

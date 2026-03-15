@@ -455,14 +455,14 @@ inline bool gamestate::handle_npc(entityid id) {
     else if (d_action == ENTITY_DEFAULT_ACTION_ATTACK_TARGET_IF_ADJACENT) {
         if (is_entity_adjacent(id, tgt_id)) {
             vec3 loc = ct.get<location>(tgt_id).value();
-            try_entity_attack(id, loc.x, loc.y);
+            run_attack_action(id, loc);
             return true;
         }
     }
     else if (d_action == ENTITY_DEFAULT_ACTION_RANDOM_MOVE_AND_ATTACK_TARGET_IF_ADJACENT) {
         if (is_entity_adjacent(id, tgt_id)) {
             vec3 loc = ct.get<location>(tgt_id).value();
-            try_entity_attack(id, loc.x, loc.y);
+            run_attack_action(id, loc);
             return true;
         }
         else if (try_entity_move_random(id)) {
@@ -472,7 +472,7 @@ inline bool gamestate::handle_npc(entityid id) {
     else if (d_action == ENTITY_DEFAULT_ACTION_MOVE_TO_TARGET_AND_ATTACK_TARGET_IF_ADJACENT) {
         if (is_entity_adjacent(id, tgt_id)) {
             vec3 loc = ct.get<location>(tgt_id).value();
-            try_entity_attack(id, loc.x, loc.y);
+            run_attack_action(id, loc);
             return true;
         }
         else if (try_entity_move_to_target(id)) {

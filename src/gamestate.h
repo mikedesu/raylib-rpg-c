@@ -999,6 +999,9 @@ public:
     /** @brief Queue a movement intent for ordered turn resolution. */
     bool queue_move_event(entityid id, vec3 v);
 
+    /** @brief Queue an attack intent for ordered turn resolution. */
+    bool queue_attack_event(entityid id, vec3 loc);
+
     /** @brief Queue a pull intent for ordered turn resolution. */
     bool queue_pull_event(entityid id);
 
@@ -1022,6 +1025,9 @@ public:
 
     /** @brief Queue and immediately resolve one movement intent plus follow-up events. */
     bool run_move_action(entityid id, vec3 v);
+
+    /** @brief Queue and immediately resolve one attack intent. */
+    attack_result_t run_attack_action(entityid id, vec3 loc);
 
     /** @brief Queue and immediately resolve one pull intent plus follow-up events. */
     bool run_pull_action(entityid id);
@@ -1140,7 +1146,7 @@ public:
             }
             if (ct.has<location>(hero_id) && ct.has<direction>(hero_id)) {
                 vec3 loc = get_loc_facing_player();
-                try_entity_attack(hero_id, loc.x, loc.y);
+                run_attack_action(hero_id, loc);
                 flag = GAMESTATE_FLAG_PLAYER_ANIM;
                 return true;
             }

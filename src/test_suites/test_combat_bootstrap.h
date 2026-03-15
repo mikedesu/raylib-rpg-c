@@ -330,6 +330,65 @@ public:
         }
     }
 
+    void testRunAttackActionUsesQueuedAttackIntent() {
+        gamestate g;
+        g.test = true;
+        g.mt.seed(24680);
+        add_floor(g, 8, 8);
+
+        const entityid hero = g.create_player_at_with(vec3{1, 1, 0}, "hero", g.player_init(12));
+        const entityid orc = g.create_orc_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(orc, ENTITYID_INVALID);
+
+        const entityid hero_weapon = g.create_weapon_with(g.sword_init());
+        TS_ASSERT_DIFFERS(hero_weapon, ENTITYID_INVALID);
+        g.add_to_inventory(hero, hero_weapon);
+        g.ct.set<equipped_weapon>(hero, hero_weapon);
+
+        g.ct.set<strength>(hero, 18);
+        g.ct.set<dexterity>(hero, 18);
+        g.ct.set<hp>(orc, vec2{12, 12});
+
+        const attack_result_t result = g.run_attack_action(hero, vec3{2, 1, 0});
+
+        TS_ASSERT_DIFFERS(result, ATTACK_RESULT_NONE);
+        TS_ASSERT(g.gameplay_events.empty());
+        TS_ASSERT_EQUALS(g.ct.get<direction>(hero).value_or(DIR_NONE), DIR_RIGHT);
+    }
+
+    void testRunAttackActionKillsTargetThroughQueuedAttackIntent() {
+        gamestate g;
+        g.test = true;
+        g.mt.seed(7);
+        add_floor(g, 8, 8);
+
+        const entityid hero = g.create_player_at_with(vec3{1, 1, 0}, "hero", g.player_init(12));
+        const entityid orc = g.create_orc_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(orc, ENTITYID_INVALID);
+
+        const entityid hero_weapon = g.create_weapon_with(g.sword_init());
+        TS_ASSERT_DIFFERS(hero_weapon, ENTITYID_INVALID);
+        g.add_to_inventory(hero, hero_weapon);
+        g.ct.set<equipped_weapon>(hero, hero_weapon);
+        g.ct.set<strength>(hero, 18);
+        g.ct.set<dexterity>(hero, 18);
+        g.ct.set<base_ac>(orc, 1);
+        g.ct.set<dexterity>(orc, 1);
+        g.ct.set<hp>(orc, vec2{1, 1});
+
+        const attack_result_t result = g.run_attack_action(hero, vec3{2, 1, 0});
+
+        TS_ASSERT_EQUALS(result, ATTACK_RESULT_HIT);
+        TS_ASSERT(g.ct.get<dead>(orc).value_or(false));
+        tile_t& target_tile = g.d.get_floor(0)->tile_at(vec3{2, 1, 0});
+        TS_ASSERT_EQUALS(target_tile.get_cached_live_npc(), ENTITYID_INVALID);
+        TS_ASSERT_EQUALS(target_tile.get_cached_dead_npc(), orc);
+        TS_ASSERT_EQUALS(g.ct.get<xp>(hero).value_or(0), 1);
+        TS_ASSERT(g.gameplay_events.empty());
+    }
+
     void testTickInTestModeAdvancesTicksAndTurnsWithHeroPresent() {
         gamestate g;
         g.test = true;

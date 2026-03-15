@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "attack_result.h"
 #include "entityid.h"
 #include "vec3.h"
 
@@ -40,4 +41,5 @@ struct gameplay_event_result_t {
     entityid actor_id = ENTITYID_INVALID;
     bool handled = false;
     bool succeeded = false;
+    attack_result_t attack_result = ATTACK_RESULT_NONE;
 };

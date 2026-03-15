@@ -1,5 +1,30 @@
 # Project Plan
 
+## Session Handoff
+
+- Event-queue migration status:
+  - queued and working in the current tree: movement, pull, manual door toggles, chest toggles, stairs traversal, and attack intent
+  - explicit queued follow-up events currently exist for pressure-plate refresh after movement, pull, and stairs traversal
+  - attack intent now enters through the queue for both player and NPC adjacent attacks, but hit/block/damage/death still resolve inline inside the existing combat helpers
+- Human-verified slices so far:
+  - pull
+  - open door
+  - stairs traversal
+  - chest toggles
+- Current automated baseline:
+  - `make tests && ./tests`
+  - latest passing count before handoff: `140` tests
+- Next session target:
+  - split queued attack resolution into explicit damage/block/death follow-up events
+  - likely first cuts: queue attack intent -> queue block-or-damage result -> queue death cleanup/xp/message consequences
+  - preserve the current gameplay contract while migrating, the same way earlier slices kept legacy `try_entity_*` helpers working during the transition
+- Files most relevant for the next step:
+  - `event_type.h`
+  - `gamestate.h`
+  - `gamestate_world_interaction_impl.h`
+  - `gamestate_npc_combat_impl.h`
+  - `test_suites/test_combat_bootstrap.h`
+
 ## START HERE
 
 As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSERT=1 -DNPCS_ALL_AT_ONCE -DDEBUG=1 -DMASTER_VOLUME=1.0f " make game` for now...
@@ -19,10 +44,13 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
     - Player pull input now also queues `EVENT_PULL_INTENT`, with queued pull likewise fanning out into `EVENT_REFRESH_PRESSURE_PLATES`.
     - Player manual door toggles now queue `EVENT_OPEN_DOOR_INTENT`.
     - Player stairs traversal now queues `EVENT_TRAVERSE_STAIRS_INTENT`, with queued floor changes scheduling ordered pressure-plate refresh follow-ups for source and destination floors.
+    - Player chest toggles now queue `EVENT_OPEN_CHEST_INTENT`.
+    - Player and NPC adjacent attacks now queue `EVENT_ATTACK_INTENT`, while hit/block/damage/death still resolve through the existing combat helpers behind that queued entrypoint.
     - Pull was verified by a real human after the queue migration slice landed.
     - Manual door toggles were verified by a real human after the queue migration slice landed.
     - Stairs traversal was verified by a real human after the queue migration slice landed.
-    - Legacy direct `try_entity_move` / `try_entity_pull` / `try_entity_open_door` / `try_entity_stairs` paths still work during the migration so existing helpers and tests are not forced over all at once.
+    - Chest toggles were verified by a real human after the queue migration slice landed.
+    - Legacy direct `try_entity_move` / `try_entity_pull` / `try_entity_open_door` / `try_entity_stairs` / `try_entity_open_chest` / `try_entity_attack` paths still work during the migration so existing helpers and tests are not forced over all at once.
     - Current automated verification for the migrated slice: `make tests && ./tests`.
   - [ ] Below are some of the example type of events that shall be converted over from their existing hardcoded forms:
   - [ ] `try_entity_attack`
@@ -39,7 +67,7 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
     - Main gameplay payoff: much better orchestration for cascading systems such as pressure plates, traps, forced movement, on-hit reactions, death triggers, scripted room logic, and future multi-step interactions.
     - Main engineering payoff: easier debugging/logging/replay of world-state transitions, clearer separation between intent and resolution, and lower risk of fragile ordering bugs.
     - Likely migration path: introduce a narrow event queue for one domain first, such as movement plus world triggers, then expand to combat and other interaction systems after the pattern is stable.
-    - Current next suggested slice after movement + pull + manual door toggles + stairs traversal: chest toggles, because that finishes the remaining contained interaction-toggle path before combat.
+    - Current next suggested slice after movement + pull + manual door toggles + stairs traversal + chest toggles + combat intent: split damage/block/death into explicit follow-up events once the queued attack entrypoint is stable.
 
 - [ ] Continue top-down `libdraw` cleanup and reduce remaining rendering global-state coupling.
   - Recent passes centralized renderer-global declarations through `libdraw_context.h`, removed repeated ad hoc `extern` declarations across draw/update headers, and routed `libdraw.h` scene dispatch through the compatibility include.
@@ -87,7 +115,7 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
     - Main benefit: deterministic ordered resolution for chained effects, so one action can fan out into queued follow-up events without burying rules in nested direct calls.
     - Main gameplay payoff: much better orchestration for cascading systems such as pressure plates, traps, forced movement, on-hit reactions, death triggers, scripted room logic, and future multi-step interactions.
     - Main engineering payoff: easier debugging/logging/replay of world-state transitions, clearer separation between intent and resolution, and lower risk of fragile ordering bugs.
-    - Likely migration path: movement + pressure-plate follow-ups, pull, manual door toggles, and stairs traversal are now queued; the next contained slice should be chest, then combat.
+    - Likely migration path: movement + pressure-plate follow-ups, pull, manual door toggles, stairs traversal, chest toggles, and attack intent are now queued; the next contained slice should be deeper attack follow-up events for damage/block/death.
 
 - [ ] Documentation
   - [x] continue Doxygen coverage on remaining core headers
@@ -161,10 +189,12 @@ Compact status handoff for the current C++ / raylib dungeon project.
     - queued pull intent now resolves through the same queue
     - queued manual door-toggle intent now resolves through the same queue
     - queued stairs-traversal intent now resolves through the same queue
+    - queued chest-toggle intent now resolves through the same queue
     - queued movement, pull, and stairs traversal schedule pressure-plate refresh as explicit ordered follow-up events
     - queued pull migration has now been human-verified in gameplay
     - queued manual door-toggle migration has now been human-verified in gameplay
     - queued stairs-traversal migration has now been human-verified in gameplay
+    - queued chest-toggle migration has now been human-verified in gameplay
 
 - Prop interaction polish
   - Candle props are now pullable.
