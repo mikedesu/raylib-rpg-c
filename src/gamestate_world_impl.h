@@ -666,7 +666,10 @@ inline bool gamestate::setup_floor_four_pressure_plate_tutorial() {
         for (int y = room_y; y < room_y + tutorial_height; y++) {
             const bool outer_wall = x == room_x || x == room_x + tutorial_width - 1 || y == room_y || y == room_y + tutorial_height - 1;
             const bool center_divider = x == split_x && y != center_y;
-            df->df_set_tile((outer_wall || center_divider) ? TILE_STONE_WALL_00 : TILE_FLOOR_STONE_00, x, y);
+            const tiletype_t tile_type = (outer_wall || center_divider)
+                ? TILE_STONE_WALL_00
+                : df->random_tiletype(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
+            df->df_set_tile(tile_type, x, y);
             df->tile_at(vec3{x, y, 2}).set_can_have_door(false);
         }
     }
