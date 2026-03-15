@@ -290,11 +290,7 @@ inline void gamestate::handle_hero_potion_use(entityid id) {
     if (i_type == ITEM_NONE || i_type != ITEM_POTION) {
         return;
     }
-    if (use_potion(hero_id, id)) {
-        flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        controlmode = CONTROLMODE_PLAYER;
-        display_inventory_menu = false;
-    }
+    run_use_item_action(hero_id, id);
 }
 
 inline void gamestate::handle_hero_item_use() {

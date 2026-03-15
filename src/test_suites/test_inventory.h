@@ -187,6 +187,45 @@ public:
         TS_ASSERT(g.msg_history.size() >= 2U);
     }
 
+    void testRunUseItemActionUsesQueuedPotionIntent() {
+        gamestate g;
+        const vec3 loc = add_initialized_floor(g);
+        const entityid hero = create_hero(g, loc);
+        const entityid potion = g.create_potion_at_with(loc, g.potion_init(POTION_HP_SMALL));
+
+        TS_ASSERT(g.add_to_inventory(hero, potion));
+        g.ct.set<hp>(hero, vec2{3, 10});
+        g.hero_id = hero;
+        g.display_inventory_menu = true;
+        g.controlmode = CONTROLMODE_INVENTORY;
+
+        TS_ASSERT(g.run_use_item_action(hero, potion));
+        TS_ASSERT(!g.is_in_inventory(hero, potion));
+        TS_ASSERT(g.ct.get<hp>(hero).value_or(vec2{0, 0}).x > 3);
+        TS_ASSERT_EQUALS(g.flag, GAMESTATE_FLAG_PLAYER_ANIM);
+        TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_PLAYER);
+        TS_ASSERT(!g.display_inventory_menu);
+        TS_ASSERT(g.gameplay_events.empty());
+    }
+
+    void testRunUseItemActionReturnsFalseForNonPotionItem() {
+        gamestate g;
+        const vec3 loc = add_initialized_floor(g);
+        const entityid hero = create_hero(g, loc);
+        const entityid dagger = g.create_weapon_at_with(g.ct, loc, g.dagger_init());
+
+        TS_ASSERT(g.add_to_inventory(hero, dagger));
+        g.hero_id = hero;
+        g.display_inventory_menu = true;
+        g.controlmode = CONTROLMODE_INVENTORY;
+
+        TS_ASSERT(!g.run_use_item_action(hero, dagger));
+        TS_ASSERT(g.is_in_inventory(hero, dagger));
+        TS_ASSERT(g.display_inventory_menu);
+        TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_INVENTORY);
+        TS_ASSERT(g.gameplay_events.empty());
+    }
+
     void testChestTransferMovesItemsBetweenHeroAndChestInventories() {
         gamestate g;
         g.sfx.resize(71);

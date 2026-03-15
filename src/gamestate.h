@@ -1032,6 +1032,9 @@ public:
     /** @brief Queue a pickup intent for ordered turn resolution. */
     bool queue_pickup_event(entityid id);
 
+    /** @brief Queue an item-use intent for ordered turn resolution. */
+    bool queue_use_item_event(entityid id, entityid item_id);
+
     /** @brief Queue a stairs-traversal intent for ordered turn resolution. */
     bool queue_traverse_stairs_event(entityid id);
 
@@ -1070,6 +1073,9 @@ public:
 
     /** @brief Queue and immediately resolve one pickup intent. */
     bool run_pickup_action(entityid id);
+
+    /** @brief Queue and immediately resolve one item-use intent. */
+    bool run_use_item_action(entityid id, entityid item_id);
 
     /** @brief Queue and immediately resolve one stairs-traversal intent. */
     bool run_traverse_stairs_action(entityid id);

@@ -383,6 +383,14 @@ inline bool gamestate::queue_pickup_event(entityid id) {
     return queue_gameplay_event(event);
 }
 
+inline bool gamestate::queue_use_item_event(entityid id, entityid item_id) {
+    gameplay_event_t event;
+    event.type = EVENT_USE_ITEM_INTENT;
+    event.actor_id = id;
+    event.target_id = item_id;
+    return queue_gameplay_event(event);
+}
+
 inline bool gamestate::queue_traverse_stairs_event(entityid id) {
     gameplay_event_t event;
     event.type = EVENT_TRAVERSE_STAIRS_INTENT;
@@ -486,6 +494,20 @@ inline gameplay_event_result_t gamestate::process_gameplay_event(const gameplay_
         result.handled = true;
         result.succeeded = try_entity_pickup(event.actor_id);
         return result;
+    case EVENT_USE_ITEM_INTENT:
+        result.handled = true;
+        result.succeeded = false;
+        if (ct.get<entitytype>(event.target_id).value_or(ENTITY_NONE) == ENTITY_ITEM &&
+            ct.get<itemtype>(event.target_id).value_or(ITEM_NONE) == ITEM_POTION &&
+            use_potion(event.actor_id, event.target_id)) {
+            if (event.actor_id == hero_id) {
+                flag = GAMESTATE_FLAG_PLAYER_ANIM;
+                controlmode = CONTROLMODE_PLAYER;
+                display_inventory_menu = false;
+            }
+            result.succeeded = true;
+        }
+        return result;
     case EVENT_TRAVERSE_STAIRS_INTENT:
         result.handled = true;
         result.succeeded = try_entity_stairs(event.actor_id);
@@ -586,6 +608,14 @@ inline bool gamestate::run_interact_action(entityid id, vec3 loc) {
 inline bool gamestate::run_pickup_action(entityid id) {
     clear_gameplay_events();
     if (!queue_pickup_event(id)) {
+        return false;
+    }
+    return process_gameplay_events().succeeded;
+}
+
+inline bool gamestate::run_use_item_action(entityid id, entityid item_id) {
+    clear_gameplay_events();
+    if (!queue_use_item_event(id, item_id)) {
         return false;
     }
     return process_gameplay_events().succeeded;

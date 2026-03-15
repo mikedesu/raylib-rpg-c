@@ -6,7 +6,7 @@
   - [ ] While pushing a table around on floor 4, when the table is pushed on to a tile that contains a Jar Prop or some other prop that you can't interact with much, the table takes precadence, which is great, but when the table is pushed or pulled off that tile, the Jar Prop is gone!
 
 - Event-queue migration status:
-  - queued and working in the current tree: movement, implicit push resolution, pull, manual door toggles, chest toggles, interaction/talk intents, pickup intents, stairs traversal, and attack intent
+  - queued and working in the current tree: movement, implicit push resolution, pull, manual door toggles, chest toggles, interaction/talk intents, pickup intents, hero item-use intents, stairs traversal, and attack intent
   - explicit queued follow-up events currently exist for pressure-plate refresh after movement, push, pull, and stairs traversal
   - attack intent now enters through the queue for both player and NPC adjacent attacks, and queued combat now fans out into explicit block, damage, and death follow-up events
   - queued pressure-plate refresh now also fans out into explicit linked-door open/close follow-up events instead of mutating those door states inline during queued processing
@@ -54,6 +54,7 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
     - Player chest toggles now queue `EVENT_OPEN_CHEST_INTENT`.
     - Player interact/talk input now queues `EVENT_INTERACT_INTENT`.
     - Player pickup input now queues `EVENT_PICKUP_INTENT`.
+    - Hero inventory item use now queues `EVENT_USE_ITEM_INTENT`, while the actual potion effect still resolves through the existing inventory helper behind that queued entrypoint.
     - Player and NPC adjacent attacks now queue `EVENT_ATTACK_INTENT`.
     - Queued attack intent now schedules explicit ordered `EVENT_ATTACK_BLOCK`, `EVENT_ATTACK_DAMAGE`, and `EVENT_ATTACK_DEATH` follow-up events so combat side effects no longer need to resolve inline under the queued entrypoint.
     - Queued pressure-plate refresh now schedules explicit ordered door-state follow-up events for linked doors instead of toggling those doors inline during queued processing.
@@ -63,6 +64,7 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
     - Chest toggles were verified by a real human after the queue migration slice landed.
     - Interaction/talk intents have automated coverage through the queued path and still preserve the legacy direct helper.
     - Pickup intents now also have automated coverage through the queued path and still preserve the legacy direct helper.
+    - Hero item-use intents now also have automated coverage through the queued path and still preserve the legacy direct potion helper.
     - Legacy direct `try_entity_move` / `try_entity_pull` / `try_entity_open_door` / `try_entity_stairs` / `try_entity_open_chest` / `try_entity_attack` paths still work during the migration so existing helpers and tests are not forced over all at once.
     - Current automated verification for the migrated slice: `make tests && ./tests`.
   - [ ] Below are some of the example type of events that shall be converted over from their existing hardcoded forms:
