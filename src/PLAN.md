@@ -212,7 +212,8 @@ Compact status handoff for the current C++ / raylib dungeon project.
 - Future dungeon-quality gains should focus on connectivity and loops, not just more rooms.
 - Recent gameplay work has been landing with tests first or tests alongside implementation; keep that pattern.
 - Libdraw cleanup hand-off:
-  - `libdraw.cpp` now owns most renderer orchestration plus a broad slice of gameplay-scene rendering helpers.
-  - The main remaining implementation-header draw modules are the larger widgets/scenes: `draw_inventory_menu.h`, `draw_chest_menu.h`, `draw_mini_inventory_menu.h`, `draw_title_screen.h`, `draw_character_creation_screen.h`, plus smaller renderer leafs like `draw_damage_numbers.h`, `draw_debug_panel.h`, `draw_handle_gamestate_flag.h`, and any tiny support draw helpers they pull in.
-  - Next pass should keep moving coherent renderer-only clusters into `libdraw.cpp` or a follow-up renderer `.cpp`, not back into gameplay code.
+  - `libdraw.cpp` now also owns the inventory/chest/mini-inventory renderer cluster, shared item-detail panel/grid helpers, title screen, character-creation scene, debug-panel plumbing, gameplay-scene damage-popup drawing, and renderer-side gamestate-flag advancement.
+  - One small renderer seam helper intentionally remains header-inline: `damage_popup_font_size_world()` in `draw_damage_numbers.h`, because `make tests` links deterministic seam tests without `libdraw.o`.
+  - The main renderer-only implementation headers left are now mostly tiny leaf/support helpers such as `libdraw_update_weapon_for_entity.h`, `libdraw_update_shield_for_entity.h`, and `draw_version.h`, plus the existing debug-only frame-stats inline helpers.
+  - Next pass should either finish those tiny renderer helpers in `libdraw.cpp` or split a small renderer-support `.cpp` if `libdraw.cpp` starts becoming awkward, but keep the work renderer-local and out of gameplay code.
   - Verification baseline after each renderer move remains: `make game`, `make tests`, `./tests`.

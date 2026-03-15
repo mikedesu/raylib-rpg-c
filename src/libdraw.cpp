@@ -63,6 +63,7 @@
 #include <algorithm>
 #include <array>
 #include <cstdio>
+#include <cstring>
 
 libdraw_context_t libdraw_ctx;
 
@@ -157,6 +158,621 @@ bool create_spritegroup(gamestate& g, entityid id, int* keys, int num_keys, int 
 
 bool create_sg(gamestate& g, entityid id, int* keys, int num_keys) {
     return create_spritegroup(g, id, keys, num_keys, -12, -12);
+}
+
+vector<string> build_item_detail_lines(gamestate& g, entityid selection_id) {
+    vector<string> lines;
+    const itemtype_t item_type = g.ct.get<itemtype>(selection_id).value_or(ITEM_NONE);
+
+    lines.push_back(g.ct.get<name>(selection_id).value_or("no-name"));
+
+    if (item_type == ITEM_WEAPON) {
+        const vec3 dmg = g.ct.get<damage>(selection_id).value_or(vec3{-1, -1, -1});
+        lines.push_back(TextFormat("Damage: %d-%d", dmg.x, dmg.y));
+
+        const int dura = g.ct.get<durability>(selection_id).value_or(-1);
+        const int max_dura = g.ct.get<max_durability>(selection_id).value_or(-1);
+        lines.push_back(TextFormat("Durability: %d/%d", dura, max_dura));
+    }
+    else if (item_type == ITEM_SHIELD) {
+        const int block = g.ct.get<block_chance>(selection_id).value_or(-1);
+        lines.push_back(TextFormat("Block chance: %d", block));
+
+        const int dura = g.ct.get<durability>(selection_id).value_or(-1);
+        const int max_dura = g.ct.get<max_durability>(selection_id).value_or(-1);
+        lines.push_back(TextFormat("Durability: %d/%d", dura, max_dura));
+    }
+    else if (item_type == ITEM_POTION) {
+        const vec3 heal = g.ct.get<healing>(selection_id).value_or(vec3{-1, -1, -1});
+        lines.push_back(TextFormat("Heal amount: %d-%d", heal.x, heal.y));
+    }
+
+    lines.push_back(g.ct.get<description>(selection_id).value_or("no-description"));
+    return lines;
+}
+
+void draw_item_detail_panel(gamestate& g, const Rectangle& right_box, entityid selection_id) {
+    spritegroup* sg = libdraw_ctx.spritegroups[selection_id];
+    if (!sg) {
+        return;
+    }
+
+    auto sprite = sg->get_current();
+    DrawTexturePro(*(sprite->get_texture()), Rectangle{0, 0, 32, 32}, right_box, Vector2{0, 0}, 0.0f, WHITE);
+
+    const int fontsize = 20;
+    const int cur_x = right_box.x + 10;
+    int cur_y = right_box.y + 10;
+    const int y_incr = 20;
+    const vector<string> lines = build_item_detail_lines(g, selection_id);
+    for (const string& line : lines) {
+        DrawText(line.c_str(), cur_x, cur_y, fontsize, g.window_box_fgcolor);
+        cur_y += y_incr;
+    }
+}
+
+void draw_inventory_grid(gamestate& g, shared_ptr<vector<entityid>> inventory, const Rectangle& left_box, bool show_equipped_labels) {
+    float x = left_box.x + 2;
+    float y = left_box.y + 2;
+    const int cols = 7;
+    const int rows = 7;
+    const float w = (left_box.width - 4) / cols;
+    const float h = (left_box.height - 4) / rows;
+    auto it = inventory->begin();
+    for (int j = 0; j < rows; j++) {
+        for (int i = 0; i < cols; i++) {
+            Rectangle grid_box = {x, y, w, h};
+            Rectangle grid_box2 = {x + 2, y + 2, w - 4, h - 4};
+            DrawRectangleLinesEx(grid_box, 1, Color{0x66, 0x66, 0x66, 255});
+            if (it != inventory->end()) {
+                spritegroup* sg = libdraw_ctx.spritegroups[*it];
+                if (sg) {
+                    auto sprite = sg->get_current();
+                    DrawTexturePro(*(sprite->get_texture()), Rectangle{10, 10, 12, 12}, grid_box2, Vector2{0, 0}, 0.0f, WHITE);
+                    if (show_equipped_labels) {
+                        size_t index = static_cast<size_t>(j * cols + i);
+                        if (index < inventory->size()) {
+                            const entityid selection_id = inventory->at(index);
+                            const entityid cur_wpn_id = g.ct.get<equipped_weapon>(g.hero_id).value_or(ENTITYID_INVALID);
+                            const entityid cur_shield_id = g.ct.get<equipped_shield>(g.hero_id).value_or(ENTITYID_INVALID);
+                            const bool cur_wpn_selected = selection_id == cur_wpn_id && cur_wpn_id != ENTITYID_INVALID;
+                            const bool cur_shield_selected = selection_id == cur_shield_id && cur_shield_id != ENTITYID_INVALID;
+                            if (cur_wpn_selected || cur_shield_selected) {
+                                DrawText("equipped", grid_box2.x, grid_box2.y + grid_box2.height - 10, 10, g.window_box_fgcolor);
+                            }
+                        }
+                    }
+                }
+                ++it;
+            }
+            if ((float)i == g.inventory_cursor.x && (float)j == g.inventory_cursor.y) {
+                DrawRectangleLinesEx(grid_box, 2, GREEN);
+            }
+            x += w;
+        }
+        x = left_box.x + 2;
+        y += h;
+    }
+}
+
+void draw_inventory_menu(gamestate& g) {
+    if (!g.display_inventory_menu) {
+        return;
+    }
+
+    const char* menu_title = "Inventory Menu";
+    const int section_gap = 8;
+    const int font_size = 10;
+    const Vector2 title_size = MeasureTextEx(GetFontDefault(), menu_title, font_size, g.line_spacing);
+    const float menu_width_percent = 0.75f;
+    const float menu_height_percent = 0.75f;
+    const int w = DEFAULT_TARGET_WIDTH;
+    const int h = DEFAULT_TARGET_HEIGHT;
+    const float menu_width = w * menu_width_percent;
+    const float menu_height = h * menu_height_percent;
+    Rectangle menu_box = {(w - menu_width) / 2.0f, (h - menu_height) / 4.0f, menu_width, menu_height};
+    float title_x = menu_box.x + (menu_box.width - title_size.x) / 2.0f;
+    float title_y = menu_box.y + g.pad;
+    float half_width = (menu_box.width - section_gap) / 2.0f;
+    float half_height = menu_box.height - title_size.y - g.pad * 3.0f;
+
+    DrawRectangleRec(menu_box, g.window_box_bgcolor);
+    DrawRectangleLinesEx(menu_box, 2, g.window_box_fgcolor);
+    DrawText(menu_title, title_x, title_y, font_size, g.window_box_fgcolor);
+
+    Rectangle left_box = {menu_box.x + g.pad, title_y + title_size.y + g.pad, half_width - g.pad, half_height};
+    Rectangle right_box = {left_box.x + half_width + section_gap, left_box.y, half_width - g.pad * 2, half_height};
+    DrawRectangleRec(left_box, g.window_box_bgcolor);
+    DrawRectangleLinesEx(left_box, 2, g.window_box_fgcolor);
+    DrawRectangleRec(right_box, g.window_box_bgcolor);
+    DrawRectangleLinesEx(right_box, 2, g.window_box_fgcolor);
+
+    auto maybe_inventory = g.ct.get<inventory>(g.hero_id);
+    if (!maybe_inventory.has_value()) {
+        return;
+    }
+
+    auto inventory = maybe_inventory.value();
+    draw_inventory_grid(g, inventory, left_box, true);
+
+    if (!inventory->empty()) {
+        size_t index = static_cast<size_t>(g.inventory_cursor.y) * 7 + static_cast<size_t>(g.inventory_cursor.x);
+        if (index < inventory->size()) {
+            draw_item_detail_panel(g, right_box, inventory->at(index));
+        }
+    }
+}
+
+void draw_chest_menu(gamestate& g) {
+    if (!g.display_chest_menu || g.active_chest_id == ENTITYID_INVALID) {
+        return;
+    }
+
+    auto maybe_inventory = g.ct.get<inventory>(g.chest_deposit_mode ? g.hero_id : g.active_chest_id);
+    if (!maybe_inventory.has_value()) {
+        return;
+    }
+
+    auto inventory = maybe_inventory.value();
+    const char* menu_title = g.chest_deposit_mode ? "Treasure Chest - Deposit" : "Treasure Chest";
+    const char* hint_text = g.chest_deposit_mode ? "TAB: chest view  ENTER: deposit  ESC/D: close" : "TAB: hero inventory  ENTER: take  ESC/D: close";
+    const int section_gap = 8;
+    const int font_size = 10;
+    const Vector2 title_size = MeasureTextEx(GetFontDefault(), menu_title, font_size, g.line_spacing);
+    const int w = DEFAULT_TARGET_WIDTH;
+    const int h = DEFAULT_TARGET_HEIGHT;
+    const float menu_width = w * 0.75f;
+    const float menu_height = h * 0.75f;
+    Rectangle menu_box = {(w - menu_width) / 2.0f, (h - menu_height) / 4.0f, menu_width, menu_height};
+    float title_x = menu_box.x + (menu_box.width - title_size.x) / 2.0f;
+    float title_y = menu_box.y + g.pad;
+    float half_width = (menu_box.width - section_gap) / 2.0f;
+    float half_height = menu_box.height - title_size.y - g.pad * 3.0f;
+
+    DrawRectangleRec(menu_box, g.window_box_bgcolor);
+    DrawRectangleLinesEx(menu_box, 2, g.window_box_fgcolor);
+    DrawText(menu_title, title_x, title_y, font_size, g.window_box_fgcolor);
+    DrawText(hint_text, menu_box.x + g.pad, menu_box.y + menu_box.height - g.pad, font_size, g.window_box_fgcolor);
+
+    Rectangle left_box = {menu_box.x + g.pad, title_y + title_size.y + g.pad, half_width - g.pad, half_height};
+    Rectangle right_box = {left_box.x + half_width + section_gap, left_box.y, half_width - g.pad * 2, half_height};
+    DrawRectangleRec(left_box, g.window_box_bgcolor);
+    DrawRectangleLinesEx(left_box, 2, g.window_box_fgcolor);
+    DrawRectangleRec(right_box, g.window_box_bgcolor);
+    DrawRectangleLinesEx(right_box, 2, g.window_box_fgcolor);
+
+    draw_inventory_grid(g, inventory, left_box, g.chest_deposit_mode);
+
+    if (!inventory->empty()) {
+        size_t index = static_cast<size_t>(g.inventory_cursor.y) * 7 + static_cast<size_t>(g.inventory_cursor.x);
+        if (index < inventory->size()) {
+            draw_item_detail_panel(g, right_box, inventory->at(index));
+        }
+    }
+}
+
+Rectangle mini_inventory_panel_for_hero(gamestate& g, float width, float height) {
+    const vec3 hero_loc = g.ct.get<location>(g.hero_id).value_or(vec3{0, 0, 0});
+    const Vector2 hero_screen = GetWorldToScreen2D(
+        Vector2{
+            static_cast<float>(hero_loc.x * DEFAULT_TILE_SIZE) + DEFAULT_TILE_SIZE * 0.5f,
+            static_cast<float>(hero_loc.y * DEFAULT_TILE_SIZE),
+        },
+        g.cam2d);
+    const float margin = 12.0f;
+    const float x = std::clamp(hero_screen.x + 36.0f, margin, g.targetwidth - width - margin);
+    const float y = std::clamp(hero_screen.y - height * 0.5f, margin, g.targetheight - height - margin);
+    return Rectangle{x, y, width, height};
+}
+
+void draw_mini_inventory_menu(gamestate& g, shared_ptr<vector<entityid>> inventory, const char* title, const char* hint, bool show_equipped) {
+    const float width = 260.0f;
+    const float row_h = 18.0f;
+    const float preview_h = 118.0f;
+    const float padding = 10.0f;
+    const float footer_h = 18.0f;
+    const size_t visible_count = std::max(1U, g.mini_inventory_visible_count);
+    const float list_h = row_h * static_cast<float>(visible_count);
+    const Rectangle panel = mini_inventory_panel_for_hero(g, width, padding * 3.0f + 14.0f + list_h + preview_h + footer_h + 12.0f);
+    DrawRectangleRec(panel, g.window_box_bgcolor);
+    DrawRectangleLinesEx(panel, 2, g.window_box_fgcolor);
+    DrawText(title, static_cast<int>(panel.x + padding), static_cast<int>(panel.y + padding), 12, g.window_box_fgcolor);
+
+    const float hint_y = panel.y + panel.height - footer_h;
+    DrawText(hint, static_cast<int>(panel.x + padding), static_cast<int>(hint_y), 10, g.window_box_fgcolor);
+
+    const Rectangle list_box = {panel.x + padding, panel.y + 28.0f, panel.width - padding * 2.0f, list_h};
+    DrawRectangleLinesEx(list_box, 1, g.window_box_fgcolor);
+
+    const size_t selected_index = g.get_inventory_selection_index();
+    const size_t scroll = g.mini_inventory_scroll_offset;
+    for (size_t i = 0; i < visible_count; i++) {
+        const float row_y = list_box.y + row_h * static_cast<float>(i);
+        const Rectangle row = {list_box.x, row_y, list_box.width, row_h};
+        const size_t item_index = scroll + i;
+        if (item_index == selected_index && item_index < inventory->size()) {
+            DrawRectangleRec(row, Color{255, 255, 255, 28});
+            DrawRectangleLinesEx(row, 1, YELLOW);
+        }
+        if (item_index >= inventory->size()) {
+            continue;
+        }
+
+        const entityid item_id = inventory->at(item_index);
+        const string item_name = g.ct.get<name>(item_id).value_or("no-name");
+        const bool equipped =
+            show_equipped &&
+            (item_id == g.ct.get<equipped_weapon>(g.hero_id).value_or(ENTITYID_INVALID) ||
+             item_id == g.ct.get<equipped_shield>(g.hero_id).value_or(ENTITYID_INVALID));
+        DrawText(
+            TextFormat("%s%s", item_index == selected_index ? "> " : "  ", item_name.c_str()),
+            static_cast<int>(row.x + 6),
+            static_cast<int>(row.y + 4),
+            10,
+            item_index == selected_index ? YELLOW : g.window_box_fgcolor);
+        if (equipped) {
+            DrawText("E", static_cast<int>(row.x + row.width - 14), static_cast<int>(row.y + 4), 10, g.window_box_fgcolor);
+        }
+    }
+
+    if (scroll > 0) {
+        DrawText("^", static_cast<int>(list_box.x + list_box.width - 12), static_cast<int>(list_box.y - 10), 10, g.window_box_fgcolor);
+    }
+    if (scroll + visible_count < inventory->size()) {
+        DrawText("v", static_cast<int>(list_box.x + list_box.width - 12), static_cast<int>(list_box.y + list_box.height), 10, g.window_box_fgcolor);
+    }
+
+    if (inventory->empty() || selected_index >= inventory->size()) {
+        DrawText("empty", static_cast<int>(panel.x + padding), static_cast<int>(list_box.y + list_box.height + 10), 10, g.window_box_fgcolor);
+        return;
+    }
+
+    const entityid selection_id = inventory->at(selected_index);
+    const Rectangle preview = {panel.x + padding, list_box.y + list_box.height + 10.0f, panel.width - padding * 2.0f, preview_h};
+    DrawRectangleLinesEx(preview, 1, g.window_box_fgcolor);
+    spritegroup* sg = libdraw_ctx.spritegroups[selection_id];
+    const float preview_sprite_size = 72.0f;
+    if (sg) {
+        auto sprite = sg->get_current();
+        DrawTexturePro(
+            *(sprite->get_texture()),
+            Rectangle{0, 0, 32, 32},
+            Rectangle{preview.x + 8, preview.y + 8, preview_sprite_size, preview_sprite_size},
+            Vector2{0, 0},
+            0.0f,
+            WHITE);
+    }
+    const vector<string> lines = build_item_detail_lines(g, selection_id);
+    const float text_x = preview.x + preview_sprite_size + 18.0f;
+    float text_y = preview.y + 8.0f;
+    for (size_t i = 0; i < lines.size() && i < 3; i++) {
+        DrawText(lines[i].c_str(), static_cast<int>(text_x), static_cast<int>(text_y), i == 0 ? 11 : 10, g.window_box_fgcolor);
+        text_y += 20.0f;
+    }
+    if (!lines.empty()) {
+        DrawText(lines.back().c_str(), static_cast<int>(preview.x + 8), static_cast<int>(preview.y + preview_sprite_size + 14.0f), 10, g.window_box_fgcolor);
+    }
+}
+
+void draw_damage_numbers(gamestate& g) {
+    if (g.damage_popups.empty()) {
+        return;
+    }
+
+    for (const damage_popup_t& popup : g.damage_popups) {
+        if (popup.floor != g.d.current_floor) {
+            continue;
+        }
+
+        const float progress = popup.lifetime_seconds > 0.0f ? popup.age_seconds / popup.lifetime_seconds : 1.0f;
+        const float clamped_progress = std::min(std::max(progress, 0.0f), 1.0f);
+        const float rise = popup.rise_distance * (1.0f - (1.0f - clamped_progress) * (1.0f - clamped_progress));
+        const float drift_x = popup.drift_x * clamped_progress;
+        const float font_size = damage_popup_font_size_world(g, popup);
+        const float spacing = 0.0f;
+        const std::string text = std::to_string(popup.amount);
+        const Vector2 measure = MeasureTextEx(GetFontDefault(), text.c_str(), font_size, spacing);
+        const Vector2 pos = {
+            popup.world_anchor.x + drift_x - measure.x / 2.0f,
+            popup.world_anchor.y - rise,
+        };
+        const unsigned char alpha = static_cast<unsigned char>(255.0f * (1.0f - clamped_progress));
+        const Color text_color = popup.critical ? Color{255, 64, 64, alpha} : Color{255, 255, 255, alpha};
+        const Color shadow_color = Color{0, 0, 0, static_cast<unsigned char>(alpha * 0.7f)};
+
+        DrawTextEx(GetFontDefault(), text.c_str(), Vector2{pos.x + 0.5f, pos.y + 0.5f}, font_size, spacing, shadow_color);
+        DrawTextEx(GetFontDefault(), text.c_str(), pos, font_size, spacing, text_color);
+    }
+}
+
+void draw_debug_panel(gamestate& g) {
+    minfo3("draw debug panel");
+    constexpr int fontsize = 20;
+    constexpr float yp = 10;
+    constexpr float wp = 20;
+    constexpr float hp = 20;
+    constexpr float xp = 5;
+    constexpr float rotation = 0;
+    constexpr int thickness = 1;
+    constexpr float h = fontsize * 30;
+    constexpr Vector2 origin = {0, 0};
+
+    const float w = MeasureText(g.debugpanel.buffer, fontsize);
+    const float x = g.targetwidth - (w + wp);
+    const float y = g.targetheight - (h + hp);
+    const Rectangle r = {x, y - yp, w + wp, h + hp};
+
+    DrawRectanglePro(r, origin, rotation, g.get_debug_panel_bgcolor());
+    DrawRectangleLinesEx(r, thickness, g.window_box_fgcolor);
+    DrawText(g.debugpanel.buffer, x + xp, y, fontsize, g.window_box_fgcolor);
+    msuccess3("draw debug panel");
+}
+
+void update_debug_panel(gamestate& g) {
+    minfo3("update debug panel");
+    if (g.hero_id == INVALID) {
+        return;
+    }
+
+    char tmp[1024] = {0};
+    snprintf(tmp, sizeof(tmp), "@evildojo666");
+    strncat(g.debugpanel.buffer, tmp, sizeof(g.debugpanel.buffer) - strlen(g.debugpanel.buffer) - 1);
+    msuccess3("update debug panel");
+}
+
+void handle_debug_panel(gamestate& g) {
+    minfo3("handle debug panel");
+    if (g.debugpanelon) {
+        update_debug_panel(g);
+        draw_debug_panel(g);
+    }
+    msuccess3("handle debug panel");
+}
+
+void libdraw_handle_gamestate_flag(gamestate& g) {
+    if (g.flag == GAMESTATE_FLAG_PLAYER_ANIM) {
+#ifndef NPCS_ALL_AT_ONCE
+        g.entity_turn++;
+        if (g.entity_turn >= g.next_entityid) {
+            g.entity_turn = 0;
+        }
+#endif
+
+        g.flag = GAMESTATE_FLAG_NPC_TURN;
+    }
+    else if (g.flag == GAMESTATE_FLAG_NPC_ANIM) {
+#ifndef NPCS_ALL_AT_ONCE
+        g.entity_turn++;
+        if (g.entity_turn >= g.next_entityid) {
+            g.entity_turn = 0;
+        }
+        if (g.entity_turn == g.hero_id) {
+            g.flag = GAMESTATE_FLAG_PLAYER_INPUT;
+            g.turn_count++;
+        }
+        else {
+            g.flag = GAMESTATE_FLAG_NPC_TURN;
+        }
+#else
+        g.flag = GAMESTATE_FLAG_PLAYER_INPUT;
+        g.turn_count++;
+#endif
+    }
+}
+
+void draw_character_creation_screen(gamestate& g) {
+    minfo3("draw character creation scene");
+
+    const char* title_text = "Character Creation";
+    const std::array<std::string, 4> instructions = {
+        "Type to change your name (no spaces)",
+        "Press LEFT/RIGHT to change race",
+        "Press UP/DOWN to change alignment",
+        "Press SPACE to re-roll, ENTER to confirm",
+    };
+
+    constexpr int font_size_0 = 40;
+    constexpr int font_size_1 = 20;
+    constexpr int w = DEFAULT_TARGET_WIDTH;
+    constexpr int h = DEFAULT_TARGET_HEIGHT;
+    constexpr int cx = w / 2;
+    constexpr int sy = h / 4;
+    constexpr int x = cx;
+    constexpr int y0 = sy;
+    constexpr int line_gap = 10;
+    constexpr int line_step = font_size_1 + line_gap;
+    constexpr int stats_start_y = y0 + font_size_0 + 10;
+    constexpr int instructions_start_y = stats_start_y + line_step * 10 + 8;
+    constexpr float pad = -40;
+    constexpr float dst2_y = sy + pad;
+    constexpr float dst2_wh = 400;
+    constexpr float dst2_x = cx - dst2_wh;
+    constexpr Rectangle src = {0, 0, 32, 32};
+    constexpr Rectangle dst2 = Rectangle{dst2_x, dst2_y, dst2_wh, dst2_wh};
+    constexpr Vector2 zero_vec = Vector2{0, 0};
+
+    ClearBackground(BLACK);
+    DrawText(title_text, x, y0, font_size_0, WHITE);
+
+    const std::array<std::string, 10> stat_lines = {
+        TextFormat("Name: %s_", g.chara_creation.name.c_str()),
+        TextFormat("< Race: %s >", race2str(g.chara_creation.race).c_str()),
+        TextFormat("< Alignment: %s >", alignment_to_str(g.chara_creation.alignment).c_str()),
+        TextFormat("Hitdie: %d", g.chara_creation.hitdie),
+        TextFormat("Strength: %d", g.chara_creation.strength),
+        TextFormat("Dexterity: %d", g.chara_creation.dexterity),
+        TextFormat("Intelligence: %d", g.chara_creation.intelligence),
+        TextFormat("Wisdom: %d", g.chara_creation.wisdom),
+        TextFormat("Constitution: %d", g.chara_creation.constitution),
+        TextFormat("Charisma: %d", g.chara_creation.charisma),
+    };
+
+    int text_y = stats_start_y;
+    for (const std::string& line : stat_lines) {
+        DrawText(line.c_str(), x, text_y, font_size_1, WHITE);
+        text_y += line_step;
+    }
+
+    switch (g.chara_creation.race) {
+    case RACE_HUMAN:
+        DrawTexturePro(libdraw_ctx.txinfo[TX_CHAR_HUMAN_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
+        break;
+    case RACE_ORC:
+        DrawTexturePro(libdraw_ctx.txinfo[TX_CHAR_ORC_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
+        break;
+    case RACE_ELF:
+        DrawTexturePro(libdraw_ctx.txinfo[TX_CHAR_ELF_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
+        break;
+    case RACE_DWARF:
+        DrawTexturePro(libdraw_ctx.txinfo[TX_CHAR_DWARF_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
+        break;
+    case RACE_HALFLING:
+        DrawTexturePro(libdraw_ctx.txinfo[TX_CHAR_HALFLING_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
+        break;
+    case RACE_GOBLIN:
+        DrawTexturePro(libdraw_ctx.txinfo[TX_CHAR_GOBLIN_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
+        break;
+    case RACE_GREEN_SLIME:
+        DrawTexturePro(libdraw_ctx.txinfo[TX_MONSTER_GREEN_SLIME_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
+        break;
+    case RACE_BAT:
+        DrawTexturePro(libdraw_ctx.txinfo[TX_MONSTER_BAT_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
+        break;
+    case RACE_WOLF:
+        DrawTexturePro(libdraw_ctx.txinfo[TX_MONSTER_WOLF_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
+        break;
+    case RACE_WARG:
+        DrawTexturePro(libdraw_ctx.txinfo[TX_MONSTER_WARG_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
+        break;
+    case RACE_ZOMBIE:
+        DrawTexturePro(libdraw_ctx.txinfo[TX_MONSTER_ZOMBIE_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
+        break;
+    case RACE_SKELETON:
+        DrawTexturePro(libdraw_ctx.txinfo[TX_MONSTER_SKELETON_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
+        break;
+    case RACE_RAT:
+        DrawTexturePro(libdraw_ctx.txinfo[TX_MONSTER_RAT_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
+        break;
+    default:
+        break;
+    }
+
+    text_y = instructions_start_y;
+    for (const std::string& line : instructions) {
+        DrawText(line.c_str(), x, text_y, font_size_1, WHITE);
+        text_y += font_size_1 + 8;
+    }
+
+    msuccess3("draw character creation scene");
+}
+
+void draw_title_screen(gamestate& g, bool show_menu) {
+    constexpr int sm_font_size = 20;
+    constexpr int font_size = 80;
+    char buffer[1024] = {0};
+    const char* menu_text[2] = {"New Game", "Continue (coming soon)"};
+    constexpr Color active_color = WHITE;
+    constexpr Color disabled_color = {0x99, 0x99, 0x99, 0xFF};
+    constexpr Color title_text_0_color = {0x66, 0x66, 0x66, 0xFF};
+    constexpr Color title_text_1_color = {0xFF, 0xFF, 0xFF, 0xFF};
+    constexpr int spacing = 2;
+    constexpr Vector2 origin = {0, 0};
+    constexpr float sw = 128;
+    constexpr float rx = 0;
+    constexpr float ry = 0;
+    constexpr float pad = 10;
+    constexpr int menu_count = sizeof(menu_text) / sizeof(menu_text[0]);
+    constexpr int menu_spacing = 10;
+    const char* evildojo_presents_text = "@evildojo666 presents";
+    const char* title_text_0 = "project.rpg";
+    const char* title_text_1 = "          rpg";
+    const char* start_text = "Press enter or space to begin";
+    const char* programming_by = "programming by darkmage";
+    const char* art_by = "art by Krishna Palacio";
+    const char* sound_effects_by = "sound effects by Leoh Paz";
+    const char* music_by = "music by darkmage + suno.ai";
+    const char* version_text = g.version.c_str();
+    const char* date_text = GAME_VERSION_DATE;
+
+    const Rectangle frame = {g.targetwidth / 4.0f, g.targetheight / 4.0f, g.targetwidth / 2.0f, g.targetheight / 2.0f};
+    ClearBackground(BLACK);
+
+    const Vector2 m = MeasureTextEx(GetFontDefault(), title_text_0, font_size, spacing);
+    const Vector2 start_measure = MeasureTextEx(GetFontDefault(), start_text, sm_font_size, spacing);
+    const Vector2 version_measure = MeasureTextEx(GetFontDefault(), version_text, sm_font_size, spacing);
+    const Vector2 date_measure = MeasureTextEx(GetFontDefault(), date_text, sm_font_size, spacing);
+    const Vector2 evildojo_presents_measure = MeasureTextEx(GetFontDefault(), evildojo_presents_text, sm_font_size, spacing);
+    const Vector2 prog_m = MeasureTextEx(GetFontDefault(), programming_by, sm_font_size, spacing);
+    const Vector2 art_m = MeasureTextEx(GetFontDefault(), art_by, sm_font_size, spacing);
+    const Vector2 music_m = MeasureTextEx(GetFontDefault(), music_by, sm_font_size, spacing);
+    const Vector2 sfx_m = MeasureTextEx(GetFontDefault(), sound_effects_by, sm_font_size, spacing);
+
+    const float x = frame.x + frame.width / 2.0f - m.x / 2.0f;
+    const float y = frame.y;
+    const float placeholder_y = y + font_size + sm_font_size + 10;
+
+    Vector2 pos = {g.targetwidth / 2.0f - evildojo_presents_measure.x / 2.0f, y - sm_font_size - pad};
+    DrawText(evildojo_presents_text, pos.x, pos.y, sm_font_size, WHITE);
+
+    pos = {x, y};
+    DrawText(title_text_0, pos.x, pos.y, font_size, title_text_0_color);
+    DrawText(title_text_1, pos.x, pos.y, font_size, title_text_1_color);
+
+    pos = {g.targetwidth / 2.0f - date_measure.x / 2.0f, placeholder_y};
+    DrawText(date_text, pos.x, pos.y, sm_font_size, WHITE);
+    pos = {g.targetwidth / 2.0f - version_measure.x / 2.0f, pos.y + sm_font_size + pad};
+    DrawText(version_text, pos.x, pos.y, sm_font_size, WHITE);
+    pos = {g.targetwidth / 2.0f - prog_m.x / 2.0f, pos.y + sm_font_size + pad};
+    DrawText(programming_by, pos.x, pos.y, sm_font_size, WHITE);
+    pos = {g.targetwidth / 2.0f - art_m.x / 2.0f, pos.y + sm_font_size + pad};
+    DrawText(art_by, pos.x, pos.y, sm_font_size, WHITE);
+    pos = {g.targetwidth / 2.0f - sfx_m.x / 2.0f, pos.y + sm_font_size + pad};
+    DrawText(sound_effects_by, pos.x, pos.y, sm_font_size, WHITE);
+    pos = {g.targetwidth / 2.0f - music_m.x / 2.0f, pos.y + sm_font_size + pad};
+    DrawText(music_by, pos.x, pos.y, sm_font_size, WHITE);
+
+    const float mx = frame.x;
+    const float my = frame.y + sw / 2;
+    const Texture t1 = libdraw_ctx.txinfo[TX_ACTIONS_SLASH_SHORT_SWORD_B].texture;
+    const Texture t2 = libdraw_ctx.txinfo[TX_CHAR_HUMAN_ATTACK_SLASH].texture;
+    const Texture t3 = libdraw_ctx.txinfo[TX_ACTIONS_SLASH_SHORT_SWORD_F].texture;
+    const Texture t4 = libdraw_ctx.txinfo[TX_ACTIONS_SLASH_AXE_B].texture;
+    const Texture t5 = libdraw_ctx.txinfo[TX_CHAR_ORC_ATTACK].texture;
+    const Texture t6 = libdraw_ctx.txinfo[TX_ACTIONS_SLASH_AXE_F].texture;
+    constexpr Rectangle src = {rx, ry, 32, 32};
+    const Rectangle dst = {mx, my, sw, sw};
+    const float mx2 = frame.x + frame.width - sw;
+    const float my2 = frame.y + sw / 2;
+    const Rectangle src2 = {rx, ry, -32, 32};
+    const Rectangle dst2 = {mx2, my2, sw, sw};
+
+    DrawTexturePro(t1, src, dst, origin, 0.0f, WHITE);
+    DrawTexturePro(t2, src, dst, origin, 0.0f, WHITE);
+    DrawTexturePro(t3, src, dst, origin, 0.0f, WHITE);
+    DrawTexturePro(t4, src2, dst2, origin, 0.0f, WHITE);
+    DrawTexturePro(t5, src2, dst2, origin, 0.0f, WHITE);
+    DrawTexturePro(t6, src2, dst2, origin, 0.0f, WHITE);
+    if (!show_menu) {
+        pos = {g.targetwidth / 2.0f - start_measure.x / 2.0f, pos.y + sm_font_size + pad * 2};
+        DrawText(start_text, pos.x, pos.y, sm_font_size, WHITE);
+        return;
+    }
+
+    const float start_y = pos.y + sm_font_size + pad * 4;
+    const int current_selection_index = g.title_screen_selection;
+    for (int i = 0; i < menu_count; i++) {
+        bzero(buffer, sizeof(buffer));
+        const float menu_x = (g.targetwidth - MeasureText(menu_text[i], sm_font_size)) / 2.0f;
+        const float menu_y = start_y + (i * (sm_font_size + menu_spacing));
+        if (i == current_selection_index) {
+            snprintf(buffer, sizeof(buffer), "> %s", menu_text[i]);
+        }
+        else {
+            snprintf(buffer, sizeof(buffer), "  %s", menu_text[i]);
+        }
+        const Color selection_color = i == 0 ? active_color : disabled_color;
+        DrawText(buffer, menu_x, menu_y, sm_font_size, selection_color);
+    }
 }
 
 void draw_hud(gamestate& g) {
