@@ -298,6 +298,13 @@ inline bool gamestate::queue_open_door_event(entityid id, vec3 loc) {
     return queue_gameplay_event(event);
 }
 
+inline bool gamestate::queue_traverse_stairs_event(entityid id) {
+    gameplay_event_t event;
+    event.type = EVENT_TRAVERSE_STAIRS_INTENT;
+    event.actor_id = id;
+    return queue_gameplay_event(event);
+}
+
 inline bool gamestate::queue_pressure_plate_refresh_event(int z) {
     gameplay_event_t event;
     event.type = EVENT_REFRESH_PRESSURE_PLATES;
@@ -336,6 +343,10 @@ inline gameplay_event_result_t gamestate::process_gameplay_event(const gameplay_
         result.handled = true;
         result.succeeded = try_entity_open_door(event.actor_id, event.target_loc);
         return result;
+    case EVENT_TRAVERSE_STAIRS_INTENT:
+        result.handled = true;
+        result.succeeded = try_entity_stairs(event.actor_id);
+        return result;
     case EVENT_REFRESH_PRESSURE_PLATES:
         result.handled = true;
         if (event.floor >= 0 && static_cast<size_t>(event.floor) < d.floors.size()) {
@@ -345,7 +356,6 @@ inline gameplay_event_result_t gamestate::process_gameplay_event(const gameplay_
         return result;
     case EVENT_NONE:
     case EVENT_ATTACK_INTENT:
-    case EVENT_TRAVERSE_STAIRS_INTENT:
     case EVENT_COUNT:
     default:
         return result;
@@ -389,6 +399,14 @@ inline bool gamestate::run_pull_action(entityid id) {
 inline bool gamestate::run_open_door_action(entityid id, vec3 loc) {
     clear_gameplay_events();
     if (!queue_open_door_event(id, loc)) {
+        return false;
+    }
+    return process_gameplay_events().succeeded;
+}
+
+inline bool gamestate::run_traverse_stairs_action(entityid id) {
+    clear_gameplay_events();
+    if (!queue_traverse_stairs_event(id)) {
         return false;
     }
     return process_gameplay_events().succeeded;
@@ -785,7 +803,13 @@ inline bool gamestate::try_entity_stairs(entityid id) {
             vec3 uloc = df2->get_downstairs_loc();
             df2->df_add_at(hero_id, ENTITY_PLAYER, uloc);
             ct.set<location>(hero_id, uloc);
-            refresh_pressure_plates();
+            if (processing_actions) {
+                queue_pressure_plate_refresh_event(current_floor);
+                queue_pressure_plate_refresh_event(new_floor);
+            }
+            else {
+                refresh_pressure_plates();
+            }
             flag = GAMESTATE_FLAG_PLAYER_ANIM;
             PlaySound(sfx.at(SFX_STEP_STONE_1));
             return true;
@@ -800,7 +824,13 @@ inline bool gamestate::try_entity_stairs(entityid id) {
             vec3 uloc = df2->get_upstairs_loc();
             df2->df_add_at(hero_id, ENTITY_PLAYER, uloc);
             ct.set<location>(hero_id, uloc);
-            refresh_pressure_plates();
+            if (processing_actions) {
+                queue_pressure_plate_refresh_event(current_floor);
+                queue_pressure_plate_refresh_event(new_floor);
+            }
+            else {
+                refresh_pressure_plates();
+            }
             flag = GAMESTATE_FLAG_PLAYER_ANIM;
             PlaySound(sfx.at(SFX_STEP_STONE_1));
             return true;
@@ -817,7 +847,7 @@ inline bool gamestate::handle_traverse_stairs(inputstate& is, bool is_dead) {
         if (is_dead) {
             return add_message("You cannot traverse stairs while dead");
         }
-        try_entity_stairs(hero_id);
+        run_traverse_stairs_action(hero_id);
         return true;
     }
     return false;

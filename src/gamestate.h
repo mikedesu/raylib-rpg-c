@@ -1005,6 +1005,9 @@ public:
     /** @brief Queue a manual door-toggle intent for ordered turn resolution. */
     bool queue_open_door_event(entityid id, vec3 loc);
 
+    /** @brief Queue a stairs-traversal intent for ordered turn resolution. */
+    bool queue_traverse_stairs_event(entityid id);
+
     /** @brief Queue a floor-local pressure-plate refresh follow-up. */
     bool queue_pressure_plate_refresh_event(int z);
 
@@ -1022,6 +1025,9 @@ public:
 
     /** @brief Queue and immediately resolve one manual door-toggle intent. */
     bool run_open_door_action(entityid id, vec3 loc);
+
+    /** @brief Queue and immediately resolve one stairs-traversal intent. */
+    bool run_traverse_stairs_action(entityid id);
 
     /**
      * @brief Attempt to move an entity by a delta vector.

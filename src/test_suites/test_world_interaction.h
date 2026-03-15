@@ -419,6 +419,49 @@ public:
         TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_CHEST);
     }
 
+    void testRunTraverseStairsActionUsesQueuedStairsIntent() {
+        gamestate g;
+        g.sfx.resize(71);
+        add_floor(g);
+        add_floor(g);
+
+        auto floor0 = g.d.get_floor(0);
+        auto floor1 = g.d.get_floor(1);
+        TS_ASSERT(floor0->df_set_downstairs_loc(vec3{1, 1, 0}));
+        TS_ASSERT(floor1->df_set_upstairs_loc(vec3{2, 2, 1}));
+
+        const entityid hero = create_hero(g, vec3{1, 1, 0});
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+        g.hero_id = hero;
+        g.d.current_floor = 0;
+
+        TS_ASSERT(g.run_traverse_stairs_action(hero));
+        TS_ASSERT_EQUALS(g.d.current_floor, 1);
+        TS_ASSERT(vec3_equal(g.ct.get<location>(hero).value_or(vec3{-1, -1, -1}), vec3{2, 2, 1}));
+        TS_ASSERT(g.gameplay_events.empty());
+    }
+
+    void testRunTraverseStairsActionReportsTopFloorMessage() {
+        gamestate g;
+        add_floor(g);
+
+        auto floor0 = g.d.get_floor(0);
+        TS_ASSERT(floor0->df_set_upstairs_loc(vec3{1, 1, 0}));
+
+        const entityid hero = create_hero(g, vec3{1, 1, 0});
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+        g.hero_id = hero;
+        g.d.current_floor = 0;
+
+        TS_ASSERT(!g.run_traverse_stairs_action(hero));
+        TS_ASSERT_EQUALS(g.d.current_floor, 0);
+        TS_ASSERT(vec3_equal(g.ct.get<location>(hero).value_or(vec3{-1, -1, -1}), vec3{1, 1, 0}));
+        TS_ASSERT(g.msg_system_is_active);
+        TS_ASSERT(!g.msg_system.empty());
+        TS_ASSERT_EQUALS(g.msg_system.front(), "You are already on the top floor!");
+        TS_ASSERT(g.gameplay_events.empty());
+    }
+
     void testHandleOpenDoorUsesKeyDInsteadOfKeyO() {
         gamestate g;
         g.sfx.resize(71);
