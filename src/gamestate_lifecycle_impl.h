@@ -167,6 +167,7 @@ inline void gamestate::logic_init() {
     create_and_add_df_1(BIOME_STONE, 8, 8, 4, parts);
     create_and_add_df_1(BIOME_STONE, 24, 24, 4, parts);
     create_and_add_df_1(BIOME_STONE, 16, 16, 4, parts);
+    create_and_add_df_0(BIOME_STONE, 16, 16, 4, parts);
     const bool stairs_assigned = assign_random_stairs();
     massert(stairs_assigned, "failed to assign dungeon stairs");
     if (!stairs_assigned) {
@@ -183,13 +184,18 @@ inline void gamestate::logic_init() {
     place_floor_three_pullable_props();
     place_floor_three_pullable_sign();
     place_first_floor_chest();
-    auto df = d.get_current_floor();
+    auto floor_zero = d.get_current_floor();
     constexpr int num_boxes = 1;
     for (int i = 0; i < num_boxes; i++) {
-        create_box_at_with(df->get_random_loc());
+        create_box_at_with(floor_zero->get_random_loc());
     }
-    create_weapon_at_with(ct, df->get_random_loc(), sword_init());
-    create_shield_at_with(ct, df->get_random_loc(), shield_init());
+    auto floor_three = d.get_floor(3);
+    constexpr int floor_three_box_count = 3;
+    for (int i = 0; i < floor_three_box_count; i++) {
+        create_box_at_with(floor_three->get_random_loc());
+    }
+    create_weapon_at_with(ct, floor_zero->get_random_loc(), sword_init());
+    create_shield_at_with(ct, floor_zero->get_random_loc(), shield_init());
     auto green_slime_init = [](CT& ct, const entityid id) {
         ct.set<name>(id, "green slime");
         ct.set<dialogue_text>(id, "The slime jiggles quietly.");

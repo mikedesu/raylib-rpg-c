@@ -8,14 +8,6 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
 
 ## Top 5 Next Things
 
-- [x] Want to add a sign on Floor 3 with text that explains how to pull/drag bodies.
-  - [x] Human dev needs to pull in a sign asset into the appropriate `img/` folder first and re-generate the texture files.
-  - [x] texture key array in `tx_keys.h` (only consists of 1 element) needs to be created for the new sign (use TX_PROP_WOODEN_SIGN).
-  - [x] new prop-type needs to be created for WOODEN_SIGN
-  - [x] When "interacting" via KEY_E, player can read a WOODEN_SIGN and get a message box popup containing the sign text.
-  - [x] We want to put a sign on floor 3, so that if a player is confused about what to do, they can read the sign text
-  - [x] The sign text on the floor 3 sign will simply read "TEXT GOES HERE" for right now.
-- [x] Implement the core `FLOOR_PRESSURE_PLATE` system with live activate/deactivate behavior tied to world state changes.
 - [ ] Continue top-down `libdraw` cleanup and reduce remaining rendering global-state coupling.
   - Recent passes centralized renderer-global declarations through `libdraw_context.h`, removed repeated ad hoc `extern` declarations across draw/update headers, and routed `libdraw.h` scene dispatch through the compatibility include.
   - Latest pass also collapsed libdraw-owned process-lifetime renderer state into a single `libdraw_ctx` object instead of many separate globals in `main.cpp`, so spritegroups, texture metadata, shaders, render targets, and presentation rectangles now move through one shared renderer context.
@@ -41,6 +33,7 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
 ## Active Backlog
 
 - [ ] Dungeon / world quality
+  - [ ] make sure that upstairs/downstairs tiles do not spawn where doors should go
   - [ ] improve door placement quality beyond the first-pass implementation
   - [ ] keep tightening prop placement so it cannot create broader layout soft-locks
   - [ ] consider smarter spawn-selection rules and better dungeon interconnection / loops
@@ -68,33 +61,17 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
     - Completed a broad Doxygen/documentation sweep across the current non-generated header set, including core runtime, renderer, UI, world, helper, and test aggregate headers.
     - `texture_ids.h` was intentionally left untouched per project rules.
 
+## Immediate New Changes To Make
+
 - [ ] Leveling / progression
   - [ ] choose a proper level-up sound or music cue
   - [ ] decide what future non-player (or player) level-up rules should be beyond HP gain
   - [ ] add future progression systems such as skills / feats when ready
 
-
-
-## Immediate New Changes To Make
-
-- [x] Remove all props from floor 4's creation
-  - Floor 4 prop spawning is now skipped in `place_props()` so the tutorial floor stays clean for pressure-plate setup.
-- [x] Develop a `FLOOR_PRESSURE_PLATE` system where
-  - [x] A heavy object such as a `pushable` or `pullable` must be on the tile that has the pressure plate
-  - [x] When triggered, can be tied to some state such as a `ENTITY_DOOR` opening and remaining opened so long as the plate is activated
-  - [x] When a `pullable` or `pushable` or `ENTITY_PLAYER` or `ENTITY_NPC` removes from the tile, then the plate is no longer triggered, so an opened door would close, etc. - some state would revert to its pre-trigger state
-- [x] In one of the rooms on floor 4, add a new pressure plate tile and connect it to a door
-  - [x] this door can only open if the pressure plate is activated
-  - [x] the player can walk on top of the pressure plate and watch the door open
-  - [x] the player can walk off the pressure plate and watch the door close
-  - [ ] we remove all props so that we can force the player into learning about dragging dead bodies onto pressure plates
-  - Floor 4 now gets a deterministic arrival-room tutorial setup with a linked pressure plate and door.
-
 - [ ] save game
   - [ ] a lot of stuff goes here
 - [ ] load game
   - [ ] a lot of stuff goes here
-
 
 ## Critical Note
 
@@ -126,12 +103,14 @@ Compact status handoff for the current C++ / raylib dungeon project.
 - Gameplay bootstrap
   - Gameplay currently boots 4 floors:
     - floor `0`: `8x8`
-    - floor `1`: `16x16`
-    - floor `2`: `24x24`
+    - floor `1`: `24x24`
+    - floor `2`: `16x16`
     - floor `3`: `16x16`
   - Floor `1` now spawns a passive `green slime`.
   - Floor `2` now spawns 9 passive level-1 `green slimes`.
-  - Floor `3` now spawns 1 orc with a random existing weapon and a small healing potion.
+  - Floor `2` now hosts the pullables / pressure-plate tutorial room with two linked plates, a wooden sign, pullable props in both rooms, and a deterministic downstairs to Floor `3`.
+  - Floor `2` now spawns 1 orc with a random existing weapon and a small healing potion.
+  - Floor `3` is currently a placeholder `16x16` stone floor with props and boxes.
   - Green slime racial modifiers are implemented as `-2` to all six attributes.
   - Slime kills now award `1 xp`.
 
@@ -169,6 +148,8 @@ Compact status handoff for the current C++ / raylib dungeon project.
 - text interaction polish
 - Player light radius does NOT render behind closed doors
 
+- Pressure plates
+- Floor 3 pressure plate + pullables tutorial
 
 ## Current State
 

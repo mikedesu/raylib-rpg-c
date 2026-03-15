@@ -698,6 +698,8 @@ inline bool gamestate::setup_floor_four_pressure_plate_tutorial() {
     const int room_y = dungeon_clamp_int(df->get_upstairs_loc().y - 3, 1, df->get_height() - tutorial_height - 1);
     const int split_x = room_x + 6;
     const int center_y = room_y + 3;
+    const vec3 previous_upstairs_loc = df->get_upstairs_loc();
+    const vec3 previous_downstairs_loc = df->get_downstairs_loc();
 
     for (int x = room_x; x < room_x + tutorial_width; x++) {
         for (int y = room_y; y < room_y + tutorial_height; y++) {
@@ -714,9 +716,20 @@ inline bool gamestate::setup_floor_four_pressure_plate_tutorial() {
     const vec3 upstairs_loc{room_x + 2, center_y, 2};
     const vec3 plate_loc{room_x + 4, center_y, 2};
     const vec3 door_loc{split_x, center_y, 2};
+    const vec3 downstairs_loc{room_x + 10, center_y, 2};
     floor_four_tutorial_orc_spawn = vec3{room_x + 9, center_y, 2};
 
+    if (vec3_valid(previous_upstairs_loc) && !vec3_equal(previous_upstairs_loc, upstairs_loc)) {
+        df->df_set_tile(df->random_tiletype(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11), previous_upstairs_loc.x, previous_upstairs_loc.y);
+    }
+    if (vec3_valid(previous_downstairs_loc) && !vec3_equal(previous_downstairs_loc, downstairs_loc)) {
+        df->df_set_tile(df->random_tiletype(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11), previous_downstairs_loc.x, previous_downstairs_loc.y);
+    }
+
     df->df_set_upstairs_loc(upstairs_loc);
+    if (!df->df_set_downstairs_loc(downstairs_loc)) {
+        return false;
+    }
 
     const entityid door_id = create_door_at_with(door_loc, [](CT&, const entityid) {});
     if (door_id == ENTITYID_INVALID) {

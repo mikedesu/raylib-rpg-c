@@ -206,7 +206,7 @@ public:
         g.restart_game();
 
         TS_ASSERT(g.d.is_initialized);
-        TS_ASSERT_EQUALS(g.d.get_floor_count(), 3U);
+        TS_ASSERT_EQUALS(g.d.get_floor_count(), 4U);
         TS_ASSERT_EQUALS(g.current_scene, SCENE_TITLE);
         TS_ASSERT_EQUALS(g.restart_count, 8U);
         TS_ASSERT(!g.do_restart);
@@ -626,7 +626,7 @@ public:
 
         g.logic_init();
 
-        TS_ASSERT_EQUALS(g.d.get_floor_count(), 3U);
+        TS_ASSERT_EQUALS(g.d.get_floor_count(), 4U);
         TS_ASSERT_EQUALS(g.floor_pressure_plates.size(), 2U);
         const entityid linked_door_id = g.floor_pressure_plates.front().linked_door_id;
         TS_ASSERT_DIFFERS(linked_door_id, ENTITYID_INVALID);
@@ -642,6 +642,11 @@ public:
         TS_ASSERT_EQUALS(g.floor_four_tutorial_orc_spawn.z, 2);
 
         auto floor_four = g.d.get_floor(2);
+        const vec3 tutorial_downstairs = floor_four->get_downstairs_loc();
+        TS_ASSERT(vec3_valid(tutorial_downstairs));
+        TS_ASSERT_EQUALS(tutorial_downstairs.z, 2);
+        TS_ASSERT(tutorial_downstairs.x > 6);
+        TS_ASSERT_EQUALS(floor_four->tile_at(tutorial_downstairs).get_type(), TILE_DOWNSTAIRS);
         TS_ASSERT(tile_is_walkable(floor_four->tile_at(g.floor_four_tutorial_orc_spawn).get_type()));
 
         size_t floor_four_orc_count = 0;
@@ -723,5 +728,38 @@ public:
         }
 
         TS_ASSERT_EQUALS(floor_three_pullable_prop_count, 4U);
+    }
+
+    void testLogicInitAddsPlaceholderFourthFloorWithPropsAndBoxes() {
+        gamestate g;
+        g.test = true;
+        g.mt.seed(12345);
+
+        g.logic_init();
+
+        TS_ASSERT_EQUALS(g.d.get_floor_count(), 4U);
+        auto floor = g.d.get_floor(3);
+        TS_ASSERT_EQUALS(floor->get_width(), 16);
+        TS_ASSERT_EQUALS(floor->get_height(), 16);
+        TS_ASSERT(vec3_valid(floor->get_upstairs_loc()));
+
+        size_t floor_four_box_count = 0;
+        size_t floor_four_prop_count = 0;
+        for (entityid id = 1; id < g.next_entityid; id++) {
+            const entitytype_t type = g.ct.get<entitytype>(id).value_or(ENTITY_NONE);
+            const vec3 loc = g.ct.get<location>(id).value_or(vec3{-1, -1, -1});
+            if (!vec3_valid(loc) || loc.z != 3) {
+                continue;
+            }
+            if (type == ENTITY_BOX) {
+                floor_four_box_count++;
+            }
+            else if (type == ENTITY_PROP) {
+                floor_four_prop_count++;
+            }
+        }
+
+        TS_ASSERT(floor_four_box_count >= 3U);
+        TS_ASSERT(floor_four_prop_count >= 1U);
     }
 };
