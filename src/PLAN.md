@@ -211,3 +211,8 @@ Compact status handoff for the current C++ / raylib dungeon project.
 - `unit_test_old.h` remains the resurrection source for older large simulation tests.
 - Future dungeon-quality gains should focus on connectivity and loops, not just more rooms.
 - Recent gameplay work has been landing with tests first or tests alongside implementation; keep that pattern.
+- Libdraw cleanup hand-off:
+  - `libdraw.cpp` now owns most renderer orchestration plus a broad slice of gameplay-scene rendering helpers.
+  - The main remaining implementation-header draw modules are the larger widgets/scenes: `draw_inventory_menu.h`, `draw_chest_menu.h`, `draw_mini_inventory_menu.h`, `draw_title_screen.h`, `draw_character_creation_screen.h`, plus smaller renderer leafs like `draw_damage_numbers.h`, `draw_debug_panel.h`, `draw_handle_gamestate_flag.h`, and any tiny support draw helpers they pull in.
+  - Next pass should keep moving coherent renderer-only clusters into `libdraw.cpp` or a follow-up renderer `.cpp`, not back into gameplay code.
+  - Verification baseline after each renderer move remains: `make game`, `make tests`, `./tests`.
