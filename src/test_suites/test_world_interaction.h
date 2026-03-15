@@ -264,8 +264,11 @@ public:
         TS_ASSERT_DIFFERS(door, ENTITYID_INVALID);
         TS_ASSERT(g.create_floor_pressure_plate(vec3{3, 1, 0}, door));
 
-        TS_ASSERT(!g.try_entity_open_door(hero, vec3{2, 1, 0}));
+        TS_ASSERT(g.try_entity_open_door(hero, vec3{2, 1, 0}));
         TS_ASSERT(!g.ct.get<door_open>(door).value_or(true));
+        TS_ASSERT(g.msg_system_is_active);
+        TS_ASSERT(!g.msg_system.empty());
+        TS_ASSERT_EQUALS(g.msg_system.front(), "You cannot open this door with your hands");
     }
 
     void testDestroyPressurePlateSeversLinkAndClosesDoor() {

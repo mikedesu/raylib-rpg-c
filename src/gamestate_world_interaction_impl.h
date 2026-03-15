@@ -677,7 +677,7 @@ inline bool gamestate::try_entity_open_door(entityid id, vec3 loc) {
     }
     massert(tile_has_door(loc) == door_id, "door cache mismatch at (%d, %d, %d)", loc.x, loc.y, loc.z);
     if (door_is_pressure_plate_controlled(door_id)) {
-        return false;
+        return add_message("You cannot open this door with your hands");
     }
     optional<bool> maybe_is_open = ct.get<door_open>(door_id);
     massert(maybe_is_open.has_value(), "door %d has no `is_open` component", door_id);
