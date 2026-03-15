@@ -8,13 +8,13 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
 
 ## Top 5 Next Things
 
-- [ ] Want to add a sign on Floor 3 with text that explains how to pull/drag bodies.
+- [x] Want to add a sign on Floor 3 with text that explains how to pull/drag bodies.
   - [x] Human dev needs to pull in a sign asset into the appropriate `img/` folder first and re-generate the texture files.
-  - [ ] texture key array in `tx_keys.h` (only consists of 1 element) needs to be created for the new sign (use TX_PROP_WOODEN_SIGN).
-  - [ ] new prop-type needs to be created for WOODEN_SIGN
-  - [ ] When "interacting" via KEY_E, player can read a WOODEN_SIGN and get a message box popup containing the sign text.
-  - [ ] We want to put a sign on floor 3, so that if a player is confused about what to do, they can read the sign text
-  - [ ] The sign text on the floor 3 sign will simply read "TEXT GOES HERE" for right now.
+  - [x] texture key array in `tx_keys.h` (only consists of 1 element) needs to be created for the new sign (use TX_PROP_WOODEN_SIGN).
+  - [x] new prop-type needs to be created for WOODEN_SIGN
+  - [x] When "interacting" via KEY_E, player can read a WOODEN_SIGN and get a message box popup containing the sign text.
+  - [x] We want to put a sign on floor 3, so that if a player is confused about what to do, they can read the sign text
+  - [x] The sign text on the floor 3 sign will simply read "TEXT GOES HERE" for right now.
 - [x] Implement the core `FLOOR_PRESSURE_PLATE` system with live activate/deactivate behavior tied to world state changes.
 - [ ] Continue top-down `libdraw` cleanup and reduce remaining rendering global-state coupling.
   - Recent passes centralized renderer-global declarations through `libdraw_context.h`, removed repeated ad hoc `extern` declarations across draw/update headers, and routed `libdraw.h` scene dispatch through the compatibility include.

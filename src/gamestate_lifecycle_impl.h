@@ -180,6 +180,7 @@ inline void gamestate::logic_init() {
     setup_floor_four_pressure_plate_tutorial();
     place_doors();
     place_props();
+    place_floor_three_pullable_sign();
     place_first_floor_chest();
     auto df = d.get_current_floor();
     constexpr int num_boxes = 1;

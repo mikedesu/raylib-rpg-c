@@ -660,4 +660,34 @@ public:
         TS_ASSERT_EQUALS(floor_four_orc_count, 1U);
         TS_ASSERT(found_orc_in_tutorial_room);
     }
+
+    void testLogicInitAddsFloorThreePullablesTutorialSign() {
+        gamestate g;
+        g.test = true;
+        g.mt.seed(12345);
+
+        g.logic_init();
+
+        size_t floor_three_sign_count = 0;
+        for (entityid id = 1; id < g.next_entityid; id++) {
+            if (g.ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_PROP) {
+                continue;
+            }
+            if (g.ct.get<proptype>(id).value_or(PROP_NONE) != PROP_DUNGEON_WOODEN_SIGN) {
+                continue;
+            }
+
+            const vec3 loc = g.ct.get<location>(id).value_or(vec3{-1, -1, -1});
+            TS_ASSERT(vec3_valid(loc));
+            TS_ASSERT_EQUALS(loc.z, 2);
+            TS_ASSERT_EQUALS(g.ct.get<name>(id).value_or(""), "wooden sign");
+            TS_ASSERT_EQUALS(g.ct.get<description>(id).value_or(""), "TEXT GOES HERE");
+            TS_ASSERT(g.ct.get<solid>(id).value_or(false));
+            TS_ASSERT(!g.ct.get<pushable>(id).value_or(true));
+            TS_ASSERT(!g.ct.get<pullable>(id).value_or(true));
+            floor_three_sign_count++;
+        }
+
+        TS_ASSERT_EQUALS(floor_three_sign_count, 1U);
+    }
 };

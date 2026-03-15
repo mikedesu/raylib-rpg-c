@@ -64,6 +64,7 @@ inline bool dungeon_prop_is_solid(proptype_t type) {
     case PROP_DUNGEON_WOODEN_TABLE_01:
     case PROP_DUNGEON_WOODEN_BARREL_OPEN_TOP_EMPTY:
     case PROP_DUNGEON_WOODEN_BARREL_OPEN_TOP_WATER:
+    case PROP_DUNGEON_WOODEN_SIGN:
         return true;
     default:
         return false;
@@ -104,6 +105,7 @@ inline const char* dungeon_prop_name(proptype_t type) {
     case PROP_DUNGEON_WOODEN_CHAIR_00: return "wooden chair";
     case PROP_DUNGEON_WOODEN_TABLE_00: return "wooden table";
     case PROP_DUNGEON_WOODEN_TABLE_01: return "wooden table";
+    case PROP_DUNGEON_WOODEN_SIGN: return "wooden sign";
     case PROP_DUNGEON_BANNER_00:
     case PROP_DUNGEON_BANNER_01:
     case PROP_DUNGEON_BANNER_02:
@@ -126,6 +128,8 @@ inline const char* dungeon_prop_description(proptype_t type) {
     case PROP_DUNGEON_WOODEN_TABLE_00:
     case PROP_DUNGEON_WOODEN_TABLE_01:
         return "A sturdy wooden table scarred by cuts, heat marks, and years of hard use.";
+    case PROP_DUNGEON_WOODEN_SIGN:
+        return "TEXT GOES HERE";
     default:
         return "A bit of dungeon clutter left to rot in the dark.";
     }
@@ -565,6 +569,39 @@ inline int gamestate::place_props() {
         }
     }
     return placed_props;
+}
+
+inline entityid gamestate::place_floor_three_pullable_sign() {
+    if (d.get_floor_count() < 3) {
+        return ENTITYID_INVALID;
+    }
+
+    shared_ptr<dungeon_floor> df = d.get_floor(2);
+    const vec3 upstairs_loc = df->get_upstairs_loc();
+    const vec3 candidate_locs[] = {
+        vec3{upstairs_loc.x, upstairs_loc.y - 1, upstairs_loc.z},
+        vec3{upstairs_loc.x - 1, upstairs_loc.y, upstairs_loc.z},
+        vec3{upstairs_loc.x + 1, upstairs_loc.y, upstairs_loc.z},
+        vec3{upstairs_loc.x, upstairs_loc.y + 1, upstairs_loc.z},
+    };
+
+    for (const vec3 loc : candidate_locs) {
+        if (loc.x < 0 || loc.x >= df->get_width() || loc.y < 0 || loc.y >= df->get_height()) {
+            continue;
+        }
+
+        tile_t& tile = df->tile_at(loc);
+        if (!tile_is_walkable(tile.get_type()) || tile.get_type() == TILE_UPSTAIRS || tile.get_type() == TILE_DOWNSTAIRS) {
+            continue;
+        }
+        if (tile.entity_count() != 0) {
+            continue;
+        }
+
+        return create_prop_at_with(PROP_DUNGEON_WOODEN_SIGN, loc, dungeon_prop_init(PROP_DUNGEON_WOODEN_SIGN));
+    }
+
+    return ENTITYID_INVALID;
 }
 
 inline bool gamestate::create_floor_pressure_plate(vec3 loc, entityid linked_door_id) {

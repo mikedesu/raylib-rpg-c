@@ -511,6 +511,9 @@ public:
     /** @brief Populate generated floors with props after layout generation completes. */
     int place_props();
 
+    /** @brief Place the floor-3 tutorial sign that explains pullables. */
+    entityid place_floor_three_pullable_sign();
+
     /** @brief Register a floor pressure plate that controls a specific door. */
     bool create_floor_pressure_plate(vec3 loc, entityid linked_door_id);
 
