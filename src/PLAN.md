@@ -8,6 +8,27 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
 
 ## Top 5 Next Things
 
+- [ ] Event-queue migration
+  - [ ] MUST BE DONE INCREMENTALLY SO AS TO NOT BREAK ANYTHING DURING DEVELOPMENT
+  - [ ] Each working piece will be tested by a real human
+  - [ ] Upon completion, all new actions and events shall be built using the new events system
+  - [ ] All new files, functions, classes, methods, etc. shall be properly documented conforming to existing standards
+  - [ ] Below are some of the example type of events that shall be converted over from their existing hardcoded forms:
+  - [ ] `try_entity_attack`
+  - [ ] `try_entity_push`
+  - [ ] open door
+  - [ ] pressure plate triggered
+  - [ ] talked with NPC
+  - [ ] went upstairs/downstairs
+  - [ ] etc...
+  - [ ] evaluate migrating direct `try_entity_*` gameplay mutations toward an event-queue / action-resolution pipeline
+    - Current candidates include `try_entity_attack`, being damaged v.s. blocking, dying, `try_entity_move`, push/pull handling, door/chest toggles, pressure-plate updates, and other world-state mutations that presently happen inline.
+    - Estimated work: medium-to-large refactor because it would cut across input handling, NPC turns, combat resolution, movement, animation timing, message generation, and tests.
+    - Main benefit: deterministic ordered resolution for chained effects, so one action can fan out into queued follow-up events without burying rules in nested direct calls.
+    - Main gameplay payoff: much better orchestration for cascading systems such as pressure plates, traps, forced movement, on-hit reactions, death triggers, scripted room logic, and future multi-step interactions.
+    - Main engineering payoff: easier debugging/logging/replay of world-state transitions, clearer separation between intent and resolution, and lower risk of fragile ordering bugs.
+    - Likely migration path: introduce a narrow event queue for one domain first, such as movement plus world triggers, then expand to combat and other interaction systems after the pattern is stable.
+
 - [ ] Continue top-down `libdraw` cleanup and reduce remaining rendering global-state coupling.
   - Recent passes centralized renderer-global declarations through `libdraw_context.h`, removed repeated ad hoc `extern` declarations across draw/update headers, and routed `libdraw.h` scene dispatch through the compatibility include.
   - Latest pass also collapsed libdraw-owned process-lifetime renderer state into a single `libdraw_ctx` object instead of many separate globals in `main.cpp`, so spritegroups, texture metadata, shaders, render targets, and presentation rectangles now move through one shared renderer context.
@@ -167,7 +188,6 @@ Compact status handoff for the current C++ / raylib dungeon project.
   - `make clean && make tests && ./tests`
   - `make clean && make tests_heavy && ./tests_heavy`
   - `make clean && make game`
-
 
 ## Remaining Cleanup
 
