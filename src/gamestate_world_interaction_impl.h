@@ -263,6 +263,93 @@ inline void gamestate::refresh_pressure_plates() {
     }
 }
 
+inline void gamestate::clear_gameplay_events() {
+    gameplay_events.clear();
+}
+
+inline bool gamestate::queue_gameplay_event(const gameplay_event_t& event) {
+    if (event.type == EVENT_NONE) {
+        return false;
+    }
+    gameplay_events.push_back(event);
+    return true;
+}
+
+inline bool gamestate::queue_move_event(entityid id, vec3 v) {
+    gameplay_event_t event;
+    event.type = EVENT_MOVE_INTENT;
+    event.actor_id = id;
+    event.delta = v;
+    return queue_gameplay_event(event);
+}
+
+inline bool gamestate::queue_pressure_plate_refresh_event(int z) {
+    gameplay_event_t event;
+    event.type = EVENT_REFRESH_PRESSURE_PLATES;
+    event.floor = z;
+    return queue_gameplay_event(event);
+}
+
+inline gameplay_event_result_t gamestate::process_gameplay_event(const gameplay_event_t& event) {
+    gameplay_event_result_t result;
+    result.type = event.type;
+    result.actor_id = event.actor_id;
+    switch (event.type) {
+    case EVENT_MOVE_INTENT: {
+        result.handled = true;
+        result.succeeded = try_entity_move(event.actor_id, event.delta);
+        if (result.succeeded) {
+            const vec3 loc = ct.get<location>(event.actor_id).value_or(vec3{-1, -1, -1});
+            if (vec3_valid(loc)) {
+                queue_pressure_plate_refresh_event(loc.z);
+            }
+        }
+        return result;
+    }
+    case EVENT_REFRESH_PRESSURE_PLATES:
+        result.handled = true;
+        if (event.floor >= 0 && static_cast<size_t>(event.floor) < d.floors.size()) {
+            update_pressure_plates_for_floor(event.floor);
+            result.succeeded = true;
+        }
+        return result;
+    case EVENT_NONE:
+    case EVENT_ATTACK_INTENT:
+    case EVENT_PULL_INTENT:
+    case EVENT_OPEN_DOOR_INTENT:
+    case EVENT_TRAVERSE_STAIRS_INTENT:
+    case EVENT_COUNT:
+    default:
+        return result;
+    }
+}
+
+inline gameplay_event_result_t gamestate::process_gameplay_events() {
+    gameplay_event_result_t first_result;
+    if (processing_actions) {
+        return first_result;
+    }
+
+    processing_actions = true;
+    for (size_t i = 0; i < gameplay_events.size(); i++) {
+        const gameplay_event_result_t result = process_gameplay_event(gameplay_events[i]);
+        if (first_result.type == EVENT_NONE && result.type != EVENT_NONE) {
+            first_result = result;
+        }
+    }
+    gameplay_events.clear();
+    processing_actions = false;
+    return first_result;
+}
+
+inline bool gamestate::run_move_action(entityid id, vec3 v) {
+    clear_gameplay_events();
+    if (!queue_move_event(id, v)) {
+        return false;
+    }
+    return process_gameplay_events().succeeded;
+}
+
 inline bool gamestate::try_entity_move(entityid id, vec3 v) {
     massert(id != ENTITYID_INVALID, "Entity ID is invalid!");
     minfo2("entity %d is trying to move: (%d,%d,%d)", id, v.x, v.y, v.z);
@@ -344,7 +431,9 @@ inline bool gamestate::try_entity_move(entityid id, vec3 v) {
         }
     }
     ct.set<steps_taken>(id, ct.get<steps_taken>(id).value_or(0) + 1);
-    update_pressure_plates_for_floor(loc.z);
+    if (!processing_actions) {
+        update_pressure_plates_for_floor(loc.z);
+    }
     msuccess2("npc %d moved to (%d,%d,%d)", id, aloc.x, aloc.y, aloc.z);
     return true;
 }
@@ -354,7 +443,7 @@ inline bool gamestate::handle_move_up(inputstate& is, bool is_dead) {
         if (is_dead) {
             return add_message("You cannot move while dead");
         }
-        try_entity_move(hero_id, (vec3){0, -1, 0});
+        run_move_action(hero_id, (vec3){0, -1, 0});
         flag = GAMESTATE_FLAG_PLAYER_ANIM;
         return true;
     }
@@ -366,7 +455,7 @@ inline bool gamestate::handle_move_down(inputstate& is, bool is_dead) {
         if (is_dead) {
             return add_message("You cannot move while dead");
         }
-        try_entity_move(hero_id, (vec3){0, 1, 0});
+        run_move_action(hero_id, (vec3){0, 1, 0});
         flag = GAMESTATE_FLAG_PLAYER_ANIM;
         return true;
     }
@@ -378,7 +467,7 @@ inline bool gamestate::handle_move_left(inputstate& is, bool is_dead) {
         if (is_dead) {
             return add_message("You cannot move while dead");
         }
-        try_entity_move(hero_id, (vec3){-1, 0, 0});
+        run_move_action(hero_id, (vec3){-1, 0, 0});
         flag = GAMESTATE_FLAG_PLAYER_ANIM;
         return true;
     }
@@ -390,7 +479,7 @@ inline bool gamestate::handle_move_right(inputstate& is, bool is_dead) {
         if (is_dead) {
             return add_message("You cannot move while dead");
         }
-        try_entity_move(hero_id, (vec3){1, 0, 0});
+        run_move_action(hero_id, (vec3){1, 0, 0});
         flag = GAMESTATE_FLAG_PLAYER_ANIM;
         return true;
     }
@@ -402,7 +491,7 @@ inline bool gamestate::handle_move_up_left(inputstate& is, bool is_dead) {
         if (is_dead) {
             return add_message("You cannot move while dead");
         }
-        try_entity_move(hero_id, (vec3){-1, -1, 0});
+        run_move_action(hero_id, (vec3){-1, -1, 0});
         flag = GAMESTATE_FLAG_PLAYER_ANIM;
         return true;
     }
@@ -415,7 +504,7 @@ inline bool gamestate::handle_move_up_right(inputstate& is, bool is_dead) {
             add_message("You cannot move while dead");
             return true;
         }
-        try_entity_move(hero_id, (vec3){1, -1, 0});
+        run_move_action(hero_id, (vec3){1, -1, 0});
         flag = GAMESTATE_FLAG_PLAYER_ANIM;
         return true;
     }
@@ -427,7 +516,7 @@ inline bool gamestate::handle_move_down_left(inputstate& is, bool is_dead) {
         if (is_dead) {
             return add_message("You cannot move while dead");
         }
-        try_entity_move(hero_id, (vec3){-1, 1, 0});
+        run_move_action(hero_id, (vec3){-1, 1, 0});
         flag = GAMESTATE_FLAG_PLAYER_ANIM;
         return true;
     }
@@ -439,7 +528,7 @@ inline bool gamestate::handle_move_down_right(inputstate& is, bool is_dead) {
         if (is_dead) {
             return add_message("You cannot move while dead");
         }
-        try_entity_move(hero_id, (vec3){1, 1, 0});
+        run_move_action(hero_id, (vec3){1, 1, 0});
         flag = GAMESTATE_FLAG_PLAYER_ANIM;
         return true;
     }

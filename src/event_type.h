@@ -1,21 +1,42 @@
 /** @file event_type.h
- *  @brief Event categories for animation, combat, and inventory actions.
+ *  @brief Turn-scoped gameplay event categories and queue payloads.
  */
 
 #pragma once
 
-/// @brief High-level event types that can describe gameplay actions.
+#include "entityid.h"
+#include "vec3.h"
+
+/// @brief High-level gameplay events that may be queued and resolved in order.
 typedef enum {
-    EVENT_NONE, // No event
-    EVENT_MOVE, // Walking to a new tile
-    EVENT_ATTACK, // Attacking a target
-    EVENT_BLOCK, // Blocking an attack
-    EVENT_DODGE, // Dodging an attack (included from your list)
-    EVENT_EQUIP_SWORD, // Equipping a sword (manual or auto)
-    EVENT_EQUIP_SHIELD, // Equipping a shield
-    EVENT_UNEQUIP_SWORD, // Unequipping a sword
-    EVENT_USE_ITEM, // Using an item
-    EVENT_PICKUP_ITEM, // Picking up a sword (or other item)
-    EVENT_DAMAGE, // Receiving damage from an attack
-    EVENT_COUNT // More event types can be added later, e.g., EVENT_DROP_ITEM
+    EVENT_NONE = 0,
+    EVENT_MOVE_INTENT,
+    EVENT_ATTACK_INTENT,
+    EVENT_PULL_INTENT,
+    EVENT_OPEN_DOOR_INTENT,
+    EVENT_TRAVERSE_STAIRS_INTENT,
+    EVENT_REFRESH_PRESSURE_PLATES,
+    EVENT_COUNT
 } event_type_t;
+
+/**
+ * @brief Queue payload for one gameplay event.
+ *
+ * The queue is intentionally narrow during the migration. Unused fields stay at
+ * sentinel defaults until more event domains move over.
+ */
+struct gameplay_event_t {
+    event_type_t type = EVENT_NONE;
+    entityid actor_id = ENTITYID_INVALID;
+    vec3 delta = vec3{0, 0, 0};
+    vec3 target_loc = vec3{-1, -1, -1};
+    int floor = -1;
+};
+
+/// @brief Resolution summary for a processed gameplay event.
+struct gameplay_event_result_t {
+    event_type_t type = EVENT_NONE;
+    entityid actor_id = ENTITYID_INVALID;
+    bool handled = false;
+    bool succeeded = false;
+};

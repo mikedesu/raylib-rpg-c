@@ -538,7 +538,7 @@ inline void gamestate::handle_input_gameplay_controlmode_player(inputstate& is) 
             vx = dist(mt);
             vy = dist(mt);
         }
-        if (try_entity_move(hero_id, vec3{vx, vy, 0})) {
+        if (run_move_action(hero_id, vec3{vx, vy, 0})) {
             msuccess2("hero moved randomly successfully");
         }
         else {

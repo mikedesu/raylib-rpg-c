@@ -403,7 +403,7 @@ inline bool gamestate::try_entity_move_to_target(entityid id) {
         vec3 id_location = ct.get<location>(id).value();
         vec3 next_location = path->at(0);
         vec3 diff_location = vec3_sub(next_location, id_location);
-        if (try_entity_move(id, diff_location)) {
+        if (run_move_action(id, diff_location)) {
             msuccess2("try entity move succeeded");
             return true;
         }
@@ -413,7 +413,7 @@ inline bool gamestate::try_entity_move_to_target(entityid id) {
 
 inline bool gamestate::try_entity_move_random(entityid id) {
     uniform_int_distribution<int> dist(-1, 1);
-    if (try_entity_move(id, vec3{dist(mt), dist(mt), 0})) {
+    if (run_move_action(id, vec3{dist(mt), dist(mt), 0})) {
         msuccess2("try entity move succeeded");
         return true;
     }

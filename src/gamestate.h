@@ -13,6 +13,7 @@
 #include "controlmode.h"
 #include "debugpanel.h"
 #include "dungeon.h"
+#include "event_type.h"
 #include "gameplay_keybindings.h"
 #include "gamestate_flag.h"
 #include "get_racial_hd.h"
@@ -222,6 +223,7 @@ public:
     int pending_level_ups;
     vector<damage_popup_t> damage_popups;
     vector<floor_pressure_plate_t> floor_pressure_plates;
+    vector<gameplay_event_t> gameplay_events;
     vec3 floor_four_tutorial_orc_spawn = vec3{-1, -1, -1};
 
     void set_seed() {
@@ -416,6 +418,7 @@ public:
         pending_level_ups = 0;
         damage_popups.clear();
         floor_pressure_plates.clear();
+        gameplay_events.clear();
         floor_four_tutorial_orc_spawn = vec3{-1, -1, -1};
         prefer_mini_inventory_menu = false;
         controls_menu_waiting_for_key = false;
@@ -986,6 +989,27 @@ public:
 
     /** @brief Return whether an entity can perceive activity at the target location by hearing. */
     bool check_hearing(entityid id, vec3 loc);
+
+    /** @brief Remove all queued gameplay events for the current turn slice. */
+    void clear_gameplay_events();
+
+    /** @brief Append one gameplay event to the current turn queue. */
+    bool queue_gameplay_event(const gameplay_event_t& event);
+
+    /** @brief Queue a movement intent for ordered turn resolution. */
+    bool queue_move_event(entityid id, vec3 v);
+
+    /** @brief Queue a floor-local pressure-plate refresh follow-up. */
+    bool queue_pressure_plate_refresh_event(int z);
+
+    /** @brief Resolve one queued gameplay event. */
+    gameplay_event_result_t process_gameplay_event(const gameplay_event_t& event);
+
+    /** @brief Drain queued gameplay events in FIFO order. */
+    gameplay_event_result_t process_gameplay_events();
+
+    /** @brief Queue and immediately resolve one movement intent plus follow-up events. */
+    bool run_move_action(entityid id, vec3 v);
 
     /**
      * @brief Attempt to move an entity by a delta vector.
