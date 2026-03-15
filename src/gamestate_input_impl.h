@@ -556,7 +556,7 @@ inline void gamestate::handle_input_gameplay_controlmode_player(inputstate& is) 
         return;
     }
     else if (is_action_pressed(is, INPUT_ACTION_PULL)) {
-        try_entity_pull(hero_id);
+        run_pull_action(hero_id);
         flag = GAMESTATE_FLAG_PLAYER_ANIM;
         return;
     }

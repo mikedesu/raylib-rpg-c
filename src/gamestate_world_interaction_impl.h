@@ -283,6 +283,21 @@ inline bool gamestate::queue_move_event(entityid id, vec3 v) {
     return queue_gameplay_event(event);
 }
 
+inline bool gamestate::queue_pull_event(entityid id) {
+    gameplay_event_t event;
+    event.type = EVENT_PULL_INTENT;
+    event.actor_id = id;
+    return queue_gameplay_event(event);
+}
+
+inline bool gamestate::queue_open_door_event(entityid id, vec3 loc) {
+    gameplay_event_t event;
+    event.type = EVENT_OPEN_DOOR_INTENT;
+    event.actor_id = id;
+    event.target_loc = loc;
+    return queue_gameplay_event(event);
+}
+
 inline bool gamestate::queue_pressure_plate_refresh_event(int z) {
     gameplay_event_t event;
     event.type = EVENT_REFRESH_PRESSURE_PLATES;
@@ -306,6 +321,21 @@ inline gameplay_event_result_t gamestate::process_gameplay_event(const gameplay_
         }
         return result;
     }
+    case EVENT_PULL_INTENT: {
+        result.handled = true;
+        result.succeeded = try_entity_pull(event.actor_id);
+        if (result.succeeded) {
+            const vec3 loc = ct.get<location>(event.actor_id).value_or(vec3{-1, -1, -1});
+            if (vec3_valid(loc)) {
+                queue_pressure_plate_refresh_event(loc.z);
+            }
+        }
+        return result;
+    }
+    case EVENT_OPEN_DOOR_INTENT:
+        result.handled = true;
+        result.succeeded = try_entity_open_door(event.actor_id, event.target_loc);
+        return result;
     case EVENT_REFRESH_PRESSURE_PLATES:
         result.handled = true;
         if (event.floor >= 0 && static_cast<size_t>(event.floor) < d.floors.size()) {
@@ -315,8 +345,6 @@ inline gameplay_event_result_t gamestate::process_gameplay_event(const gameplay_
         return result;
     case EVENT_NONE:
     case EVENT_ATTACK_INTENT:
-    case EVENT_PULL_INTENT:
-    case EVENT_OPEN_DOOR_INTENT:
     case EVENT_TRAVERSE_STAIRS_INTENT:
     case EVENT_COUNT:
     default:
@@ -345,6 +373,22 @@ inline gameplay_event_result_t gamestate::process_gameplay_events() {
 inline bool gamestate::run_move_action(entityid id, vec3 v) {
     clear_gameplay_events();
     if (!queue_move_event(id, v)) {
+        return false;
+    }
+    return process_gameplay_events().succeeded;
+}
+
+inline bool gamestate::run_pull_action(entityid id) {
+    clear_gameplay_events();
+    if (!queue_pull_event(id)) {
+        return false;
+    }
+    return process_gameplay_events().succeeded;
+}
+
+inline bool gamestate::run_open_door_action(entityid id, vec3 loc) {
+    clear_gameplay_events();
+    if (!queue_open_door_event(id, loc)) {
         return false;
     }
     return process_gameplay_events().succeeded;
@@ -673,6 +717,9 @@ inline bool gamestate::try_entity_pull(entityid id) {
     ct.set<steps_taken>(id, ct.get<steps_taken>(id).value_or(0) + 1);
     msuccess("npc %d moved to (%d,%d,%d)", id, aloc.x, aloc.y, aloc.z);
     try_entity_move(box_id2, v);
+    if (!processing_actions) {
+        update_pressure_plates_for_floor(loc.z);
+    }
     msuccess("try_entity_pull(%d)", id);
     return true;
 }
@@ -883,7 +930,7 @@ inline bool gamestate::handle_open_door(inputstate& is, bool is_dead) {
         }
         vec3 loc = get_loc_facing_player();
         if (!try_entity_open_chest(hero_id, loc)) {
-            try_entity_open_door(hero_id, loc);
+            run_open_door_action(hero_id, loc);
         }
         flag = GAMESTATE_FLAG_PLAYER_ANIM;
         return true;

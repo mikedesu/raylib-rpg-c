@@ -999,6 +999,12 @@ public:
     /** @brief Queue a movement intent for ordered turn resolution. */
     bool queue_move_event(entityid id, vec3 v);
 
+    /** @brief Queue a pull intent for ordered turn resolution. */
+    bool queue_pull_event(entityid id);
+
+    /** @brief Queue a manual door-toggle intent for ordered turn resolution. */
+    bool queue_open_door_event(entityid id, vec3 loc);
+
     /** @brief Queue a floor-local pressure-plate refresh follow-up. */
     bool queue_pressure_plate_refresh_event(int z);
 
@@ -1010,6 +1016,12 @@ public:
 
     /** @brief Queue and immediately resolve one movement intent plus follow-up events. */
     bool run_move_action(entityid id, vec3 v);
+
+    /** @brief Queue and immediately resolve one pull intent plus follow-up events. */
+    bool run_pull_action(entityid id);
+
+    /** @brief Queue and immediately resolve one manual door-toggle intent. */
+    bool run_open_door_action(entityid id, vec3 loc);
 
     /**
      * @brief Attempt to move an entity by a delta vector.

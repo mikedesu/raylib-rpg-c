@@ -13,10 +13,18 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
   - [ ] Each working piece will be tested by a real human
   - [ ] Upon completion, all new actions and events shall be built using the new events system
   - [ ] All new files, functions, classes, methods, etc. shall be properly documented conforming to existing standards
+  - Recent progress:
+    - Added a narrow turn-scoped gameplay event queue with documented payload/result structs.
+    - Player movement input and NPC movement now queue `EVENT_MOVE_INTENT`, and successful queued movement fans out into `EVENT_REFRESH_PRESSURE_PLATES`.
+    - Player pull input now also queues `EVENT_PULL_INTENT`, with queued pull likewise fanning out into `EVENT_REFRESH_PRESSURE_PLATES`.
+    - Player manual door toggles now queue `EVENT_OPEN_DOOR_INTENT`.
+    - Pull was verified by a real human after the queue migration slice landed.
+    - Legacy direct `try_entity_move` / `try_entity_pull` / `try_entity_open_door` paths still work during the migration so existing helpers and tests are not forced over all at once.
+    - Current automated verification for the migrated slice: `make tests && ./tests`.
   - [ ] Below are some of the example type of events that shall be converted over from their existing hardcoded forms:
   - [ ] `try_entity_attack`
   - [ ] `try_entity_push`
-  - [ ] open door
+  - [x] open door
   - [ ] pressure plate triggered
   - [ ] talked with NPC
   - [ ] went upstairs/downstairs
@@ -28,6 +36,7 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
     - Main gameplay payoff: much better orchestration for cascading systems such as pressure plates, traps, forced movement, on-hit reactions, death triggers, scripted room logic, and future multi-step interactions.
     - Main engineering payoff: easier debugging/logging/replay of world-state transitions, clearer separation between intent and resolution, and lower risk of fragile ordering bugs.
     - Likely migration path: introduce a narrow event queue for one domain first, such as movement plus world triggers, then expand to combat and other interaction systems after the pattern is stable.
+    - Current next suggested slice after movement + pull + manual door toggles: chest toggles or stairs traversal, because they remain player-initiated and have contained follow-up effects compared with combat.
 
 - [ ] Continue top-down `libdraw` cleanup and reduce remaining rendering global-state coupling.
   - Recent passes centralized renderer-global declarations through `libdraw_context.h`, removed repeated ad hoc `extern` declarations across draw/update headers, and routed `libdraw.h` scene dispatch through the compatibility include.
@@ -75,7 +84,7 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
     - Main benefit: deterministic ordered resolution for chained effects, so one action can fan out into queued follow-up events without burying rules in nested direct calls.
     - Main gameplay payoff: much better orchestration for cascading systems such as pressure plates, traps, forced movement, on-hit reactions, death triggers, scripted room logic, and future multi-step interactions.
     - Main engineering payoff: easier debugging/logging/replay of world-state transitions, clearer separation between intent and resolution, and lower risk of fragile ordering bugs.
-    - Likely migration path: introduce a narrow event queue for one domain first, such as movement plus world triggers, then expand to combat and other interaction systems after the pattern is stable.
+    - Likely migration path: movement + pressure-plate follow-ups, pull, and manual door toggles are now queued; the next contained slice should be chest/stairs, then combat.
 
 - [ ] Documentation
   - [x] continue Doxygen coverage on remaining core headers
@@ -144,6 +153,12 @@ Compact status handoff for the current C++ / raylib dungeon project.
   - Permanent attribute increases were separated from level-up rewards so future item-based stat gains can reuse the same path.
   - A mini inventory / chest menu mode now exists with an options-menu toggle between `full` and `mini`.
   - Mini inventory / chest display is world-adjacent to the player and supports compact scrolling selection plus item preview/details.
+  - Turn action migration progress:
+    - queued movement intent now resolves through the new gameplay-event queue
+    - queued pull intent now resolves through the same queue
+    - queued manual door-toggle intent now resolves through the same queue
+    - queued movement and pull both schedule pressure-plate refresh as explicit ordered follow-up events
+    - queued pull migration has now been human-verified in gameplay
 
 - Prop interaction polish
   - Candle props are now pullable.
