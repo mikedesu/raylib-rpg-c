@@ -700,15 +700,21 @@ inline bool gamestate::setup_floor_four_pressure_plate_tutorial() {
     const int center_y = room_y + 3;
     const vec3 previous_upstairs_loc = df->get_upstairs_loc();
     const vec3 previous_downstairs_loc = df->get_downstairs_loc();
+    const auto tutorial_tile_type_at = [&](int x, int y) {
+        const bool inside_room = x >= room_x && x < room_x + tutorial_width && y >= room_y && y < room_y + tutorial_height;
+        if (!inside_room) {
+            return df->random_tiletype(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
+        }
+        const bool outer_wall = x == room_x || x == room_x + tutorial_width - 1 || y == room_y || y == room_y + tutorial_height - 1;
+        const bool center_divider = x == split_x && y != center_y;
+        return (outer_wall || center_divider)
+            ? TILE_STONE_WALL_00
+            : df->random_tiletype(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
+    };
 
     for (int x = room_x; x < room_x + tutorial_width; x++) {
         for (int y = room_y; y < room_y + tutorial_height; y++) {
-            const bool outer_wall = x == room_x || x == room_x + tutorial_width - 1 || y == room_y || y == room_y + tutorial_height - 1;
-            const bool center_divider = x == split_x && y != center_y;
-            const tiletype_t tile_type = (outer_wall || center_divider)
-                ? TILE_STONE_WALL_00
-                : df->random_tiletype(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
-            df->df_set_tile(tile_type, x, y);
+            df->df_set_tile(tutorial_tile_type_at(x, y), x, y);
             df->tile_at(vec3{x, y, 2}).set_can_have_door(false);
         }
     }
@@ -720,10 +726,10 @@ inline bool gamestate::setup_floor_four_pressure_plate_tutorial() {
     floor_four_tutorial_orc_spawn = vec3{room_x + 9, center_y, 2};
 
     if (vec3_valid(previous_upstairs_loc) && !vec3_equal(previous_upstairs_loc, upstairs_loc)) {
-        df->df_set_tile(df->random_tiletype(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11), previous_upstairs_loc.x, previous_upstairs_loc.y);
+        df->df_set_tile(tutorial_tile_type_at(previous_upstairs_loc.x, previous_upstairs_loc.y), previous_upstairs_loc.x, previous_upstairs_loc.y);
     }
     if (vec3_valid(previous_downstairs_loc) && !vec3_equal(previous_downstairs_loc, downstairs_loc)) {
-        df->df_set_tile(df->random_tiletype(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11), previous_downstairs_loc.x, previous_downstairs_loc.y);
+        df->df_set_tile(tutorial_tile_type_at(previous_downstairs_loc.x, previous_downstairs_loc.y), previous_downstairs_loc.x, previous_downstairs_loc.y);
     }
 
     df->df_set_upstairs_loc(upstairs_loc);

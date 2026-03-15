@@ -2,11 +2,16 @@
 
 ## Session Handoff
 
+- [ ] I noticed there is a bug with how PROPs are handled:
+  - [ ] While pushing a table around on floor 4, when the table is pushed on to a tile that contains a Jar Prop or some other prop that you can't interact with much, the table takes precadence, which is great, but when the table is pushed or pulled off that tile, the Jar Prop is gone!
+
 - Event-queue migration status:
-  - queued and working in the current tree: movement, pull, manual door toggles, chest toggles, stairs traversal, and attack intent
-  - explicit queued follow-up events currently exist for pressure-plate refresh after movement, pull, and stairs traversal
+  - queued and working in the current tree: movement, implicit push resolution, pull, manual door toggles, chest toggles, stairs traversal, and attack intent
+  - explicit queued follow-up events currently exist for pressure-plate refresh after movement, push, pull, and stairs traversal
   - attack intent now enters through the queue for both player and NPC adjacent attacks, and queued combat now fans out into explicit block, damage, and death follow-up events
+  - queued pressure-plate refresh now also fans out into explicit linked-door open/close follow-up events instead of mutating those door states inline during queued processing
   - legacy direct combat helpers still exist for compatibility during the migration, including direct `try_entity_attack` / `process_attack_entity` / `process_attack_results` paths
+  - legacy direct `handle_box_push` / `try_entity_move` / `update_pressure_plates_for_floor` paths still work for compatibility outside the queued pipeline
 - Human-verified slices so far:
   - pull
   - open door
@@ -16,8 +21,8 @@
   - `make tests && ./tests`
   - latest passing count before handoff: `140` tests
 - Next session target:
-  - human-verify the queued combat follow-up slice in live gameplay the same way earlier migration slices were verified
-  - choose the next contained queue migration after combat follow-ups, likely `try_entity_push` or pressure-plate-triggered world reactions
+  - human-verify the queued push and pressure-plate door-follow-up slices in live gameplay
+  - choose the next contained queue migration after push and pressure-plate door follow-ups
   - preserve the current gameplay contract while migrating, the same way earlier slices kept legacy `try_entity_*` helpers working during the transition
 - Files most relevant for the next step:
   - `event_type.h`
@@ -42,12 +47,14 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
   - Recent progress:
     - Added a narrow turn-scoped gameplay event queue with documented payload/result structs.
     - Player movement input and NPC movement now queue `EVENT_MOVE_INTENT`, and successful queued movement fans out into `EVENT_REFRESH_PRESSURE_PLATES`.
+    - Implicit push resolution that occurs during movement now queues `EVENT_PUSH_INTENT`, with queued push likewise fanning out into `EVENT_REFRESH_PRESSURE_PLATES`.
     - Player pull input now also queues `EVENT_PULL_INTENT`, with queued pull likewise fanning out into `EVENT_REFRESH_PRESSURE_PLATES`.
     - Player manual door toggles now queue `EVENT_OPEN_DOOR_INTENT`.
     - Player stairs traversal now queues `EVENT_TRAVERSE_STAIRS_INTENT`, with queued floor changes scheduling ordered pressure-plate refresh follow-ups for source and destination floors.
     - Player chest toggles now queue `EVENT_OPEN_CHEST_INTENT`.
     - Player and NPC adjacent attacks now queue `EVENT_ATTACK_INTENT`.
     - Queued attack intent now schedules explicit ordered `EVENT_ATTACK_BLOCK`, `EVENT_ATTACK_DAMAGE`, and `EVENT_ATTACK_DEATH` follow-up events so combat side effects no longer need to resolve inline under the queued entrypoint.
+    - Queued pressure-plate refresh now schedules explicit ordered door-state follow-up events for linked doors instead of toggling those doors inline during queued processing.
     - Pull was verified by a real human after the queue migration slice landed.
     - Manual door toggles were verified by a real human after the queue migration slice landed.
     - Stairs traversal was verified by a real human after the queue migration slice landed.

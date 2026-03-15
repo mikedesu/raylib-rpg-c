@@ -103,6 +103,13 @@ inline bool gamestate::handle_box_push(entityid id, vec3 v) {
     if (!can_push) {
         return false;
     }
+    if (processing_actions) {
+        return queue_push_event(id, v);
+    }
+    return try_entity_push(id, v);
+}
+
+inline bool gamestate::try_entity_push(entityid id, vec3 v) {
     return try_entity_move(id, v);
 }
 
@@ -245,16 +252,28 @@ inline void gamestate::update_pressure_plates_for_floor(int z) {
                 break;
             }
         }
-
-        const bool was_open = ct.get<door_open>(door_id).value_or(false);
-        ct.set<door_open>(door_id, should_open);
-        ct.set<update>(door_id, true);
-        if (!was_open && should_open && IsAudioDeviceReady() && sfx.size() > SFX_CHEST_OPEN) {
-            PlaySound(sfx.at(SFX_CHEST_OPEN));
+        if (processing_actions) {
+            queue_pressure_plate_set_door_event(door_id, should_open);
+        }
+        else {
+            resolve_pressure_plate_set_door_event(door_id, should_open);
         }
     }
 
     frame_dirty = true;
+}
+
+inline void gamestate::resolve_pressure_plate_set_door_event(entityid door_id, bool should_open) {
+    if (door_id == ENTITYID_INVALID || ct.get<entitytype>(door_id).value_or(ENTITY_NONE) != ENTITY_DOOR) {
+        return;
+    }
+
+    const bool was_open = ct.get<door_open>(door_id).value_or(false);
+    ct.set<door_open>(door_id, should_open);
+    ct.set<update>(door_id, true);
+    if (!was_open && should_open && IsAudioDeviceReady() && sfx.size() > SFX_CHEST_OPEN) {
+        PlaySound(sfx.at(SFX_CHEST_OPEN));
+    }
 }
 
 inline void gamestate::refresh_pressure_plates() {
@@ -278,6 +297,14 @@ inline bool gamestate::queue_gameplay_event(const gameplay_event_t& event) {
 inline bool gamestate::queue_move_event(entityid id, vec3 v) {
     gameplay_event_t event;
     event.type = EVENT_MOVE_INTENT;
+    event.actor_id = id;
+    event.delta = v;
+    return queue_gameplay_event(event);
+}
+
+inline bool gamestate::queue_push_event(entityid id, vec3 v) {
+    gameplay_event_t event;
+    event.type = EVENT_PUSH_INTENT;
     event.actor_id = id;
     event.delta = v;
     return queue_gameplay_event(event);
@@ -355,6 +382,14 @@ inline bool gamestate::queue_pressure_plate_refresh_event(int z) {
     return queue_gameplay_event(event);
 }
 
+inline bool gamestate::queue_pressure_plate_set_door_event(entityid door_id, bool should_open) {
+    gameplay_event_t event;
+    event.type = EVENT_PRESSURE_PLATE_SET_DOOR;
+    event.actor_id = door_id;
+    event.state = should_open;
+    return queue_gameplay_event(event);
+}
+
 inline gameplay_event_result_t gamestate::process_gameplay_event(const gameplay_event_t& event) {
     gameplay_event_result_t result;
     result.type = event.type;
@@ -363,6 +398,17 @@ inline gameplay_event_result_t gamestate::process_gameplay_event(const gameplay_
     case EVENT_MOVE_INTENT: {
         result.handled = true;
         result.succeeded = try_entity_move(event.actor_id, event.delta);
+        if (result.succeeded) {
+            const vec3 loc = ct.get<location>(event.actor_id).value_or(vec3{-1, -1, -1});
+            if (vec3_valid(loc)) {
+                queue_pressure_plate_refresh_event(loc.z);
+            }
+        }
+        return result;
+    }
+    case EVENT_PUSH_INTENT: {
+        result.handled = true;
+        result.succeeded = try_entity_push(event.actor_id, event.delta);
         if (result.succeeded) {
             const vec3 loc = ct.get<location>(event.actor_id).value_or(vec3{-1, -1, -1});
             if (vec3_valid(loc)) {
@@ -428,6 +474,11 @@ inline gameplay_event_result_t gamestate::process_gameplay_event(const gameplay_
             result.succeeded = true;
         }
         return result;
+    case EVENT_PRESSURE_PLATE_SET_DOOR:
+        result.handled = true;
+        resolve_pressure_plate_set_door_event(event.actor_id, event.state);
+        result.succeeded = true;
+        return result;
     case EVENT_NONE:
     case EVENT_COUNT:
     default:
@@ -456,6 +507,14 @@ inline gameplay_event_result_t gamestate::process_gameplay_events() {
 inline bool gamestate::run_move_action(entityid id, vec3 v) {
     clear_gameplay_events();
     if (!queue_move_event(id, v)) {
+        return false;
+    }
+    return process_gameplay_events().succeeded;
+}
+
+inline bool gamestate::run_push_action(entityid id, vec3 v) {
+    clear_gameplay_events();
+    if (!queue_push_event(id, v)) {
         return false;
     }
     return process_gameplay_events().succeeded;

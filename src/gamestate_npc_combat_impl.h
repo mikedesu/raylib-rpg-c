@@ -165,6 +165,9 @@ inline void gamestate::process_attack_results(tile_t& tile, entityid atk_id, ent
 }
 
 inline void gamestate::handle_shield_block_sfx(entityid target_id) {
+    if (test || !IsAudioDeviceReady() || sfx.size() <= SFX_HIT_METAL_ON_METAL) {
+        return;
+    }
     bool event_heard = check_hearing(hero_id, ct.get<location>(target_id).value_or((vec3){-1, -1, -1}));
     if (event_heard) {
         PlaySound(sfx[SFX_HIT_METAL_ON_METAL]);

@@ -638,10 +638,14 @@ public:
             TS_ASSERT_EQUALS(plate.linked_door_id, linked_door_id);
         }
         TS_ASSERT_EQUALS(g.ct.get<entitytype>(linked_door_id).value_or(ENTITY_NONE), ENTITY_DOOR);
+        const vec3 tutorial_door_loc = g.ct.get<location>(linked_door_id).value_or(vec3{-1, -1, -1});
+        TS_ASSERT(vec3_valid(tutorial_door_loc));
+        TS_ASSERT_EQUALS(tutorial_door_loc.z, 2);
         TS_ASSERT(vec3_valid(g.floor_four_tutorial_orc_spawn));
         TS_ASSERT_EQUALS(g.floor_four_tutorial_orc_spawn.z, 2);
 
         auto floor_four = g.d.get_floor(2);
+        TS_ASSERT_EQUALS(floor_four->tile_at(vec3{tutorial_door_loc.x, tutorial_door_loc.y - 1, tutorial_door_loc.z}).get_type(), TILE_STONE_WALL_00);
         const vec3 tutorial_downstairs = floor_four->get_downstairs_loc();
         TS_ASSERT(vec3_valid(tutorial_downstairs));
         TS_ASSERT_EQUALS(tutorial_downstairs.z, 2);

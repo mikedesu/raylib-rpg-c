@@ -168,6 +168,36 @@ public:
         TS_ASSERT(g.gameplay_events.empty());
     }
 
+    void testRunPushActionUsesQueuedPushIntent() {
+        gamestate g;
+        add_floor(g);
+
+        const entityid box = g.create_box_at_with(vec3{2, 2, 0});
+        TS_ASSERT_DIFFERS(box, ENTITYID_INVALID);
+
+        TS_ASSERT(g.run_push_action(box, vec3{1, 0, 0}));
+        TS_ASSERT(vec3_equal(g.ct.get<location>(box).value_or(vec3{-1, -1, -1}), vec3{3, 2, 0}));
+        TS_ASSERT(g.gameplay_events.empty());
+    }
+
+    void testRunMoveActionQueuesPushIntentForPushableTarget() {
+        gamestate g;
+        add_floor(g);
+        const entityid hero = create_hero(g, vec3{2, 2, 0});
+        const entityid table = g.create_prop_at_with(
+            PROP_DUNGEON_WOODEN_TABLE_00,
+            vec3{3, 2, 0},
+            dungeon_prop_init(PROP_DUNGEON_WOODEN_TABLE_00));
+
+        TS_ASSERT_DIFFERS(table, ENTITYID_INVALID);
+        TS_ASSERT(g.ct.get<pushable>(table).value_or(false));
+
+        TS_ASSERT(g.run_move_action(hero, vec3{1, 0, 0}));
+        TS_ASSERT(vec3_equal(g.ct.get<location>(hero).value_or(vec3{-1, -1, -1}), vec3{2, 2, 0}));
+        TS_ASSERT(vec3_equal(g.ct.get<location>(table).value_or(vec3{-1, -1, -1}), vec3{4, 2, 0}));
+        TS_ASSERT(g.gameplay_events.empty());
+    }
+
     void testTryEntityPullMovesPullableTableProp() {
         gamestate g;
         add_floor(g);
@@ -298,6 +328,33 @@ public:
         TS_ASSERT(g.run_move_action(hero, vec3{1, 0, 0}));
         TS_ASSERT(g.ct.get<door_open>(door).value_or(false));
         TS_ASSERT(plate->active);
+        TS_ASSERT(g.gameplay_events.empty());
+    }
+
+    void testQueuedPressurePlateRefreshSchedulesDoorStateFollowup() {
+        gamestate g;
+        add_floor(g);
+
+        const entityid hero = create_hero(g, vec3{1, 1, 0});
+        const entityid door = g.create_door_at_with(vec3{4, 1, 0}, [](CT&, const entityid) {});
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(door, ENTITYID_INVALID);
+        TS_ASSERT(g.create_floor_pressure_plate(vec3{2, 1, 0}, door));
+
+        floor_pressure_plate_t* plate = g.get_floor_pressure_plate(vec3{2, 1, 0});
+        TS_ASSERT(plate != nullptr);
+        const entityid box = g.create_box_at_with(vec3{2, 1, 0});
+        TS_ASSERT_DIFFERS(box, ENTITYID_INVALID);
+        plate->active = false;
+        g.ct.set<door_open>(door, false);
+
+        TS_ASSERT(g.queue_pressure_plate_refresh_event(0));
+        const gameplay_event_result_t result = g.process_gameplay_events();
+
+        TS_ASSERT_EQUALS(result.type, EVENT_REFRESH_PRESSURE_PLATES);
+        TS_ASSERT(result.succeeded);
+        TS_ASSERT(plate->active);
+        TS_ASSERT(g.ct.get<door_open>(door).value_or(false));
         TS_ASSERT(g.gameplay_events.empty());
     }
 

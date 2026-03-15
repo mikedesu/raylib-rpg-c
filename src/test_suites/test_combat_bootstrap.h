@@ -420,7 +420,9 @@ public:
         const attack_result_t result = g.run_attack_action(hero, vec3{2, 1, 0});
 
         TS_ASSERT_EQUALS(result, ATTACK_RESULT_BLOCK);
-        TS_ASSERT_EQUALS(g.ct.get<hp>(orc).value_or(vec2{-1, -1}), vec2{12, 12});
+        const vec2 orc_hp = g.ct.get<hp>(orc).value_or(vec2{-1, -1});
+        TS_ASSERT_EQUALS(orc_hp.x, 12);
+        TS_ASSERT_EQUALS(orc_hp.y, 12);
         TS_ASSERT(g.ct.get<block_success>(orc).value_or(false));
         TS_ASSERT(g.gameplay_events.empty());
     }

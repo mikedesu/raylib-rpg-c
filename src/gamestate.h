@@ -981,6 +981,9 @@ public:
     /** @brief Attempt to push a box-like entity in the requested direction. */
     bool handle_box_push(entityid id, vec3 v);
 
+    /** @brief Attempt to push one pushable entity by a delta vector. */
+    bool try_entity_push(entityid id, vec3 v);
+
     /** @brief Return the pushable entity cached on a tile, if any. */
     entityid tile_has_pushable(int x, int y, int z);
 
@@ -998,6 +1001,9 @@ public:
 
     /** @brief Queue a movement intent for ordered turn resolution. */
     bool queue_move_event(entityid id, vec3 v);
+
+    /** @brief Queue a push intent for ordered turn resolution. */
+    bool queue_push_event(entityid id, vec3 v);
 
     /** @brief Queue an attack intent for ordered turn resolution. */
     bool queue_attack_event(entityid id, vec3 loc);
@@ -1026,6 +1032,9 @@ public:
     /** @brief Queue a floor-local pressure-plate refresh follow-up. */
     bool queue_pressure_plate_refresh_event(int z);
 
+    /** @brief Queue a pressure-plate-driven door-state follow-up. */
+    bool queue_pressure_plate_set_door_event(entityid door_id, bool should_open);
+
     /** @brief Resolve one queued gameplay event. */
     gameplay_event_result_t process_gameplay_event(const gameplay_event_t& event);
 
@@ -1034,6 +1043,9 @@ public:
 
     /** @brief Queue and immediately resolve one movement intent plus follow-up events. */
     bool run_move_action(entityid id, vec3 v);
+
+    /** @brief Queue and immediately resolve one push intent plus follow-up events. */
+    bool run_push_action(entityid id, vec3 v);
 
     /** @brief Queue and immediately resolve one attack intent. */
     attack_result_t run_attack_action(entityid id, vec3 loc);
@@ -1186,6 +1198,9 @@ public:
 
     /** @brief Recompute all pressure plates on one floor and apply linked door states. */
     void update_pressure_plates_for_floor(int z);
+
+    /** @brief Apply one pressure-plate-driven linked-door open/close state. */
+    void resolve_pressure_plate_set_door_event(entityid door_id, bool should_open);
 
     /** @brief Recompute every registered pressure plate in the dungeon. */
     void refresh_pressure_plates();

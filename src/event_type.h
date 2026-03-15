@@ -12,6 +12,7 @@
 typedef enum {
     EVENT_NONE = 0,
     EVENT_MOVE_INTENT,
+    EVENT_PUSH_INTENT,
     EVENT_ATTACK_INTENT,
     EVENT_ATTACK_BLOCK,
     EVENT_ATTACK_DAMAGE,
@@ -21,6 +22,7 @@ typedef enum {
     EVENT_OPEN_CHEST_INTENT,
     EVENT_TRAVERSE_STAIRS_INTENT,
     EVENT_REFRESH_PRESSURE_PLATES,
+    EVENT_PRESSURE_PLATE_SET_DOOR,
     EVENT_COUNT
 } event_type_t;
 
@@ -38,6 +40,7 @@ struct gameplay_event_t {
     vec3 target_loc = vec3{-1, -1, -1};
     int floor = -1;
     int amount = 0;
+    bool state = false;
     attack_result_t attack_result = ATTACK_RESULT_NONE;
 };
 
