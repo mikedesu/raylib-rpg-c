@@ -50,6 +50,44 @@ public:
         TS_ASSERT_EQUALS(g.d.get_floor(0)->tile_at(loc).get_cached_item(), dagger);
     }
 
+    void testRunPickupActionUsesQueuedPickupIntent() {
+        gamestate g;
+        g.sfx.resize(71);
+        const vec3 loc = add_initialized_floor(g);
+        const entityid hero = create_hero(g, loc);
+
+        const entityid dagger = g.create_weapon_at_with(g.ct, loc, g.dagger_init());
+        const entityid potion = g.create_potion_at_with(loc, g.potion_init(POTION_HP_SMALL));
+
+        TS_ASSERT_DIFFERS(dagger, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(potion, ENTITYID_INVALID);
+        TS_ASSERT_EQUALS(g.d.get_floor(0)->tile_at(loc).get_cached_item(), potion);
+
+        TS_ASSERT(g.run_pickup_action(hero));
+
+        auto inv = g.ct.get<inventory>(hero);
+        TS_ASSERT(inv.has_value());
+        TS_ASSERT_EQUALS(inv.value()->size(), 1U);
+        TS_ASSERT_EQUALS(inv.value()->at(0), potion);
+        TS_ASSERT(g.is_in_inventory(hero, potion));
+        TS_ASSERT(!g.is_in_inventory(hero, dagger));
+        TS_ASSERT_EQUALS(g.d.get_floor(0)->tile_at(loc).get_cached_item(), dagger);
+        TS_ASSERT(g.gameplay_events.empty());
+    }
+
+    void testRunPickupActionReturnsFalseWithoutItem() {
+        gamestate g;
+        const vec3 loc = add_initialized_floor(g);
+        const entityid hero = create_hero(g, loc);
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+
+        TS_ASSERT(!g.run_pickup_action(hero));
+        auto inv = g.ct.get<inventory>(hero);
+        TS_ASSERT(inv.has_value());
+        TS_ASSERT_EQUALS(inv.value()->size(), 0U);
+        TS_ASSERT(g.gameplay_events.empty());
+    }
+
     void testAddAndRemoveInventoryBookkeeping() {
         gamestate g;
         const vec3 loc = add_initialized_floor(g);

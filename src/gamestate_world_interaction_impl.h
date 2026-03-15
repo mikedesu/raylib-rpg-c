@@ -368,6 +368,21 @@ inline bool gamestate::queue_open_chest_event(entityid id, vec3 loc) {
     return queue_gameplay_event(event);
 }
 
+inline bool gamestate::queue_interact_event(entityid id, vec3 loc) {
+    gameplay_event_t event;
+    event.type = EVENT_INTERACT_INTENT;
+    event.actor_id = id;
+    event.target_loc = loc;
+    return queue_gameplay_event(event);
+}
+
+inline bool gamestate::queue_pickup_event(entityid id) {
+    gameplay_event_t event;
+    event.type = EVENT_PICKUP_INTENT;
+    event.actor_id = id;
+    return queue_gameplay_event(event);
+}
+
 inline bool gamestate::queue_traverse_stairs_event(entityid id) {
     gameplay_event_t event;
     event.type = EVENT_TRAVERSE_STAIRS_INTENT;
@@ -463,6 +478,14 @@ inline gameplay_event_result_t gamestate::process_gameplay_event(const gameplay_
         result.handled = true;
         result.succeeded = try_entity_open_chest(event.actor_id, event.target_loc);
         return result;
+    case EVENT_INTERACT_INTENT:
+        result.handled = true;
+        result.succeeded = try_entity_interact(event.actor_id, event.target_loc);
+        return result;
+    case EVENT_PICKUP_INTENT:
+        result.handled = true;
+        result.succeeded = try_entity_pickup(event.actor_id);
+        return result;
     case EVENT_TRAVERSE_STAIRS_INTENT:
         result.handled = true;
         result.succeeded = try_entity_stairs(event.actor_id);
@@ -547,6 +570,22 @@ inline bool gamestate::run_open_door_action(entityid id, vec3 loc) {
 inline bool gamestate::run_open_chest_action(entityid id, vec3 loc) {
     clear_gameplay_events();
     if (!queue_open_chest_event(id, loc)) {
+        return false;
+    }
+    return process_gameplay_events().succeeded;
+}
+
+inline bool gamestate::run_interact_action(entityid id, vec3 loc) {
+    clear_gameplay_events();
+    if (!queue_interact_event(id, loc)) {
+        return false;
+    }
+    return process_gameplay_events().succeeded;
+}
+
+inline bool gamestate::run_pickup_action(entityid id) {
+    clear_gameplay_events();
+    if (!queue_pickup_event(id)) {
         return false;
     }
     return process_gameplay_events().succeeded;
@@ -927,7 +966,7 @@ inline bool gamestate::handle_pickup_item(inputstate& is, bool is_dead) {
     if (is_dead) {
         return add_message("You cannot pick up items while dead");
     }
-    try_entity_pickup(hero_id);
+    run_pickup_action(hero_id);
     flag = GAMESTATE_FLAG_PLAYER_ANIM;
     return true;
 }
@@ -1094,7 +1133,7 @@ inline bool gamestate::handle_interact(inputstate& is, bool is_dead) {
         return add_message("You cannot interact while dead");
     }
     vec3 loc = get_loc_facing_player();
-    if (!try_entity_interact(hero_id, loc)) {
+    if (!run_interact_action(hero_id, loc)) {
         return add_message("There is nothing to interact with");
     }
     flag = GAMESTATE_FLAG_PLAYER_ANIM;

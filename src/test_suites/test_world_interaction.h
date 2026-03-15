@@ -606,6 +606,39 @@ public:
         TS_ASSERT_EQUALS(g.interaction_body, "Keep your torch high.");
     }
 
+    void testRunInteractActionUsesQueuedInteractIntent() {
+        gamestate g;
+        add_floor(g);
+
+        const entityid hero = create_hero(g, vec3{1, 1, 0});
+        const entityid npc = g.create_npc_at_with(RACE_DWARF, vec3{2, 1, 0}, [](CT& ct, const entityid id) {
+            ct.set<name>(id, "Borin");
+            ct.set<dialogue_text>(id, "Keep your torch high.");
+        });
+
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(npc, ENTITYID_INVALID);
+        TS_ASSERT(g.run_interact_action(hero, vec3{2, 1, 0}));
+        TS_ASSERT(g.display_interaction_modal);
+        TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_INTERACTION);
+        TS_ASSERT_EQUALS(g.active_interaction_entity_id, npc);
+        TS_ASSERT_EQUALS(g.interaction_title, "Borin");
+        TS_ASSERT_EQUALS(g.interaction_body, "Keep your torch high.");
+        TS_ASSERT(g.gameplay_events.empty());
+    }
+
+    void testRunInteractActionReturnsFalseWhenNothingIsThere() {
+        gamestate g;
+        add_floor(g);
+
+        const entityid hero = create_hero(g, vec3{1, 1, 0});
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+
+        TS_ASSERT(!g.run_interact_action(hero, vec3{2, 1, 0}));
+        TS_ASSERT(!g.display_interaction_modal);
+        TS_ASSERT(g.gameplay_events.empty());
+    }
+
     void testTryEntityInteractOpensPropDescriptionModal() {
         gamestate g;
         add_floor(g);

@@ -1026,6 +1026,12 @@ public:
     /** @brief Queue a chest-toggle intent for ordered turn resolution. */
     bool queue_open_chest_event(entityid id, vec3 loc);
 
+    /** @brief Queue an interaction intent for ordered turn resolution. */
+    bool queue_interact_event(entityid id, vec3 loc);
+
+    /** @brief Queue a pickup intent for ordered turn resolution. */
+    bool queue_pickup_event(entityid id);
+
     /** @brief Queue a stairs-traversal intent for ordered turn resolution. */
     bool queue_traverse_stairs_event(entityid id);
 
@@ -1058,6 +1064,12 @@ public:
 
     /** @brief Queue and immediately resolve one chest-toggle intent. */
     bool run_open_chest_action(entityid id, vec3 loc);
+
+    /** @brief Queue and immediately resolve one interaction intent. */
+    bool run_interact_action(entityid id, vec3 loc);
+
+    /** @brief Queue and immediately resolve one pickup intent. */
+    bool run_pickup_action(entityid id);
 
     /** @brief Queue and immediately resolve one stairs-traversal intent. */
     bool run_traverse_stairs_action(entityid id);
