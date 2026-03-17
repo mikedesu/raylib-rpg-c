@@ -1,5 +1,23 @@
 # Project Plan
 
+## Immediate Bugs To Fix
+
+- [ ] When you press backtick (`) to open the options menu, the display of the text "controls" appears to be cut-off at the bottom, so only the top portion of the text displays
+- [ ] Movement, attacking, or taking any action when there is a message box on the screen should not be possible
+  - [ ] The player must cycle through all messages queued before they can take action again
+  - [ ] The player can and should still be able to open the options menu, and the inventory menu, among other menus, except for opening a chest (opening a chest counts as an action)
+
+## Interesting Future Ideas
+
+- [ ] Multi-dimensional dungeons
+  - [ ] Dungeons are currently a vector of dungeon_floor objects
+  - [ ] To facilitate the addition of multiple "exits" to a dungeon_floor, we need to consider how best to map each exit
+    - [ ] At the moment, our dungeon floors have a correlation between floor number and "what floor/zone is this?"...what if one floor has two exits: a downstairs, and a door into a small shack?
+    - [ ] How do we best represent such a `zone`? "world_zone"?
+      - [ ] world: collection of `world_zone`s 
+      - [ ] world_zone: previously `dungeon`
+      - [ ] world_zone_area: previously `dungeon_floor`
+
 ## Session Handoff
 
 - Event-queue migration status:
