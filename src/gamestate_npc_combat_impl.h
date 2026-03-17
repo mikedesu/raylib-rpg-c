@@ -109,58 +109,27 @@ inline void gamestate::provoke_npc(entityid npc_id, entityid source_id) {
 }
 
 inline void gamestate::process_attack_results(tile_t& tile, entityid atk_id, entityid tgt_id, bool atk_successful) {
+    (void)tile;
     massert(atk_id != ENTITYID_INVALID, "attacker entity id is invalid");
     massert(tgt_id != ENTITYID_INVALID, "target entity id is invalid");
 
-    string attacker_name = ct.get<name>(atk_id).value_or("no-name");
-    string target_name = ct.get<name>(tgt_id).value_or("no-name");
-    const char* atk_name = attacker_name.c_str();
-    const char* tgt_name = target_name.c_str();
-
     if (ct.get<dead>(tgt_id).value_or(false)) {
-        add_message_history("%s swings at a dead target", atk_name);
+        const string attacker_name = ct.get<name>(atk_id).value_or("no-name");
+        add_message_history("%s swings at a dead target", attacker_name.c_str());
         return;
     }
     if (!atk_successful) {
-        add_message_history("%s swings at %s and misses!", atk_name, tgt_name);
+        const string attacker_name = ct.get<name>(atk_id).value_or("no-name");
+        const string target_name = ct.get<name>(tgt_id).value_or("no-name");
+        add_message_history("%s swings at %s and misses!", attacker_name.c_str(), target_name.c_str());
         return;
     }
 
-    int dmg = compute_attack_damage(atk_id, tgt_id);
-    ct.set<damaged>(tgt_id, true);
-    ct.set<update>(tgt_id, true);
-
-    optional<vec2> maybe_tgt_hp = ct.get<hp>(tgt_id);
-    if (!maybe_tgt_hp.has_value()) {
-        merror("target has no HP component");
+    if (!queue_attack_damage_event(atk_id, tgt_id, compute_attack_damage(atk_id, tgt_id))) {
         return;
     }
-
-    vec2 tgt_hp = maybe_tgt_hp.value();
-    tgt_hp.x -= dmg;
-    add_message_history("%s deals %d damage to %s", atk_name, dmg, tgt_name);
-    ct.set<hp>(tgt_id, tgt_hp);
-    add_damage_popup(tgt_id, dmg, false);
-    handle_weapon_durability_loss(atk_id, tgt_id);
-    if (tgt_hp.x > 0) {
-        return;
-    }
-
-    ct.set<dead>(tgt_id, true);
-    ct.set<pullable>(tgt_id, true);
-    tile.tile_remove(tgt_id);
-    tile.add_dead_npc(tgt_id);
-
-    switch (ct.get<entitytype>(tgt_id).value_or(ENTITY_NONE)) {
-    case ENTITY_NPC:
-        update_npc_xp(atk_id, tgt_id);
-        drop_all_from_inventory(tgt_id);
-        break;
-    case ENTITY_PLAYER:
-        add_message("You died");
-        break;
-    default:
-        break;
+    if (!processing_actions) {
+        process_gameplay_events();
     }
 }
 
@@ -328,6 +297,7 @@ inline void gamestate::resolve_attack_shield_durability_event(entityid defender_
 }
 
 inline attack_result_t gamestate::process_attack_entity(tile_t& tile, entityid attacker_id, entityid target_id) {
+    (void)tile;
     massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
     if (target_id == INVALID) {
         return ATTACK_RESULT_MISS;
@@ -340,39 +310,17 @@ inline attack_result_t gamestate::process_attack_entity(tile_t& tile, entityid a
     if (ct.get<dead>(target_id).value_or(true)) {
         return ATTACK_RESULT_MISS;
     }
-    if (type == ENTITY_NPC) {
-        provoke_npc(target_id, attacker_id);
-    }
 
-    bool attack_successful = compute_attack_roll(attacker_id, target_id);
-    if (!attack_successful) {
-        process_attack_results(tile, attacker_id, target_id, false);
+    const vec3 target_loc = ct.get<location>(target_id).value_or(vec3{-1, -1, -1});
+    if (vec3_invalid(target_loc)) {
         return ATTACK_RESULT_MISS;
     }
 
-    entityid shield_id = ct.get<equipped_shield>(target_id).value_or(ENTITYID_INVALID);
-    if (shield_id == ENTITYID_INVALID) {
-        process_attack_results(tile, attacker_id, target_id, true);
-        return ATTACK_RESULT_HIT;
+    const attack_result_t result = resolve_attack_intent(attacker_id, target_loc);
+    if (!processing_actions) {
+        process_gameplay_events();
     }
-
-    uniform_int_distribution<int> gen(1, MAX_BLOCK_CHANCE);
-    int roll = gen(mt);
-    int chance = ct.get<block_chance>(shield_id).value_or(MAX_BLOCK_CHANCE);
-    int low_roll = MAX_BLOCK_CHANCE - chance;
-    if (roll <= low_roll) {
-        process_attack_results(tile, attacker_id, target_id, true);
-        return ATTACK_RESULT_HIT;
-    }
-
-    handle_shield_durability_loss(target_id, attacker_id);
-    handle_shield_block_sfx(target_id);
-    ct.set<block_success>(target_id, true);
-    ct.set<update>(target_id, true);
-    string atk_name = ct.get<name>(attacker_id).value_or("no-name");
-    string tgt_name = ct.get<name>(target_id).value_or("no-name");
-    add_message_history("%s blocked an attack from %s", tgt_name.c_str(), atk_name.c_str());
-    return ATTACK_RESULT_BLOCK;
+    return result;
 }
 
 inline void gamestate::handle_attack_sfx(entityid attacker, attack_result_t result) {
@@ -418,21 +366,7 @@ inline attack_result_t gamestate::try_entity_attack(entityid id, int x, int y) {
     massert(!ct.get<dead>(id).value_or(false), "attacker entity is dead");
     massert(ct.has<location>(id), "entity %d has no location", id);
     vec3 loc = ct.get<location>(id).value();
-    shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
-    tile_t& tile = df->tile_at(vec3{x, y, loc.z});
-    int dx = x - loc.x;
-    int dy = y - loc.y;
-    ct.set<direction>(id, get_dir_from_xy(dx, dy));
-    ct.set<attacking>(id, true);
-    ct.set<update>(id, true);
-
-    entityid npc_id = tile.get_cached_live_npc();
-    attack_result_t result = process_attack_entity(tile, id, npc_id);
-    handle_attack_sfx(id, result);
-    if (!test) {
-        set_gamestate_flag_for_attack_animation(ct.get<entitytype>(id).value_or(ENTITY_NONE));
-    }
-    return result;
+    return run_attack_action(id, vec3{x, y, loc.z});
 }
 
 inline bool gamestate::is_entity_adjacent(entityid id0, entityid id1) {
