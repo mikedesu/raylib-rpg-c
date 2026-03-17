@@ -553,6 +553,48 @@ public:
         TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_OPTION_MENU);
     }
 
+    void testQueuedMessagesStillAllowOpeningOptionsMenu() {
+        gamestate g;
+        g.sfx.resize(71);
+        g.current_scene = SCENE_GAMEPLAY;
+        add_floor(g);
+        const entityid hero = g.create_player_at_with(vec3{3, 3, 0}, "hero", g.player_init(10));
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+
+        g.hero_id = hero;
+        g.add_message("queued");
+
+        inputstate is = {};
+        inputstate_reset(is);
+        press_key(is, g.get_keybinding_primary(g.keyboard_profile, INPUT_ACTION_OPTIONS));
+        g.handle_input_gameplay_controlmode_player(is);
+
+        TS_ASSERT(g.msg_system_is_active);
+        TS_ASSERT(g.display_option_menu);
+        TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_OPTION_MENU);
+    }
+
+    void testQueuedMessagesStillAllowOpeningInventoryMenu() {
+        gamestate g;
+        g.sfx.resize(71);
+        g.current_scene = SCENE_GAMEPLAY;
+        add_floor(g);
+        const entityid hero = g.create_player_at_with(vec3{3, 3, 0}, "hero", g.player_init(10));
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+
+        g.hero_id = hero;
+        g.add_message("queued");
+
+        inputstate is = {};
+        inputstate_reset(is);
+        press_key(is, g.get_keybinding_primary(g.keyboard_profile, INPUT_ACTION_INVENTORY));
+        g.handle_input_gameplay_controlmode_player(is);
+
+        TS_ASSERT(g.msg_system_is_active);
+        TS_ASSERT(g.display_inventory_menu);
+        TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_INVENTORY);
+    }
+
     void testFaceDirectionAttackUsesBoundActionInsteadOfHardCodedKey() {
         gamestate g;
         g.test = true;

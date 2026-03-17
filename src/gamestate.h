@@ -960,6 +960,9 @@ public:
     /** @brief Test helper for message queue cycling behavior. */
     bool handle_cycle_messages_test();
 
+    /** @brief Return true when queued messages should block gameplay actions this frame. */
+    bool gameplay_actions_locked_by_messages() const;
+
     /** @brief Handle free-camera zoom input. */
     void handle_camera_zoom(inputstate& is);
 

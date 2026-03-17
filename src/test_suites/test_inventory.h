@@ -460,6 +460,63 @@ public:
         TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_CHEST);
     }
 
+    void testQueuedMessagesBlockInventoryUseEquipAndDrop() {
+        gamestate g;
+        g.sfx.resize(71);
+        const vec3 loc = add_initialized_floor(g);
+        const entityid hero = create_hero(g, loc);
+        const entityid potion = g.create_potion_at_with(loc, g.potion_init(POTION_HP_SMALL));
+
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(potion, ENTITYID_INVALID);
+        TS_ASSERT(g.add_to_inventory(hero, potion));
+        g.hero_id = hero;
+        g.display_inventory_menu = true;
+        g.controlmode = CONTROLMODE_INVENTORY;
+        g.add_message("queued");
+
+        inputstate is = {};
+        press_key(is, KEY_ENTER);
+        g.handle_input_inventory(is);
+        TS_ASSERT(g.is_in_inventory(hero, potion));
+
+        press_key(is, KEY_E);
+        g.handle_input_inventory(is);
+        TS_ASSERT(g.is_in_inventory(hero, potion));
+
+        press_key(is, KEY_Q);
+        g.handle_input_inventory(is);
+        TS_ASSERT(g.is_in_inventory(hero, potion));
+        TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_INVENTORY);
+    }
+
+    void testQueuedMessagesBlockChestTransferConfirm() {
+        gamestate g;
+        const vec3 loc = add_initialized_floor(g);
+        const entityid hero = create_hero(g, loc);
+        const entityid chest = g.create_chest_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
+        const entityid dagger = g.create_weapon_at_with(g.ct, loc, g.dagger_init());
+
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(chest, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(dagger, ENTITYID_INVALID);
+        TS_ASSERT(g.add_to_inventory(hero, dagger));
+        g.hero_id = hero;
+        g.active_chest_id = chest;
+        g.display_chest_menu = true;
+        g.controlmode = CONTROLMODE_CHEST;
+        g.chest_deposit_mode = true;
+        g.add_message("queued");
+
+        inputstate is = {};
+        press_key(is, KEY_ENTER);
+        g.handle_input_chest(is);
+
+        TS_ASSERT(g.is_in_inventory(hero, dagger));
+        TS_ASSERT(!g.is_in_inventory(chest, dagger));
+        TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_CHEST);
+    }
+
     void testMiniInventorySelectionScrollsPastVisibleWindow() {
         gamestate g;
         g.sfx.resize(71);

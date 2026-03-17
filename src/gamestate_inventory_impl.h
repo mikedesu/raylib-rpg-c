@@ -474,6 +474,9 @@ inline void gamestate::handle_input_chest(inputstate& is) {
             inventory_cursor.y++;
         }
     }
+    else if (gameplay_actions_locked_by_messages()) {
+        // Allow browsing and closing the chest UI while queued messages remain on screen.
+    }
     else if (inputstate_is_pressed(is, KEY_ENTER)) {
         handle_chest_menu_confirm();
     }

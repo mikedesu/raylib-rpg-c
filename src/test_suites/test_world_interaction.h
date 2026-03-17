@@ -657,6 +657,47 @@ public:
         TS_ASSERT(!g.ct.get<door_open>(door).value_or(true));
     }
 
+    void testQueuedMessagesBlockMovementInput() {
+        gamestate g;
+        add_floor(g);
+
+        const entityid hero = create_hero(g, vec3{1, 1, 0});
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+        g.hero_id = hero;
+        g.add_message("queued");
+
+        inputstate is = {};
+        press_key(is, g.get_keybinding_primary(g.keyboard_profile, INPUT_ACTION_MOVE_RIGHT));
+        g.handle_input_gameplay_controlmode_player(is);
+
+        TS_ASSERT(vec3_equal(g.ct.get<location>(hero).value_or(vec3{-1, -1, -1}), vec3{1, 1, 0}));
+        TS_ASSERT(g.msg_system_is_active);
+    }
+
+    void testQueuedMessagesBlockChestOpenInput() {
+        gamestate g;
+        g.sfx.resize(71);
+        add_floor(g);
+
+        const entityid hero = create_hero(g, vec3{1, 1, 0});
+        const entityid chest = g.create_chest_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(chest, ENTITYID_INVALID);
+        g.hero_id = hero;
+        g.ct.set<direction>(hero, DIR_RIGHT);
+        g.add_message("queued");
+
+        inputstate is = {};
+        press_key(is, g.get_keybinding_primary(g.keyboard_profile, INPUT_ACTION_OPEN));
+        g.handle_input_gameplay_controlmode_player(is);
+
+        TS_ASSERT(g.msg_system_is_active);
+        TS_ASSERT(!g.display_chest_menu);
+        TS_ASSERT_EQUALS(g.controlmode, CONTROLMODE_PLAYER);
+        TS_ASSERT_EQUALS(g.active_chest_id, ENTITYID_INVALID);
+        TS_ASSERT(!g.ct.get<door_open>(chest).value_or(true));
+    }
+
     void testTryEntityInteractOpensNpcDialogueModal() {
         gamestate g;
         add_floor(g);

@@ -336,6 +336,9 @@ inline void gamestate::handle_input_inventory(inputstate& is) {
             inventory_cursor.y++;
         }
     }
+    else if (gameplay_actions_locked_by_messages()) {
+        // Allow browsing and closing the inventory while queued messages remain on screen.
+    }
     else if (inputstate_is_pressed(is, KEY_E)) {
         handle_hero_inventory_equip();
     }
@@ -392,6 +395,10 @@ inline bool gamestate::handle_cycle_messages_test() {
     PlaySound(sfx[SFX_CONFIRM_01]);
     cycle_messages();
     return true;
+}
+
+inline bool gamestate::gameplay_actions_locked_by_messages() const {
+    return msg_system_is_active;
 }
 
 inline void gamestate::handle_camera_zoom(inputstate& is) {
@@ -522,6 +529,7 @@ inline void gamestate::handle_input_gameplay_controlmode_player(inputstate& is) 
     if (is_action_pressed(is, INPUT_ACTION_HELP)) {
         display_help_menu = true;
         controlmode = CONTROLMODE_HELP_MENU;
+        return;
     }
     bool is_dead = ct.get<dead>(hero_id).value_or(true);
     if (is_dead) {
@@ -553,6 +561,18 @@ inline void gamestate::handle_input_gameplay_controlmode_player(inputstate& is) 
         return;
     }
     else if (test) {
+        return;
+    }
+    if (gameplay_actions_locked_by_messages()) {
+        if (is_action_pressed(is, INPUT_ACTION_OPTIONS)) {
+            display_option_menu = true;
+            controlmode = CONTROLMODE_OPTION_MENU;
+            frame_dirty = true;
+            return;
+        }
+        if (handle_display_inventory(is)) {
+            return;
+        }
         return;
     }
     else if (is_action_pressed(is, INPUT_ACTION_OPTIONS)) {

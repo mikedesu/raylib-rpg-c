@@ -32,10 +32,7 @@ Active items:
 
 ## Bugs To Fix
 
-- [ ] When you press backtick (`) to open the options menu, the display of the text "controls" appears to be cut-off at the bottom, so only the top portion of the text displays
-- [ ] Movement, attacking, or taking any action when there is a message box on the screen should not be possible
-  - [ ] The player must cycle through all messages queued before they can take action again
-  - [ ] The player can and should still be able to open the options menu, and the inventory menu, among other menus, except for opening a chest (opening a chest counts as an action)
+- [ ] Upstairs/downstairs tiles should not spawn where a door should go
 
 ## Backlog Of Tasks
 
