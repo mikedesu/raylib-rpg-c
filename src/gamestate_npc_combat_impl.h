@@ -31,6 +31,32 @@ inline int gamestate::compute_attack_damage(entityid attacker, entityid target) 
     return dmg + bonus;
 }
 
+inline void gamestate::add_combat_miss_message(entityid attacker_id, entityid target_id) {
+    const string atk_name = ct.get<name>(attacker_id).value_or("no-name");
+    const string tgt_name = ct.get<name>(target_id).value_or("no-name");
+    add_message_history("%s swings at %s and misses!", atk_name.c_str(), tgt_name.c_str());
+}
+
+inline void gamestate::add_combat_block_message(entityid attacker_id, entityid target_id) {
+    const string atk_name = ct.get<name>(attacker_id).value_or("no-name");
+    const string tgt_name = ct.get<name>(target_id).value_or("no-name");
+    add_message_history("%s blocked an attack from %s", tgt_name.c_str(), atk_name.c_str());
+}
+
+inline void gamestate::add_combat_damage_message(entityid attacker_id, entityid target_id, int damage) {
+    const string atk_name = ct.get<name>(attacker_id).value_or("no-name");
+    const string tgt_name = ct.get<name>(target_id).value_or("no-name");
+    add_message_history("%s deals %d damage to %s", atk_name.c_str(), damage, tgt_name.c_str());
+}
+
+inline void gamestate::add_combat_break_message(entityid item_id) {
+    add_message_history("%s broke!", ct.get<name>(item_id).value_or("no-name-item").c_str());
+}
+
+inline void gamestate::add_combat_player_death_message() {
+    add_message("You died");
+}
+
 inline void gamestate::handle_weapon_durability_loss(entityid atk_id, entityid tgt_id) {
     entityid equipped_wpn = ct.get<equipped_weapon>(atk_id).value_or(ENTITYID_INVALID);
     optional<int> maybe_dura = ct.get<durability>(equipped_wpn);
@@ -49,7 +75,7 @@ inline void gamestate::handle_weapon_durability_loss(entityid atk_id, entityid t
     if (!test && event_heard && IsAudioDeviceReady() && sfx.size() > SFX_05_ALCHEMY_GLASS_BREAK) {
         PlaySound(sfx[SFX_05_ALCHEMY_GLASS_BREAK]);
     }
-    add_message_history("%s broke!", ct.get<name>(equipped_wpn).value_or("no-name-weapon").c_str());
+    add_combat_break_message(equipped_wpn);
 }
 
 inline void gamestate::handle_shield_durability_loss(entityid defender, entityid attacker) {
@@ -70,7 +96,7 @@ inline void gamestate::handle_shield_durability_loss(entityid defender, entityid
     if (!test && event_heard && IsAudioDeviceReady() && sfx.size() > SFX_05_ALCHEMY_GLASS_BREAK) {
         PlaySound(sfx[SFX_05_ALCHEMY_GLASS_BREAK]);
     }
-    add_message_history("%s broke!", ct.get<name>(shield).value_or("no-name-shield").c_str());
+    add_combat_break_message(shield);
 }
 
 inline int gamestate::get_npc_xp(entityid id) {
@@ -123,6 +149,18 @@ inline attack_result_t gamestate::resolve_attack_intent(entityid attacker_id, ve
     massert(!ct.get<dead>(attacker_id).value_or(false), "attacker entity is dead");
     massert(ct.has<location>(attacker_id), "entity %d has no location", attacker_id);
 
+    // Ordering contract for queued combat:
+    // 1. `EVENT_ATTACK_INTENT` decides miss/block/hit and appends the first
+    //    follow-up events only; it does not apply chained side effects inline.
+    // 2. For NPC targets, provoke is appended before block/damage so aggro is
+    //    established ahead of later combat consequences in the same turn slice.
+    // 3. Block appends shield durability loss after the block message/state.
+    // 4. Damage appends weapon durability loss after the damage message/state,
+    //    and appends death only if HP reached zero or below.
+    // 5. Death appends XP/drop or player-death consequences after the corpse
+    //    has been moved to the tile's dead-NPC cache.
+    //
+    // Tests and plan docs assume this FIFO append order remains stable.
     const vec3 attacker_loc = ct.get<location>(attacker_id).value();
     shared_ptr<dungeon_floor> df = d.get_floor(attacker_loc.z);
     tile_t& tile = df->tile_at(vec3{target_loc.x, target_loc.y, attacker_loc.z});
@@ -149,9 +187,7 @@ inline attack_result_t gamestate::resolve_attack_intent(entityid attacker_id, ve
     }
 
     if (!compute_attack_roll(attacker_id, target_id)) {
-        const string atk_name = ct.get<name>(attacker_id).value_or("no-name");
-        const string tgt_name = ct.get<name>(target_id).value_or("no-name");
-        add_message_history("%s swings at %s and misses!", atk_name.c_str(), tgt_name.c_str());
+        add_combat_miss_message(attacker_id, target_id);
         return ATTACK_RESULT_MISS;
     }
 
@@ -179,9 +215,7 @@ inline void gamestate::resolve_attack_block_event(entityid attacker_id, entityid
     handle_shield_block_sfx(target_id);
     ct.set<block_success>(target_id, true);
     ct.set<update>(target_id, true);
-    const string atk_name = ct.get<name>(attacker_id).value_or("no-name");
-    const string tgt_name = ct.get<name>(target_id).value_or("no-name");
-    add_message_history("%s blocked an attack from %s", tgt_name.c_str(), atk_name.c_str());
+    add_combat_block_message(attacker_id, target_id);
 }
 
 inline void gamestate::resolve_attack_damage_event(entityid attacker_id, entityid target_id, int damage) {
@@ -203,9 +237,7 @@ inline void gamestate::resolve_attack_damage_event(entityid attacker_id, entityi
 
     vec2 tgt_hp = maybe_tgt_hp.value();
     tgt_hp.x -= damage;
-    const string atk_name = ct.get<name>(attacker_id).value_or("no-name");
-    const string tgt_name = ct.get<name>(target_id).value_or("no-name");
-    add_message_history("%s deals %d damage to %s", atk_name.c_str(), damage, tgt_name.c_str());
+    add_combat_damage_message(attacker_id, target_id, damage);
     ct.set<hp>(target_id, tgt_hp);
     add_damage_popup(target_id, damage, false);
     queue_attack_weapon_durability_event(attacker_id, target_id);
@@ -256,7 +288,7 @@ inline void gamestate::resolve_attack_drop_inventory_event(entityid target_id) {
 
 inline void gamestate::resolve_attack_player_death_event(entityid target_id) {
     (void)target_id;
-    add_message("You died");
+    add_combat_player_death_message();
 }
 
 inline void gamestate::resolve_provoke_npc_event(entityid npc_id, entityid source_id) {

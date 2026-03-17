@@ -1170,6 +1170,21 @@ public:
     /** @brief Compute attack damage from attacker to target after current modifiers. */
     int compute_attack_damage(entityid attacker, entityid target);
 
+    /** @brief Emit the standard queued-combat miss message. */
+    void add_combat_miss_message(entityid attacker_id, entityid target_id);
+
+    /** @brief Emit the standard queued-combat block message. */
+    void add_combat_block_message(entityid attacker_id, entityid target_id);
+
+    /** @brief Emit the standard queued-combat damage message. */
+    void add_combat_damage_message(entityid attacker_id, entityid target_id, int damage);
+
+    /** @brief Emit the standard queued-combat item-break message. */
+    void add_combat_break_message(entityid item_id);
+
+    /** @brief Emit the standard queued-combat player-death message. */
+    void add_combat_player_death_message();
+
     /** @brief Apply weapon durability loss after an attack exchange. */
     void handle_weapon_durability_loss(entityid atk_id, entityid tgt_id);
 

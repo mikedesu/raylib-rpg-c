@@ -488,6 +488,81 @@ public:
         TS_ASSERT(g.gameplay_events.empty());
     }
 
+    void testRunAttackActionNonBreakBlockMessageSequenceIsStable() {
+        gamestate g;
+        g.test = true;
+        g.mt.seed(99);
+        add_floor(g, 8, 8);
+
+        const entityid hero = g.create_player_at_with(vec3{1, 1, 0}, "hero", g.player_init(12));
+        const entityid orc = g.create_orc_at_with(vec3{2, 1, 0}, [](CT& ct, const entityid id) {
+            ct.set<name>(id, "orc");
+        });
+        const entityid hero_weapon = g.create_weapon_with(g.sword_init());
+        const entityid shield = g.create_shield_with(g.ct, g.shield_init());
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(orc, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(hero_weapon, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(shield, ENTITYID_INVALID);
+
+        g.add_to_inventory(hero, hero_weapon);
+        g.ct.set<equipped_weapon>(hero, hero_weapon);
+        g.add_to_inventory(orc, shield);
+        g.ct.set<equipped_shield>(orc, shield);
+        g.ct.set<block_chance>(shield, 100);
+        g.ct.set<durability>(shield, 5);
+        g.ct.set<strength>(hero, 18);
+        g.ct.set<dexterity>(hero, 18);
+        g.ct.set<base_ac>(orc, 1);
+        g.ct.set<dexterity>(orc, 1);
+
+        const size_t initial_history_size = g.msg_history.size();
+        const attack_result_t result = g.run_attack_action(hero, vec3{2, 1, 0});
+
+        TS_ASSERT_EQUALS(result, ATTACK_RESULT_BLOCK);
+        TS_ASSERT_EQUALS(g.msg_history.size(), initial_history_size + 1);
+        TS_ASSERT(g.msg_history.back().find("blocked an attack") != string::npos);
+        TS_ASSERT(g.msg_history.back().find("broke") == string::npos);
+        TS_ASSERT(g.msg_history.back().find("deals") == string::npos);
+        TS_ASSERT(g.gameplay_events.empty());
+    }
+
+    void testRunAttackActionNonLethalHitMessageSequenceIsStable() {
+        gamestate g;
+        g.test = true;
+        g.mt.seed(7);
+        add_floor(g, 8, 8);
+
+        const entityid hero = g.create_player_at_with(vec3{1, 1, 0}, "hero", g.player_init(12));
+        const entityid orc = g.create_orc_at_with(vec3{2, 1, 0}, [](CT& ct, const entityid id) {
+            ct.set<name>(id, "orc");
+        });
+        const entityid hero_weapon = g.create_weapon_with(g.sword_init());
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(orc, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(hero_weapon, ENTITYID_INVALID);
+
+        g.add_to_inventory(hero, hero_weapon);
+        g.ct.set<equipped_weapon>(hero, hero_weapon);
+        g.ct.set<durability>(hero_weapon, 5);
+        g.ct.set<strength>(hero, 18);
+        g.ct.set<dexterity>(hero, 18);
+        g.ct.set<base_ac>(orc, 1);
+        g.ct.set<dexterity>(orc, 1);
+        g.ct.set<hp>(orc, vec2{12, 12});
+
+        const size_t initial_history_size = g.msg_history.size();
+        const attack_result_t result = g.run_attack_action(hero, vec3{2, 1, 0});
+
+        TS_ASSERT_EQUALS(result, ATTACK_RESULT_HIT);
+        TS_ASSERT_EQUALS(g.msg_history.size(), initial_history_size + 1);
+        TS_ASSERT(g.msg_history.back().find("deals") != string::npos);
+        TS_ASSERT(g.msg_history.back().find("broke") == string::npos);
+        TS_ASSERT(g.msg_history.back().find("blocked") == string::npos);
+        TS_ASSERT(!g.msg_system_is_active);
+        TS_ASSERT(g.gameplay_events.empty());
+    }
+
     void testRunAttackActionResolvesQueuedWeaponDurabilityBreakFollowup() {
         gamestate g;
         g.test = true;
@@ -508,6 +583,7 @@ public:
         g.ct.set<dexterity>(hero, 18);
         g.ct.set<base_ac>(orc, 1);
         g.ct.set<dexterity>(orc, 1);
+        const size_t initial_history_size = g.msg_history.size();
 
         const attack_result_t result = g.run_attack_action(hero, vec3{2, 1, 0});
 
@@ -515,6 +591,9 @@ public:
         TS_ASSERT_EQUALS(g.ct.get<equipped_weapon>(hero).value_or(ENTITYID_INVALID), ENTITYID_INVALID);
         TS_ASSERT(g.ct.get<destroyed>(hero_weapon).value_or(false));
         TS_ASSERT(!g.is_in_inventory(hero, hero_weapon));
+        TS_ASSERT_EQUALS(g.msg_history.size(), initial_history_size + 2);
+        TS_ASSERT(g.msg_history[initial_history_size].find("deals") != string::npos);
+        TS_ASSERT(g.msg_history[initial_history_size + 1].find("broke!") != string::npos);
         TS_ASSERT(g.gameplay_events.empty());
     }
 
@@ -543,6 +622,7 @@ public:
         g.ct.set<dexterity>(hero, 18);
         g.ct.set<base_ac>(orc, 1);
         g.ct.set<dexterity>(orc, 1);
+        const size_t initial_history_size = g.msg_history.size();
 
         const attack_result_t result = g.run_attack_action(hero, vec3{2, 1, 0});
 
@@ -550,6 +630,9 @@ public:
         TS_ASSERT_EQUALS(g.ct.get<equipped_shield>(orc).value_or(ENTITYID_INVALID), ENTITYID_INVALID);
         TS_ASSERT(g.ct.get<destroyed>(shield).value_or(false));
         TS_ASSERT(!g.is_in_inventory(orc, shield));
+        TS_ASSERT_EQUALS(g.msg_history.size(), initial_history_size + 2);
+        TS_ASSERT(g.msg_history[initial_history_size].find("blocked an attack") != string::npos);
+        TS_ASSERT(g.msg_history[initial_history_size + 1].find("broke!") != string::npos);
         TS_ASSERT(g.gameplay_events.empty());
     }
 
@@ -603,6 +686,44 @@ public:
         TS_ASSERT(g.gameplay_events.empty());
     }
 
+    void testRunAttackActionLethalNpcHitMessageSequenceIsStable() {
+        gamestate g;
+        g.test = true;
+        g.mt.seed(7);
+        add_floor(g, 8, 8);
+
+        const entityid hero = g.create_player_at_with(vec3{1, 1, 0}, "hero", g.player_init(12));
+        const entityid orc = g.create_orc_at_with(vec3{2, 1, 0}, [](CT& ct, const entityid id) {
+            ct.set<name>(id, "orc");
+        });
+        const entityid hero_weapon = g.create_weapon_with(g.sword_init());
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(orc, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(hero_weapon, ENTITYID_INVALID);
+
+        g.add_to_inventory(hero, hero_weapon);
+        g.ct.set<equipped_weapon>(hero, hero_weapon);
+        g.ct.set<durability>(hero_weapon, 5);
+        g.ct.set<strength>(hero, 18);
+        g.ct.set<dexterity>(hero, 18);
+        g.ct.set<base_ac>(orc, 1);
+        g.ct.set<dexterity>(orc, 1);
+        g.ct.set<hp>(orc, vec2{1, 1});
+
+        const size_t initial_history_size = g.msg_history.size();
+        const attack_result_t result = g.run_attack_action(hero, vec3{2, 1, 0});
+
+        TS_ASSERT_EQUALS(result, ATTACK_RESULT_HIT);
+        TS_ASSERT(g.ct.get<dead>(orc).value_or(false));
+        TS_ASSERT_EQUALS(g.msg_history.size(), initial_history_size + 1);
+        TS_ASSERT(g.msg_history.back().find("deals") != string::npos);
+        TS_ASSERT(g.msg_history.back().find("broke") == string::npos);
+        TS_ASSERT(g.msg_history.back().find("blocked") == string::npos);
+        TS_ASSERT_EQUALS(g.ct.get<xp>(hero).value_or(0), 1);
+        TS_ASSERT(!g.msg_system_is_active);
+        TS_ASSERT(g.gameplay_events.empty());
+    }
+
     void testRunAttackActionLethalHitOnHeroResolvesQueuedPlayerDeathFollowup() {
         gamestate g;
         g.test = true;
@@ -628,6 +749,7 @@ public:
         g.ct.set<hp>(hero, vec2{1, 1});
 
         tile_t& hero_tile = g.d.get_floor(0)->tile_at(vec3{1, 1, 0});
+        const size_t initial_history_size = g.msg_history.size();
         const attack_result_t result = g.run_attack_action(orc, vec3{1, 1, 0});
 
         TS_ASSERT_EQUALS(result, ATTACK_RESULT_HIT);
@@ -636,6 +758,8 @@ public:
         TS_ASSERT_EQUALS(hero_tile.get_cached_live_npc(), ENTITYID_INVALID);
         TS_ASSERT_EQUALS(hero_tile.get_cached_dead_npc(), hero);
         TS_ASSERT_EQUALS(g.damage_popups.size(), 1U);
+        TS_ASSERT_EQUALS(g.msg_history.size(), initial_history_size + 1);
+        TS_ASSERT(g.msg_history.back().find("deals") != string::npos);
         TS_ASSERT(g.msg_system_is_active);
         TS_ASSERT(!g.msg_system.empty());
         TS_ASSERT_EQUALS(g.msg_system.front(), "You died");

@@ -8,7 +8,26 @@
 #include "entityid.h"
 #include "vec3.h"
 
-/// @brief High-level gameplay events that may be queued and resolved in order.
+/**
+ * @brief High-level gameplay events that may be queued and resolved in order.
+ *
+ * Combat follow-up ordering intentionally relies on FIFO append semantics in
+ * `process_gameplay_events()`. The current contract is:
+ * - attack miss: `EVENT_ATTACK_INTENT` emits the miss message inline and does
+ *   not enqueue damage/block/death/durability follow-ups
+ * - attack block: `EVENT_ATTACK_INTENT` may enqueue `EVENT_PROVOKE_NPC`, then
+ *   `EVENT_ATTACK_BLOCK`; block resolution then appends
+ *   `EVENT_ATTACK_SHIELD_DURABILITY`
+ * - attack hit: `EVENT_ATTACK_INTENT` may enqueue `EVENT_PROVOKE_NPC`, then
+ *   `EVENT_ATTACK_DAMAGE`; damage resolution then appends
+ *   `EVENT_ATTACK_WEAPON_DURABILITY` and, on lethal damage,
+ *   `EVENT_ATTACK_DEATH`; death resolution then appends either
+ *   `EVENT_ATTACK_AWARD_XP` plus `EVENT_ATTACK_DROP_INVENTORY` for NPC targets
+ *   or `EVENT_ATTACK_PLAYER_DEATH` for the hero
+ *
+ * Future queue changes should preserve that observable order unless the tests
+ * and gameplay contract are updated deliberately.
+ */
 typedef enum {
     EVENT_NONE = 0,
     EVENT_MOVE_INTENT,

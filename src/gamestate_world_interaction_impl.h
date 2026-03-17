@@ -669,6 +669,10 @@ inline gameplay_event_result_t gamestate::process_gameplay_events() {
     }
 
     processing_actions = true;
+    // FIFO iteration over a growable vector is the ordering contract for the
+    // current gameplay-event migration. Handlers may append follow-up events
+    // while processing earlier ones; those appended events must execute later
+    // in the same turn slice, in append order.
     for (size_t i = 0; i < gameplay_events.size(); i++) {
         const gameplay_event_result_t result = process_gameplay_event(gameplay_events[i]);
         if (first_result.type == EVENT_NONE && result.type != EVENT_NONE) {

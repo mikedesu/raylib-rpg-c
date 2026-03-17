@@ -11,18 +11,32 @@
   - the old direct combat compatibility wrappers have now been removed; combat enters through queued attack intent and queued combat follow-up events only
   - legacy direct `handle_box_push` / `try_entity_move` / `update_pressure_plates_for_floor` and direct inventory/combat helpers still work for compatibility outside the queued pipeline
 - Human-verified slices so far:
+  - push
   - pull
+  - pressure-plate door follow-up
   - open door
   - stairs traversal
   - chest toggles
 - Current automated baseline:
   - `make tests && ./tests`
-  - latest passing count before handoff: `167` tests
+  - latest passing count before handoff: `170` tests
+- Event-queue migration remainder:
+  - most gameplay-facing combat and world interaction entrypoints that were in scope for the migration are now queued and covered
+  - the migration no longer looks like a large foundational blocker before UI/UX or feature work; it has narrowed to a small cleanup/evaluation tail
+  - explicit remaining queue-migration decisions are:
+    - queued inventory/item/chest helper-backed intents: decide whether to keep the current helper-backed queue entrypoints or move them to queue-native resolvers
+    - remaining legacy direct movement/world helpers (`handle_box_push`, `try_entity_move`, `update_pressure_plates_for_floor`, etc.): decide whether they should stay as compatibility seams or be further collapsed behind queue-owned entrypoints
+  - if a UI/UX bug or new feature is otherwise ready to build, it is now reasonable to treat the event-queue migration as "good enough to park temporarily" after preserving the current test baseline
 - Next session target:
-  - human-verify the queued push and pressure-plate door-follow-up slices in live gameplay if that has not happened yet
-  - continue combat migration with queued combat message-generation cleanup and any remaining downstream simplification now that the old direct combat wrappers are gone
-  - likely next contained combat-only slices: tighten queued combat message-generation ownership and remove any stale combat-era notes/docs that still describe the deleted direct path
+  - unless a more urgent bug/feature takes priority, finish the remaining queue-tail evaluation items so the migration can be considered intentionally paused or effectively complete
+  - if UI/UX bugs or new features have better immediate value, it is reasonable to switch focus now and leave the remaining queue-tail items as follow-up cleanup instead of a blocker
   - preserve the current gameplay contract while migrating, the same way earlier slices kept legacy `try_entity_*` helpers working during the transition
+  - Queued combat / migration checklist:
+    - [x] consolidate queued combat message generation so attack, block, damage, death, XP, and breakage messaging has one clear ownership path
+    - [x] audit queued combat follow-up ordering and document the intended event order contract near the queue/combat code
+    - [x] add focused tests for queued combat message sequencing so message history remains stable across hit/block/kill/player-death cases
+    - [ ] evaluate whether queued inventory/item/chest helper-backed intents should keep their legacy direct helper implementations or move to queue-native resolvers
+    - [ ] evaluate whether remaining legacy direct movement/world helpers (`handle_box_push`, `try_entity_move`, `update_pressure_plates_for_floor`, etc.) should stay as compatibility seams or be further collapsed behind queue-owned entrypoints
   - Event-queue test hardening:
     - [x] add queued pressure-plate close-path test after the last occupant leaves a linked plate
     - [x] add queued stairs traversal test that refreshes source and destination floors and updates both linked doors correctly
@@ -65,9 +79,14 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
     - Player and NPC adjacent attacks now queue `EVENT_ATTACK_INTENT`.
     - Queued attack intent now schedules explicit ordered `EVENT_PROVOKE_NPC`, `EVENT_ATTACK_BLOCK`, `EVENT_ATTACK_DAMAGE`, `EVENT_ATTACK_DEATH`, `EVENT_ATTACK_AWARD_XP`, `EVENT_ATTACK_DROP_INVENTORY`, `EVENT_ATTACK_PLAYER_DEATH`, `EVENT_ATTACK_WEAPON_DURABILITY`, and `EVENT_ATTACK_SHIELD_DURABILITY` follow-up events so more combat side effects no longer need to resolve inline under the queued entrypoint.
     - Legacy direct `try_entity_attack`, `process_attack_entity`, and `process_attack_results` combat compatibility helpers have now been deleted after the queued combat path absorbed their behavior.
+    - Queued combat text ownership is now consolidated behind shared combat-message helpers instead of being formatted inline across multiple queued handlers.
+    - The queued combat follow-up ordering contract is now documented in the event enum, queue drain loop, and queued combat resolver so future queue changes have an explicit reference point.
+    - Focused queued combat message-sequencing coverage now exists for non-lethal hit, non-break block, lethal NPC hit, durability-break follow-ups, miss, and lethal hero hit cases.
     - Queued pressure-plate refresh now schedules explicit ordered door-state follow-up events for linked doors instead of toggling those doors inline during queued processing.
     - Queued push intent and queued pressure-plate door follow-up resolution now also have automated coverage through the new queue path.
+    - Push was verified by a real human after the queue migration slice landed.
     - Pull was verified by a real human after the queue migration slice landed.
+    - Pressure-plate door follow-up resolution was verified by a real human after the queue migration slice landed.
     - Manual door toggles were verified by a real human after the queue migration slice landed.
     - Stairs traversal was verified by a real human after the queue migration slice landed.
     - Chest toggles were verified by a real human after the queue migration slice landed.
@@ -95,7 +114,7 @@ As a reminder, the proper way to build is: `make clean && CXXFLAGS="-DDEBUG_ASSE
     - Main gameplay payoff: much better orchestration for cascading systems such as pressure plates, traps, forced movement, on-hit reactions, death triggers, scripted room logic, and future multi-step interactions.
     - Main engineering payoff: easier debugging/logging/replay of world-state transitions, clearer separation between intent and resolution, and lower risk of fragile ordering bugs.
     - Likely migration path: introduce a narrow event queue for one domain first, such as movement plus world triggers, then expand to combat and other interaction systems after the pattern is stable.
-    - Current next suggested slice after movement + push/pull + manual door toggles + stairs traversal + chest toggles + combat intent + deeper combat follow-ups: human-verify queued push / pressure-plate door behavior in gameplay, then continue queued combat cleanup now that the direct combat wrappers are gone.
+    - Current next suggested slice after movement + push/pull + manual door toggles + stairs traversal + chest toggles + combat intent + deeper combat follow-ups: reassess the remaining helper-backed inventory/chest queue entrypoints and remaining direct world-helper seams, or deliberately park the migration and switch to higher-value UI/UX / feature work.
 
 - [ ] Continue top-down `libdraw` cleanup and reduce remaining rendering global-state coupling.
   - Recent passes centralized renderer-global declarations through `libdraw_context.h`, removed repeated ad hoc `extern` declarations across draw/update headers, and routed `libdraw.h` scene dispatch through the compatibility include.
@@ -221,10 +240,12 @@ Compact status handoff for the current C++ / raylib dungeon project.
     - queued chest-toggle intent now resolves through the same queue
     - queued interact/talk, pickup, hero item-use, hero equip/unequip, hero drop, and chest transfer intents now also resolve through the same queue
     - queued attack intent now also fans out into explicit block, damage, death, XP reward, inventory drop, player-death, provoke, and durability-loss follow-up events
-    - legacy direct combat compatibility entrypoints now also delegate into the queued combat pipeline
+    - direct combat compatibility entrypoints have now been removed after the queued combat pipeline absorbed their behavior
     - queued movement, push, pull, and stairs traversal schedule pressure-plate refresh as explicit ordered follow-up events
     - queued pressure-plate refresh now fans out into explicit linked-door open/close follow-up events
+    - queued push migration has now been human-verified in gameplay
     - queued pull migration has now been human-verified in gameplay
+    - queued pressure-plate door follow-up migration has now been human-verified in gameplay
     - queued manual door-toggle migration has now been human-verified in gameplay
     - queued stairs-traversal migration has now been human-verified in gameplay
     - queued chest-toggle migration has now been human-verified in gameplay
