@@ -857,8 +857,9 @@ void draw_action_menu(gamestate& g) {
 }
 
 void draw_option_menu(gamestate& g) {
-    constexpr float x = 10, y = 10, p = 20, pa = 10, rotation = 0;
-    constexpr int fsize = 10, thickness = 1;
+    constexpr float x = 10, y = 10, rotation = 0;
+    constexpr int fsize = 10, line_height = 12, thickness = 1;
+    constexpr float padding_x = 20, padding_y = 10;
     constexpr Vector2 origin = {0, 0};
     float max_w = 0;
     for (size_t i = 0; i < g.options_menu.get_option_count(); i++) {
@@ -873,14 +874,16 @@ void draw_option_menu(gamestate& g) {
             max_w = w;
         }
     }
-    const float h = fsize * g.options_menu.get_option_count();
-    const float padded_w = max_w + p, padded_h = h + p;
+    // Use a line height larger than the font size so adjacent rows do not overdraw descenders.
+    const float h = line_height * g.options_menu.get_option_count();
+    const float padded_w = max_w + padding_x;
+    const float padded_h = h + padding_y * 2;
     const Rectangle r = {x, y, padded_w, padded_h};
     DrawRectanglePro(r, origin, rotation, g.window_box_bgcolor);
     DrawRectangleLinesEx(r, thickness, g.window_box_fgcolor);
     for (size_t i = 0; i < g.options_menu.get_option_count(); i++) {
-        constexpr int x0 = x + pa;
-        const int y0 = y + pa + fsize * i;
+        const int x0 = static_cast<int>(x + padding_y);
+        const int y0 = static_cast<int>(y + padding_y + line_height * i);
         const option_type otype = g.options_menu.get_option(i);
         const string ostr =
             otype == OPTION_INVENTORY_MENU
