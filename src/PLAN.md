@@ -33,6 +33,11 @@ Active items:
 ## Bugs To Fix
 
 - [ ] Upstairs/downstairs tiles should not spawn where a door should go
+  - [ ] When arriving on Floor 2 from Floor 1, I am sometimes appearing on a tile that joins 2 rooms
+    - [ ] This tile would be a perfect place for a door, but instead, there is a upstairs tile
+    - [ ] Doors should obviously not be created on top of upstairs/downstairs tiles
+    - [ ] Tiles that contain doors should not have their types changed to upstairs or downstairs
+    - [ ] Doors should be created before assignment of upstairs or downstairs or any other exit tiles (yet to be created...)
 
 ## Backlog Of Tasks
 
