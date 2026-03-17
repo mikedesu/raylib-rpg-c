@@ -1191,9 +1191,6 @@ public:
     /** @brief Advance and expire active floating damage-number popups. */
     void update_damage_popups(float dt_seconds);
 
-    /** @brief Apply gameplay side effects after resolving an attack attempt. */
-    void process_attack_results(tile_t& tile, entityid atk_id, entityid tgt_id, bool atk_successful);
-
     /** @brief Play shield-block audio feedback for a defending entity. */
     void handle_shield_block_sfx(entityid target_id);
 
@@ -1227,25 +1224,11 @@ public:
     /** @brief Apply queued defender shield durability loss consequences. */
     void resolve_attack_shield_durability_event(entityid defender_id, entityid attacker_id);
 
-    /**
-     * @brief Resolve a direct attack against a target entity on a tile.
-     *
-     * @return Detailed attack result describing hit, miss, or block outcome.
-     */
-    attack_result_t process_attack_entity(tile_t& tile, entityid attacker_id, entityid target_id);
-
     /** @brief Play attack-result audio feedback for an entity action. */
     void handle_attack_sfx(entityid attacker, attack_result_t result);
 
     /** @brief Set the active gamestate flag for the next attack animation phase. */
     void set_gamestate_flag_for_attack_animation(entitytype_t type);
-
-    /**
-     * @brief Attempt a melee attack from an entity toward a target tile.
-     *
-     * @return Detailed attack result describing the resolved outcome.
-     */
-    attack_result_t try_entity_attack(entityid id, int x, int y);
 
     bool handle_attack(inputstate& is, bool is_dead) {
         if (is_action_pressed(is, INPUT_ACTION_ATTACK)) {

@@ -108,31 +108,6 @@ inline void gamestate::provoke_npc(entityid npc_id, entityid source_id) {
     update_npc_behavior(npc_id);
 }
 
-inline void gamestate::process_attack_results(tile_t& tile, entityid atk_id, entityid tgt_id, bool atk_successful) {
-    (void)tile;
-    massert(atk_id != ENTITYID_INVALID, "attacker entity id is invalid");
-    massert(tgt_id != ENTITYID_INVALID, "target entity id is invalid");
-
-    if (ct.get<dead>(tgt_id).value_or(false)) {
-        const string attacker_name = ct.get<name>(atk_id).value_or("no-name");
-        add_message_history("%s swings at a dead target", attacker_name.c_str());
-        return;
-    }
-    if (!atk_successful) {
-        const string attacker_name = ct.get<name>(atk_id).value_or("no-name");
-        const string target_name = ct.get<name>(tgt_id).value_or("no-name");
-        add_message_history("%s swings at %s and misses!", attacker_name.c_str(), target_name.c_str());
-        return;
-    }
-
-    if (!queue_attack_damage_event(atk_id, tgt_id, compute_attack_damage(atk_id, tgt_id))) {
-        return;
-    }
-    if (!processing_actions) {
-        process_gameplay_events();
-    }
-}
-
 inline void gamestate::handle_shield_block_sfx(entityid target_id) {
     if (test || !IsAudioDeviceReady() || sfx.size() <= SFX_HIT_METAL_ON_METAL) {
         return;
@@ -296,33 +271,6 @@ inline void gamestate::resolve_attack_shield_durability_event(entityid defender_
     handle_shield_durability_loss(defender_id, attacker_id);
 }
 
-inline attack_result_t gamestate::process_attack_entity(tile_t& tile, entityid attacker_id, entityid target_id) {
-    (void)tile;
-    massert(attacker_id != ENTITYID_INVALID, "attacker is NULL");
-    if (target_id == INVALID) {
-        return ATTACK_RESULT_MISS;
-    }
-
-    entitytype_t type = ct.get<entitytype>(target_id).value_or(ENTITY_NONE);
-    if (type != ENTITY_PLAYER && type != ENTITY_NPC) {
-        return ATTACK_RESULT_MISS;
-    }
-    if (ct.get<dead>(target_id).value_or(true)) {
-        return ATTACK_RESULT_MISS;
-    }
-
-    const vec3 target_loc = ct.get<location>(target_id).value_or(vec3{-1, -1, -1});
-    if (vec3_invalid(target_loc)) {
-        return ATTACK_RESULT_MISS;
-    }
-
-    const attack_result_t result = resolve_attack_intent(attacker_id, target_loc);
-    if (!processing_actions) {
-        process_gameplay_events();
-    }
-    return result;
-}
-
 inline void gamestate::handle_attack_sfx(entityid attacker, attack_result_t result) {
     if (test) {
         return;
@@ -359,14 +307,6 @@ inline void gamestate::set_gamestate_flag_for_attack_animation(entitytype_t type
     else if (type == ENTITY_NPC) {
         flag = GAMESTATE_FLAG_NPC_ANIM;
     }
-}
-
-inline attack_result_t gamestate::try_entity_attack(entityid id, int x, int y) {
-    minfo2("entity %d is attacking location %d, %d", id, x, y);
-    massert(!ct.get<dead>(id).value_or(false), "attacker entity is dead");
-    massert(ct.has<location>(id), "entity %d has no location", id);
-    vec3 loc = ct.get<location>(id).value();
-    return run_attack_action(id, vec3{x, y, loc.z});
 }
 
 inline bool gamestate::is_entity_adjacent(entityid id0, entityid id1) {

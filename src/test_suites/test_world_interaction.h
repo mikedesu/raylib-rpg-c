@@ -864,12 +864,20 @@ public:
 
         const entityid hero = create_hero(g, vec3{1, 1, 0});
         const entityid orc = g.create_orc_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
+        const entityid hero_weapon = g.create_weapon_with(g.sword_init());
         TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
         TS_ASSERT_DIFFERS(orc, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(hero_weapon, ENTITYID_INVALID);
 
+        g.add_to_inventory(hero, hero_weapon);
+        g.ct.set<equipped_weapon>(hero, hero_weapon);
+        g.ct.set<strength>(hero, 18);
+        g.ct.set<dexterity>(hero, 18);
+        g.ct.set<base_ac>(orc, 1);
+        g.ct.set<dexterity>(orc, 1);
         g.ct.set<hp>(orc, vec2{1, 1});
         tile_t& target_tile = g.d.get_floor(0)->tile_at(vec3{2, 1, 0});
-        g.process_attack_results(target_tile, hero, orc, true);
+        TS_ASSERT_EQUALS(g.run_attack_action(hero, vec3{2, 1, 0}), ATTACK_RESULT_HIT);
 
         TS_ASSERT(g.ct.get<dead>(orc).value_or(false));
         TS_ASSERT_EQUALS(target_tile.get_cached_live_npc(), ENTITYID_INVALID);

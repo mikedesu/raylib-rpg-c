@@ -252,17 +252,17 @@ public:
 
     void testAttackingFriendlyNpcSetsAggro() {
         gamestate g;
+        g.test = true;
         add_floor(g, 8, 8);
 
         const entityid friendly = g.create_npc_at_with(RACE_DWARF, vec3{2, 1, 0}, [](CT&, const entityid) {});
         const entityid hero = g.create_player_at_with(vec3{1, 1, 0}, "hero", g.player_init(10));
-        tile_t& target_tile = g.d.get_floor(0)->tile_at(vec3{2, 1, 0});
 
         TS_ASSERT_DIFFERS(friendly, ENTITYID_INVALID);
         TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
         TS_ASSERT(!g.ct.get<aggro>(friendly).value_or(true));
 
-        g.process_attack_entity(target_tile, hero, friendly);
+        g.run_attack_action(hero, vec3{2, 1, 0});
 
         TS_ASSERT(g.ct.get<aggro>(friendly).value_or(false));
         TS_ASSERT_EQUALS(g.ct.get<target_id>(friendly).value_or(ENTITYID_INVALID), hero);
@@ -270,6 +270,7 @@ public:
 
     void testBoundedMeleeDuelEndsWithConsistentDeathState() {
         gamestate g;
+        g.test = true;
         g.mt.seed(24680);
         add_floor(g, 8, 8);
 
@@ -299,12 +300,10 @@ public:
         bool duel_finished = false;
         for (int round = 0; round < 16 && !duel_finished; ++round) {
             if (!g.ct.get<dead>(hero).value_or(true) && !g.ct.get<dead>(orc).value_or(true)) {
-                tile_t& orc_tile = g.d.get_floor(0)->tile_at(vec3{2, 1, 0});
-                g.process_attack_entity(orc_tile, hero, orc);
+                g.run_attack_action(hero, vec3{2, 1, 0});
             }
             if (!g.ct.get<dead>(hero).value_or(true) && !g.ct.get<dead>(orc).value_or(true)) {
-                tile_t& hero_tile = g.d.get_floor(0)->tile_at(vec3{1, 1, 0});
-                g.process_attack_entity(hero_tile, orc, hero);
+                g.run_attack_action(orc, vec3{1, 1, 0});
             }
             duel_finished = g.ct.get<dead>(hero).value_or(false) || g.ct.get<dead>(orc).value_or(false);
         }
@@ -676,7 +675,7 @@ public:
         TS_ASSERT(!g.ct.get<dead>(g.hero_id).value_or(true));
     }
 
-    void testProcessAttackResultsAddsDamagePopupForHpTarget() {
+    void testResolveAttackDamageEventAddsDamagePopupForHpTarget() {
         gamestate g;
         add_floor(g, 8, 8);
 
@@ -685,11 +684,10 @@ public:
         TS_ASSERT_DIFFERS(attacker, ENTITYID_INVALID);
         TS_ASSERT_DIFFERS(target, ENTITYID_INVALID);
 
-        g.mt.seed(7);
-        g.process_attack_results(g.d.get_current_floor()->tile_at(vec3{2, 1, 0}), attacker, target, true);
+        g.resolve_attack_damage_event(attacker, target, 3);
 
         TS_ASSERT_EQUALS(g.damage_popups.size(), 1U);
-        TS_ASSERT(g.damage_popups[0].amount >= 1);
+        TS_ASSERT_EQUALS(g.damage_popups[0].amount, 3);
         TS_ASSERT_EQUALS(g.damage_popups[0].floor, 0);
         TS_ASSERT(g.frame_dirty);
     }
