@@ -179,4 +179,37 @@ public:
             TS_ASSERT_EQUALS(connected.size(), count_walkable_tiles(df));
         }
     }
+
+    void testPossibleStairsLocationsExcludeDoorCandidates() {
+        gamestate g;
+        auto df = g.d.create_floor(BIOME_STONE, 8, 8);
+        df->df_set_all_tiles(TILE_FLOOR_STONE_00);
+        const vec3 blocked_loc{3, 3, 0};
+        df->df_set_can_have_door(blocked_loc);
+
+        auto upstairs_locs = df->df_get_possible_upstairs_locs();
+        auto downstairs_locs = df->df_get_possible_downstairs_locs();
+        const bool upstairs_contains_blocked = std::any_of(
+            upstairs_locs->begin(), upstairs_locs->end(), [&](const vec3& loc) { return vec3_equal(loc, blocked_loc); });
+        const bool downstairs_contains_blocked = std::any_of(
+            downstairs_locs->begin(), downstairs_locs->end(), [&](const vec3& loc) { return vec3_equal(loc, blocked_loc); });
+
+        TS_ASSERT(upstairs_locs);
+        TS_ASSERT(downstairs_locs);
+        TS_ASSERT(!upstairs_contains_blocked);
+        TS_ASSERT(!downstairs_contains_blocked);
+    }
+
+    void testStairsAssignmentRejectsDoorCandidateTile() {
+        gamestate g;
+        auto df = g.d.create_floor(BIOME_STONE, 8, 8);
+        df->df_set_all_tiles(TILE_FLOOR_STONE_00);
+        const vec3 blocked_loc{4, 4, 0};
+        df->df_set_can_have_door(blocked_loc);
+
+        TS_ASSERT(!df->df_set_upstairs_loc(blocked_loc));
+        TS_ASSERT(!df->df_set_downstairs_loc(blocked_loc));
+        TS_ASSERT_EQUALS(df->tile_at(blocked_loc).get_type(), TILE_FLOOR_STONE_00);
+        TS_ASSERT(df->tile_at(blocked_loc).get_can_have_door());
+    }
 };

@@ -93,6 +93,9 @@ public:
         if (!tile_is_possible_upstairs(tile.get_type())) {
             return false;
         }
+        if (tile.get_can_have_door() || tile.get_cached_door() != ENTITYID_INVALID) {
+            return false;
+        }
         upstairs_loc = loc;
         tile.set_type(TILE_UPSTAIRS);
         tile.set_can_have_door(false);
@@ -111,6 +114,9 @@ public:
         loc.z = floor;
         tile_t& tile = tile_at(loc);
         if (!tile_is_possible_downstairs(tile.get_type())) {
+            return false;
+        }
+        if (tile.get_can_have_door() || tile.get_cached_door() != ENTITYID_INVALID) {
             return false;
         }
         downstairs_loc = loc;
@@ -540,7 +546,7 @@ public:
             for (int x0 = r.x; x0 < width; x0++) {
                 tile_t& tile = tile_at(vec3{x0, y0, -1});
                 // there wont be any entities yet so do not check for them
-                if (tile_is_possible_upstairs(tile.get_type())) {
+                if (tile_is_possible_upstairs(tile.get_type()) && !tile.get_can_have_door() && tile.get_cached_door() == ENTITYID_INVALID) {
                     locations->push_back(vec3{x0, y0, floor});
                 }
             }
@@ -561,7 +567,7 @@ public:
             for (int x0 = r.x; x0 < width; x0++) {
                 tile_t& tile = tile_at(vec3{x0, y0, -1});
                 // there wont be any entities yet so do not check for them
-                if (tile_is_possible_downstairs(tile.get_type())) {
+                if (tile_is_possible_downstairs(tile.get_type()) && !tile.get_can_have_door() && tile.get_cached_door() == ENTITYID_INVALID) {
                     locations->push_back(vec3{x0, y0, floor});
                 }
             }
