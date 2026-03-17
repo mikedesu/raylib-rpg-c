@@ -63,6 +63,32 @@ private:
     }
 
 public:
+    void testHeavyDungeonGenerationKeepsStairsOffDoorTopology() {
+        constexpr unsigned int seed_count = 256;
+
+        for (unsigned int seed = 1; seed <= seed_count; ++seed) {
+            gamestate g;
+            g.mt.seed(seed);
+            SetRandomSeed(seed);
+            srand(seed);
+
+            g.init_dungeon(BIOME_STONE, 4, 4.0f, 16, 16);
+
+            for (size_t floor_index = 0; floor_index < g.d.get_floor_count(); ++floor_index) {
+                auto df = g.d.get_floor(floor_index);
+                const vec3 upstairs = df->get_upstairs_loc();
+                const vec3 downstairs = df->get_downstairs_loc();
+
+                TS_ASSERT(vec3_valid(upstairs));
+                TS_ASSERT(vec3_valid(downstairs));
+                TS_ASSERT(!df->df_is_good_door_loc(upstairs));
+                TS_ASSERT(!df->df_is_good_door_loc(downstairs));
+                TS_ASSERT_EQUALS(df->tile_at(upstairs).get_cached_door(), ENTITYID_INVALID);
+                TS_ASSERT_EQUALS(df->tile_at(downstairs).get_cached_door(), ENTITYID_INVALID);
+            }
+        }
+    }
+
     void testPathfindingSoakMovesHostileOrcThroughSingleGapTowardHero() {
         gamestate g;
         g.test = true;
