@@ -2,21 +2,12 @@
 
 #include "../gamestate.h"
 #include "../inputstate.h"
+#include "test_helpers.h"
 #include <cxxtest/TestSuite.h>
 #include <set>
 
 class CombatBootstrapTestSuite : public CxxTest::TestSuite {
 private:
-    size_t count_entities_of_type(gamestate& g, entitytype_t type) {
-        size_t count = 0;
-        for (entityid id = 1; id < g.next_entityid; id++) {
-            if (g.ct.get<entitytype>(id).value_or(ENTITY_NONE) == type) {
-                count++;
-            }
-        }
-        return count;
-    }
-
     size_t count_live_npcs_on_floor(gamestate& g, int floor) {
         size_t count = 0;
         for (entityid id = 1; id < g.next_entityid; id++) {
@@ -54,33 +45,10 @@ private:
         return count;
     }
 
-    entityid find_live_npc_on_floor(gamestate& g, int floor) {
-        for (entityid id = 1; id < g.next_entityid; id++) {
-            if (g.ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_NPC) {
-                continue;
-            }
-            if (g.ct.get<dead>(id).value_or(true)) {
-                continue;
-            }
-            const vec3 loc = g.ct.get<location>(id).value_or(vec3{-1, -1, -1});
-            if (loc.z == floor) {
-                return id;
-            }
-        }
-        return ENTITYID_INVALID;
-    }
-
-    void add_floor(gamestate& g, int width = 8, int height = 8) {
-        auto df = g.d.create_floor(BIOME_STONE, width, height);
-        df->df_set_all_tiles(TILE_FLOOR_STONE_00);
-        g.d.add_floor(df);
-        g.d.is_initialized = true;
-    }
-
 public:
     void testCreateMultipleOrcsProducesUniqueIdsAndNpcState() {
         gamestate g;
-        add_floor(g, 10, 10);
+        add_initialized_floor(g, 10, 10);
 
         std::set<entityid> ids;
         const vec3 locs[] = {{1, 1, 0}, {2, 1, 0}, {3, 1, 0}, {4, 1, 0}};
@@ -99,7 +67,7 @@ public:
 
     void testCreateOrcRejectsOccupiedTile() {
         gamestate g;
-        add_floor(g, 8, 8);
+        add_initialized_floor(g, 8, 8);
 
         const vec3 loc{1, 1, 0};
         const entityid first = g.create_orc_at_with(loc, [](CT&, const entityid) {});
@@ -112,7 +80,7 @@ public:
 
     void testCreateOrcStopsAtWalkableTileCapacityWithoutLeakingIds() {
         gamestate g;
-        add_floor(g, 3, 3);
+        add_initialized_floor(g, 3, 3);
 
         std::set<entityid> ids;
         for (int y = 0; y < 3; ++y) {
@@ -201,8 +169,8 @@ public:
 
     void testUpdateNpcsStateSetsFriendlyAndHostileDefaultActions() {
         gamestate g;
-        add_floor(g, 8, 8);
-        add_floor(g, 8, 8);
+        add_initialized_floor(g, 8, 8);
+        add_initialized_floor(g, 8, 8);
 
         const entityid friendly = g.create_npc_at_with(RACE_DWARF, vec3{1, 1, 0}, [](CT&, const entityid) {});
         const entityid hostile = g.create_orc_at_with(vec3{2, 2, 1}, [](CT&, const entityid) {});
@@ -233,7 +201,7 @@ public:
 
     void testProvokeNpcTurnsFriendlyNpcHostile() {
         gamestate g;
-        add_floor(g, 8, 8);
+        add_initialized_floor(g, 8, 8);
 
         const entityid friendly = g.create_npc_at_with(RACE_DWARF, vec3{2, 1, 0}, [](CT&, const entityid) {});
         const entityid hero = g.create_player_at_with(vec3{1, 1, 0}, "hero", g.player_init(10));
@@ -253,7 +221,7 @@ public:
     void testAttackingFriendlyNpcSetsAggro() {
         gamestate g;
         g.test = true;
-        add_floor(g, 8, 8);
+        add_initialized_floor(g, 8, 8);
 
         const entityid friendly = g.create_npc_at_with(RACE_DWARF, vec3{2, 1, 0}, [](CT&, const entityid) {});
         const entityid hero = g.create_player_at_with(vec3{1, 1, 0}, "hero", g.player_init(10));
@@ -272,7 +240,7 @@ public:
         gamestate g;
         g.test = true;
         g.mt.seed(24680);
-        add_floor(g, 8, 8);
+        add_initialized_floor(g, 8, 8);
 
         const entityid hero = g.create_player_at_with(vec3{1, 1, 0}, "hero", g.player_init(12));
         const entityid orc = g.create_orc_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
@@ -333,7 +301,7 @@ public:
         gamestate g;
         g.test = true;
         g.mt.seed(24680);
-        add_floor(g, 8, 8);
+        add_initialized_floor(g, 8, 8);
 
         const entityid hero = g.create_player_at_with(vec3{1, 1, 0}, "hero", g.player_init(12));
         const entityid orc = g.create_orc_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
@@ -360,7 +328,7 @@ public:
         gamestate g;
         g.test = true;
         g.mt.seed(24680);
-        add_floor(g, 8, 8);
+        add_initialized_floor(g, 8, 8);
 
         const entityid friendly = g.create_npc_at_with(RACE_DWARF, vec3{2, 1, 0}, [](CT&, const entityid) {});
         const entityid hero = g.create_player_at_with(vec3{1, 1, 0}, "hero", g.player_init(12));
@@ -387,7 +355,7 @@ public:
         gamestate g;
         g.test = true;
         g.mt.seed(7);
-        add_floor(g, 8, 8);
+        add_initialized_floor(g, 8, 8);
 
         const entityid hero = g.create_player_at_with(vec3{1, 1, 0}, "hero", g.player_init(12));
         const entityid orc = g.create_orc_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
@@ -419,7 +387,7 @@ public:
         gamestate g;
         g.test = true;
         g.mt.seed(7);
-        add_floor(g, 8, 8);
+        add_initialized_floor(g, 8, 8);
 
         const entityid hero = g.create_player_at_with(vec3{1, 1, 0}, "hero", g.player_init(12));
         const entityid orc = g.create_orc_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
@@ -454,7 +422,7 @@ public:
         gamestate g;
         g.test = true;
         g.mt.seed(99);
-        add_floor(g, 8, 8);
+        add_initialized_floor(g, 8, 8);
 
         const entityid hero = g.create_player_at_with(vec3{1, 1, 0}, "hero", g.player_init(12));
         const entityid orc = g.create_orc_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
@@ -492,7 +460,7 @@ public:
         gamestate g;
         g.test = true;
         g.mt.seed(99);
-        add_floor(g, 8, 8);
+        add_initialized_floor(g, 8, 8);
 
         const entityid hero = g.create_player_at_with(vec3{1, 1, 0}, "hero", g.player_init(12));
         const entityid orc = g.create_orc_at_with(vec3{2, 1, 0}, [](CT& ct, const entityid id) {
@@ -531,7 +499,7 @@ public:
         gamestate g;
         g.test = true;
         g.mt.seed(7);
-        add_floor(g, 8, 8);
+        add_initialized_floor(g, 8, 8);
 
         const entityid hero = g.create_player_at_with(vec3{1, 1, 0}, "hero", g.player_init(12));
         const entityid orc = g.create_orc_at_with(vec3{2, 1, 0}, [](CT& ct, const entityid id) {
@@ -567,7 +535,7 @@ public:
         gamestate g;
         g.test = true;
         g.mt.seed(7);
-        add_floor(g, 8, 8);
+        add_initialized_floor(g, 8, 8);
 
         const entityid hero = g.create_player_at_with(vec3{1, 1, 0}, "hero", g.player_init(12));
         const entityid orc = g.create_orc_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
@@ -601,7 +569,7 @@ public:
         gamestate g;
         g.test = true;
         g.mt.seed(99);
-        add_floor(g, 8, 8);
+        add_initialized_floor(g, 8, 8);
 
         const entityid hero = g.create_player_at_with(vec3{1, 1, 0}, "hero", g.player_init(12));
         const entityid orc = g.create_orc_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
@@ -640,7 +608,7 @@ public:
         gamestate g;
         g.test = true;
         g.mt.seed(7);
-        add_floor(g, 8, 8);
+        add_initialized_floor(g, 8, 8);
 
         const entityid hero = g.create_player_at_with(vec3{1, 1, 0}, "hero", g.player_init(12));
         const entityid orc = g.create_orc_at_with(vec3{2, 1, 0}, [](CT& ct, const entityid id) {
@@ -690,7 +658,7 @@ public:
         gamestate g;
         g.test = true;
         g.mt.seed(7);
-        add_floor(g, 8, 8);
+        add_initialized_floor(g, 8, 8);
 
         const entityid hero = g.create_player_at_with(vec3{1, 1, 0}, "hero", g.player_init(12));
         const entityid orc = g.create_orc_at_with(vec3{2, 1, 0}, [](CT& ct, const entityid id) {
@@ -728,7 +696,7 @@ public:
         gamestate g;
         g.test = true;
         g.mt.seed(7);
-        add_floor(g, 8, 8);
+        add_initialized_floor(g, 8, 8);
 
         const entityid hero = g.create_player_at_with(vec3{1, 1, 0}, "hero", g.player_init(12));
         const entityid orc = g.create_orc_at_with(vec3{2, 1, 0}, [](CT& ct, const entityid id) {
@@ -769,7 +737,7 @@ public:
     void testTickInTestModeAdvancesTicksAndTurnsWithHeroPresent() {
         gamestate g;
         g.test = true;
-        g.sfx.resize(71);
+        init_test_sfx(g);
         g.logic_init();
 
         const vec3 hero_loc = g.d.get_floor(0)->get_random_loc();
@@ -801,7 +769,7 @@ public:
 
     void testResolveAttackDamageEventAddsDamagePopupForHpTarget() {
         gamestate g;
-        add_floor(g, 8, 8);
+        add_initialized_floor(g, 8, 8);
 
         const entityid attacker = g.create_player_at_with(vec3{1, 1, 0}, "hero", g.player_init(10));
         const entityid target = g.create_orc_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
@@ -818,7 +786,7 @@ public:
 
     void testUpdateDamagePopupsExpiresFinishedEntries() {
         gamestate g;
-        add_floor(g, 8, 8);
+        add_initialized_floor(g, 8, 8);
 
         const entityid target = g.create_orc_at_with(vec3{2, 2, 0}, [](CT&, const entityid) {});
         TS_ASSERT_DIFFERS(target, ENTITYID_INVALID);

@@ -1,29 +1,11 @@
 #pragma once
 
 #include "../gamestate.h"
+#include "test_helpers.h"
 #include <cxxtest/TestSuite.h>
 
 class GamestateLifecycleTestSuite : public CxxTest::TestSuite {
 public:
-    void press_key(inputstate& is, int key) {
-        const int idx = key / BITS_PER_LONG;
-        const int bit = key % BITS_PER_LONG;
-        is.pressed[idx] |= (1ULL << bit);
-    }
-
-    void hold_key(inputstate& is, int key) {
-        const int idx = key / BITS_PER_LONG;
-        const int bit = key % BITS_PER_LONG;
-        is.held[idx] |= (1ULL << bit);
-    }
-
-    void add_floor(gamestate& g, int width = 8, int height = 8) {
-        auto df = g.d.create_floor(BIOME_STONE, width, height);
-        df->df_set_all_tiles(TILE_FLOOR_STONE_00);
-        g.d.add_floor(df);
-        g.d.is_initialized = true;
-    }
-
     void testGamestateEmpty() {
     }
 
@@ -347,8 +329,8 @@ public:
     void testCharacterCreationTransitionsIntoKeyboardProfilePrompt() {
         gamestate g;
         g.test = true;
-        g.sfx.resize(71);
-        add_floor(g);
+        init_test_sfx(g);
+        add_initialized_floor(g);
         g.current_scene = SCENE_CHARACTER_CREATION;
 
         inputstate is = {};
@@ -388,8 +370,8 @@ public:
     void testCharacterCreationSkipsKeyboardPromptAfterProfileAlreadyConfirmed() {
         gamestate g;
         g.test = true;
-        g.sfx.resize(71);
-        add_floor(g);
+        init_test_sfx(g);
+        add_initialized_floor(g);
         g.current_scene = SCENE_CHARACTER_CREATION;
         g.keyboard_profile = KEYBOARD_PROFILE_LAPTOP;
         g.keyboard_profile_confirmed = true;
@@ -410,7 +392,7 @@ public:
     void testLaptopProfileUsesHjklMovementKeys() {
         gamestate g;
         g.test = true;
-        add_floor(g);
+        add_initialized_floor(g);
         const entityid hero = g.create_player_at_with(vec3{3, 3, 0}, "hero", g.player_init(10));
         TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
 
@@ -556,7 +538,7 @@ public:
     void testFaceDirectionAttackUsesBoundActionInsteadOfHardCodedKey() {
         gamestate g;
         g.test = true;
-        add_floor(g);
+        add_initialized_floor(g);
         const entityid hero = g.create_player_at_with(vec3{3, 3, 0}, "hero", g.player_init(10));
         TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
 

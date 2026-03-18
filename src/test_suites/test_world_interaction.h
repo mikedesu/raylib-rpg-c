@@ -1,32 +1,14 @@
 #pragma once
 
 #include "../gamestate.h"
+#include "test_helpers.h"
 #include <cxxtest/TestSuite.h>
 
 class WorldInteractionTestSuite : public CxxTest::TestSuite {
-private:
-    void add_floor(gamestate& g, int width = 6, int height = 6) {
-        auto df = g.d.create_floor(BIOME_STONE, width, height);
-        df->df_set_all_tiles(TILE_FLOOR_STONE_00);
-        g.d.add_floor(df);
-        g.d.is_initialized = true;
-    }
-
-    entityid create_hero(gamestate& g, vec3 loc) {
-        return g.create_player_at_with(loc, "hero", [](CT&, const entityid) {});
-    }
-
-    void press_key(inputstate& is, int key) {
-        inputstate_reset(is);
-        const int idx = key / BITS_PER_LONG;
-        const int bit = key % BITS_PER_LONG;
-        is.pressed[idx] |= (1ULL << bit);
-    }
-
 public:
     void testTryEntityMoveBlockedByWall() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
         const vec3 hero_loc{1, 1, 0};
         const entityid hero = create_hero(g, hero_loc);
         g.d.get_floor(0)->df_set_tile(TILE_STONE_WALL_00, 2, 1);
@@ -37,7 +19,7 @@ public:
 
     void testTryEntityMoveBlockedBySolidPropAndClosedDoor() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
         const vec3 hero_loc{1, 1, 0};
         const entityid hero = create_hero(g, hero_loc);
 
@@ -58,7 +40,7 @@ public:
 
     void testCreateDoorAtWithRejectsOccupiedTile() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
 
         const entityid prop_id = g.create_prop_at_with(PROP_DUNGEON_STATUE_00, vec3{2, 2, 0}, dungeon_prop_init(PROP_DUNGEON_STATUE_00));
         TS_ASSERT_DIFFERS(prop_id, ENTITYID_INVALID);
@@ -68,7 +50,7 @@ public:
 
     void testTryEntityMovePushesBox() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
         const entityid hero = create_hero(g, vec3{2, 2, 0});
         const entityid box = g.create_box_at_with(vec3{3, 2, 0});
 
@@ -81,7 +63,7 @@ public:
 
     void testTryEntityPullMovesHeroAndBoxBackward() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
         const entityid hero = create_hero(g, vec3{2, 2, 0});
         g.ct.set<direction>(hero, DIR_RIGHT);
         const entityid box = g.create_box_at_with(vec3{3, 2, 0});
@@ -95,7 +77,7 @@ public:
 
     void testTryEntityPullDeadNpcKeepsDeadNpcCachePath() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
         const entityid hero = create_hero(g, vec3{2, 2, 0});
         g.ct.set<direction>(hero, DIR_RIGHT);
 
@@ -120,7 +102,7 @@ public:
 
     void testTryEntityPullMovesPullableCandleProp() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
         const entityid hero = create_hero(g, vec3{2, 2, 0});
         g.ct.set<direction>(hero, DIR_RIGHT);
 
@@ -140,7 +122,7 @@ public:
 
     void testTryEntityMovePushesPushableTableProp() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
         const entityid hero = create_hero(g, vec3{2, 2, 0});
         const entityid table = g.create_prop_at_with(
             PROP_DUNGEON_WOODEN_TABLE_00,
@@ -158,7 +140,7 @@ public:
 
     void testRunMoveActionUsesQueuedMovementIntent() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
 
         const entityid hero = create_hero(g, vec3{1, 1, 0});
         TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
@@ -170,7 +152,7 @@ public:
 
     void testRunPushActionUsesQueuedPushIntent() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
 
         const entityid box = g.create_box_at_with(vec3{2, 2, 0});
         TS_ASSERT_DIFFERS(box, ENTITYID_INVALID);
@@ -182,7 +164,7 @@ public:
 
     void testRunMoveActionQueuesPushIntentForPushableTarget() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
         const entityid hero = create_hero(g, vec3{2, 2, 0});
         const entityid table = g.create_prop_at_with(
             PROP_DUNGEON_WOODEN_TABLE_00,
@@ -200,7 +182,7 @@ public:
 
     void testTryEntityPullMovesPullableTableProp() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
         const entityid hero = create_hero(g, vec3{2, 2, 0});
         g.ct.set<direction>(hero, DIR_RIGHT);
         const entityid table = g.create_prop_at_with(
@@ -219,7 +201,7 @@ public:
 
     void testRunPullActionUsesQueuedPullIntent() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
 
         const entityid hero = create_hero(g, vec3{2, 2, 0});
         g.ct.set<direction>(hero, DIR_RIGHT);
@@ -234,8 +216,8 @@ public:
 
     void testTryEntityMoveRespectsDoorOnEntityFloorNotCurrentFloor() {
         gamestate g;
-        add_floor(g);
-        add_floor(g);
+        add_initialized_floor(g);
+        add_initialized_floor(g);
         g.d.current_floor = 0;
 
         const entityid npc = g.create_orc_at_with(vec3{1, 1, 1}, [](CT&, const entityid) {});
@@ -251,8 +233,8 @@ public:
 
     void testTryEntityOpenDoorUsesDoorLocationFloor() {
         gamestate g;
-        add_floor(g);
-        add_floor(g);
+        add_initialized_floor(g);
+        add_initialized_floor(g);
         g.d.current_floor = 0;
 
         const entityid hero = create_hero(g, vec3{1, 1, 0});
@@ -268,7 +250,7 @@ public:
 
     void testPressurePlateOpensAndClosesLinkedDoorWhenPlayerMovesOnAndOff() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
 
         const entityid hero = create_hero(g, vec3{1, 1, 0});
         const entityid door = g.create_door_at_with(vec3{4, 1, 0}, [](CT&, const entityid) {});
@@ -292,7 +274,7 @@ public:
 
     void testPressurePlateOpensAndClosesLinkedDoorForPushableObject() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
 
         const entityid door = g.create_door_at_with(vec3{4, 1, 0}, [](CT&, const entityid) {});
         const entityid box = g.create_box_at_with(vec3{1, 1, 0});
@@ -313,7 +295,7 @@ public:
 
     void testRunMoveActionQueuesPressurePlateRefreshFollowUp() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
 
         const entityid hero = create_hero(g, vec3{1, 1, 0});
         const entityid door = g.create_door_at_with(vec3{4, 1, 0}, [](CT&, const entityid) {});
@@ -333,7 +315,7 @@ public:
 
     void testQueuedPressurePlateRefreshSchedulesDoorStateFollowup() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
 
         const entityid hero = create_hero(g, vec3{1, 1, 0});
         const entityid door = g.create_door_at_with(vec3{4, 1, 0}, [](CT&, const entityid) {});
@@ -360,7 +342,7 @@ public:
 
     void testRunPullActionQueuesPressurePlateRefreshFollowUp() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
 
         const entityid hero = create_hero(g, vec3{2, 1, 0});
         g.ct.set<direction>(hero, DIR_RIGHT);
@@ -385,7 +367,7 @@ public:
 
     void testRunMoveActionQueuesPressurePlateCloseAfterLastOccupantLeaves() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
 
         const entityid hero = create_hero(g, vec3{1, 1, 0});
         const entityid door = g.create_door_at_with(vec3{4, 1, 0}, [](CT&, const entityid) {});
@@ -411,7 +393,7 @@ public:
 
     void testPressurePlateControlledDoorCannotBeOpenedManually() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
 
         const entityid hero = create_hero(g, vec3{1, 1, 0});
         const entityid door = g.create_door_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
@@ -428,8 +410,8 @@ public:
 
     void testRunOpenDoorActionUsesQueuedDoorIntent() {
         gamestate g;
-        g.sfx.resize(71);
-        add_floor(g);
+        init_test_sfx(g);
+        add_initialized_floor(g);
 
         const entityid hero = create_hero(g, vec3{1, 1, 0});
         const entityid door = g.create_door_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
@@ -444,7 +426,7 @@ public:
 
     void testRunOpenDoorActionRejectsPressurePlateControlledDoor() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
 
         const entityid hero = create_hero(g, vec3{1, 1, 0});
         const entityid door = g.create_door_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
@@ -462,7 +444,7 @@ public:
 
     void testDestroyPressurePlateSeversLinkAndClosesDoor() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
 
         const entityid hero = create_hero(g, vec3{1, 1, 0});
         const entityid door = g.create_door_at_with(vec3{4, 1, 0}, [](CT&, const entityid) {});
@@ -483,9 +465,9 @@ public:
 
     void testTryEntityOpenChestUsesChestLocationFloorAndOpensMenu() {
         gamestate g;
-        g.sfx.resize(71);
-        add_floor(g);
-        add_floor(g);
+        init_test_sfx(g);
+        add_initialized_floor(g);
+        add_initialized_floor(g);
         g.d.current_floor = 0;
 
         const entityid hero = create_hero(g, vec3{1, 1, 0});
@@ -504,8 +486,8 @@ public:
 
     void testRunOpenChestActionUsesQueuedChestIntent() {
         gamestate g;
-        g.sfx.resize(71);
-        add_floor(g);
+        init_test_sfx(g);
+        add_initialized_floor(g);
 
         const entityid hero = create_hero(g, vec3{1, 1, 0});
         const entityid chest = g.create_chest_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
@@ -524,8 +506,8 @@ public:
 
     void testRunOpenChestActionClosesExistingChestMenu() {
         gamestate g;
-        g.sfx.resize(71);
-        add_floor(g);
+        init_test_sfx(g);
+        add_initialized_floor(g);
 
         const entityid hero = create_hero(g, vec3{1, 1, 0});
         const entityid chest = g.create_chest_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
@@ -546,9 +528,9 @@ public:
 
     void testRunTraverseStairsActionUsesQueuedStairsIntent() {
         gamestate g;
-        g.sfx.resize(71);
-        add_floor(g);
-        add_floor(g);
+        init_test_sfx(g);
+        add_initialized_floor(g);
+        add_initialized_floor(g);
 
         auto floor0 = g.d.get_floor(0);
         auto floor1 = g.d.get_floor(1);
@@ -568,9 +550,9 @@ public:
 
     void testRunTraverseStairsActionRefreshesSourceAndDestinationPressurePlateDoors() {
         gamestate g;
-        g.sfx.resize(71);
-        add_floor(g);
-        add_floor(g);
+        init_test_sfx(g);
+        add_initialized_floor(g);
+        add_initialized_floor(g);
 
         const entityid source_door = g.create_door_at_with(vec3{4, 1, 0}, [](CT&, const entityid) {});
         const entityid destination_door = g.create_door_at_with(vec3{5, 2, 1}, [](CT&, const entityid) {});
@@ -613,7 +595,7 @@ public:
 
     void testRunTraverseStairsActionReportsTopFloorMessage() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
 
         auto floor0 = g.d.get_floor(0);
         TS_ASSERT(floor0->df_set_upstairs_loc(vec3{1, 1, 0}));
@@ -634,8 +616,8 @@ public:
 
     void testHandleOpenDoorUsesKeyDInsteadOfKeyO() {
         gamestate g;
-        g.sfx.resize(71);
-        add_floor(g);
+        init_test_sfx(g);
+        add_initialized_floor(g);
 
         const entityid hero = create_hero(g, vec3{1, 1, 0});
         const entityid door = g.create_door_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
@@ -659,7 +641,7 @@ public:
 
     void testTryEntityInteractOpensNpcDialogueModal() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
 
         const entityid hero = create_hero(g, vec3{1, 1, 0});
         const entityid npc = g.create_npc_at_with(RACE_DWARF, vec3{2, 1, 0}, [](CT& ct, const entityid id) {
@@ -679,7 +661,7 @@ public:
 
     void testRunInteractActionUsesQueuedInteractIntent() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
 
         const entityid hero = create_hero(g, vec3{1, 1, 0});
         const entityid npc = g.create_npc_at_with(RACE_DWARF, vec3{2, 1, 0}, [](CT& ct, const entityid id) {
@@ -700,7 +682,7 @@ public:
 
     void testRunInteractActionReturnsFalseWhenNothingIsThere() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
 
         const entityid hero = create_hero(g, vec3{1, 1, 0});
         TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
@@ -712,7 +694,7 @@ public:
 
     void testTryEntityInteractOpensPropDescriptionModal() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
 
         const entityid hero = create_hero(g, vec3{1, 1, 0});
         const entityid prop = g.create_prop_at_with(PROP_DUNGEON_JAR_00, vec3{2, 1, 0}, [](CT& ct, const entityid id) {
@@ -732,7 +714,7 @@ public:
 
     void testTryEntityInteractOpensBoxDescriptionModal() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
 
         const entityid hero = create_hero(g, vec3{1, 1, 0});
         const entityid box = g.create_box_at_with(vec3{2, 1, 0});
@@ -748,7 +730,7 @@ public:
 
     void testTryEntityInteractOpensChestDescriptionModal() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
 
         const entityid hero = create_hero(g, vec3{1, 1, 0});
         const entityid chest = g.create_chest_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
@@ -769,7 +751,7 @@ public:
 
     void testTryEntityInteractOpensDoorDescriptionModal() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
 
         const entityid hero = create_hero(g, vec3{1, 1, 0});
         const entityid door = g.create_door_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
@@ -790,7 +772,7 @@ public:
 
     void testHandleInputInteractionClosesModalAndRestoresPlayerControl() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
         g.test = true;
         g.controlmode = CONTROLMODE_PLAYER;
         g.open_interaction_modal(42, "Speaker", "Line");
@@ -808,7 +790,7 @@ public:
 
     void testUpdatePlayerTilesExploredRevealsClosedDoorTileButNotBeyond() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
         g.current_scene = SCENE_GAMEPLAY;
 
         const entityid hero = create_hero(g, vec3{1, 1, 0});
@@ -832,7 +814,7 @@ public:
 
     void testUpdatePlayerTilesExploredClearsVisibilityBeyondClosedDoorAfterClosing() {
         gamestate g;
-        add_floor(g);
+        add_initialized_floor(g);
         g.current_scene = SCENE_GAMEPLAY;
 
         const entityid hero = create_hero(g, vec3{1, 1, 0});
@@ -860,7 +842,7 @@ public:
     void testCanMoveOntoTileContainingFreshlyKilledDeadNpc() {
         gamestate g;
         g.test = true;
-        add_floor(g);
+        add_initialized_floor(g);
 
         const entityid hero = create_hero(g, vec3{1, 1, 0});
         const entityid orc = g.create_orc_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});

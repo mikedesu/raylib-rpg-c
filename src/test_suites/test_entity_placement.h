@@ -1,26 +1,11 @@
 #pragma once
 
 #include "../gamestate.h"
+#include "test_helpers.h"
 #include <cxxtest/TestSuite.h>
 
 class EntityPlacementTestSuite : public CxxTest::TestSuite {
 private:
-    size_t count_entities_of_type(gamestate& g, entitytype_t type) {
-        size_t count = 0;
-        for (entityid id = 1; id < g.next_entityid; id++) {
-            if (g.ct.get<entitytype>(id).value_or(ENTITY_NONE) == type) {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    void add_simple_floor(gamestate& g, int width = 5, int height = 5) {
-        auto df = g.d.create_floor(BIOME_STONE, width, height);
-        df->df_set_all_tiles(TILE_FLOOR_STONE_00);
-        g.d.add_floor(df);
-    }
-
     void add_chokepoint_floor(gamestate& g) {
         auto df = g.d.create_floor(BIOME_STONE, 7, 7);
         df->df_set_all_tiles(TILE_NONE);

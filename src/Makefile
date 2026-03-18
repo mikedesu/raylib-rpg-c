@@ -99,10 +99,10 @@ HEAVY_TEST_HEADERS = unit_test_heavy.h \
 	test_suites/test_utility_helpers.h \
 	test_suites/test_world_interaction.h
 
-tests.cpp: $(FAST_TEST_HEADERS)
+tests.cpp: $(FAST_TEST_HEADERS) test_suites/test_helpers.h
 	cxxtestgen --error-printer -o tests.cpp $(FAST_TEST_HEADERS)
 
-tests_heavy.cpp: $(HEAVY_TEST_HEADERS)
+tests_heavy.cpp: $(HEAVY_TEST_HEADERS) test_suites/test_helpers.h
 	cxxtestgen --error-printer -o tests_heavy.cpp $(HEAVY_TEST_HEADERS)
 
 # Documentation

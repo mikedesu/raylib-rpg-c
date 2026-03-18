@@ -2,33 +2,14 @@
 
 #include "../gamestate.h"
 #include "../sfx.h"
+#include "test_helpers.h"
 #include <cxxtest/TestSuite.h>
 
 class InventoryTestSuite : public CxxTest::TestSuite {
-private:
-    vec3 add_initialized_floor(gamestate& g, int width = 8, int height = 8) {
-        auto df = g.d.create_floor(BIOME_STONE, width, height);
-        df->df_set_all_tiles(TILE_FLOOR_STONE_00);
-        g.d.add_floor(df);
-        g.d.is_initialized = true;
-        return vec3{1, 1, 0};
-    }
-
-    entityid create_hero(gamestate& g, vec3 loc) {
-        return g.create_player_at_with(loc, "hero", [](CT&, const entityid) {});
-    }
-
-    void press_key(inputstate& is, int key) {
-        inputstate_reset(is);
-        const int idx = key / BITS_PER_LONG;
-        const int bit = key % BITS_PER_LONG;
-        is.pressed[idx] |= (1ULL << bit);
-    }
-
 public:
     void testTryEntityPickupTakesTopItemFromMultiItemTile() {
         gamestate g;
-        g.sfx.resize(71);
+        init_test_sfx(g);
         const vec3 loc = add_initialized_floor(g);
         const entityid hero = create_hero(g, loc);
 
@@ -52,7 +33,7 @@ public:
 
     void testRunPickupActionUsesQueuedPickupIntent() {
         gamestate g;
-        g.sfx.resize(71);
+        init_test_sfx(g);
         const vec3 loc = add_initialized_floor(g);
         const entityid hero = create_hero(g, loc);
 
@@ -349,7 +330,7 @@ public:
 
     void testChestTransferMovesItemsBetweenHeroAndChestInventories() {
         gamestate g;
-        g.sfx.resize(71);
+        init_test_sfx(g);
         const vec3 loc = add_initialized_floor(g);
         const entityid hero = create_hero(g, loc);
         const entityid chest = g.create_chest_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
@@ -438,7 +419,7 @@ public:
 
     void testChestMenuClosesOnKeyDAndNotKeyO() {
         gamestate g;
-        g.sfx.resize(71);
+        init_test_sfx(g);
         const vec3 loc = add_initialized_floor(g);
         const entityid hero = create_hero(g, loc);
         const entityid chest = g.create_chest_at_with(vec3{2, 1, 0}, [](CT&, const entityid) {});
@@ -462,7 +443,7 @@ public:
 
     void testMiniInventorySelectionScrollsPastVisibleWindow() {
         gamestate g;
-        g.sfx.resize(71);
+        init_test_sfx(g);
         g.prefer_mini_inventory_menu = true;
         g.mini_inventory_visible_count = 3;
         const vec3 loc = add_initialized_floor(g);

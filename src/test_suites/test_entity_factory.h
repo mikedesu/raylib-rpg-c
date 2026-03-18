@@ -1,18 +1,10 @@
 #pragma once
 
 #include "../gamestate.h"
+#include "test_helpers.h"
 #include <cxxtest/TestSuite.h>
 
 class EntityFactoryTestSuite : public CxxTest::TestSuite {
-private:
-    vec3 add_initialized_floor(gamestate& g, int width = 8, int height = 8) {
-        auto df = g.d.create_floor(BIOME_STONE, width, height);
-        df->df_set_all_tiles(TILE_FLOOR_STONE_00);
-        g.d.add_floor(df);
-        g.d.is_initialized = true;
-        return vec3{1, 1, 0};
-    }
-
 public:
     void testAlignmentToStrReturnsExpectedNames() {
         TS_ASSERT_EQUALS(alignment_to_str(ALIGNMENT_GOOD_LAWFUL), "lawful good");

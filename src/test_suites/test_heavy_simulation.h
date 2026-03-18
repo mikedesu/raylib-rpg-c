@@ -2,36 +2,11 @@
 
 #include "../gamestate.h"
 #include "../inputstate.h"
+#include "test_helpers.h"
 #include <cxxtest/TestSuite.h>
 
 class HeavySimulationTestSuite : public CxxTest::TestSuite {
 private:
-    void add_open_floor(gamestate& g, int width = 8, int height = 8) {
-        auto df = g.d.create_floor(BIOME_STONE, width, height);
-        df->df_set_all_tiles(TILE_FLOOR_STONE_00);
-        g.d.add_floor(df);
-        g.d.is_initialized = true;
-    }
-
-    entityid find_live_npc_on_floor(gamestate& g, int floor, race_t race_value = RACE_NONE) {
-        for (entityid id = 1; id < g.next_entityid; id++) {
-            if (g.ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_NPC) {
-                continue;
-            }
-            if (g.ct.get<dead>(id).value_or(true)) {
-                continue;
-            }
-            if (race_value != RACE_NONE && g.ct.get<race>(id).value_or(RACE_NONE) != race_value) {
-                continue;
-            }
-            const vec3 loc = g.ct.get<location>(id).value_or(vec3{-1, -1, -1});
-            if (loc.z == floor) {
-                return id;
-            }
-        }
-        return ENTITYID_INVALID;
-    }
-
     vec3 find_open_adjacent_tile(gamestate& g, vec3 origin) {
         auto df = g.d.get_floor(origin.z);
         static constexpr vec3 offsets[] = {
@@ -66,7 +41,7 @@ public:
     void testPathfindingSoakMovesHostileOrcThroughSingleGapTowardHero() {
         gamestate g;
         g.test = true;
-        add_open_floor(g, 12, 12);
+        add_initialized_floor(g, 12, 12);
         g.d.current_floor = 0;
 
         auto df = g.d.get_floor(0);
@@ -128,7 +103,7 @@ public:
     void testTickHeavySimulationResolvesAdjacentOrcFightWithoutBreakingTileState() {
         gamestate g;
         g.test = true;
-        g.sfx.resize(71);
+        init_test_sfx(g);
         g.mt.seed(12345);
         g.logic_init();
 
