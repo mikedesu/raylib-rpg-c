@@ -6,7 +6,6 @@
 
 #include "dungeon_floor.h"
 #include "dungeon_tile_type.h"
-#include "dungeonfloorid.h"
 #include "room.h"
 #include <functional>
 #include <memory>
@@ -17,8 +16,6 @@ using std::function;
 using std::make_shared;
 using std::shared_ptr;
 using std::vector;
-
-#define INITIAL_DUNGEON_CAPACITY 4
 
 /**
  * @brief Runtime container for the stack of dungeon floors in the active game.

@@ -19,17 +19,16 @@
 
 // Assert macro with printf formatting
 #ifdef DEBUG_ASSERT
-#define massert(cond, ...) \
-    do { \
-        if (!(cond)) { \
+#define massert(cond, ...)                                                    \
+    do {                                                                      \
+        if (!(cond)) {                                                        \
             printf("☠️  \033[31;1mASSERT\033[0m %s:%d: ", __FILE__, __LINE__); \
-            printf(__VA_ARGS__); \
-            printf("\n"); \
-            DEBUG_BREAK(); \
-            exit(EXIT_FAILURE); \
-        } \
+            printf(__VA_ARGS__);                                              \
+            printf("\n");                                                     \
+            DEBUG_BREAK();                                                    \
+            exit(EXIT_FAILURE);                                               \
+        }                                                                     \
     } while (0)
-//#define mbreak() DEBUG_BREAK()
 #else
 #define massert(cond, ...) ((void)0)
 #endif

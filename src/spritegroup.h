@@ -86,10 +86,6 @@ public:
     void add(shared_ptr<sprite> s) {
         massert(s, "s is null");
         massert(size < capacity, "size %d is >= capacity %d", size, capacity);
-
-        //if (!s || size >= capacity) {
-        //    return;
-        //}
         sprites2->push_back(s);
         size++;
     }

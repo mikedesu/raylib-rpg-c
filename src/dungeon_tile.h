@@ -12,7 +12,6 @@
 #include "item_cache.h"
 #include "massert.h"
 #include "mprint.h"
-#include "tile_id.h"
 
 /**
  * @brief Runtime storage for a single dungeon tile.
@@ -303,16 +302,9 @@ public:
         return INVALID;
     }
 
-    inline void tile_create(tiletype_t type) {
-        massert(type >= TILE_NONE && type < TILE_COUNT, "tile_create: type is out-of-bounds");
-        tile_init(type);
-    }
-
     tile_t(tiletype_t t)
         : type(t) {
-        //minfo2("BEGIN tile_t(%d, %d)", tid, t);
         tile_init(t);
-        //minfo2("END tile_t(%d, %d)", tid, t);
     }
 
     tile_t() {

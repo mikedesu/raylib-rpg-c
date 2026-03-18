@@ -30,9 +30,6 @@ using std::string;
 using std::unordered_map;
 using std::vector;
 
-/// @brief Legacy integer alias used for tile identifiers.
-using TileID = int;
-
 /**
  * @brief Map a component tag type to its stored value type.
  *
@@ -134,12 +131,6 @@ template <>
 struct ComponentTraits<damaged> {
     using Type = bool;
 };
-
-//struct txalpha { }; // int
-//template <>
-//struct ComponentTraits<txalpha> {
-//    using Type = int;
-//};
 
 /// @brief Component tag for entities that can be pushed.
 struct pushable { };

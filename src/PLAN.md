@@ -336,7 +336,7 @@ Compact status handoff for the current C++ / raylib dungeon project.
 
 ## Notes
 
-- `unit_test_old.h` remains the resurrection source for older large simulation tests.
+- `unit_test_old.h` was deleted during the conservative audit refactor; its tests were superseded by the modern test suites in `test_suites/`.
 - Future dungeon-quality gains should focus on connectivity and loops, not just more rooms.
 - Recent gameplay work has been landing with tests first or tests alongside implementation; keep that pattern.
 - Libdraw cleanup hand-off:

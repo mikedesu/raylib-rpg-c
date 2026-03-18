@@ -29,8 +29,8 @@
 #include "sfx.h"
 #include "stat_bonus.h"
 #include "texture_ids.h"
-#include <array>
 #include <algorithm>
+#include <array>
 #include <chrono>
 #include <map>
 #include <queue>
@@ -40,18 +40,12 @@
 
 #define GAMESTATE_SIZEOFTIMEBUF 64
 #define GAMESTATE_SIZEOFDEBUGPANELBUF 1024
-#define MAX_MESSAGES 64
 #define MAX_MSG_LENGTH 256
-#define LIST_INIT_CAPACITY 16
-#define DEFAULT_MAX_HISTORY_SIZE 1024
-#define MAX_MUSIC_PATHS 1024
-#define MAX_MUSIC_PATH_LENGTH 256
 #define GAMESTATE_DEBUGPANEL_DEFAULT_X 0
 #define GAMESTATE_DEBUGPANEL_DEFAULT_Y 0
 #define GAMESTATE_DEBUGPANEL_DEFAULT_WIDTH 200
 #define GAMESTATE_DEBUGPANEL_DEFAULT_HEIGHT 200
 #define GAMESTATE_DEBUGPANEL_DEFAULT_FONT_SIZE 20
-#define GAMESTATE_INIT_ENTITYIDS_MAX 3000000
 #define LAST_FRAME_TIMES_MAX 1000
 
 typedef ComponentTable CT;
@@ -331,7 +325,7 @@ public:
         player_changing_dir = false;
         msg_system_is_active = false;
         chest_deposit_mode = false;
-        #ifndef TEST
+#ifndef TEST
         test = false;
 #else
         test = true;
@@ -374,10 +368,7 @@ public:
         last_frame_time = 0;
         max_frame_time = 0;
         last_frame_times_current = 0;
-        last_frame_times.reserve(LAST_FRAME_TIMES_MAX);
-        for (size_t i = 0; i < last_frame_times.size(); i++) {
-            last_frame_times[i] = 0;
-        }
+        last_frame_times.resize(LAST_FRAME_TIMES_MAX, 0);
         turn_count = 0;
         action_selection = 0;
         inventory_menu_selection = 0;
@@ -428,9 +419,6 @@ public:
         msg_system.clear();
         msg_history.clear();
         ct.clear();
-        for (size_t i = 0; i < d.floors.size(); i++) {
-            d.floors[i]->df_free();
-        }
         d.floors.clear();
         d.is_initialized = false;
         init_music_paths();
@@ -942,14 +930,6 @@ public:
 
     /** @brief Handle input while the level-up picker is active. */
     void handle_input_level_up(inputstate& is);
-
-    //inl_count_0 + 2bool handle_quit_pressed(const inputstate& is) {
-    //    if (inputstate_is_pressed(is, KEY_ESCAPE)) {
-    //        do_quit = true;
-    //        return true;
-    //    }
-    //    return false;
-    //}
 
     /** @brief Advance the visible message queue to the next pending message. */
     void cycle_messages();
@@ -1478,17 +1458,16 @@ public:
     void adjust_window_box_fg_channel(size_t channel, int dir);
     void reset_window_box_colors();
     Color get_debug_panel_bgcolor() const;
-
 };
 
-#include "gamestate_lifecycle_impl.h"
-#include "gamestate_scene_impl.h"
+#include "gamestate_damage_popups_impl.h"
+#include "gamestate_entity_factory_impl.h"
+#include "gamestate_input_impl.h"
 #include "gamestate_inventory_impl.h"
 #include "gamestate_keybinding_impl.h"
-#include "gamestate_options_impl.h"
-#include "gamestate_input_impl.h"
+#include "gamestate_lifecycle_impl.h"
 #include "gamestate_npc_combat_impl.h"
-#include "gamestate_damage_popups_impl.h"
+#include "gamestate_options_impl.h"
+#include "gamestate_scene_impl.h"
 #include "gamestate_world_impl.h"
 #include "gamestate_world_interaction_impl.h"
-#include "gamestate_entity_factory_impl.h"

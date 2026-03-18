@@ -4,8 +4,8 @@
 
 #include "libdraw.h"
 #include "ComponentTraits.h"
-#include "create_sg_byid.h"
 #include "camera_lock_on.h"
+#include "create_sg_byid.h"
 #include "draw_action_menu.h"
 #include "draw_character_creation_screen.h"
 #include "draw_chest_menu.h"
@@ -13,9 +13,8 @@
 #include "draw_damage_numbers.h"
 #include "draw_dungeon_floor.h"
 #include "draw_entity_sprite.h"
-#include "draw_sprite.h"
-#include "draw_handle_gamestate_flag.h"
 #include "draw_handle_debug_panel.h"
+#include "draw_handle_gamestate_flag.h"
 #include "draw_help_menu.h"
 #include "draw_hud.h"
 #include "draw_interaction_modal.h"
@@ -28,18 +27,19 @@
 #include "draw_mini_inventory_menu.h"
 #include "draw_option_menu.h"
 #include "draw_sound_menu.h"
+#include "draw_sprite.h"
 #include "draw_title_screen.h"
 #include "draw_window_color_menu.h"
 #include "entitytype.h"
-#include "get_txkey_for_tiletype.h"
 #include "get_shield_sprite.h"
+#include "get_txkey_for_tiletype.h"
 #include "get_weapon_sprite.h"
 #include "item.h"
+#include "libdraw_create_spritegroup.h"
 #include "libdraw_frame_stats.h"
 #include "libdraw_from_texture.h"
-#include "libdraw_create_spritegroup.h"
-#include "libdraw_update_shield_for_entity.h"
 #include "libdraw_to_texture.h"
+#include "libdraw_update_shield_for_entity.h"
 #include "libdraw_update_sprites.h"
 #include "libdraw_update_weapon_for_entity.h"
 #include "load_music.h"
@@ -87,7 +87,6 @@ bool create_spritegroup(gamestate& g, entityid id, int* keys, int num_keys, int 
 
         minfo2("creating spritegroups...");
         minfo2("num_keys: %d", num_keys);
-        int count = 0;
         for (int i = 0; i < num_keys; i++) {
             const int k = keys[i];
             minfo("k: %d", k);
@@ -95,7 +94,6 @@ bool create_spritegroup(gamestate& g, entityid id, int* keys, int num_keys, int 
             auto s = make_shared<sprite>(tex, libdraw_ctx.txinfo[k].contexts, libdraw_ctx.txinfo[k].num_frames);
             massert(s, "s is NULL for some reason!");
             group->add(s);
-            count++;
         }
         msuccess2("spritegroups created");
         minfo2("count: %d", count);
@@ -400,10 +398,8 @@ void draw_mini_inventory_menu(gamestate& g, shared_ptr<vector<entityid>> invento
 
         const entityid item_id = inventory->at(item_index);
         const string item_name = g.ct.get<name>(item_id).value_or("no-name");
-        const bool equipped =
-            show_equipped &&
-            (item_id == g.ct.get<equipped_weapon>(g.hero_id).value_or(ENTITYID_INVALID) ||
-             item_id == g.ct.get<equipped_shield>(g.hero_id).value_or(ENTITYID_INVALID));
+        const bool equipped = show_equipped && (item_id == g.ct.get<equipped_weapon>(g.hero_id).value_or(ENTITYID_INVALID) ||
+                                                item_id == g.ct.get<equipped_shield>(g.hero_id).value_or(ENTITYID_INVALID));
         DrawText(
             TextFormat("%s%s", item_index == selected_index ? "> " : "  ", item_name.c_str()),
             static_cast<int>(row.x + 6),
@@ -614,47 +610,20 @@ void draw_character_creation_screen(gamestate& g) {
     }
 
     switch (g.chara_creation.race) {
-    case RACE_HUMAN:
-        DrawTexturePro(libdraw_ctx.txinfo[TX_CHAR_HUMAN_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
-        break;
-    case RACE_ORC:
-        DrawTexturePro(libdraw_ctx.txinfo[TX_CHAR_ORC_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
-        break;
-    case RACE_ELF:
-        DrawTexturePro(libdraw_ctx.txinfo[TX_CHAR_ELF_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
-        break;
-    case RACE_DWARF:
-        DrawTexturePro(libdraw_ctx.txinfo[TX_CHAR_DWARF_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
-        break;
-    case RACE_HALFLING:
-        DrawTexturePro(libdraw_ctx.txinfo[TX_CHAR_HALFLING_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
-        break;
-    case RACE_GOBLIN:
-        DrawTexturePro(libdraw_ctx.txinfo[TX_CHAR_GOBLIN_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
-        break;
-    case RACE_GREEN_SLIME:
-        DrawTexturePro(libdraw_ctx.txinfo[TX_MONSTER_GREEN_SLIME_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
-        break;
-    case RACE_BAT:
-        DrawTexturePro(libdraw_ctx.txinfo[TX_MONSTER_BAT_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
-        break;
-    case RACE_WOLF:
-        DrawTexturePro(libdraw_ctx.txinfo[TX_MONSTER_WOLF_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
-        break;
-    case RACE_WARG:
-        DrawTexturePro(libdraw_ctx.txinfo[TX_MONSTER_WARG_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
-        break;
-    case RACE_ZOMBIE:
-        DrawTexturePro(libdraw_ctx.txinfo[TX_MONSTER_ZOMBIE_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
-        break;
-    case RACE_SKELETON:
-        DrawTexturePro(libdraw_ctx.txinfo[TX_MONSTER_SKELETON_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
-        break;
-    case RACE_RAT:
-        DrawTexturePro(libdraw_ctx.txinfo[TX_MONSTER_RAT_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE);
-        break;
-    default:
-        break;
+    case RACE_HUMAN: DrawTexturePro(libdraw_ctx.txinfo[TX_CHAR_HUMAN_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE); break;
+    case RACE_ORC: DrawTexturePro(libdraw_ctx.txinfo[TX_CHAR_ORC_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE); break;
+    case RACE_ELF: DrawTexturePro(libdraw_ctx.txinfo[TX_CHAR_ELF_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE); break;
+    case RACE_DWARF: DrawTexturePro(libdraw_ctx.txinfo[TX_CHAR_DWARF_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE); break;
+    case RACE_HALFLING: DrawTexturePro(libdraw_ctx.txinfo[TX_CHAR_HALFLING_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE); break;
+    case RACE_GOBLIN: DrawTexturePro(libdraw_ctx.txinfo[TX_CHAR_GOBLIN_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE); break;
+    case RACE_GREEN_SLIME: DrawTexturePro(libdraw_ctx.txinfo[TX_MONSTER_GREEN_SLIME_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE); break;
+    case RACE_BAT: DrawTexturePro(libdraw_ctx.txinfo[TX_MONSTER_BAT_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE); break;
+    case RACE_WOLF: DrawTexturePro(libdraw_ctx.txinfo[TX_MONSTER_WOLF_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE); break;
+    case RACE_WARG: DrawTexturePro(libdraw_ctx.txinfo[TX_MONSTER_WARG_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE); break;
+    case RACE_ZOMBIE: DrawTexturePro(libdraw_ctx.txinfo[TX_MONSTER_ZOMBIE_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE); break;
+    case RACE_SKELETON: DrawTexturePro(libdraw_ctx.txinfo[TX_MONSTER_SKELETON_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE); break;
+    case RACE_RAT: DrawTexturePro(libdraw_ctx.txinfo[TX_MONSTER_RAT_IDLE].texture, src, dst2, zero_vec, 0.0f, WHITE); break;
+    default: break;
     }
 
     text_y = instructions_start_y;
@@ -863,10 +832,8 @@ void draw_option_menu(gamestate& g) {
     float max_w = 0;
     for (size_t i = 0; i < g.options_menu.get_option_count(); i++) {
         const option_type option = g.options_menu.get_option(i);
-        const string option_label =
-            option == OPTION_INVENTORY_MENU
-                ? TextFormat("inventory menu: %s", g.prefer_mini_inventory_menu ? "mini" : "full")
-                : g.options_menu.get_option_str(option);
+        const string option_label = option == OPTION_INVENTORY_MENU ? TextFormat("inventory menu: %s", g.prefer_mini_inventory_menu ? "mini" : "full")
+                                                                    : g.options_menu.get_option_str(option);
         const char* spaced_str = TextFormat("  %s", option_label.c_str());
         const float w = MeasureText(spaced_str, fsize);
         if (w > max_w) {
@@ -882,10 +849,8 @@ void draw_option_menu(gamestate& g) {
         constexpr int x0 = x + pa;
         const int y0 = y + pa + fsize * i;
         const option_type otype = g.options_menu.get_option(i);
-        const string ostr =
-            otype == OPTION_INVENTORY_MENU
-                ? TextFormat("inventory menu: %s", g.prefer_mini_inventory_menu ? "mini" : "full")
-                : g.options_menu.get_option_str(otype);
+        const string ostr = otype == OPTION_INVENTORY_MENU ? TextFormat("inventory menu: %s", g.prefer_mini_inventory_menu ? "mini" : "full")
+                                                           : g.options_menu.get_option_str(otype);
         const char* cstr = ostr.c_str();
         if (g.options_menu.get_selection() == i) {
             DrawText(TextFormat("> %s", cstr), x0, y0, fsize, YELLOW);
@@ -921,8 +886,8 @@ void draw_sound_menu(gamestate& g) {
     int y = box_y + padding + 48;
     for (size_t i = 0; i < 3; i++) {
         const bool selected = g.sound_menu_selection == i;
-        DrawText(selected ? TextFormat("> %-14s %3d%%", labels[i], (int)(values[i] * 100.0f))
-                          : TextFormat("  %-14s %3d%%", labels[i], (int)(values[i] * 100.0f)),
+        DrawText(
+            selected ? TextFormat("> %-14s %3d%%", labels[i], (int)(values[i] * 100.0f)) : TextFormat("  %-14s %3d%%", labels[i], (int)(values[i] * 100.0f)),
             box_x + padding,
             y,
             font_size,
@@ -952,20 +917,22 @@ void draw_window_color_menu(gamestate& g) {
     DrawText("Up/Down select, Left/Right adjust, Enter reset, Esc returns", box_x + padding, box_y + padding + 22, font_size, g.window_box_fgcolor);
 
     const unsigned char values[] = {
-        g.window_box_bgcolor.r, g.window_box_bgcolor.g, g.window_box_bgcolor.b, g.window_box_bgcolor.a,
-        g.window_box_fgcolor.r, g.window_box_fgcolor.g, g.window_box_fgcolor.b, g.window_box_fgcolor.a
-    };
+        g.window_box_bgcolor.r,
+        g.window_box_bgcolor.g,
+        g.window_box_bgcolor.b,
+        g.window_box_bgcolor.a,
+        g.window_box_fgcolor.r,
+        g.window_box_fgcolor.g,
+        g.window_box_fgcolor.b,
+        g.window_box_fgcolor.a};
     const char* labels[] = {
-        "Background R", "Background G", "Background B", "Background A",
-        "Foreground R", "Foreground G", "Foreground B", "Foreground A",
-        "Reset Defaults"
-    };
+        "Background R", "Background G", "Background B", "Background A", "Foreground R", "Foreground G", "Foreground B", "Foreground A", "Reset Defaults"};
 
     int y = box_y + padding + 48;
     for (size_t i = 0; i < 9; i++) {
         const bool selected = g.window_color_menu_selection == i;
-        const char* text = i < 8 ? TextFormat("%c %-14s %3d", selected ? '>' : ' ', labels[i], values[i])
-                                 : (selected ? "> Reset Defaults" : "  Reset Defaults");
+        const char* text =
+            i < 8 ? TextFormat("%c %-14s %3d", selected ? '>' : ' ', labels[i], values[i]) : (selected ? "> Reset Defaults" : "  Reset Defaults");
         DrawText(text, box_x + padding, y, font_size, selected ? YELLOW : g.window_box_fgcolor);
         y += line_height;
     }
@@ -995,29 +962,40 @@ void draw_controls_menu(gamestate& g) {
     DrawRectangleLinesEx(box, 2.0f, g.window_box_fgcolor);
     DrawText("Keyboard Controls", box_x + padding, box_y + padding, 18, g.window_box_fgcolor);
     const char* subtitle = g.controls_menu_waiting_for_key
-        ? TextFormat("Press a new key for %s. Esc cancels.", gameplay_input_action_label(g.controls_menu_pending_action))
-        : "Up/Down select, Enter edit, Left/Right swap profile, Esc closes";
+                               ? TextFormat("Press a new key for %s. Esc cancels.", gameplay_input_action_label(g.controls_menu_pending_action))
+                               : "Up/Down select, Enter edit, Left/Right swap profile, Esc closes";
     DrawText(subtitle, box_x + padding, box_y + padding + 20, font_size, g.window_box_fgcolor);
 
     int y = box_y + padding + 38;
     const bool profile_selected = g.controls_menu_selection == 0;
-    DrawText(profile_selected ? TextFormat("> Profile: %s", keyboard_profile_label(g.keyboard_profile))
-                              : TextFormat("  Profile: %s", keyboard_profile_label(g.keyboard_profile)),
-        box_x + padding, y, font_size, profile_selected ? YELLOW : g.window_box_fgcolor);
+    DrawText(
+        profile_selected ? TextFormat("> Profile: %s", keyboard_profile_label(g.keyboard_profile))
+                         : TextFormat("  Profile: %s", keyboard_profile_label(g.keyboard_profile)),
+        box_x + padding,
+        y,
+        font_size,
+        profile_selected ? YELLOW : g.window_box_fgcolor);
     y += line_height;
 
     const bool reset_selected = g.controls_menu_selection == 1;
-    DrawText(reset_selected ? "> Reset Current Profile To Defaults" : "  Reset Current Profile To Defaults",
-        box_x + padding, y, font_size, reset_selected ? YELLOW : g.window_box_fgcolor);
+    DrawText(
+        reset_selected ? "> Reset Current Profile To Defaults" : "  Reset Current Profile To Defaults",
+        box_x + padding,
+        y,
+        font_size,
+        reset_selected ? YELLOW : g.window_box_fgcolor);
     y += line_height;
 
     for (int action = 0; action < INPUT_ACTION_COUNT; action++) {
         const bool selected = g.controls_menu_selection == static_cast<size_t>(action + 2);
         const char* action_label = gameplay_input_action_label(static_cast<gameplay_input_action_t>(action));
         const string binding = g.get_keybinding_label(g.keyboard_profile, static_cast<gameplay_input_action_t>(action));
-        DrawText(selected ? TextFormat("> %-22s %s", action_label, binding.c_str())
-                          : TextFormat("  %-22s %s", action_label, binding.c_str()),
-            box_x + padding, y, font_size, selected ? YELLOW : g.window_box_fgcolor);
+        DrawText(
+            selected ? TextFormat("> %-22s %s", action_label, binding.c_str()) : TextFormat("  %-22s %s", action_label, binding.c_str()),
+            box_x + padding,
+            y,
+            font_size,
+            selected ? YELLOW : g.window_box_fgcolor);
         y += line_height;
     }
 }
@@ -1314,7 +1292,12 @@ void draw_look_panel(gamestate& g) {
     DrawText(TextFormat("There are %d things here", entity_count), r.x + pad_w, r.y + pad_h + (font_size + 5) * 1, font_size, g.window_box_fgcolor);
     DrawText(TextFormat("living npc %d", tile.get_cached_live_npc()), r.x + pad_w, r.y + pad_h + (font_size + 5) * 2, font_size, g.window_box_fgcolor);
     DrawText(TextFormat("dead npc %d", tile.get_cached_dead_npc()), r.x + pad_w, r.y + pad_h + (font_size + 5) * 3, font_size, g.window_box_fgcolor);
-    DrawText(TextFormat("items %d (%d)", (int)tile.get_item_count(), tile.get_cached_item()), r.x + pad_w, r.y + pad_h + (font_size + 5) * 4, font_size, g.window_box_fgcolor);
+    DrawText(
+        TextFormat("items %d (%d)", (int)tile.get_item_count(), tile.get_cached_item()),
+        r.x + pad_w,
+        r.y + pad_h + (font_size + 5) * 4,
+        font_size,
+        g.window_box_fgcolor);
     DrawText(TextFormat("door %d", tile.get_cached_door()), r.x + pad_w, r.y + pad_h + (font_size + 5) * 5, font_size, g.window_box_fgcolor);
     DrawText(TextFormat("box %d", tile.get_cached_box()), r.x + pad_w, r.y + pad_h + (font_size + 5) * 6, font_size, g.window_box_fgcolor);
 }
@@ -1361,7 +1344,10 @@ void draw_interaction_modal(gamestate& g) {
     const int box_y = (DEFAULT_TARGET_HEIGHT - box_height) / 2;
 
     DrawRectangle(box_x, box_y, box_width, box_height, g.window_box_bgcolor);
-    DrawRectangleLinesEx(Rectangle{static_cast<float>(box_x), static_cast<float>(box_y), static_cast<float>(box_width), static_cast<float>(box_height)}, 2, g.window_box_fgcolor);
+    DrawRectangleLinesEx(
+        Rectangle{static_cast<float>(box_x), static_cast<float>(box_y), static_cast<float>(box_width), static_cast<float>(box_height)},
+        2,
+        g.window_box_fgcolor);
 
     int text_y = box_y + padding;
     if (!g.interaction_title.empty()) {
@@ -1410,7 +1396,8 @@ void draw_level_up_modal(gamestate& g) {
     const int box_y = (DEFAULT_TARGET_HEIGHT - box_h) / 2;
 
     DrawRectangle(box_x, box_y, box_w, box_h, g.window_box_bgcolor);
-    DrawRectangleLinesEx(Rectangle{static_cast<float>(box_x), static_cast<float>(box_y), static_cast<float>(box_w), static_cast<float>(box_h)}, 2, g.window_box_fgcolor);
+    DrawRectangleLinesEx(
+        Rectangle{static_cast<float>(box_x), static_cast<float>(box_y), static_cast<float>(box_w), static_cast<float>(box_h)}, 2, g.window_box_fgcolor);
 
     const char* title = "Level Up";
     const char* subtitle = "Choose one attribute to permanently increase by 1";
@@ -1429,7 +1416,8 @@ void draw_level_up_modal(gamestate& g) {
         const bool selected = static_cast<int>(g.level_up_selection % 6) == i;
         const Color fill = selected ? Color{0x00, 0x88, 0x44, 220} : Color{0x11, 0x11, 0x66, 180};
         DrawRectangle(cell_x, cell_y, cell_w, cell_h, fill);
-        DrawRectangleLinesEx(Rectangle{static_cast<float>(cell_x), static_cast<float>(cell_y), static_cast<float>(cell_w), static_cast<float>(cell_h)}, 2, g.window_box_fgcolor);
+        DrawRectangleLinesEx(
+            Rectangle{static_cast<float>(cell_x), static_cast<float>(cell_y), static_cast<float>(cell_w), static_cast<float>(cell_h)}, 2, g.window_box_fgcolor);
 
         const int text_w = MeasureText(labels[i], cell_font_size);
         const int text_x = cell_x + (cell_w - text_w) / 2;
@@ -1788,19 +1776,58 @@ void create_npc_sg_byid(gamestate& g, entityid id) {
     int key_count = 0;
 
     switch (r) {
-    case RACE_HUMAN: keys = TX_HUMAN_KEYS; key_count = TX_HUMAN_COUNT; break;
-    case RACE_ORC: keys = TX_ORC_KEYS; key_count = TX_ORC_COUNT; break;
-    case RACE_ELF: keys = TX_ELF_KEYS; key_count = TX_ELF_COUNT; break;
-    case RACE_DWARF: keys = TX_DWARF_KEYS; key_count = TX_DWARF_COUNT; break;
-    case RACE_HALFLING: keys = TX_HALFLING_KEYS; key_count = TX_HALFLING_COUNT; break;
-    case RACE_GOBLIN: keys = TX_GOBLIN_KEYS; key_count = TX_GOBLIN_COUNT; break;
-    case RACE_WOLF: keys = TX_WOLF_KEYS; key_count = TX_WOLF_COUNT; break;
-    case RACE_BAT: keys = TX_BAT_KEYS; key_count = TX_BAT_COUNT; break;
-    case RACE_WARG: keys = TX_WARG_KEYS; key_count = TX_WARG_COUNT; break;
-    case RACE_GREEN_SLIME: keys = TX_GREEN_SLIME_KEYS; key_count = TX_GREEN_SLIME_COUNT; break;
-    case RACE_SKELETON: keys = TX_SKELETON_KEYS; key_count = TX_SKELETON_COUNT; break;
-    case RACE_RAT: keys = TX_RAT_KEYS; key_count = TX_RAT_COUNT; break;
-    case RACE_ZOMBIE: keys = TX_ZOMBIE_KEYS; key_count = TX_ZOMBIE_COUNT; break;
+    case RACE_HUMAN:
+        keys = TX_HUMAN_KEYS;
+        key_count = TX_HUMAN_COUNT;
+        break;
+    case RACE_ORC:
+        keys = TX_ORC_KEYS;
+        key_count = TX_ORC_COUNT;
+        break;
+    case RACE_ELF:
+        keys = TX_ELF_KEYS;
+        key_count = TX_ELF_COUNT;
+        break;
+    case RACE_DWARF:
+        keys = TX_DWARF_KEYS;
+        key_count = TX_DWARF_COUNT;
+        break;
+    case RACE_HALFLING:
+        keys = TX_HALFLING_KEYS;
+        key_count = TX_HALFLING_COUNT;
+        break;
+    case RACE_GOBLIN:
+        keys = TX_GOBLIN_KEYS;
+        key_count = TX_GOBLIN_COUNT;
+        break;
+    case RACE_WOLF:
+        keys = TX_WOLF_KEYS;
+        key_count = TX_WOLF_COUNT;
+        break;
+    case RACE_BAT:
+        keys = TX_BAT_KEYS;
+        key_count = TX_BAT_COUNT;
+        break;
+    case RACE_WARG:
+        keys = TX_WARG_KEYS;
+        key_count = TX_WARG_COUNT;
+        break;
+    case RACE_GREEN_SLIME:
+        keys = TX_GREEN_SLIME_KEYS;
+        key_count = TX_GREEN_SLIME_COUNT;
+        break;
+    case RACE_SKELETON:
+        keys = TX_SKELETON_KEYS;
+        key_count = TX_SKELETON_COUNT;
+        break;
+    case RACE_RAT:
+        keys = TX_RAT_KEYS;
+        key_count = TX_RAT_COUNT;
+        break;
+    case RACE_ZOMBIE:
+        keys = TX_ZOMBIE_KEYS;
+        key_count = TX_ZOMBIE_COUNT;
+        break;
     default: break;
     }
 
@@ -2214,12 +2241,8 @@ void libdraw_update_sprites_post(gamestate& g) {
 
 void libdraw_render_current_scene_to_scene_texture(gamestate& g) {
     switch (g.current_scene) {
-    case SCENE_TITLE:
-        draw_title_screen_to_texture(g, false);
-        break;
-    case SCENE_MAIN_MENU:
-        draw_title_screen_to_texture(g, true);
-        break;
+    case SCENE_TITLE: draw_title_screen_to_texture(g, false); break;
+    case SCENE_MAIN_MENU: draw_title_screen_to_texture(g, true); break;
     case SCENE_CHARACTER_CREATION:
         minfo3("draw character creation scene to texture");
         draw_char_creation_to_texture(g);
@@ -2229,25 +2252,17 @@ void libdraw_render_current_scene_to_scene_texture(gamestate& g) {
         const int light_rad = g.ct.get<light_radius>(g.hero_id).value_or(0);
         libdraw_drawframe_2d_to_texture(g, vision_dist, light_rad);
     } break;
-    default:
-        break;
+    default: break;
     }
 }
 
 void libdraw_draw_current_scene_from_scene_texture(gamestate& g) {
     switch (g.current_scene) {
     case SCENE_TITLE:
-    case SCENE_MAIN_MENU:
-        draw_title_screen_from_texture(g);
-        break;
-    case SCENE_CHARACTER_CREATION:
-        draw_char_creation_from_texture(g);
-        break;
-    case SCENE_GAMEPLAY:
-        libdraw_drawframe_2d_from_texture(g);
-        break;
-    default:
-        break;
+    case SCENE_MAIN_MENU: draw_title_screen_from_texture(g); break;
+    case SCENE_CHARACTER_CREATION: draw_char_creation_from_texture(g); break;
+    case SCENE_GAMEPLAY: libdraw_drawframe_2d_from_texture(g); break;
+    default: break;
     }
 }
 

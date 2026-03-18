@@ -45,8 +45,6 @@ static inline void inputstate_update(inputstate& is) {
     // Update keyboard state
     for (int k = 0; k < MAX_KEYS; k++) {
         if (IsKeyPressed(k)) {
-            //if (k == KEY_ENTER)
-            //    printf("KEY_ENTER pressed\n");
             const int idx = k / BITS_PER_LONG, bit = k % BITS_PER_LONG;
             is.pressed[idx] |= (1ULL << bit);
         }
