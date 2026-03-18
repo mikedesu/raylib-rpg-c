@@ -287,8 +287,8 @@ public:
         targetheight = -1;
         windowwidth = -1;
         windowheight = -1;
-        hero_id = INVALID;
-        active_chest_id = INVALID;
+        hero_id = ENTITYID_INVALID;
+        active_chest_id = ENTITYID_INVALID;
         entity_turn = 1;
         new_entityid_begin = ENTITYID_INVALID;
         new_entityid_end = ENTITYID_INVALID;
@@ -1130,7 +1130,7 @@ public:
 
     entityid get_cached_live_npc(shared_ptr<tile_t> t) {
         if (t == nullptr) {
-            return INVALID;
+            return ENTITYID_INVALID;
         }
         //recompute_entity_cache(t); // Force update
         return t->get_cached_live_npc();

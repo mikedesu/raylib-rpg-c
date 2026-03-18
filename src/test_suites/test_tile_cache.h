@@ -55,8 +55,8 @@ public:
 
     void testDeadNpcCacheTopAndPop() {
         dead_npc_cache cache;
-        TS_ASSERT_EQUALS(cache.top(), INVALID);
-        TS_ASSERT_EQUALS(cache.pop(), INVALID);
+        TS_ASSERT_EQUALS(cache.top(), ENTITYID_INVALID);
+        TS_ASSERT_EQUALS(cache.pop(), ENTITYID_INVALID);
 
         cache.add_id(10);
         cache.add_id(20);
@@ -66,7 +66,7 @@ public:
         TS_ASSERT_EQUALS(cache.pop(), 30);
         TS_ASSERT_EQUALS(cache.pop(), 20);
         TS_ASSERT_EQUALS(cache.pop(), 10);
-        TS_ASSERT_EQUALS(cache.pop(), INVALID);
+        TS_ASSERT_EQUALS(cache.pop(), ENTITYID_INVALID);
         TS_ASSERT_EQUALS(cache.get_count(), 0U);
     }
 
@@ -74,8 +74,8 @@ public:
         item_cache cache;
 
         TS_ASSERT_EQUALS(cache.get_count(), 0U);
-        TS_ASSERT_EQUALS(cache.top(), INVALID);
-        TS_ASSERT_EQUALS(cache.at(0), INVALID);
+        TS_ASSERT_EQUALS(cache.top(), ENTITYID_INVALID);
+        TS_ASSERT_EQUALS(cache.at(0), ENTITYID_INVALID);
 
         TS_ASSERT(cache.add_id(11));
         TS_ASSERT(cache.add_id(12));
@@ -87,7 +87,7 @@ public:
         TS_ASSERT_EQUALS(cache.contains(13), 2);
         TS_ASSERT_EQUALS(cache.top(), 13);
         TS_ASSERT_EQUALS(cache.at(1), 12);
-        TS_ASSERT_EQUALS(cache.at(99), INVALID);
+        TS_ASSERT_EQUALS(cache.at(99), ENTITYID_INVALID);
     }
 
     void testItemCacheCapacityAndRemove() {
@@ -194,7 +194,7 @@ public:
         TS_ASSERT_EQUALS(tile.entity_count(), 1U);
         TS_ASSERT_EQUALS(tile.tile_remove(4), 4);
         TS_ASSERT_EQUALS(tile.entity_count(), 0U);
-        TS_ASSERT_EQUALS(tile.tile_remove(999), INVALID);
+        TS_ASSERT_EQUALS(tile.tile_remove(999), ENTITYID_INVALID);
     }
 
     void testTileItemCacheLimit() {
@@ -205,7 +205,7 @@ public:
         }
 
         TS_ASSERT_EQUALS(tile.get_item_count(), static_cast<size_t>(ITEM_CACHE_SIZE));
-        TS_ASSERT_EQUALS(tile.tile_add(999, ENTITY_ITEM), INVALID);
+        TS_ASSERT_EQUALS(tile.tile_add(999, ENTITY_ITEM), ENTITYID_INVALID);
         TS_ASSERT_EQUALS(tile.get_item_count(), static_cast<size_t>(ITEM_CACHE_SIZE));
         TS_ASSERT_EQUALS(tile.get_cached_item(), 200 + ITEM_CACHE_SIZE - 1);
     }
@@ -214,7 +214,7 @@ public:
         tile_t tile(TILE_FLOOR_STONE_00);
 
         TS_ASSERT_EQUALS(tile.tile_add(10, ENTITY_DOOR), 10);
-        TS_ASSERT_EQUALS(tile.tile_add(11, ENTITY_DOOR), INVALID);
+        TS_ASSERT_EQUALS(tile.tile_add(11, ENTITY_DOOR), ENTITYID_INVALID);
         TS_ASSERT_EQUALS(tile.get_cached_door(), 10);
         TS_ASSERT_EQUALS(tile.entity_count(), 1U);
     }

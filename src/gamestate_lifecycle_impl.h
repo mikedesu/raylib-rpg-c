@@ -21,7 +21,7 @@ inline bool gamestate::path_blocked(vec3 a, vec3 b) {
             return true;
         }
         entityid door_id = t.get_cached_door();
-        if (door_id != INVALID) {
+        if (door_id != ENTITYID_INVALID) {
             bool door_is_open = ct.get<door_open>(door_id).value_or(false);
             if (!door_is_open) {
                 return true;
@@ -43,7 +43,7 @@ inline bool gamestate::visibility_path_blocked(vec3 a, vec3 b) {
             return true;
         }
         entityid door_id = t.get_cached_door();
-        if (door_id != INVALID && !vec3_equal(loc, b)) {
+        if (door_id != ENTITYID_INVALID && !vec3_equal(loc, b)) {
             bool door_is_open = ct.get<door_open>(door_id).value_or(false);
             if (!door_is_open) {
                 return true;
@@ -220,9 +220,7 @@ inline void gamestate::logic_init() {
 
     const race_t friendly_race = static_cast<race_t>(GetRandomValue(RACE_NONE + 1, RACE_COUNT - 1));
     const vec3 friendly_loc = d.get_floor(0)->get_random_loc();
-    create_npc_at_with(friendly_race, friendly_loc, [](CT& ct, const entityid id) {
-        ct.set<aggro>(id, false);
-    });
+    create_npc_at_with(friendly_race, friendly_loc, [](CT& ct, const entityid id) { ct.set<aggro>(id, false); });
 
     auto floor_one = d.get_floor(1);
     for (int i = 0; i < 9; i++) {

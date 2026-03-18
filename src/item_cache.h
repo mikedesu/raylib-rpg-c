@@ -27,7 +27,7 @@ public:
     item_cache() {
         count = 0;
         for (int i = 0; i < ITEM_CACHE_SIZE; i++) {
-            ids[i] = INVALID;
+            ids[i] = ENTITYID_INVALID;
         }
     }
 
@@ -69,22 +69,22 @@ public:
         for (size_t j = static_cast<size_t>(i); j < count; j++) {
             ids[j] = ids[j + 1];
         }
-        ids[count] = INVALID;
+        ids[count] = ENTITYID_INVALID;
         return true;
     }
 
-    /** @brief Return the most recently cached item id, or `INVALID`. */
+    /** @brief Return the most recently cached item id, or `ENTITYID_INVALID`. */
     entityid top() const {
         if (count == 0) {
-            return INVALID;
+            return ENTITYID_INVALID;
         }
         return ids[count - 1];
     }
 
-    /** @brief Return the cached item id at `index`, or `INVALID` when out of bounds. */
+    /** @brief Return the cached item id at `index`, or `ENTITYID_INVALID` when out of bounds. */
     entityid at(size_t index) const {
         if (index >= count) {
-            return INVALID;
+            return ENTITYID_INVALID;
         }
         return ids[index];
     }

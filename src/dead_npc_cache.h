@@ -27,7 +27,7 @@ public:
     dead_npc_cache() {
         count = 0;
         for (int i = 0; i < DEAD_NPC_CACHE_SIZE; i++) {
-            ids[i] = INVALID;
+            ids[i] = ENTITYID_INVALID;
         }
     }
 
@@ -72,27 +72,27 @@ public:
             for (; i < count; i++) {
                 ids[i] = ids[i + 1];
             }
-            ids[count] = INVALID;
+            ids[count] = ENTITYID_INVALID;
             return true;
         }
         return false;
     }
 
-    /** @brief Return the most recently cached dead NPC id, or `INVALID`. */
+    /** @brief Return the most recently cached dead NPC id, or `ENTITYID_INVALID`. */
     entityid top() {
         if (count == 0) {
-            return INVALID;
+            return ENTITYID_INVALID;
         }
         return ids[count - 1];
     }
 
-    /** @brief Remove and return the most recently cached dead NPC id, or `INVALID`. */
+    /** @brief Remove and return the most recently cached dead NPC id, or `ENTITYID_INVALID`. */
     entityid pop() {
         if (count == 0) {
-            return INVALID;
+            return ENTITYID_INVALID;
         }
         entityid id = ids[count - 1];
-        ids[count - 1] = INVALID;
+        ids[count - 1] = ENTITYID_INVALID;
         count--;
         return id;
     }

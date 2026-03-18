@@ -45,11 +45,11 @@ public:
      */
     inline size_t entity_count() {
         size_t count = 0;
-        count += cached_live_npc != INVALID ? 1 : 0;
-        count += cached_prop != INVALID ? 1 : 0;
-        count += cached_box != INVALID ? 1 : 0;
-        count += cached_chest != INVALID ? 1 : 0;
-        count += cached_door != INVALID ? 1 : 0;
+        count += cached_live_npc != ENTITYID_INVALID ? 1 : 0;
+        count += cached_prop != ENTITYID_INVALID ? 1 : 0;
+        count += cached_box != ENTITYID_INVALID ? 1 : 0;
+        count += cached_chest != ENTITYID_INVALID ? 1 : 0;
+        count += cached_door != ENTITYID_INVALID ? 1 : 0;
 
         count += dead_npcs.get_count();
         count += items.get_count();
@@ -221,7 +221,7 @@ public:
      *
      * @param id Entity id to cache on the tile.
      * @param type Logical entity type that controls which cache slot is used.
-     * @return The entity id on success, or `INVALID` when the cache cannot accept it.
+     * @return The entity id on success, or `ENTITYID_INVALID` when the cache cannot accept it.
      */
     inline entityid tile_add(entityid id, entitytype_t type) {
         if (type == ENTITY_PLAYER) {
@@ -235,7 +235,7 @@ public:
         else if (type == ENTITY_ITEM) {
             if (!items.add_id(id)) {
                 merror("tile_add: item cache is full");
-                return INVALID;
+                return ENTITYID_INVALID;
             }
         }
         else if (type == ENTITY_PROP) {
@@ -245,16 +245,16 @@ public:
             cached_box = id;
         }
         else if (type == ENTITY_CHEST) {
-            if (cached_chest != INVALID) {
+            if (cached_chest != ENTITYID_INVALID) {
                 merror("tile_add: chest cache already occupied");
-                return INVALID;
+                return ENTITYID_INVALID;
             }
             cached_chest = id;
         }
         else if (type == ENTITY_DOOR) {
-            if (cached_door != INVALID) {
+            if (cached_door != ENTITYID_INVALID) {
                 merror("tile_add: door cache already occupied");
-                return INVALID;
+                return ENTITYID_INVALID;
             }
             cached_door = id;
         }
@@ -266,12 +266,12 @@ public:
      * @brief Remove an entity from whichever tile cache currently owns it.
      *
      * @param id Entity id to remove.
-     * @return The removed entity id, or `INVALID` if the tile did not contain it.
+     * @return The removed entity id, or `ENTITYID_INVALID` if the tile did not contain it.
      */
     inline entityid tile_remove(entityid id) {
         massert(id != ENTITYID_INVALID, "tile_remove: id is invalid");
         if (id == cached_live_npc) {
-            cached_live_npc = INVALID;
+            cached_live_npc = ENTITYID_INVALID;
             if (cached_player_present) {
                 cached_player_present = false;
             }
@@ -281,25 +281,25 @@ public:
             return id;
         }
         else if (id == cached_prop) {
-            cached_prop = INVALID;
+            cached_prop = ENTITYID_INVALID;
             return id;
         }
         else if (id == cached_box) {
-            cached_box = INVALID;
+            cached_box = ENTITYID_INVALID;
             return id;
         }
         else if (id == cached_chest) {
-            cached_chest = INVALID;
+            cached_chest = ENTITYID_INVALID;
             return id;
         }
         else if (id == cached_door) {
-            cached_door = INVALID;
+            cached_door = ENTITYID_INVALID;
             return id;
         }
         else if (items.remove_id(id)) {
             return id;
         }
-        return INVALID;
+        return ENTITYID_INVALID;
     }
 
     tile_t(tiletype_t t)

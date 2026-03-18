@@ -23,28 +23,28 @@ inline entityid gamestate::tile_has_pullable(int x, int y, int z) {
     shared_ptr<dungeon_floor> df = d.get_floor(z);
     tile_t& t = df->tile_at(vec3{x, y, z});
     entityid box_id = t.get_cached_box();
-    if (box_id != INVALID) {
+    if (box_id != ENTITYID_INVALID) {
         bool is_pullable = ct.get<pullable>(box_id).value_or(false);
         if (is_pullable) {
             return box_id;
         }
     }
     entityid chest_id = t.get_cached_chest();
-    if (chest_id != INVALID) {
+    if (chest_id != ENTITYID_INVALID) {
         bool is_pullable = ct.get<pullable>(chest_id).value_or(false);
         if (is_pullable) {
             return chest_id;
         }
     }
     entityid dead_npc_id = t.get_cached_dead_npc();
-    if (dead_npc_id != INVALID) {
+    if (dead_npc_id != ENTITYID_INVALID) {
         bool is_pullable = ct.get<pullable>(dead_npc_id).value_or(false);
         if (is_pullable) {
             return dead_npc_id;
         }
     }
     entityid prop_id = t.get_cached_prop();
-    if (prop_id != INVALID) {
+    if (prop_id != ENTITYID_INVALID) {
         bool is_pullable = ct.get<pullable>(prop_id).value_or(false);
         if (is_pullable) {
             return prop_id;
@@ -827,7 +827,7 @@ inline bool gamestate::try_entity_move(entityid id, vec3 v) {
         merror2("solid present, cannot move");
         return false;
     }
-    else if (tile.get_cached_live_npc() != INVALID) {
+    else if (tile.get_cached_live_npc() != ENTITYID_INVALID) {
         merror2("live npcs present, cannot move");
         return false;
     }
@@ -1056,7 +1056,7 @@ inline bool gamestate::try_entity_pull(entityid id) {
         return false;
     }
 
-    if (tile_dest.get_cached_live_npc() != INVALID) {
+    if (tile_dest.get_cached_live_npc() != ENTITYID_INVALID) {
         merror("live npcs present, cannot move");
         return false;
     }

@@ -506,7 +506,7 @@ void draw_debug_panel(gamestate& g) {
 
 void update_debug_panel(gamestate& g) {
     minfo3("update debug panel");
-    if (g.hero_id == INVALID) {
+    if (g.hero_id == ENTITYID_INVALID) {
         return;
     }
 
@@ -1671,11 +1671,11 @@ void draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type_0, int vision
 
             if (type_0 == ENTITY_NPC) {
                 entityid dead_npc_id = tile.get_cached_dead_npc();
-                if (dead_npc_id != INVALID && extra_check(g, dead_npc_id)) {
+                if (dead_npc_id != ENTITYID_INVALID && extra_check(g, dead_npc_id)) {
                     draw_sprite_and_shadow(g, dead_npc_id);
                 }
                 entityid npc_id = tile.get_cached_live_npc();
-                if (npc_id != INVALID && extra_check(g, npc_id)) {
+                if (npc_id != ENTITYID_INVALID && extra_check(g, npc_id)) {
                     draw_sprite_and_shadow(g, npc_id);
                 }
             }
@@ -1687,31 +1687,31 @@ void draw_dungeon_floor_entitytype(gamestate& g, entitytype_t type_0, int vision
             }
             else if (type_0 == ENTITY_BOX) {
                 entityid box_id = tile.get_cached_box();
-                if (box_id != INVALID && extra_check(g, box_id)) {
+                if (box_id != ENTITYID_INVALID && extra_check(g, box_id)) {
                     draw_sprite_and_shadow(g, box_id);
                 }
             }
             else if (type_0 == ENTITY_CHEST) {
                 entityid chest_id = tile.get_cached_chest();
-                if (chest_id != INVALID && extra_check(g, chest_id)) {
+                if (chest_id != ENTITYID_INVALID && extra_check(g, chest_id)) {
                     draw_sprite_and_shadow(g, chest_id);
                 }
             }
             else if (type_0 == ENTITY_PROP) {
                 entityid prop_id = tile.get_cached_prop();
-                if (prop_id != INVALID && extra_check(g, prop_id)) {
+                if (prop_id != ENTITYID_INVALID && extra_check(g, prop_id)) {
                     draw_sprite_and_shadow(g, prop_id);
                 }
             }
             else if (type_0 == ENTITY_ITEM) {
                 entityid item_id = tile.get_cached_item();
-                if (item_id != INVALID && extra_check(g, item_id)) {
+                if (item_id != ENTITYID_INVALID && extra_check(g, item_id)) {
                     draw_sprite_and_shadow(g, item_id);
                 }
             }
             else if (type_0 == ENTITY_DOOR) {
                 entityid door_id = tile.get_cached_door();
-                if (door_id != INVALID && extra_check(g, door_id)) {
+                if (door_id != ENTITYID_INVALID && extra_check(g, door_id)) {
                     draw_sprite_and_shadow(g, door_id);
                 }
             }

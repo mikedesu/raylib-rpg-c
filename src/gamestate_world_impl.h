@@ -4,7 +4,8 @@
 
 #pragma once
 
-namespace {
+namespace
+{
 inline int dungeon_clamp_int(int value, int min_value, int max_value) {
     if (value < min_value) {
         return min_value;
@@ -64,10 +65,8 @@ inline bool dungeon_prop_is_solid(proptype_t type) {
     case PROP_DUNGEON_WOODEN_TABLE_01:
     case PROP_DUNGEON_WOODEN_BARREL_OPEN_TOP_EMPTY:
     case PROP_DUNGEON_WOODEN_BARREL_OPEN_TOP_WATER:
-    case PROP_DUNGEON_WOODEN_SIGN:
-        return true;
-    default:
-        return false;
+    case PROP_DUNGEON_WOODEN_SIGN: return true;
+    default: return false;
     }
 }
 
@@ -75,10 +74,8 @@ inline bool dungeon_prop_is_pushable(proptype_t type) {
     switch (type) {
     case PROP_DUNGEON_STATUE_00:
     case PROP_DUNGEON_WOODEN_TABLE_00:
-    case PROP_DUNGEON_WOODEN_TABLE_01:
-        return true;
-    default:
-        return false;
+    case PROP_DUNGEON_WOODEN_TABLE_01: return true;
+    default: return false;
     }
 }
 
@@ -86,10 +83,8 @@ inline bool dungeon_prop_is_pullable(proptype_t type) {
     switch (type) {
     case PROP_DUNGEON_CANDLE_00:
     case PROP_DUNGEON_WOODEN_TABLE_00:
-    case PROP_DUNGEON_WOODEN_TABLE_01:
-        return true;
-    default:
-        return false;
+    case PROP_DUNGEON_WOODEN_TABLE_01: return true;
+    default: return false;
     }
 }
 
@@ -108,10 +103,8 @@ inline const char* dungeon_prop_name(proptype_t type) {
     case PROP_DUNGEON_WOODEN_SIGN: return "wooden sign";
     case PROP_DUNGEON_BANNER_00:
     case PROP_DUNGEON_BANNER_01:
-    case PROP_DUNGEON_BANNER_02:
-        return "banner";
-    default:
-        return "prop";
+    case PROP_DUNGEON_BANNER_02: return "banner";
+    default: return "prop";
     }
 }
 
@@ -126,12 +119,9 @@ inline const char* dungeon_prop_description(proptype_t type) {
     case PROP_DUNGEON_WOODEN_BARREL_OPEN_TOP_WATER: return "An open-topped barrel filled with still water dark enough to hide the bottom.";
     case PROP_DUNGEON_WOODEN_CHAIR_00: return "A wooden chair with scraped legs and a backrest polished by use.";
     case PROP_DUNGEON_WOODEN_TABLE_00:
-    case PROP_DUNGEON_WOODEN_TABLE_01:
-        return "A sturdy wooden table scarred by cuts, heat marks, and years of hard use.";
-    case PROP_DUNGEON_WOODEN_SIGN:
-        return "Pull something onto the\npressure plate to keep the door open.";
-    default:
-        return "A bit of dungeon clutter left to rot in the dark.";
+    case PROP_DUNGEON_WOODEN_TABLE_01: return "A sturdy wooden table scarred by cuts, heat marks, and years of hard use.";
+    case PROP_DUNGEON_WOODEN_SIGN: return "Pull something onto the\npressure plate to keep the door open.";
+    default: return "A bit of dungeon clutter left to rot in the dark.";
     }
 }
 
@@ -231,7 +221,7 @@ inline bool dungeon_is_safe_prop_loc(shared_ptr<dungeon_floor> df, vec3 loc) {
 
     return true;
 }
-}
+} // namespace
 
 inline void gamestate::create_and_add_df_0(biome_t type, int w, int h, int df_count, float parts) {
     (void)df_count;
@@ -262,12 +252,10 @@ inline void gamestate::create_and_add_df_1(biome_t type, int w, int h, int df_co
     rooms.push_back(room(0, TextFormat("room-%d", 0), TextFormat("room-%d description", 0), start_area));
 
     const int dungeon_area = w * h;
-    const int density_divisor = compact_map
-        ? dungeon_clamp_int(static_cast<int>(16.0f / parts), 8, 16)
-        : dungeon_clamp_int(static_cast<int>(48.0f / parts), 24, 64);
-    const int target_room_count = compact_map
-        ? dungeon_clamp_int(dungeon_area / density_divisor, 4, 5)
-        : dungeon_clamp_int(dungeon_area / density_divisor, 6, 96);
+    const int density_divisor =
+        compact_map ? dungeon_clamp_int(static_cast<int>(16.0f / parts), 8, 16) : dungeon_clamp_int(static_cast<int>(48.0f / parts), 24, 64);
+    const int target_room_count =
+        compact_map ? dungeon_clamp_int(dungeon_area / density_divisor, 4, 5) : dungeon_clamp_int(dungeon_area / density_divisor, 6, 96);
     const int min_gap = compact_map ? 0 : 1;
     const int max_gap = compact_map ? 0 : dungeon_clamp_int((w + h) / 96, 1, 2);
     const int overlap_padding = compact_map ? 0 : 1;
@@ -382,20 +370,20 @@ inline entityid gamestate::create_door_at_with(vec3 loc, with_fun doorInitFuncti
     shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
     tile_t& tile = df->tile_at(loc);
     if (!tile_is_walkable(tile.get_type())) {
-        return INVALID;
+        return ENTITYID_INVALID;
     }
     if (tile.get_type() == TILE_UPSTAIRS || tile.get_type() == TILE_DOWNSTAIRS) {
-        return INVALID;
+        return ENTITYID_INVALID;
     }
     if (tile.entity_count() > 0) {
-        return INVALID;
+        return ENTITYID_INVALID;
     }
     entityid id = create_door_with(doorInitFunction);
-    if (id == INVALID) {
-        return INVALID;
+    if (id == ENTITYID_INVALID) {
+        return ENTITYID_INVALID;
     }
     if (!df->df_add_at(id, ENTITY_DOOR, loc)) {
-        return INVALID;
+        return ENTITYID_INVALID;
     }
     ct.set<location>(id, loc);
     ct.set<door_open>(id, false);
@@ -415,7 +403,7 @@ inline size_t gamestate::place_doors() {
                 if (!tile.get_can_have_door()) {
                     continue;
                 }
-                entityid door_id = create_door_at_with(loc, [](CT& ct, const entityid id) {});
+                entityid door_id = create_door_at_with(loc, [](CT& ct, const entityid id) { });
                 if (door_id == ENTITYID_INVALID) {
                     continue;
                 }
@@ -497,7 +485,7 @@ inline entityid gamestate::place_first_floor_chest() {
         return ENTITYID_INVALID;
     }
     std::shuffle(candidates.begin(), candidates.end(), mt);
-    return create_chest_at_with(candidates.front(), [](CT&, const entityid) {});
+    return create_chest_at_with(candidates.front(), [](CT&, const entityid) { });
 }
 
 inline entityid gamestate::create_prop_with(proptype_t type, with_fun initFun) {
@@ -656,14 +644,15 @@ inline bool gamestate::create_floor_pressure_plate(vec3 loc, entityid linked_doo
     }
 
     tile.set_can_have_door(false);
-    floor_pressure_plates.push_back(floor_pressure_plate_t{
-        loc,
-        linked_door_id,
-        false,
-        false,
-        TX_SWITCHES_PRESSURE_PLATE_UP_00,
-        TX_SWITCHES_PRESSURE_PLATE_DOWN_00,
-    });
+    floor_pressure_plates.push_back(
+        floor_pressure_plate_t{
+            loc,
+            linked_door_id,
+            false,
+            false,
+            TX_SWITCHES_PRESSURE_PLATE_UP_00,
+            TX_SWITCHES_PRESSURE_PLATE_DOWN_00,
+        });
     update_pressure_plates_for_floor(loc.z);
     return true;
 }
@@ -707,9 +696,7 @@ inline bool gamestate::setup_floor_four_pressure_plate_tutorial() {
         }
         const bool outer_wall = x == room_x || x == room_x + tutorial_width - 1 || y == room_y || y == room_y + tutorial_height - 1;
         const bool center_divider = x == split_x && y != center_y;
-        return (outer_wall || center_divider)
-            ? TILE_STONE_WALL_00
-            : df->random_tiletype(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
+        return (outer_wall || center_divider) ? TILE_STONE_WALL_00 : df->random_tiletype(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11);
     };
 
     for (int x = room_x; x < room_x + tutorial_width; x++) {
@@ -737,7 +724,7 @@ inline bool gamestate::setup_floor_four_pressure_plate_tutorial() {
         return false;
     }
 
-    const entityid door_id = create_door_at_with(door_loc, [](CT&, const entityid) {});
+    const entityid door_id = create_door_at_with(door_loc, [](CT&, const entityid) { });
     if (door_id == ENTITYID_INVALID) {
         return false;
     }

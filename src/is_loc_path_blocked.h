@@ -38,7 +38,7 @@ static inline bool is_loc_path_blocked(gamestate& g, shared_ptr<dungeon_floor> d
         }
         // check if tile has a DOOR
         entityid door_id = v0_tile.get_cached_door();
-        if (door_id != INVALID) {
+        if (door_id != ENTITYID_INVALID) {
             auto is_open = g.ct.get<door_open>(door_id).value_or(false);
             if (!is_open) {
                 blocked = true;
@@ -46,12 +46,12 @@ static inline bool is_loc_path_blocked(gamestate& g, shared_ptr<dungeon_floor> d
             }
         }
         entityid box_id = v0_tile.get_cached_box();
-        if (box_id != INVALID) {
+        if (box_id != ENTITYID_INVALID) {
             blocked = true;
             break;
         }
         entityid npc_id = v0_tile.get_cached_live_npc();
-        if (npc_id != INVALID) {
+        if (npc_id != ENTITYID_INVALID) {
             massert(g.ct.has<dead>(npc_id), "id %d doesn't have a dead component", npc_id);
             const bool is_dead = g.ct.get<dead>(npc_id).value();
             if (!is_dead) {

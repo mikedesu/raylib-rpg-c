@@ -127,30 +127,30 @@ inline entityid gamestate::create_weapon_at_with(ComponentTable& ct, vec3 loc, w
     minfo2("create weapon at with: %d %d %d", loc.x, loc.y, loc.z);
     if (d.floors.size() == 0) {
         merror2("dungeon floors size is 0");
-        return INVALID;
+        return ENTITYID_INVALID;
     }
     if (!d.is_initialized) {
         merror2("dungeon is_initialized flag not set");
-        return INVALID;
+        return ENTITYID_INVALID;
     }
     if (vec3_invalid(loc)) {
         merror2("loc is invalid");
-        return INVALID;
+        return ENTITYID_INVALID;
     }
     shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
     tile_t& tile = df->tile_at(loc);
     if (!tile_is_walkable(tile.get_type())) {
         merror2("cannot create entity on non-walkable tile");
-        return INVALID;
+        return ENTITYID_INVALID;
     }
     entityid id = create_weapon_with(weaponInitFunction);
     if (id == ENTITYID_INVALID) {
         minfo2("failed to create weapon");
-        return INVALID;
+        return ENTITYID_INVALID;
     }
     if (df->df_add_at(id, ENTITY_ITEM, loc) == ENTITYID_INVALID) {
         minfo2("failed to add weapon to df");
-        return INVALID;
+        return ENTITYID_INVALID;
     }
     ct.set<location>(id, loc);
     return id;
@@ -160,7 +160,7 @@ inline entityid gamestate::create_weapon_at_random_loc_with(CT& ct, with_fun wea
     vec3 loc = d.floors[d.current_floor]->get_random_loc();
     if (vec3_invalid(loc)) {
         merror("loc is invalid");
-        return INVALID;
+        return ENTITYID_INVALID;
     }
     return create_weapon_at_with(ct, loc, weaponInitFunction);
 }
@@ -179,12 +179,12 @@ inline entityid gamestate::create_shield_with(ComponentTable& ct, with_fun shiel
 
 inline entityid gamestate::create_shield_at_with(ComponentTable& ct, vec3 loc, with_fun shieldInitFunction) {
     if (d.floors.size() == 0) {
-        return INVALID;
+        return ENTITYID_INVALID;
     }
     entityid id = create_shield_with(ct, shieldInitFunction);
     shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
     if (!df->df_add_at(id, ENTITY_ITEM, loc)) {
-        return INVALID;
+        return ENTITYID_INVALID;
     }
     ct.set<location>(id, loc);
     return id;
@@ -203,14 +203,14 @@ inline entityid gamestate::create_potion_at_with(vec3 loc, with_fun potionInitFu
     shared_ptr<dungeon_floor> df = d.get_floor(loc.z);
     tile_t& tile = df->tile_at(loc);
     if (!tile_is_walkable(tile.get_type())) {
-        return INVALID;
+        return ENTITYID_INVALID;
     }
     entityid id = create_potion_with(potionInitFunction);
-    if (id == INVALID) {
-        return INVALID;
+    if (id == ENTITYID_INVALID) {
+        return ENTITYID_INVALID;
     }
     if (!df->df_add_at(id, ENTITY_ITEM, loc)) {
-        return INVALID;
+        return ENTITYID_INVALID;
     }
     ct.set<location>(id, loc);
     ct.set<update>(id, true);
@@ -319,28 +319,28 @@ inline entityid gamestate::create_npc_at_with(race_t rt, vec3 loc, with_fun npcI
     tile_t& tile = df->tile_at(loc);
     if (!tile_is_walkable(tile.get_type())) {
         merror2("cannot create entity on non-walkable tile: tile.type: %s", tiletype2str(tile.get_type()).c_str());
-        return INVALID;
+        return ENTITYID_INVALID;
     }
     if (tile_has_box(loc.x, loc.y, loc.z) != ENTITYID_INVALID) {
         merror2("cannot create entity on tile with box");
-        return INVALID;
+        return ENTITYID_INVALID;
     }
     if (tile_has_pushable(loc.x, loc.y, loc.z) != ENTITYID_INVALID) {
         merror2("cannot create entity on tile with pushable");
-        return INVALID;
+        return ENTITYID_INVALID;
     }
-    if (tile.get_cached_live_npc() != INVALID) {
+    if (tile.get_cached_live_npc() != ENTITYID_INVALID) {
         merror2("cannot create entity on tile with live npc");
-        return INVALID;
+        return ENTITYID_INVALID;
     }
     entityid id = create_npc_with(rt, npcInitFunction);
-    if (id == INVALID) {
+    if (id == ENTITYID_INVALID) {
         merror("failed to create npc");
-        return INVALID;
+        return ENTITYID_INVALID;
     }
-    if (df->df_add_at(id, ENTITY_NPC, loc) == INVALID) {
+    if (df->df_add_at(id, ENTITY_NPC, loc) == ENTITYID_INVALID) {
         merror("failed to add npc %d to %d, %d", id, loc.x, loc.y);
-        return INVALID;
+        return ENTITYID_INVALID;
     }
     minfo2("setting location for %d", id);
     ct.set<location>(id, loc);
@@ -377,8 +377,8 @@ inline entityid gamestate::create_orc_at_with(vec3 loc, with_fun monsterInitFunc
     if (!tile_is_walkable(t.get_type())) {
         return ENTITYID_INVALID;
     }
-    if (t.get_cached_live_npc() != INVALID) {
-        return INVALID;
+    if (t.get_cached_live_npc() != ENTITYID_INVALID) {
+        return ENTITYID_INVALID;
     }
     entityid id = create_orc_with(monsterInitFunction);
     if (id == ENTITYID_INVALID) {

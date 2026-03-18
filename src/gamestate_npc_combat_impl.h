@@ -171,7 +171,7 @@ inline attack_result_t gamestate::resolve_attack_intent(entityid attacker_id, ve
     ct.set<update>(attacker_id, true);
 
     const entityid target_id = tile.get_cached_live_npc();
-    if (target_id == INVALID) {
+    if (target_id == ENTITYID_INVALID) {
         return ATTACK_RESULT_MISS;
     }
 
@@ -270,11 +270,8 @@ inline void gamestate::resolve_attack_death_event(entityid attacker_id, entityid
         queue_attack_award_xp_event(attacker_id, target_id);
         queue_attack_drop_inventory_event(target_id);
         break;
-    case ENTITY_PLAYER:
-        queue_attack_player_death_event(target_id);
-        break;
-    default:
-        break;
+    case ENTITY_PLAYER: queue_attack_player_death_event(target_id); break;
+    default: break;
     }
 }
 
@@ -355,7 +352,7 @@ inline bool gamestate::is_entity_adjacent(entityid id0, entityid id1) {
 }
 
 inline void gamestate::update_path_to_target(entityid id) {
-    massert(id != INVALID, "id is invalid");
+    massert(id != ENTITYID_INVALID, "id is invalid");
     if (!ct.has<target_path>(id)) {
         merror("id doesn't have a target_path");
         return;
