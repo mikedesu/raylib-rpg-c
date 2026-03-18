@@ -40,12 +40,9 @@ inline void gamestate::resolve_confirm_prompt(bool confirmed) {
         return;
     }
     switch (action) {
-    case CONFIRM_ACTION_QUIT:
-        handle_confirm_quit();
-        break;
+    case CONFIRM_ACTION_QUIT: handle_confirm_quit(); break;
     case CONFIRM_ACTION_NONE:
-    default:
-        break;
+    default: break;
     }
 }
 
@@ -99,26 +96,13 @@ inline bool gamestate::apply_permanent_attribute_increase(entityid id, unsigned 
     }
 
     switch (attribute_index % 6) {
-    case 0:
-        ct.set<strength>(id, ct.get<strength>(id).value_or(10) + amount);
-        return true;
-    case 1:
-        ct.set<dexterity>(id, ct.get<dexterity>(id).value_or(10) + amount);
-        return true;
-    case 2:
-        ct.set<constitution>(id, ct.get<constitution>(id).value_or(10) + amount);
-        return true;
-    case 3:
-        ct.set<intelligence>(id, ct.get<intelligence>(id).value_or(10) + amount);
-        return true;
-    case 4:
-        ct.set<wisdom>(id, ct.get<wisdom>(id).value_or(10) + amount);
-        return true;
-    case 5:
-        ct.set<charisma>(id, ct.get<charisma>(id).value_or(10) + amount);
-        return true;
-    default:
-        break;
+    case 0: ct.set<strength>(id, ct.get<strength>(id).value_or(10) + amount); return true;
+    case 1: ct.set<dexterity>(id, ct.get<dexterity>(id).value_or(10) + amount); return true;
+    case 2: ct.set<constitution>(id, ct.get<constitution>(id).value_or(10) + amount); return true;
+    case 3: ct.set<intelligence>(id, ct.get<intelligence>(id).value_or(10) + amount); return true;
+    case 4: ct.set<wisdom>(id, ct.get<wisdom>(id).value_or(10) + amount); return true;
+    case 5: ct.set<charisma>(id, ct.get<charisma>(id).value_or(10) + amount); return true;
+    default: break;
     }
     return false;
 }
@@ -159,26 +143,13 @@ inline void gamestate::apply_level_up_selection() {
 
     const char* stat_name = "strength";
     switch (level_up_selection % 6) {
-    case 0:
-        stat_name = "strength";
-        break;
-    case 1:
-        stat_name = "dexterity";
-        break;
-    case 2:
-        stat_name = "constitution";
-        break;
-    case 3:
-        stat_name = "intelligence";
-        break;
-    case 4:
-        stat_name = "wisdom";
-        break;
-    case 5:
-        stat_name = "charisma";
-        break;
-    default:
-        break;
+    case 0: stat_name = "strength"; break;
+    case 1: stat_name = "dexterity"; break;
+    case 2: stat_name = "constitution"; break;
+    case 3: stat_name = "intelligence"; break;
+    case 4: stat_name = "wisdom"; break;
+    case 5: stat_name = "charisma"; break;
+    default: break;
     }
 
     if (!apply_permanent_attribute_increase(hero_id, level_up_selection, 1)) {
@@ -568,12 +539,13 @@ inline void gamestate::handle_input_gameplay_controlmode_player(inputstate& is) 
     if (handle_toggle_full_light(is) || handle_change_dir(is) || handle_change_dir_intent(is) || handle_display_inventory(is)) {
         return;
     }
-    else if (handle_move_up(is, is_dead) || handle_move_down(is, is_dead) || handle_move_left(is, is_dead) || handle_move_right(is, is_dead)) {
-        return;
-    }
     else if (
-        handle_move_up_left(is, is_dead) || handle_move_up_right(is, is_dead) || handle_move_down_left(is, is_dead) ||
-        handle_move_down_right(is, is_dead)) {
+        handle_move_direction(is, is_dead, INPUT_ACTION_MOVE_UP, {0, -1, 0}) || handle_move_direction(is, is_dead, INPUT_ACTION_MOVE_DOWN, {0, 1, 0}) ||
+        handle_move_direction(is, is_dead, INPUT_ACTION_MOVE_LEFT, {-1, 0, 0}) || handle_move_direction(is, is_dead, INPUT_ACTION_MOVE_RIGHT, {1, 0, 0}) ||
+        handle_move_direction(is, is_dead, INPUT_ACTION_MOVE_UP_LEFT, {-1, -1, 0}) ||
+        handle_move_direction(is, is_dead, INPUT_ACTION_MOVE_UP_RIGHT, {1, -1, 0}) ||
+        handle_move_direction(is, is_dead, INPUT_ACTION_MOVE_DOWN_LEFT, {-1, 1, 0}) ||
+        handle_move_direction(is, is_dead, INPUT_ACTION_MOVE_DOWN_RIGHT, {1, 1, 0})) {
         return;
     }
     else if (

@@ -874,96 +874,12 @@ inline bool gamestate::try_entity_move(entityid id, vec3 v) {
     return true;
 }
 
-inline bool gamestate::handle_move_up(inputstate& is, bool is_dead) {
-    if (is_action_pressed(is, INPUT_ACTION_MOVE_UP)) {
+inline bool gamestate::handle_move_direction(inputstate& is, bool is_dead, gameplay_input_action_t input_action, vec3 delta) {
+    if (is_action_pressed(is, input_action)) {
         if (is_dead) {
             return add_message("You cannot move while dead");
         }
-        run_move_action(hero_id, (vec3){0, -1, 0});
-        flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        return true;
-    }
-    return false;
-}
-
-inline bool gamestate::handle_move_down(inputstate& is, bool is_dead) {
-    if (is_action_pressed(is, INPUT_ACTION_MOVE_DOWN)) {
-        if (is_dead) {
-            return add_message("You cannot move while dead");
-        }
-        run_move_action(hero_id, (vec3){0, 1, 0});
-        flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        return true;
-    }
-    return false;
-}
-
-inline bool gamestate::handle_move_left(inputstate& is, bool is_dead) {
-    if (is_action_pressed(is, INPUT_ACTION_MOVE_LEFT)) {
-        if (is_dead) {
-            return add_message("You cannot move while dead");
-        }
-        run_move_action(hero_id, (vec3){-1, 0, 0});
-        flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        return true;
-    }
-    return false;
-}
-
-inline bool gamestate::handle_move_right(inputstate& is, bool is_dead) {
-    if (is_action_pressed(is, INPUT_ACTION_MOVE_RIGHT)) {
-        if (is_dead) {
-            return add_message("You cannot move while dead");
-        }
-        run_move_action(hero_id, (vec3){1, 0, 0});
-        flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        return true;
-    }
-    return false;
-}
-
-inline bool gamestate::handle_move_up_left(inputstate& is, bool is_dead) {
-    if (is_action_pressed(is, INPUT_ACTION_MOVE_UP_LEFT)) {
-        if (is_dead) {
-            return add_message("You cannot move while dead");
-        }
-        run_move_action(hero_id, (vec3){-1, -1, 0});
-        flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        return true;
-    }
-    return false;
-}
-
-inline bool gamestate::handle_move_up_right(inputstate& is, bool is_dead) {
-    if (is_action_pressed(is, INPUT_ACTION_MOVE_UP_RIGHT)) {
-        if (is_dead) {
-            return add_message("You cannot move while dead");
-        }
-        run_move_action(hero_id, (vec3){1, -1, 0});
-        flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        return true;
-    }
-    return false;
-}
-
-inline bool gamestate::handle_move_down_left(inputstate& is, bool is_dead) {
-    if (is_action_pressed(is, INPUT_ACTION_MOVE_DOWN_LEFT)) {
-        if (is_dead) {
-            return add_message("You cannot move while dead");
-        }
-        run_move_action(hero_id, (vec3){-1, 1, 0});
-        flag = GAMESTATE_FLAG_PLAYER_ANIM;
-        return true;
-    }
-    return false;
-}
-
-inline bool gamestate::handle_move_down_right(inputstate& is, bool is_dead) {
-    if (is_action_pressed(is, INPUT_ACTION_MOVE_DOWN_RIGHT)) {
-        if (is_dead) {
-            return add_message("You cannot move while dead");
-        }
-        run_move_action(hero_id, (vec3){1, 1, 0});
+        run_move_action(hero_id, delta);
         flag = GAMESTATE_FLAG_PLAYER_ANIM;
         return true;
     }
@@ -972,40 +888,11 @@ inline bool gamestate::handle_move_down_right(inputstate& is, bool is_dead) {
 
 inline vec3 gamestate::get_loc_facing_player() {
     optional<vec3> maybe_loc = ct.get<location>(hero_id);
-    if (maybe_loc.has_value()) {
-        vec3 loc = ct.get<location>(hero_id).value();
-        direction_t dir = ct.get<direction>(hero_id).value();
-        if (dir == DIR_UP) {
-            loc.y -= 1;
-        }
-        else if (dir == DIR_DOWN) {
-            loc.y += 1;
-        }
-        else if (dir == DIR_LEFT) {
-            loc.x -= 1;
-        }
-        else if (dir == DIR_RIGHT) {
-            loc.x += 1;
-        }
-        else if (dir == DIR_UP_LEFT) {
-            loc.x -= 1;
-            loc.y -= 1;
-        }
-        else if (dir == DIR_UP_RIGHT) {
-            loc.x += 1;
-            loc.y -= 1;
-        }
-        else if (dir == DIR_DOWN_LEFT) {
-            loc.x -= 1;
-            loc.y += 1;
-        }
-        else if (dir == DIR_DOWN_RIGHT) {
-            loc.x += 1;
-            loc.y += 1;
-        }
-        return loc;
+    if (!maybe_loc.has_value()) {
+        return vec3{-1, -1, -1};
     }
-    return vec3{-1, -1, -1};
+    direction_t dir = ct.get<direction>(hero_id).value_or(DIR_NONE);
+    return vec3_add(maybe_loc.value(), get_loc_from_dir(dir));
 }
 
 inline entityid gamestate::tile_get_item(shared_ptr<tile_t> t) {

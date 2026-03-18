@@ -422,7 +422,7 @@ public:
         inputstate_reset(is);
         press_key(is, KEY_H);
 
-        TS_ASSERT(g.handle_move_left(is, false));
+        TS_ASSERT(g.handle_move_direction(is, false, INPUT_ACTION_MOVE_LEFT, {-1, 0, 0}));
         TS_ASSERT(vec3_equal(g.ct.get<location>(hero).value_or(vec3{-1, -1, -1}), vec3{2, 3, 0}));
     }
 

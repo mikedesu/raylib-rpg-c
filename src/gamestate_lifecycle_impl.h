@@ -9,41 +9,16 @@ inline void gamestate::update_tile(tile_t& tile) {
     tile.set_visible(true);
 }
 
-inline bool gamestate::path_blocked(vec3 a, vec3 b) {
+inline bool gamestate::path_blocked(vec3 a, vec3 b, bool exclude_target_door) {
     vector<vec3> path = calculate_path_with_thickness(a, b);
     auto df = d.get_current_floor();
     for (auto loc : path) {
         tile_t& t = df->tile_at(loc);
-        if (tiletype_is_none(t.get_type())) {
-            return true;
-        }
-        else if (tiletype_is_wall(t.get_type())) {
+        if (tiletype_is_none(t.get_type()) || tiletype_is_wall(t.get_type())) {
             return true;
         }
         entityid door_id = t.get_cached_door();
-        if (door_id != ENTITYID_INVALID) {
-            bool door_is_open = ct.get<door_open>(door_id).value_or(false);
-            if (!door_is_open) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-inline bool gamestate::visibility_path_blocked(vec3 a, vec3 b) {
-    vector<vec3> path = calculate_path_with_thickness(a, b);
-    auto df = d.get_current_floor();
-    for (auto loc : path) {
-        tile_t& t = df->tile_at(loc);
-        if (tiletype_is_none(t.get_type())) {
-            return true;
-        }
-        if (tiletype_is_wall(t.get_type())) {
-            return true;
-        }
-        entityid door_id = t.get_cached_door();
-        if (door_id != ENTITYID_INVALID && !vec3_equal(loc, b)) {
+        if (door_id != ENTITYID_INVALID && !(exclude_target_door && vec3_equal(loc, b))) {
             bool door_is_open = ct.get<door_open>(door_id).value_or(false);
             if (!door_is_open) {
                 return true;
@@ -84,7 +59,7 @@ inline bool gamestate::update_player_tiles_explored() {
                 continue;
             }
             vec3 loc = {x, y, hero_loc.z};
-            if (visibility_path_blocked(hero_loc, loc)) {
+            if (path_blocked(hero_loc, loc, true)) {
                 continue;
             }
             tile_t& t = df->tile_at(loc);

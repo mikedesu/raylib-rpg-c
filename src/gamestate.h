@@ -680,11 +680,11 @@ public:
     /** @brief Refresh derived per-tile state after gameplay mutations. */
     void update_tile(tile_t& tile);
 
-    /** @brief Return whether movement or line travel between two points is blocked. */
-    bool path_blocked(vec3 a, vec3 b);
-
-    /** @brief Return whether line-of-sight to a tile is blocked, excluding a closed door on the target tile itself. */
-    bool visibility_path_blocked(vec3 a, vec3 b);
+    /**
+     * @brief Return whether a path between two points is blocked.
+     * @param exclude_target_door When true, a closed door on tile `b` itself does not block (used for visibility checks).
+     */
+    bool path_blocked(vec3 a, vec3 b, bool exclude_target_door = false);
 
     /** @brief Refresh explored and visible tile state from the player's current position. */
     bool update_player_tiles_explored();
@@ -1101,29 +1101,12 @@ public:
      */
     bool try_entity_move(entityid id, vec3 v);
 
-    /** @brief Handle upward movement input for the active actor. */
-    bool handle_move_up(inputstate& is, bool is_dead);
-
-    /** @brief Handle downward movement input for the active actor. */
-    bool handle_move_down(inputstate& is, bool is_dead);
-
-    /** @brief Handle leftward movement input for the active actor. */
-    bool handle_move_left(inputstate& is, bool is_dead);
-
-    /** @brief Handle rightward movement input for the active actor. */
-    bool handle_move_right(inputstate& is, bool is_dead);
-
-    /** @brief Handle up-left diagonal movement input for the active actor. */
-    bool handle_move_up_left(inputstate& is, bool is_dead);
-
-    /** @brief Handle up-right diagonal movement input for the active actor. */
-    bool handle_move_up_right(inputstate& is, bool is_dead);
-
-    /** @brief Handle down-left diagonal movement input for the active actor. */
-    bool handle_move_down_left(inputstate& is, bool is_dead);
-
-    /** @brief Handle down-right diagonal movement input for the active actor. */
-    bool handle_move_down_right(inputstate& is, bool is_dead);
+    /**
+     * @brief Handle directional movement input for the active actor.
+     * @param input_action The keybinding action to check (e.g. INPUT_ACTION_MOVE_UP).
+     * @param delta The tile-space movement vector for this direction.
+     */
+    bool handle_move_direction(inputstate& is, bool is_dead, gameplay_input_action_t input_action, vec3 delta);
 
     /** @brief Return the dungeon location directly in front of the player actor. */
     vec3 get_loc_facing_player();
