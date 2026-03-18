@@ -10,7 +10,6 @@
 #include <functional>
 
 using std::function;
-using std::make_shared;
 
 static constexpr int DEFAULT_DUNGEON_FLOOR_WIDTH = 8;
 static constexpr int DEFAULT_DUNGEON_FLOOR_HEIGHT = 8;
@@ -526,7 +525,7 @@ public:
 
     /** @brief Return all valid upstairs candidate locations inside the given area. */
     shared_ptr<vector<vec3>> df_get_possible_upstairs_locs_in_area(Rectangle r) {
-        auto locations = make_shared<vector<vec3>>();
+        auto locations = std::make_shared<vector<vec3>>();
         massert(locations, "failed to make_shared locations");
         // now we can loop thru the dungeon floor again and fill the array with the locations
         for (int y0 = r.y; y0 < height; y0++) {
@@ -547,7 +546,7 @@ public:
         massert(r.x < width, "x is out of bounds");
         massert(r.y >= 0, "y is less than zero");
         massert(r.y < height, "y is out of bounds");
-        shared_ptr<vector<vec3>> locations = make_shared<vector<vec3>>();
+        shared_ptr<vector<vec3>> locations = std::make_shared<vector<vec3>>();
         massert(locations, "failed to make_shared locations");
         // now we can loop thru the dungeon floor again and fill the array with the locations
         for (int y0 = r.y; y0 < height; y0++) {

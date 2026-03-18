@@ -31,9 +31,7 @@ public:
         }
     }
 
-    /** @brief Destroy the cache object. */
-    ~item_cache() {
-    }
+    ~item_cache() = default;
 
     /** @brief Return the number of cached item ids. */
     size_t get_count() const {

@@ -31,12 +31,10 @@ public:
         }
     }
 
-    /** @brief Destroy the cache object. */
-    ~dead_npc_cache() {
-    }
+    ~dead_npc_cache() = default;
 
     /** @brief Return the number of cached dead NPC ids. */
-    size_t get_count() {
+    size_t get_count() const {
         return count;
     }
 
@@ -55,8 +53,8 @@ public:
     }
 
     /** @brief Return the index of an id in the cache, or `-1` when absent. */
-    int contains(entityid id) {
-        for (int i = 0; i < count; i++) {
+    int contains(entityid id) const {
+        for (size_t i = 0; i < count; i++) {
             if (ids[i] == id) {
                 return i;
             }
@@ -79,7 +77,7 @@ public:
     }
 
     /** @brief Return the most recently cached dead NPC id, or `ENTITYID_INVALID`. */
-    entityid top() {
+    entityid top() const {
         if (count == 0) {
             return ENTITYID_INVALID;
         }

@@ -5,7 +5,6 @@
 #pragma once
 
 #include <cstdio>
-#include <memory>
 #include <raylib.h>
 #include <stdint.h>
 
@@ -63,7 +62,7 @@ static inline void inputstate_update(inputstate& is) {
 }
 
 /** @brief Return whether a key transitioned to pressed during the current frame. */
-static inline const bool inputstate_is_pressed(const inputstate& is, int key) {
+static inline bool inputstate_is_pressed(const inputstate& is, int key) {
     if (key < 0 || key >= MAX_KEYS) {
         return false;
     }
@@ -82,7 +81,7 @@ static inline bool inputstate_any_pressed(const inputstate& is) {
 }
 
 /** @brief Return whether a key is currently being held down. */
-static inline const bool inputstate_is_held(const inputstate& is, int key) {
+static inline bool inputstate_is_held(const inputstate& is, int key) {
     if (key < 0 || key >= MAX_KEYS) {
         return false;
     }
