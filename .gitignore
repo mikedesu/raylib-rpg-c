@@ -65,3 +65,7 @@ src/docs/api
 src/docs/api/*
 tests_heavy
 tests_heavy.cpp
+.llm
+.llm/
+.opencode
+.opencode/
