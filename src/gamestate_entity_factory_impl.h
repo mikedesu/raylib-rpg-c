@@ -113,18 +113,14 @@ inline bool gamestate::alignment_is_aggressive(alignment_t alignment_value) {
     switch (alignment_value) {
     case ALIGNMENT_EVIL_LAWFUL:
     case ALIGNMENT_EVIL_NEUTRAL:
-    case ALIGNMENT_EVIL_CHAOTIC:
-        return true;
-    default:
-        break;
+    case ALIGNMENT_EVIL_CHAOTIC: return true;
+    default: break;
     }
     return false;
 }
 
 inline with_fun gamestate::npc_alignment_init(alignment_t alignment_value) {
-    return [alignment_value](CT& ct, const entityid id) {
-        ct.set<alignment>(id, alignment_value);
-    };
+    return [alignment_value](CT& ct, const entityid id) { ct.set<alignment>(id, alignment_value); };
 }
 
 inline entityid gamestate::create_weapon_at_with(ComponentTable& ct, vec3 loc, with_fun weaponInitFunction) {
@@ -166,7 +162,7 @@ inline entityid gamestate::create_weapon_at_random_loc_with(CT& ct, with_fun wea
         merror("loc is invalid");
         return INVALID;
     }
-    return create_weapon_at_with(ct, loc, dagger_init());
+    return create_weapon_at_with(ct, loc, weaponInitFunction);
 }
 
 inline entityid gamestate::create_shield_with(ComponentTable& ct, with_fun shieldInitFunction) {

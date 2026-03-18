@@ -115,7 +115,7 @@ public:
         gamestate g;
         const vec3 loc = add_initialized_floor(g);
 
-        const entityid id = g.create_chest_at_with(loc, [](CT&, const entityid) {});
+        const entityid id = g.create_chest_at_with(loc, [](CT&, const entityid) { });
 
         TS_ASSERT_DIFFERS(id, ENTITYID_INVALID);
         TS_ASSERT_EQUALS(g.ct.get<entitytype>(id).value_or(ENTITY_NONE), ENTITY_CHEST);
@@ -137,7 +137,7 @@ public:
         gamestate g;
         const vec3 loc = add_initialized_floor(g);
 
-        const entityid id = g.create_orc_at_with(loc, [](CT&, const entityid) {});
+        const entityid id = g.create_orc_at_with(loc, [](CT&, const entityid) { });
 
         TS_ASSERT_DIFFERS(id, ENTITYID_INVALID);
         TS_ASSERT_EQUALS(g.ct.get<entitytype>(id).value_or(ENTITY_NONE), ENTITY_NPC);
@@ -164,7 +164,7 @@ public:
         gamestate g;
         const vec3 loc = add_initialized_floor(g);
 
-        const entityid id = g.create_npc_at_with(RACE_DWARF, loc, [](CT&, const entityid) {});
+        const entityid id = g.create_npc_at_with(RACE_DWARF, loc, [](CT&, const entityid) { });
 
         TS_ASSERT_DIFFERS(id, ENTITYID_INVALID);
         TS_ASSERT_EQUALS(g.ct.get<name>(id).value_or(""), "dwarf");
@@ -177,7 +177,7 @@ public:
         gamestate g;
         const vec3 loc = add_initialized_floor(g);
 
-        const entityid id = g.create_npc_at_with(RACE_GREEN_SLIME, loc, [](CT&, const entityid) {});
+        const entityid id = g.create_npc_at_with(RACE_GREEN_SLIME, loc, [](CT&, const entityid) { });
 
         TS_ASSERT_DIFFERS(id, ENTITYID_INVALID);
         TS_ASSERT_EQUALS(g.ct.get<name>(id).value_or(""), "green slime");
@@ -230,10 +230,21 @@ public:
     void testCreateDoorWithSetsDefaultNameAndDescription() {
         gamestate g;
 
-        const entityid id = g.create_door_with([](CT&, const entityid) {});
+        const entityid id = g.create_door_with([](CT&, const entityid) { });
 
         TS_ASSERT_DIFFERS(id, ENTITYID_INVALID);
         TS_ASSERT_EQUALS(g.ct.get<name>(id).value_or(""), "door");
         TS_ASSERT_EQUALS(g.ct.get<description>(id).value_or(""), "A heavy wooden door bound with iron straps and swollen from the dungeon damp.");
+    }
+
+    void testCreateWeaponAtRandomLocWithUsesSwordInit() {
+        gamestate g;
+        add_initialized_floor(g);
+
+        const entityid id = g.create_weapon_at_random_loc_with(g.ct, g.sword_init());
+
+        TS_ASSERT_DIFFERS(id, ENTITYID_INVALID);
+        TS_ASSERT_EQUALS(g.ct.get<weapontype>(id).value_or(WEAPON_NONE), WEAPON_SHORT_SWORD);
+        TS_ASSERT_EQUALS(g.ct.get<name>(id).value_or(""), "short sword");
     }
 };

@@ -330,11 +330,6 @@ public:
 #else
         test = true;
 #endif
-#ifndef GODMODE
-        god_mode = false;
-#else
-        god_mode = true;
-#endif
 #ifndef GOD_MODE
         god_mode = false;
 #else

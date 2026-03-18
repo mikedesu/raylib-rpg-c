@@ -598,8 +598,7 @@ inline gameplay_event_result_t gamestate::process_gameplay_event(const gameplay_
     case EVENT_USE_ITEM_INTENT:
         result.handled = true;
         result.succeeded = false;
-        if (ct.get<entitytype>(event.target_id).value_or(ENTITY_NONE) == ENTITY_ITEM &&
-            ct.get<itemtype>(event.target_id).value_or(ITEM_NONE) == ITEM_POTION &&
+        if (ct.get<entitytype>(event.target_id).value_or(ENTITY_NONE) == ENTITY_ITEM && ct.get<itemtype>(event.target_id).value_or(ITEM_NONE) == ITEM_POTION &&
             use_potion(event.actor_id, event.target_id)) {
             if (event.actor_id == hero_id) {
                 flag = GAMESTATE_FLAG_PLAYER_ANIM;
@@ -657,8 +656,7 @@ inline gameplay_event_result_t gamestate::process_gameplay_event(const gameplay_
         return result;
     case EVENT_NONE:
     case EVENT_COUNT:
-    default:
-        return result;
+    default: return result;
     }
 }
 
@@ -939,8 +937,7 @@ inline bool gamestate::handle_move_up_left(inputstate& is, bool is_dead) {
 inline bool gamestate::handle_move_up_right(inputstate& is, bool is_dead) {
     if (is_action_pressed(is, INPUT_ACTION_MOVE_UP_RIGHT)) {
         if (is_dead) {
-            add_message("You cannot move while dead");
-            return true;
+            return add_message("You cannot move while dead");
         }
         run_move_action(hero_id, (vec3){1, -1, 0});
         flag = GAMESTATE_FLAG_PLAYER_ANIM;
@@ -1296,7 +1293,8 @@ inline bool gamestate::try_entity_interact(entityid id, vec3 loc) {
     if (chest_id != ENTITYID_INVALID) {
         const string chest_name = ct.get<name>(chest_id).value_or("Treasure chest");
         const bool is_open = ct.get<door_open>(chest_id).value_or(false);
-        const string base_text = ct.get<description>(chest_id).value_or("A stout treasure chest reinforced with iron bands and built to survive rough handling.");
+        const string base_text =
+            ct.get<description>(chest_id).value_or("A stout treasure chest reinforced with iron bands and built to survive rough handling.");
         const string text = interaction_chest_text(base_text, is_open);
         open_interaction_modal(chest_id, chest_name, text);
         return true;
