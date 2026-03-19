@@ -87,7 +87,6 @@ bool create_spritegroup(gamestate& g, entityid id, int* keys, int num_keys, int 
 
         minfo2("creating spritegroups...");
         minfo2("num_keys: %d", num_keys);
-        int count = 0;
         for (int i = 0; i < num_keys; i++) {
             const int k = keys[i];
             minfo("k: %d", k);
@@ -95,7 +94,6 @@ bool create_spritegroup(gamestate& g, entityid id, int* keys, int num_keys, int 
             auto s = make_shared<sprite>(tex, libdraw_ctx.txinfo[k].contexts, libdraw_ctx.txinfo[k].num_frames);
             massert(s, "s is NULL for some reason!");
             group->add(s);
-            count++;
         }
         msuccess2("spritegroups created");
         minfo2("count: %d", count);
