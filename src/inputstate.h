@@ -5,7 +5,6 @@
 #pragma once
 
 #include <cstdio>
-#include <memory>
 #include <raylib.h>
 #include <stdint.h>
 
