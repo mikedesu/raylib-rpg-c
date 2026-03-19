@@ -78,19 +78,6 @@ public:
             }
             src.x = width * currentframe;
         }
-        //if (!is_animating)
-        //    return;
-        //currentframe++;
-        //if (stop_on_last_frame && currentframe == numframes - 1) {
-        //    is_animating = false;
-        //    src.x = width * currentframe;
-        //    return;
-        //}
-        //if (currentframe >= numframes) {
-        //    currentframe = 0;
-        //    num_loops++;
-        //}
-        //src.x = width * currentframe;
     }
 
     /** @brief Return the width in pixels of one animation frame. */
