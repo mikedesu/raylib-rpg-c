@@ -374,10 +374,7 @@ public:
         last_frame_time = 0;
         max_frame_time = 0;
         last_frame_times_current = 0;
-        last_frame_times.reserve(LAST_FRAME_TIMES_MAX);
-        for (size_t i = 0; i < last_frame_times.size(); i++) {
-            last_frame_times[i] = 0;
-        }
+        last_frame_times.resize(LAST_FRAME_TIMES_MAX, 0);
         turn_count = 0;
         action_selection = 0;
         inventory_menu_selection = 0;
