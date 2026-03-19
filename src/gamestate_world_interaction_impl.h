@@ -939,8 +939,7 @@ inline bool gamestate::handle_move_up_left(inputstate& is, bool is_dead) {
 inline bool gamestate::handle_move_up_right(inputstate& is, bool is_dead) {
     if (is_action_pressed(is, INPUT_ACTION_MOVE_UP_RIGHT)) {
         if (is_dead) {
-            add_message("You cannot move while dead");
-            return true;
+            return add_message("You cannot move while dead");
         }
         run_move_action(hero_id, (vec3){1, -1, 0});
         flag = GAMESTATE_FLAG_PLAYER_ANIM;
