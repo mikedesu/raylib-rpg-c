@@ -166,7 +166,7 @@ inline entityid gamestate::create_weapon_at_random_loc_with(CT& ct, with_fun wea
         merror("loc is invalid");
         return INVALID;
     }
-    return create_weapon_at_with(ct, loc, dagger_init());
+    return create_weapon_at_with(ct, loc, weaponInitFunction);
 }
 
 inline entityid gamestate::create_shield_with(ComponentTable& ct, with_fun shieldInitFunction) {
