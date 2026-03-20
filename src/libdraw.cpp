@@ -36,8 +36,10 @@
 #include "get_weapon_sprite.h"
 #include "item.h"
 #include "libdraw_frame_stats.h"
+#include "libdraw_frame_impl.h"
 #include "libdraw_from_texture.h"
 #include "libdraw_create_spritegroup.h"
+#include "libdraw_lifecycle_impl.h"
 #include "libdraw_update_shield_for_entity.h"
 #include "libdraw_to_texture.h"
 #include "libdraw_update_sprites.h"
@@ -1134,26 +1136,53 @@ void draw_keyboard_profile_prompt(gamestate& g) {
         return;
     }
 
+    constexpr int title_font_size = 20;
+    constexpr int title_line_height = 24;
+    constexpr int body_font_size = 10;
+    constexpr int body_line_height = 14;
+    constexpr int option_font_size = 12;
+    constexpr int option_line_height = 18;
+    constexpr int footer_font_size = 10;
+    constexpr int footer_line_height = 14;
+    constexpr int padding_x = 16;
+    constexpr int padding_y = 14;
+    constexpr int section_gap = 10;
+
+    const int option_count = KEYBOARD_PROFILE_COUNT;
     const int box_w = 420;
-    const int box_h = 150;
+    const int box_h =
+        padding_y * 2 +
+        title_line_height +
+        body_line_height * 2 +
+        section_gap +
+        option_line_height * option_count +
+        section_gap +
+        footer_line_height;
     const int box_x = (DEFAULT_TARGET_WIDTH - box_w) / 2;
     const int box_y = (DEFAULT_TARGET_HEIGHT - box_h) / 2;
     const Rectangle box = {(float)box_x, (float)box_y, (float)box_w, (float)box_h};
 
     DrawRectangleRec(box, g.window_box_bgcolor);
     DrawRectangleLinesEx(box, 2.0f, g.window_box_fgcolor);
-    DrawText("Choose Keyboard Layout", box_x + 16, box_y + 14, 20, g.window_box_fgcolor);
-    DrawText("Select a default gameplay profile before entering the dungeon.", box_x + 16, box_y + 42, 10, g.window_box_fgcolor);
-    DrawText("You can change this later in ` -> controls.", box_x + 16, box_y + 56, 10, g.window_box_fgcolor);
 
-    for (int i = 0; i < KEYBOARD_PROFILE_COUNT; i++) {
+    const int text_x = box_x + padding_x;
+    int text_y = box_y + padding_y;
+    DrawText("Choose Keyboard Layout", text_x, text_y, title_font_size, g.window_box_fgcolor);
+    text_y += title_line_height;
+    DrawText("Select a default gameplay profile before entering the dungeon.", text_x, text_y, body_font_size, g.window_box_fgcolor);
+    text_y += body_line_height;
+    DrawText("You can change this later in Options -> Controls.", text_x, text_y, body_font_size, g.window_box_fgcolor);
+    text_y += body_line_height + section_gap;
+
+    // Keep each option row taller than the font so descenders stay readable.
+    for (int i = 0; i < option_count; i++) {
         const bool selected = g.keyboard_profile_selection == (unsigned int)i;
-        const int option_y = box_y + 88 + i * 18;
+        const int option_y = text_y + i * option_line_height;
         const char* label = keyboard_profile_label(static_cast<keyboard_profile_t>(i));
-        DrawText(selected ? TextFormat("> %s", label) : TextFormat("  %s", label), box_x + 24, option_y, 12, selected ? YELLOW : g.window_box_fgcolor);
+        DrawText(selected ? TextFormat("> %s", label) : TextFormat("  %s", label), text_x + 8, option_y, option_font_size, selected ? YELLOW : g.window_box_fgcolor);
     }
 
-    DrawText("Arrows to choose, Enter to confirm", box_x + 16, box_y + box_h - 20, 10, g.window_box_fgcolor);
+    DrawText("Arrows to choose, Enter to confirm", text_x, box_y + box_h - padding_y - footer_font_size, footer_font_size, g.window_box_fgcolor);
 }
 
 void draw_entity_sprite(gamestate& g, spritegroup* sg) {
@@ -2279,104 +2308,4 @@ void libdraw_present_window_target(gamestate& g) {
     libdraw_ctx.win_dest.height = GetScreenHeight();
     DrawTexturePro(libdraw_ctx.target.texture, libdraw_ctx.target_src, libdraw_ctx.win_dest, Vector2{0, 0}, 0.0f, WHITE);
     DrawFPS(10, 10);
-}
-
-void drawframe(gamestate& g) {
-    minfo3("drawframe");
-    const double start_time = libdraw_frame_begin_time();
-    libdraw_update_sprites_pre(g);
-
-    BeginDrawing();
-    ClearBackground(RED);
-    libdraw_refresh_dirty_scene(g);
-    libdraw_compose_scene_to_window_target(g);
-    libdraw_present_window_target(g);
-    EndDrawing();
-    libdraw_finish_frame_stats(g, start_time);
-
-    libdraw_update_sprites_post(g);
-    msuccess3("drawframe");
-}
-
-void libdraw_init_render_targets(gamestate& g) {
-    g.windowwidth = DEFAULT_WIN_WIDTH;
-    g.windowheight = DEFAULT_WIN_HEIGHT;
-    g.targetwidth = DEFAULT_TARGET_WIDTH;
-    g.targetheight = DEFAULT_TARGET_HEIGHT;
-
-    const TextureFilter filter = TEXTURE_FILTER_POINT;
-    libdraw_ctx.target = LoadRenderTexture(DEFAULT_TARGET_WIDTH, DEFAULT_TARGET_HEIGHT);
-    libdraw_ctx.title_target_texture = LoadRenderTexture(DEFAULT_TARGET_WIDTH, DEFAULT_TARGET_HEIGHT);
-    libdraw_ctx.char_creation_target_texture = LoadRenderTexture(DEFAULT_TARGET_WIDTH, DEFAULT_TARGET_HEIGHT);
-    libdraw_ctx.main_game_target_texture = LoadRenderTexture(DEFAULT_TARGET_WIDTH, DEFAULT_TARGET_HEIGHT);
-    libdraw_ctx.hud_target_texture = LoadRenderTexture(DEFAULT_TARGET_WIDTH, DEFAULT_TARGET_HEIGHT);
-
-    SetTextureFilter(libdraw_ctx.target.texture, filter);
-    SetTextureFilter(libdraw_ctx.title_target_texture.texture, filter);
-    SetTextureFilter(libdraw_ctx.char_creation_target_texture.texture, filter);
-    SetTextureFilter(libdraw_ctx.main_game_target_texture.texture, filter);
-    SetTextureFilter(libdraw_ctx.hud_target_texture.texture, filter);
-
-    libdraw_ctx.target_src = Rectangle{0, 0, DEFAULT_TARGET_WIDTH * 1.0f, -DEFAULT_TARGET_HEIGHT * 1.0f};
-    libdraw_ctx.target_dest = Rectangle{0, 0, DEFAULT_TARGET_WIDTH * 1.0f, DEFAULT_TARGET_HEIGHT * 1.0f};
-}
-
-void libdraw_init_resources(gamestate& g) {
-    load_textures(libdraw_ctx.txinfo);
-    load_shaders();
-
-    const float x = DEFAULT_TARGET_WIDTH / 4.0f;
-    const float y = DEFAULT_TARGET_HEIGHT / 4.0f;
-    g.cam2d.offset = Vector2{x, y};
-
-    draw_title_screen_to_texture(g, false);
-    draw_char_creation_to_texture(g);
-
-    InitAudioDevice();
-    while (!IsAudioDeviceReady()) {
-    }
-    libdraw_load_music(g);
-    libdraw_load_sfx(g);
-}
-
-void libdraw_init_rest(gamestate& g) {
-    SetExitKey(KEY_ESCAPE);
-    SetTargetFPS(60);
-    libdraw_init_render_targets(g);
-    libdraw_init_resources(g);
-}
-
-void libdraw_init(gamestate& g) {
-    const int w = DEFAULT_WIN_WIDTH;
-    const int h = DEFAULT_WIN_HEIGHT;
-    const char* title = WINDOW_TITLE;
-    char full_title[1024] = {0};
-    snprintf(full_title, sizeof(full_title), "%s - %s", title, g.version.c_str());
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
-    InitWindow(w, h, full_title);
-    g.windowwidth = w;
-    g.windowheight = h;
-    SetWindowMinSize(320, 240);
-    libdraw_init_rest(g);
-}
-
-bool libdraw_windowshouldclose(gamestate& g) {
-    return g.do_quit;
-}
-
-void libdraw_close_partial() {
-    UnloadMusicStream(libdraw_ctx.audio.music);
-    CloseAudioDevice();
-    libdraw_unload_textures(libdraw_ctx.txinfo);
-    unload_shaders();
-    UnloadRenderTexture(libdraw_ctx.title_target_texture);
-    UnloadRenderTexture(libdraw_ctx.char_creation_target_texture);
-    UnloadRenderTexture(libdraw_ctx.main_game_target_texture);
-    UnloadRenderTexture(libdraw_ctx.hud_target_texture);
-    UnloadRenderTexture(libdraw_ctx.target);
-}
-
-void libdraw_close() {
-    libdraw_close_partial();
-    CloseWindow();
 }

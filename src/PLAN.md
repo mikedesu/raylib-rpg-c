@@ -10,6 +10,21 @@
   - number of columns / frames per context
 - Spell texture entries may appear again in those generated files in the future when the script is rerun.
 - Do not remove spell entries from those generated files in the future, even if active spell gameplay is currently absent.
+- When a UI text block looks garbled or illegible, check for rows being stacked too tightly with `DrawText`; the Raylib default font needs line heights larger than font size so descenders do not overdraw adjacent lines.
+- As you accomplish individual task items, you will mark them off:
+
+```
+- [ ] unaccomplished
+- [x] accomplished
+```
+
+- If you have to break a task down or leave a task incomplete:
+
+```
+- [ ] unaccomplished
+  - [ ] incomplete task current status
+- [x] accomplished
+```
 
 ## Event-Queue Migration
 
