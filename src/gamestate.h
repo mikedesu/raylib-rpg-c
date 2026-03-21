@@ -472,6 +472,9 @@ public:
     /** @brief Create and add a generated floor using the current room-and-corridor generator. */
     void create_and_add_df_1(biome_t type, int w, int h, int df_count, float parts);
 
+    /** @brief Create and add the fixed handcrafted fifth-floor open grass room. */
+    void create_and_add_df_2(biome_t type, int w, int h, int df_count, float parts);
+
     /** @brief Randomly assign upstairs and downstairs locations on a single floor. */
     bool assign_random_stairs_to_floor(shared_ptr<dungeon_floor> df);
 

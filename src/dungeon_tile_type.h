@@ -108,6 +108,8 @@ static inline std::string tiletype2str(const tiletype_t type) {
         return "TileDownstairs";
     else if (type >= TILE_FLOOR_STONE_00 && type <= TILE_FLOOR_STONE_11)
         return "TileStone";
+    else if (type >= TILE_FLOOR_GRASS_00 && type <= TILE_FLOOR_GRASS_19)
+        return "TileGrass";
     return "TileError";
 }
 

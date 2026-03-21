@@ -212,4 +212,19 @@ public:
         TS_ASSERT_EQUALS(df->tile_at(blocked_loc).get_type(), TILE_FLOOR_STONE_00);
         TS_ASSERT(df->tile_at(blocked_loc).get_can_have_door());
     }
+
+    void testGrassBiomePaintsGrassFloorTiles() {
+        gamestate g;
+        auto df = g.d.create_floor(BIOME_GRASS, 8, 8);
+
+        df->df_paint_floor_area(Rectangle{1, 1, 4, 4});
+        df->df_upgrade_floor_tiles();
+
+        for (int y = 1; y < 5; ++y) {
+            for (int x = 1; x < 5; ++x) {
+                const tiletype_t type = df->tile_at(vec3{x, y, 0}).get_type();
+                TS_ASSERT(type >= TILE_FLOOR_GRASS_00 && type <= TILE_FLOOR_GRASS_19);
+            }
+        }
+    }
 };

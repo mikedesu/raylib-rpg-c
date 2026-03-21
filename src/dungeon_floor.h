@@ -255,6 +255,42 @@ public:
         return (tiletype_t)GetRandomValue(a, b);
     }
 
+    tiletype_t df_get_default_floor_tile_min() const {
+        switch (biome) {
+        case BIOME_GRASS:
+            return TILE_FLOOR_GRASS_00;
+        case BIOME_STONE:
+        case BIOME_NONE:
+        case BIOME_COUNT:
+        default:
+            return TILE_FLOOR_STONE_00;
+        }
+    }
+
+    tiletype_t df_get_default_floor_tile_max() const {
+        switch (biome) {
+        case BIOME_GRASS:
+            return TILE_FLOOR_GRASS_19;
+        case BIOME_STONE:
+        case BIOME_NONE:
+        case BIOME_COUNT:
+        default:
+            return TILE_FLOOR_STONE_11;
+        }
+    }
+
+    tiletype_t df_get_floor_upgrade_tile() const {
+        switch (biome) {
+        case BIOME_GRASS:
+            return TILE_FLOOR_GRASS_00;
+        case BIOME_STONE:
+        case BIOME_NONE:
+        case BIOME_COUNT:
+        default:
+            return TILE_FLOOR_STONE_10;
+        }
+    }
+
     void set_area(tiletype_t a, tiletype_t b, Rectangle r) {
         for (int x = r.x; x < r.x + r.width && x < width; x++) {
             for (int y = r.y; y < r.y + r.height && y < height; y++) {
@@ -302,7 +338,7 @@ public:
 
     /** @brief Paint a floor-material area and return the painted rectangle. */
     Rectangle df_paint_floor_area(Rectangle r) {
-        return df_paint_area(TILE_FLOOR_STONE_00, TILE_FLOOR_STONE_11, r);
+        return df_paint_area(df_get_default_floor_tile_min(), df_get_default_floor_tile_max(), r);
     }
 
     /**
@@ -427,7 +463,7 @@ public:
                 if (!tile_is_good_for_upgrade(loc)) {
                     continue;
                 }
-                df_set_tile(TILE_FLOOR_STONE_10, x, y);
+                df_set_tile(df_get_floor_upgrade_tile(), x, y);
             }
         }
     }

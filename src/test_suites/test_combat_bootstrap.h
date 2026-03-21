@@ -207,7 +207,7 @@ public:
         g.logic_init();
 
         TS_ASSERT(g.d.is_initialized);
-        TS_ASSERT_EQUALS(g.d.get_floor_count(), 4U);
+        TS_ASSERT_EQUALS(g.d.get_floor_count(), 5U);
         TS_ASSERT_EQUALS(g.d.current_floor, 0);
         TS_ASSERT_EQUALS(g.d.get_floor(0)->get_width(), 8);
         TS_ASSERT_EQUALS(g.d.get_floor(0)->get_height(), 8);
@@ -217,6 +217,9 @@ public:
         TS_ASSERT_EQUALS(g.d.get_floor(2)->get_height(), 16);
         TS_ASSERT_EQUALS(g.d.get_floor(3)->get_width(), 16);
         TS_ASSERT_EQUALS(g.d.get_floor(3)->get_height(), 16);
+        TS_ASSERT_EQUALS(g.d.get_floor(4)->get_width(), 16);
+        TS_ASSERT_EQUALS(g.d.get_floor(4)->get_height(), 16);
+        TS_ASSERT_EQUALS(g.d.get_floor(4)->get_biome(), BIOME_GRASS);
         TS_ASSERT(vec3_valid(g.d.get_floor(0)->get_upstairs_loc()));
         TS_ASSERT(vec3_valid(g.d.get_floor(0)->get_downstairs_loc()));
         TS_ASSERT(count_entities_of_type(g, ENTITY_DOOR) >= 1U);

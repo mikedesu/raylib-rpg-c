@@ -208,7 +208,7 @@ public:
         g.restart_game();
 
         TS_ASSERT(g.d.is_initialized);
-        TS_ASSERT_EQUALS(g.d.get_floor_count(), 4U);
+        TS_ASSERT_EQUALS(g.d.get_floor_count(), 5U);
         TS_ASSERT_EQUALS(g.current_scene, SCENE_TITLE);
         TS_ASSERT_EQUALS(g.restart_count, 8U);
         TS_ASSERT(!g.do_restart);
@@ -670,7 +670,7 @@ public:
 
         g.logic_init();
 
-        TS_ASSERT_EQUALS(g.d.get_floor_count(), 4U);
+        TS_ASSERT_EQUALS(g.d.get_floor_count(), 5U);
         TS_ASSERT_EQUALS(g.floor_pressure_plates.size(), 2U);
         const entityid linked_door_id = g.floor_pressure_plates.front().linked_door_id;
         TS_ASSERT_DIFFERS(linked_door_id, ENTITYID_INVALID);
@@ -785,7 +785,7 @@ public:
 
         g.logic_init();
 
-        TS_ASSERT_EQUALS(g.d.get_floor_count(), 4U);
+        TS_ASSERT_EQUALS(g.d.get_floor_count(), 5U);
         auto floor = g.d.get_floor(3);
         TS_ASSERT_EQUALS(floor->get_width(), 16);
         TS_ASSERT_EQUALS(floor->get_height(), 16);
@@ -897,5 +897,76 @@ public:
 
         TS_ASSERT(floor_four_box_count >= 3U);
         TS_ASSERT(floor_four_prop_count >= 1U);
+    }
+
+    void testLogicInitAddsGrassFifthFloor() {
+        gamestate g;
+        g.test = true;
+        g.mt.seed(12345);
+
+        g.logic_init();
+
+        TS_ASSERT_EQUALS(g.d.get_floor_count(), 5U);
+        auto floor = g.d.get_floor(4);
+        TS_ASSERT_EQUALS(floor->get_biome(), BIOME_GRASS);
+        TS_ASSERT_EQUALS(floor->get_width(), 16);
+        TS_ASSERT_EQUALS(floor->get_height(), 16);
+        TS_ASSERT(vec3_valid(floor->get_upstairs_loc()));
+        TS_ASSERT(vec3_valid(floor->get_downstairs_loc()));
+        TS_ASSERT(!vec3_equal(floor->get_upstairs_loc(), floor->get_downstairs_loc()));
+
+        size_t walkable_tiles = 0;
+        std::set<vec3> visited;
+        std::queue<vec3> pending;
+        pending.push(floor->get_upstairs_loc());
+        visited.insert(floor->get_upstairs_loc());
+
+        static constexpr vec3 offsets[] = {
+            vec3{0, -1, 0},
+            vec3{-1, 0, 0},
+            vec3{1, 0, 0},
+            vec3{0, 1, 0},
+        };
+
+        for (int y = 0; y < floor->get_height(); ++y) {
+            for (int x = 0; x < floor->get_width(); ++x) {
+                const tiletype_t type = floor->tile_at(vec3{x, y, 4}).get_type();
+                const bool perimeter = x == 0 || y == 0 || x == floor->get_width() - 1 || y == floor->get_height() - 1;
+                if (perimeter) {
+                    TS_ASSERT_EQUALS(type, TILE_NONE);
+                    continue;
+                }
+                if (!tile_is_walkable(type)) {
+                    continue;
+                }
+                walkable_tiles++;
+                TS_ASSERT(type == TILE_UPSTAIRS || type == TILE_DOWNSTAIRS || (type >= TILE_FLOOR_GRASS_00 && type <= TILE_FLOOR_GRASS_19));
+            }
+        }
+
+        while (!pending.empty()) {
+            const vec3 current = pending.front();
+            pending.pop();
+
+            for (const vec3 offset : offsets) {
+                const vec3 next{current.x + offset.x, current.y + offset.y, current.z};
+                if (next.x < 0 || next.x >= floor->get_width() || next.y < 0 || next.y >= floor->get_height()) {
+                    continue;
+                }
+                if (visited.find(next) != visited.end()) {
+                    continue;
+                }
+                if (!tile_is_walkable(floor->tile_at(next).get_type())) {
+                    continue;
+                }
+
+                visited.insert(next);
+                pending.push(next);
+            }
+        }
+
+        TS_ASSERT_EQUALS(walkable_tiles, 196U);
+        TS_ASSERT_EQUALS(visited.size(), walkable_tiles);
+        TS_ASSERT(visited.find(floor->get_downstairs_loc()) != visited.end());
     }
 };

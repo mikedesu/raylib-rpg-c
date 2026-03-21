@@ -321,6 +321,19 @@ inline void gamestate::create_and_add_df_1(biome_t type, int w, int h, int df_co
     d.add_floor(df);
 }
 
+inline void gamestate::create_and_add_df_2(biome_t type, int w, int h, int df_count, float parts) {
+    (void)df_count;
+    (void)parts;
+    auto df = d.create_floor(type, w, h);
+
+    const Rectangle open_room = dungeon_make_rect(1, 1, w - 2, h - 2);
+    df->df_paint_floor_area(open_room);
+    df->df_upgrade_floor_tiles();
+    df->df_refresh_door_candidates();
+
+    d.add_floor(df);
+}
+
 inline bool gamestate::assign_random_stairs_to_floor(shared_ptr<dungeon_floor> df) {
     massert(df, "dungeon floor is null");
     if (vec3_valid(df->get_upstairs_loc()) && vec3_valid(df->get_downstairs_loc())) {

@@ -166,6 +166,7 @@ inline void gamestate::logic_init() {
     create_and_add_df_1(BIOME_STONE, 24, 24, 4, parts);
     create_and_add_df_1(BIOME_STONE, 16, 16, 4, parts);
     create_and_add_df_0(BIOME_STONE, 16, 16, 4, parts);
+    create_and_add_df_2(BIOME_GRASS, 16, 16, 5, parts);
     const bool stairs_assigned = assign_random_stairs();
     massert(stairs_assigned, "failed to assign dungeon stairs");
     if (!stairs_assigned) {

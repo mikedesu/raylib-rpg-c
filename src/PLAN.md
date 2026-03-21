@@ -2,11 +2,11 @@
 
 ## New Task
 
-- [ ] Time to create Floor 5
-    - [ ] Floor 5 will not be of type `BIOME_STONE` but instead be of type `BIOME_GRASS`. 
-      - [ ] We will treat it as a `dungeon_floor` still but it will be composed of "grass" tiles.
-        - [ ] To begin with they can be `TILE_FLOOR_GRASS_00` type
-        - [ ] There is an association between a `grass_00.png` and the `TILE_FLOOR_GRASS_00` via the texture `TX_TILES_GRASS_00`
+- [x] Time to create Floor 5
+    - [x] Floor 5 will not be of type `BIOME_STONE` but instead be of type `BIOME_GRASS`. 
+      - [x] We will treat it as a `dungeon_floor` still but it will be composed of "grass" tiles.
+        - [x] To begin with they can be `TILE_FLOOR_GRASS_00` type
+        - [x] There is an association between a `grass_00.png` and the `TILE_FLOOR_GRASS_00` via the texture `TX_TILES_GRASS_00`
     
 
 ## Working Notes
