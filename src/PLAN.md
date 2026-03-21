@@ -37,6 +37,8 @@ make clean && CXXFLAGS="-DDEBUG_ASSERT=1 -DNPCS_ALL_AT_ONCE -DDEBUG=1 -DMASTER_V
 ```
 
 - When a UI text block looks garbled or illegible, check for rows being stacked too tightly with `DrawText`; the Raylib default font needs line heights larger than font size so descenders do not overdraw adjacent lines.
+- Whenever we implement a new feature, we need to implement corresponding unit test functions that properly check for individual scenarios, including most common inputs and edge cases, and verify that the unit tests build and pass
+- If a new feature requires simulating a full instance of a game, it goes in `test_suites/test_heavy_simulation.h`
 
 
 ## Event-Queue Migration
