@@ -134,6 +134,71 @@ public:
         TS_ASSERT_EQUALS(count_live_npcs_on_floor(g, 0), 9U);
     }
 
+    void testFloorNpcCacheTracksNpcCreationAndExcludesPlayer() {
+        gamestate g;
+        add_floor(g, 8, 8);
+        add_floor(g, 8, 8);
+        g.chara_creation.race = RACE_DWARF;
+
+        const entityid floor_zero_npc = g.create_orc_at_with(vec3{1, 1, 0}, [](CT&, const entityid) {});
+        const entityid floor_one_npc = g.create_npc_at_with(RACE_GREEN_SLIME, vec3{2, 2, 1}, [](CT&, const entityid) {});
+        const entityid hero = g.create_player_at_with(vec3{3, 3, 0}, "hero", g.player_init(10));
+
+        TS_ASSERT_DIFFERS(floor_zero_npc, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(floor_one_npc, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(hero, ENTITYID_INVALID);
+        TS_ASSERT(g.floor_has_npc(0, floor_zero_npc));
+        TS_ASSERT(g.floor_has_npc(1, floor_one_npc));
+        TS_ASSERT(!g.floor_has_npc(0, hero));
+        TS_ASSERT_EQUALS(g.get_floor_npcs(0).size(), 1U);
+        TS_ASSERT_EQUALS(g.get_floor_npcs(1).size(), 1U);
+    }
+
+    void testMoveNpcToFloorUpdatesFloorNpcCache() {
+        gamestate g;
+        add_floor(g, 8, 8);
+        add_floor(g, 8, 8);
+
+        const entityid npc = g.create_orc_at_with(vec3{1, 1, 0}, [](CT&, const entityid) {});
+
+        TS_ASSERT_DIFFERS(npc, ENTITYID_INVALID);
+        TS_ASSERT(g.floor_has_npc(0, npc));
+        TS_ASSERT(!g.floor_has_npc(1, npc));
+
+        g.move_npc_to_floor(npc, 0, 1);
+
+        TS_ASSERT(!g.floor_has_npc(0, npc));
+        TS_ASSERT(g.floor_has_npc(1, npc));
+        TS_ASSERT_EQUALS(g.get_floor_npcs(0).size(), 0U);
+        TS_ASSERT_EQUALS(g.get_floor_npcs(1).size(), 1U);
+    }
+
+    void testUpdateNpcsStateOnlyTouchesCurrentFloorNpcCache() {
+        gamestate g;
+        add_floor(g, 8, 8);
+        add_floor(g, 8, 8);
+
+        const entityid floor_zero_npc = g.create_npc_at_with(RACE_DWARF, vec3{1, 1, 0}, [](CT&, const entityid) {});
+        const entityid floor_one_npc = g.create_orc_at_with(vec3{2, 2, 1}, [](CT&, const entityid) {});
+
+        TS_ASSERT_DIFFERS(floor_zero_npc, ENTITYID_INVALID);
+        TS_ASSERT_DIFFERS(floor_one_npc, ENTITYID_INVALID);
+
+        g.ct.set<damaged>(floor_zero_npc, true);
+        g.ct.set<damaged>(floor_one_npc, true);
+        g.d.current_floor = 0;
+
+        g.update_npcs_state();
+
+        TS_ASSERT(!g.ct.get<damaged>(floor_zero_npc).value_or(true));
+        TS_ASSERT(g.ct.get<damaged>(floor_one_npc).value_or(false));
+
+        g.d.current_floor = 1;
+        g.update_npcs_state();
+
+        TS_ASSERT(!g.ct.get<damaged>(floor_one_npc).value_or(true));
+    }
+
     void testLogicInitBuildsGameplayBootstrap() {
         gamestate g;
         g.test = true;
@@ -213,7 +278,7 @@ public:
         g.update_npcs_state();
 
         TS_ASSERT_EQUALS(g.ct.get<entity_default_action>(friendly).value_or(ENTITY_DEFAULT_ACTION_NONE), ENTITY_DEFAULT_ACTION_RANDOM_MOVE);
-        TS_ASSERT_EQUALS(g.ct.get<entity_default_action>(hostile).value_or(ENTITY_DEFAULT_ACTION_NONE), ENTITY_DEFAULT_ACTION_RANDOM_MOVE);
+        TS_ASSERT_EQUALS(g.ct.get<entity_default_action>(hostile).value_or(ENTITY_DEFAULT_ACTION_NONE), ENTITY_DEFAULT_ACTION_NONE);
         TS_ASSERT_EQUALS(g.ct.get<target_id>(hostile).value_or(ENTITYID_INVALID), ENTITYID_INVALID);
 
         g.d.current_floor = 1;

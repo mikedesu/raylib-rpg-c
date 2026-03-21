@@ -317,6 +317,56 @@ inline entityid gamestate::create_npc_with(race_t rt, with_fun npcInitFunction) 
     return id;
 }
 
+inline void gamestate::add_npc_to_floor(entityid id, int floor) {
+    if (id == ENTITYID_INVALID || floor < 0) {
+        return;
+    }
+    if (ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_NPC) {
+        return;
+    }
+    floor_npcs[floor].insert(id);
+}
+
+inline void gamestate::remove_npc_from_floor(entityid id, int floor) {
+    if (id == ENTITYID_INVALID || floor < 0) {
+        return;
+    }
+    auto it = floor_npcs.find(floor);
+    if (it == floor_npcs.end()) {
+        return;
+    }
+    it->second.erase(id);
+    if (it->second.empty()) {
+        floor_npcs.erase(it);
+    }
+}
+
+inline void gamestate::move_npc_to_floor(entityid id, int old_floor, int new_floor) {
+    if (old_floor == new_floor) {
+        return;
+    }
+    remove_npc_from_floor(id, old_floor);
+    add_npc_to_floor(id, new_floor);
+}
+
+inline bool gamestate::floor_has_npc(int floor, entityid id) const {
+    auto it = floor_npcs.find(floor);
+    if (it == floor_npcs.end()) {
+        return false;
+    }
+    return it->second.find(id) != it->second.end();
+}
+
+inline vector<entityid> gamestate::get_floor_npcs(int floor) const {
+    vector<entityid> ids;
+    auto it = floor_npcs.find(floor);
+    if (it == floor_npcs.end()) {
+        return ids;
+    }
+    ids.insert(ids.end(), it->second.begin(), it->second.end());
+    return ids;
+}
+
 inline entityid gamestate::create_npc_at_with(race_t rt, vec3 loc, with_fun npcInitFunction) {
     minfo2("create npc at with: (%d, %d, %d)", loc.x, loc.y, loc.z);
     auto df = d.get_floor(loc.z);
@@ -348,6 +398,7 @@ inline entityid gamestate::create_npc_at_with(race_t rt, vec3 loc, with_fun npcI
     }
     minfo2("setting location for %d", id);
     ct.set<location>(id, loc);
+    add_npc_to_floor(id, loc.z);
     msuccess2("created npc %d", id);
     return id;
 }
@@ -393,6 +444,7 @@ inline entityid gamestate::create_orc_at_with(vec3 loc, with_fun monsterInitFunc
     }
     ct.set<location>(id, loc);
     ct.set<update>(id, true);
+    add_npc_to_floor(id, loc.z);
     return id;
 }
 
@@ -417,6 +469,7 @@ inline entityid gamestate::create_player_at_with(vec3 loc, string n, with_fun pl
     constexpr int light_rad = 3;
     constexpr int hear_dist = 3;
     set_hero_id(id);
+    remove_npc_from_floor(id, loc.z);
     ct.set<entitytype>(id, ENTITY_PLAYER);
 
     auto df = d.get_floor(loc.z);

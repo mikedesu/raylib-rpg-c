@@ -2,14 +2,14 @@
 
 ## New Task
 
-- [ ] `gamestate` needs to main an `std::unordered_map<int, std::set> floor_npcs` such that:
-  - [ ] Each `dungeon_floor`'s NPCs are stored in unique `set` objects
-  - [ ] Whenever we create an NPC on a certain `dungeon_floor`, we need to add their `entityid` to that `set`
-  - [ ] If an NPC (or the player) moves between floors, we move them from one set to another
-  - [ ] We are doing this so we change how `update_npcs` and `handle_npcs` should work:
-    - [ ] Instead of updating every NPC across every floor every turn, we want to only update the NPCs on the current dungeon floor
-      - [ ] The initial end-goal of this process is because we can hear the orc on floor 3 opening and closing the door
-      - [ ] The major benefit to this is that in the future as the gamestate entity count grows, this should maintain a performant experience
+- [x] `gamestate` now maintains an `std::unordered_map<int, std::set>` `floor_npcs` such that:
+  - [x] Each `dungeon_floor`'s NPCs are stored in unique `set` objects
+  - [x] Whenever we create an NPC on a certain `dungeon_floor`, we add their `entityid` to that `set`
+  - [x] If an NPC (or the player) moves between floors, the floor-membership bookkeeping path is updated accordingly
+  - [x] We changed how `update_npcs` and `handle_npcs` work:
+    - [x] Instead of updating every NPC across every floor every turn, they now only process the NPCs on the current dungeon floor
+      - [x] The initial end-goal of this process is because we can hear the orc on floor 3 opening and closing the door
+      - [x] The major benefit to this is that in the future as the gamestate entity count grows, this should maintain a performant experience
 
 ## Working Notes
 

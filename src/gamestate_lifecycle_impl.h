@@ -112,15 +112,13 @@ inline bool gamestate::update_player_state() {
 
 inline void gamestate::update_npcs_state() {
     minfo2("BEGIN update_npcs_state");
-    auto df = d.get_current_floor();
-    (void)df;
     minfo2("begin loop");
-    for (entityid id = 0; id < next_entityid; id++) {
-        auto type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
-        if (type == ENTITY_NPC) {
-            ct.set<damaged>(id, false);
-            update_npc_behavior(id);
+    for (entityid id : get_floor_npcs(d.current_floor)) {
+        if (ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_NPC) {
+            continue;
         }
+        ct.set<damaged>(id, false);
+        update_npc_behavior(id);
     }
 }
 

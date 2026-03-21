@@ -860,6 +860,7 @@ inline bool gamestate::try_entity_move(entityid id, vec3 v) {
     }
 
     ct.set<location>(id, aloc);
+    move_npc_to_floor(id, loc.z, aloc.z);
     float mx = v.x * DEFAULT_TILE_SIZE;
     float my = v.y * DEFAULT_TILE_SIZE;
     ct.set<spritemove>(id, (Rectangle){mx, my, 0, 0});
@@ -1101,6 +1102,7 @@ inline bool gamestate::try_entity_pull(entityid id) {
     }
 
     ct.set<location>(id, aloc);
+    move_npc_to_floor(id, loc.z, aloc.z);
     float mx = v.x * DEFAULT_TILE_SIZE;
     float my = v.y * DEFAULT_TILE_SIZE;
     ct.set<spritemove>(id, (Rectangle){mx, my, 0, 0});
@@ -1179,6 +1181,7 @@ inline bool gamestate::try_entity_stairs(entityid id) {
             vec3 uloc = df2->get_downstairs_loc();
             df2->df_add_at(hero_id, ENTITY_PLAYER, uloc);
             ct.set<location>(hero_id, uloc);
+            move_npc_to_floor(hero_id, current_floor, new_floor);
             if (processing_actions) {
                 queue_pressure_plate_refresh_event(current_floor);
                 queue_pressure_plate_refresh_event(new_floor);
@@ -1200,6 +1203,7 @@ inline bool gamestate::try_entity_stairs(entityid id) {
             vec3 uloc = df2->get_upstairs_loc();
             df2->df_add_at(hero_id, ENTITY_PLAYER, uloc);
             ct.set<location>(hero_id, uloc);
+            move_npc_to_floor(hero_id, current_floor, new_floor);
             if (processing_actions) {
                 queue_pressure_plate_refresh_event(current_floor);
                 queue_pressure_plate_refresh_event(new_floor);

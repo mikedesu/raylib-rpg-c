@@ -551,27 +551,23 @@ inline void gamestate::handle_npcs() {
     if (flag == GAMESTATE_FLAG_NPC_TURN) {
 #ifndef NPCS_ALL_AT_ONCE
         if (entity_turn >= 1 && entity_turn < next_entityid) {
-            if (ct.get<entitytype>(entity_turn).value_or(ENTITY_NONE) == ENTITY_NPC) {
+            if (floor_has_npc(d.current_floor, entity_turn) &&
+                ct.get<entitytype>(entity_turn).value_or(ENTITY_NONE) == ENTITY_NPC) {
                 handle_npc(entity_turn);
-                flag = GAMESTATE_FLAG_NPC_ANIM;
             }
-            else {
-                flag = GAMESTATE_FLAG_NPC_ANIM;
-            }
+            flag = GAMESTATE_FLAG_NPC_ANIM;
         }
 #else
-        auto df = d.get_current_floor();
-        (void)df;
-        for (entityid id = 0; id < next_entityid; id++) {
-            auto type = ct.get<entitytype>(id).value_or(ENTITY_NONE);
-            if (type == ENTITY_NPC) {
-                const bool result = handle_npc(id);
-                if (result) {
-                    msuccess2("npc %d handled successfully", entity_turn);
-                }
-                else {
-                    merror2("npc %d handle failed", entity_turn);
-                }
+        for (entityid id : get_floor_npcs(d.current_floor)) {
+            if (ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_NPC) {
+                continue;
+            }
+            const bool result = handle_npc(id);
+            if (result) {
+                msuccess2("npc %d handled successfully", id);
+            }
+            else {
+                merror2("npc %d handle failed", id);
             }
         }
         flag = GAMESTATE_FLAG_NPC_ANIM;

@@ -35,8 +35,10 @@
 #include <map>
 #include <queue>
 #include <random>
+#include <set>
 #include <raylib.h>
 #include <raymath.h>
+#include <unordered_map>
 
 #define GAMESTATE_SIZEOFTIMEBUF 64
 #define GAMESTATE_SIZEOFDEBUGPANELBUF 1024
@@ -65,8 +67,10 @@ using std::pair;
 using std::priority_queue;
 using std::round;
 using std::seed_seq;
+using std::set;
 using std::uniform_int_distribution;
 using std::uniform_real_distribution;
+using std::unordered_map;
 using std::chrono::duration_cast;
 using std::chrono::nanoseconds;
 using std::chrono::system_clock;
@@ -224,6 +228,7 @@ public:
     vector<damage_popup_t> damage_popups;
     vector<floor_pressure_plate_t> floor_pressure_plates;
     vector<gameplay_event_t> gameplay_events;
+    unordered_map<int, set<entityid>> floor_npcs;
     vec3 floor_four_tutorial_orc_spawn = vec3{-1, -1, -1};
 
     void set_seed() {
@@ -327,6 +332,7 @@ public:
         cam_changed = false;
         gameover = dirty_entities = false;
         processing_actions = false;
+        floor_npcs.clear();
         test_guard = false;
         player_changing_dir = false;
         msg_system_is_active = false;
@@ -747,6 +753,21 @@ public:
      * @return The created entity id, or `ENTITYID_INVALID` on failure.
      */
     entityid create_box_at_with(vec3 loc);
+
+    /**  Add an NPC entity id to the floor membership cache. */
+    void add_npc_to_floor(entityid id, int floor);
+
+    /**  Remove an NPC entity id from the floor membership cache. */
+    void remove_npc_from_floor(entityid id, int floor);
+
+    /**  Move an NPC entity id between floor membership caches. */
+    void move_npc_to_floor(entityid id, int old_floor, int new_floor);
+
+    /**  Return whether the floor membership cache contains the NPC id. */
+    bool floor_has_npc(int floor, entityid id) const;
+
+    /**  Return a stable snapshot of NPC ids currently registered to a floor. */
+    vector<entityid> get_floor_npcs(int floor) const;
 
     /** @brief Retarget all active NPCs toward the player actor. */
     void make_all_npcs_target_player();
