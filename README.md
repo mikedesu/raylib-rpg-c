@@ -1,3 +1,18 @@
+# THIS REPO WILL NO LONGER BE MAINTAINED AS OF 2026-21-03
+
+The most recent release can always be played online at [https://evildojo.itch.io/projectrpg](https://evildojo.itch.io/projectrpg)
+
+Building **Project.RPG** in public is a fun process, but I am moving future development into a private repository and changing the LICENSE.
+
+People can continue to clone this repo and use the code for learning purposes, but active development moving forward will be private for now.
+
+Individual game components may still be released, but under a different LICENSE.
+
+Live development streams will still be present at: [https://www.youtube.com/@evildojo666](https://www.youtube.com/@evildojo666)
+
+
+-----
+
 [@evildojo666](https://x.com/evildojo666) presents...
 
 # Project.RPG 
