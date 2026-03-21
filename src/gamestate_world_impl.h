@@ -85,6 +85,7 @@ inline bool dungeon_prop_is_pushable(proptype_t type) {
 inline bool dungeon_prop_is_pullable(proptype_t type) {
     switch (type) {
     case PROP_DUNGEON_CANDLE_00:
+    case PROP_DUNGEON_JAR_00:
     case PROP_DUNGEON_WOODEN_TABLE_00:
     case PROP_DUNGEON_WOODEN_TABLE_01:
         return true;
@@ -237,10 +238,34 @@ inline void gamestate::create_and_add_df_0(biome_t type, int w, int h, int df_co
     (void)df_count;
     (void)parts;
     auto df = d.create_floor(type, w, h);
-    Rectangle room_area = dungeon_make_rect(1, 1, w - 2, h - 2);
-    df->df_paint_floor_area(room_area);
+
+    const Rectangle main_room = dungeon_make_rect(1, 1, 5, h - 2);
+    df->df_paint_floor_area(main_room);
+
+    static constexpr int side_room_size = 3;
+    static constexpr int side_room_x = 7;
+    static constexpr int connector_x = side_room_x - 1;
+    static constexpr int side_room_origins[] = {1, 5, 9};
+    for (const int room_y : side_room_origins) {
+        const int connector_y = room_y + (side_room_size / 2);
+        df->df_paint_floor_area(dungeon_make_rect(connector_x, connector_y, 1, 1));
+        df->df_paint_floor_area(dungeon_make_rect(side_room_x, room_y, side_room_size, side_room_size));
+    }
+
     df->df_upgrade_floor_tiles();
     df->df_refresh_door_candidates();
+    for (const int room_y : side_room_origins) {
+        const int connector_y = room_y + (side_room_size / 2);
+        df->df_set_can_have_door(vec3{connector_x, connector_y, df->get_floor()});
+    }
+
+    const vec3 upstairs_loc{3, 1, df->get_floor()};
+    const vec3 downstairs_loc{3, h - 2, df->get_floor()};
+    const bool upstairs_assigned = df->df_set_upstairs_loc(upstairs_loc);
+    const bool downstairs_assigned = df->df_set_downstairs_loc(downstairs_loc);
+    massert(upstairs_assigned, "failed to assign fixed upstairs for handcrafted fourth floor");
+    massert(downstairs_assigned, "failed to assign fixed downstairs for handcrafted fourth floor");
+
     d.add_floor(df);
 }
 
@@ -298,6 +323,10 @@ inline void gamestate::create_and_add_df_1(biome_t type, int w, int h, int df_co
 
 inline bool gamestate::assign_random_stairs_to_floor(shared_ptr<dungeon_floor> df) {
     massert(df, "dungeon floor is null");
+    if (vec3_valid(df->get_upstairs_loc()) && vec3_valid(df->get_downstairs_loc())) {
+        return !vec3_equal(df->get_upstairs_loc(), df->get_downstairs_loc());
+    }
+
     auto upstairs_locs = df->df_get_possible_upstairs_locs();
     if (!upstairs_locs || upstairs_locs->empty()) {
         merror("no valid upstairs location exists for floor %d", df->get_floor());

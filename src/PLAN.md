@@ -2,14 +2,12 @@
 
 ## New Task
 
-- [x] `gamestate` now maintains an `std::unordered_map<int, std::set>` `floor_npcs` such that:
-  - [x] Each `dungeon_floor`'s NPCs are stored in unique `set` objects
-  - [x] Whenever we create an NPC on a certain `dungeon_floor`, we add their `entityid` to that `set`
-  - [x] If an NPC (or the player) moves between floors, the floor-membership bookkeeping path is updated accordingly
-  - [x] We changed how `update_npcs` and `handle_npcs` work:
-    - [x] Instead of updating every NPC across every floor every turn, they now only process the NPCs on the current dungeon floor
-      - [x] The initial end-goal of this process is because we can hear the orc on floor 3 opening and closing the door
-      - [x] The major benefit to this is that in the future as the gamestate entity count grows, this should maintain a performant experience
+- [ ] Time to create Floor 5
+    - [ ] Floor 5 will not be of type `BIOME_STONE` but instead be of type `BIOME_GRASS`. 
+      - [ ] We will treat it as a `dungeon_floor` still but it will be composed of "grass" tiles.
+        - [ ] To begin with they can be `TILE_FLOOR_GRASS_00` type
+        - [ ] There is an association between a `grass_00.png` and the `TILE_FLOOR_GRASS_00` via the texture `TX_TILES_GRASS_00`
+    
 
 ## Working Notes
 
@@ -41,7 +39,6 @@ make clean && CXXFLAGS="-DDEBUG_ASSERT=1 -DNPCS_ALL_AT_ONCE -DDEBUG=1 -DMASTER_V
 - When a UI text block looks garbled or illegible, check for rows being stacked too tightly with `DrawText`; the Raylib default font needs line heights larger than font size so descenders do not overdraw adjacent lines.
 - Whenever we implement a new feature, we need to implement corresponding unit test functions that properly check for individual scenarios, including most common inputs and edge cases, and verify that the unit tests build and pass
 - If a new feature requires simulating a full instance of a game, it goes in `test_suites/test_heavy_simulation.h`
-
 
 ## Event-Queue Migration
 

@@ -2,6 +2,8 @@
 
 #include "../gamestate.h"
 #include <cxxtest/TestSuite.h>
+#include <queue>
+#include <set>
 
 class GamestateLifecycleTestSuite : public CxxTest::TestSuite {
 public:
@@ -776,7 +778,7 @@ public:
         TS_ASSERT_EQUALS(floor_three_pullable_prop_count, 4U);
     }
 
-    void testLogicInitAddsPlaceholderFourthFloorWithPropsAndBoxes() {
+    void testLogicInitBuildsCustomFourthFloorLayoutWithPropsAndBoxes() {
         gamestate g;
         g.test = true;
         g.mt.seed(12345);
@@ -788,6 +790,94 @@ public:
         TS_ASSERT_EQUALS(floor->get_width(), 16);
         TS_ASSERT_EQUALS(floor->get_height(), 16);
         TS_ASSERT(vec3_valid(floor->get_upstairs_loc()));
+        TS_ASSERT(vec3_equal(floor->get_upstairs_loc(), vec3{3, 1, 3}));
+        TS_ASSERT(vec3_equal(floor->get_downstairs_loc(), vec3{3, 14, 3}));
+        TS_ASSERT_EQUALS(floor->tile_at(floor->get_upstairs_loc()).get_type(), TILE_UPSTAIRS);
+        TS_ASSERT_EQUALS(floor->tile_at(floor->get_downstairs_loc()).get_type(), TILE_DOWNSTAIRS);
+
+        static constexpr int expected_walkable_tiles = 100;
+        size_t walkable_tiles = 0;
+        for (int y = 0; y < floor->get_height(); y++) {
+            for (int x = 0; x < floor->get_width(); x++) {
+                if (tile_is_walkable(floor->tile_at(vec3{x, y, 3}).get_type())) {
+                    walkable_tiles++;
+                }
+            }
+        }
+        TS_ASSERT_EQUALS(walkable_tiles, expected_walkable_tiles);
+
+        const auto tile_walkable = [&](int x, int y) {
+            return tile_is_walkable(floor->tile_at(vec3{x, y, 3}).get_type());
+        };
+        TS_ASSERT(tile_walkable(1, 1));
+        TS_ASSERT(tile_walkable(5, 14));
+        TS_ASSERT(tile_walkable(6, 2));
+        TS_ASSERT(tile_walkable(8, 2));
+        TS_ASSERT(tile_walkable(8, 6));
+        TS_ASSERT(tile_walkable(6, 6));
+        TS_ASSERT(tile_walkable(6, 10));
+        TS_ASSERT(tile_walkable(8, 11));
+        TS_ASSERT(!tile_walkable(6, 1));
+        TS_ASSERT(!tile_walkable(6, 3));
+        TS_ASSERT(!tile_walkable(6, 4));
+        TS_ASSERT(!tile_walkable(6, 5));
+        TS_ASSERT(!tile_walkable(6, 7));
+        TS_ASSERT(!tile_walkable(6, 8));
+        TS_ASSERT(!tile_walkable(6, 9));
+        TS_ASSERT(!tile_walkable(6, 11));
+        TS_ASSERT(!tile_walkable(6, 12));
+        TS_ASSERT(!tile_walkable(10, 2));
+        TS_ASSERT(!tile_walkable(7, 4));
+
+        std::set<vec3> visited;
+        std::queue<vec3> pending;
+        const vec3 upstairs = floor->get_upstairs_loc();
+        pending.push(upstairs);
+        visited.insert(upstairs);
+
+        static constexpr vec3 offsets[] = {
+            vec3{0, -1, 0},
+            vec3{-1, 0, 0},
+            vec3{1, 0, 0},
+            vec3{0, 1, 0},
+        };
+
+        while (!pending.empty()) {
+            const vec3 current = pending.front();
+            pending.pop();
+
+            for (const vec3 offset : offsets) {
+                const vec3 next{current.x + offset.x, current.y + offset.y, upstairs.z};
+                if (next.x < 0 || next.x >= floor->get_width() || next.y < 0 || next.y >= floor->get_height()) {
+                    continue;
+                }
+                if (visited.find(next) != visited.end()) {
+                    continue;
+                }
+                if (!tile_is_walkable(floor->tile_at(next).get_type())) {
+                    continue;
+                }
+
+                visited.insert(next);
+                pending.push(next);
+            }
+        }
+
+        TS_ASSERT_EQUALS(visited.size(), walkable_tiles);
+        TS_ASSERT(visited.find(floor->get_downstairs_loc()) != visited.end());
+
+        size_t floor_four_door_count = 0;
+        for (entityid id = 1; id < g.next_entityid; id++) {
+            if (g.ct.get<entitytype>(id).value_or(ENTITY_NONE) != ENTITY_DOOR) {
+                continue;
+            }
+            const vec3 loc = g.ct.get<location>(id).value_or(vec3{-1, -1, -1});
+            if (!vec3_valid(loc) || loc.z != 3) {
+                continue;
+            }
+            floor_four_door_count++;
+        }
+        TS_ASSERT_EQUALS(floor_four_door_count, 3U);
 
         size_t floor_four_box_count = 0;
         size_t floor_four_prop_count = 0;

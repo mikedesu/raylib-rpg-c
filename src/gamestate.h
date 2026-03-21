@@ -466,7 +466,7 @@ public:
         return d.get_current_floor()->tile_at(loc);
     }
 
-    /** @brief Create and add a simple floor using the legacy one-room bootstrap path. */
+    /** @brief Create and add the fixed handcrafted fourth-floor layout. */
     void create_and_add_df_0(biome_t type, int w, int h, int df_count, float parts);
 
     /** @brief Create and add a generated floor using the current room-and-corridor generator. */
