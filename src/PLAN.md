@@ -1,30 +1,43 @@
 # Project Plan
 
+## New Task
+
+- [ ] `gamestate` needs to main an `std::unordered_map<int, std::set> floor_npcs` such that:
+  - [ ] Each floor's NPCs are stored in unique `set` objects
+  - [ ] If an NPC (or the player) moves between floors, we move them from one set to another
+  - [ ] We are doing this so we change how `update_npcs` should work:
+    - [ ] Instead of updating every NPC across every floor every turn, we want to only update the NPCs on the current dungeon floor
+      - [ ] The initial end-goal of this process is because we can hear the orc on floor 3 opening and closing the door
+
 ## Working Notes
 
-- Build command for now: `make clean && CXXFLAGS="-DDEBUG_ASSERT=1 -DNPCS_ALL_AT_ONCE -DDEBUG=1 -DMASTER_VOLUME=1.0f " make game`
-- Do not ever tamper with `texture_ids.h` or `textures.txt`.
+- **Do not ever tamper with `texture_ids.h` or `textures.txt`**
 - `generate_texture_files.py` regenerates both files and they are used at game load to map each spritesheet/filepath to:
   - generated texture id
   - number of rows / contexts
   - number of columns / frames per context
-- Spell texture entries may appear again in those generated files in the future when the script is rerun.
-- Do not remove spell entries from those generated files in the future, even if active spell gameplay is currently absent.
-- When a UI text block looks garbled or illegible, check for rows being stacked too tightly with `DrawText`; the Raylib default font needs line heights larger than font size so descenders do not overdraw adjacent lines.
-- As you accomplish individual task items, you will mark them off:
-
+  - Spell texture entries may appear again in those generated files in the future when the script is rerun.
+  - Do not remove spell entries from those generated files in the future, even if active spell gameplay is currently absent.
+- Build command for now: 
 ```
-- [ ] unaccomplished
-- [x] accomplished
+make clean && CXXFLAGS="-DDEBUG_ASSERT=1 -DNPCS_ALL_AT_ONCE -DDEBUG=1 -DMASTER_VOLUME=1.0f " make game
+```
+
+- As you accomplish individual task items, you will mark them off:
+```
+  - [ ] unaccomplished
+  - [x] accomplished
 ```
 
 - If you have to break a task down or leave a task incomplete:
+```
+  - [ ] unaccomplished
+    - [ ] incomplete task current status
+  - [x] accomplished
+```
 
-```
-- [ ] unaccomplished
-  - [ ] incomplete task current status
-- [x] accomplished
-```
+- When a UI text block looks garbled or illegible, check for rows being stacked too tightly with `DrawText`; the Raylib default font needs line heights larger than font size so descenders do not overdraw adjacent lines.
+
 
 ## Event-Queue Migration
 

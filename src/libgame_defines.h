@@ -50,7 +50,7 @@
 #define DEFAULT_LOCK 30
 #define DEFAULT_TILE_SIZE 8
 #define DEFAULT_ZOOM_INCR 1.0f
-#define DEFAULT_ZOOM_LEVEL 4.0f
+#define DEFAULT_ZOOM_LEVEL 6.0f
 #define FRAMEINTERVAL 10
 #endif
 

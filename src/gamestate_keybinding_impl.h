@@ -167,14 +167,20 @@ inline void gamestate::handle_input_keyboard_profile_prompt(inputstate& is) {
 
     if (inputstate_is_pressed(is, KEY_LEFT) || inputstate_is_pressed(is, KEY_UP)) {
         keyboard_profile_selection = keyboard_profile_selection == 0 ? KEYBOARD_PROFILE_COUNT - 1 : keyboard_profile_selection - 1;
+        if (!test && IsAudioDeviceReady() && sfx.size() > SFX_CONFIRM_01) {
+            PlaySound(sfx[SFX_CONFIRM_01]);
+        }
         frame_dirty = true;
     }
     else if (inputstate_is_pressed(is, KEY_RIGHT) || inputstate_is_pressed(is, KEY_DOWN)) {
         keyboard_profile_selection = (keyboard_profile_selection + 1) % KEYBOARD_PROFILE_COUNT;
+        if (!test && IsAudioDeviceReady() && sfx.size() > SFX_CONFIRM_01) {
+            PlaySound(sfx[SFX_CONFIRM_01]);
+        }
         frame_dirty = true;
     }
     else if (inputstate_is_pressed(is, KEY_ENTER)) {
-        if (!test && IsAudioDeviceReady()) {
+        if (!test && IsAudioDeviceReady() && sfx.size() > SFX_CONFIRM_01) {
             PlaySound(sfx[SFX_CONFIRM_01]);
         }
         apply_keyboard_profile_selection();
